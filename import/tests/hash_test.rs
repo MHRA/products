@@ -4,7 +4,7 @@ use spc_pil_import;
 fn test_hash() {
     let bytes = include_bytes!("fixtures/MHRA MIP HLD v0.1.pdf");
     assert_eq!(
-        "03e1b22894bd2d3bd087402367147fce9e50ffea",
+        "03e1b22894bd2d3bd087402367147fce9e50ffe",
         spc_pil_import::hash(bytes)
     );
 }
