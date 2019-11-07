@@ -1,0 +1,15 @@
+name: $(Date:yyyyMMdd)$(Rev:.r)
+jobs:
+  - job: build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-18.04
+    steps:
+      - script: |
+          export CARGO_HOME="$HOME/.cargo"
+          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+          echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+        displayName: Install nightly Rust
+      - script: |
+          cargo test
+        displayName: Run tests
