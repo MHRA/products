@@ -1,0 +1,16 @@
+[package]
+name = "spc-pil-import"
+version = "0.1.0"
+authors = ["Stuart Harris <stuart.harris@red-badger.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+azure_sdk_core = "0.20.3"
+azure_sdk_storage_blob = "0.23.1"
+azure_sdk_storage_core = "0.20.4"
+log = "0.4.8"
+md5 = "0.7.0"
+sha1 = "0.6.0"
+tokio-core = "0.1.17"

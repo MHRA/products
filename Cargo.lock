@@ -14,6 +14,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "api"
+version = "0.1.0"
+
+[[package]]
 name = "arrayvec"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1233,6 +1237,10 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "try-lock 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "web"
+version = "0.1.0"
 
 [[package]]
 name = "webpki"
