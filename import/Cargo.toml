@@ -1,5 +1,5 @@
 [package]
-name = "spc-pil-import"
+name = "import"
 version = "0.1.0"
 authors = ["Stuart Harris <stuart.harris@red-badger.com>"]
 edition = "2018"
@@ -10,6 +10,7 @@ edition = "2018"
 azure_sdk_core = "0.20.3"
 azure_sdk_storage_blob = "0.23.1"
 azure_sdk_storage_core = "0.20.4"
+clap = {version = "2.33.0", features = ["yaml"]}
 log = "0.4.8"
 md5 = "0.7.0"
 sha1 = "0.6.0"

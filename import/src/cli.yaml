@@ -1,0 +1,17 @@
+name: import
+version: "0.1"
+about: Imports SPC/PIL/PAR PDFs for MIP
+author: Stuart Harris <stuart.harris@red-badger.com>
+
+settings:
+  - ArgRequiredElseHelp
+
+subcommands:
+  - pdf:
+      about: import a pdf from local file
+      args:
+        - file:
+            short: f
+            required: true
+            takes_value: true
+            help: filename to import
