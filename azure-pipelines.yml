@@ -1,7 +1,7 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 jobs:
-  - job: build
-    displayName: Build
+  - job: medicines
+    displayName: Build Medicines
     pool:
       vmImage: ubuntu-18.04
     steps:
@@ -12,4 +12,5 @@ jobs:
         displayName: Install nightly Rust
       - script: |
           cargo test
+        workingDirectory: medicines
         displayName: Run tests
