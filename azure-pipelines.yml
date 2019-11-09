@@ -1,4 +1,9 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: 1
+
 jobs:
   - job: medicines
     displayName: Build Medicines
@@ -8,8 +13,12 @@ jobs:
       - script: |
           export CARGO_HOME="$HOME/.cargo"
           curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+          rustup toolchain list
+          rustc -Vv
+          cargo -V
           echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
         displayName: Install nightly Rust
       - script: |
-          cd medicines && cargo test
-        displayName: Run tests
+          cargo test -v
+        workingDirectory: $(Build.SourcesDirectory)/medicines
+        displayName: Run tests - medicines
