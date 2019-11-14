@@ -1,0 +1,32 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:latest", "tslint-eslint-rules", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": ["node_modules"]
+  },
+  "jsRules": {
+    "quotemark": [true, "single"]
+  },
+  "rules": {
+    "arrow-parens": false,
+    "curly": [true, "ignore-same-line"],
+    "import-name": false,
+    "interface-name": false,
+    "no-implicit-dependencies": false,
+    "no-submodule-imports": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "object-literal-sort-keys": false,
+    "prettier": [true, ".prettierrc.json"],
+    "variable-name": [true],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never",
+        "esSpecCompliant": true
+      }
+    ]
+  },
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "lint": {}
+}
