@@ -21,4 +21,8 @@ jobs:
       - script: |
           cargo test -v
         workingDirectory: $(Build.SourcesDirectory)/medicines
-        displayName: Run tests - medicines
+        displayName: Run tests
+      - script: |
+          yarn && yarn build && yarn global add pa11y && pa11y dist/index.html
+        workingDirectory: $(Build.SourcesDirectory)/medicines/web
+        displayName: Build web
