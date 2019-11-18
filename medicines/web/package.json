@@ -52,7 +52,7 @@
     "lint": "yarn tslint",
     "start:dev": "webpack-dev-server --config ./config/webpack.config.dev.ts",
     "build": "webpack --config ./config/webpack.config.prod.ts",
-    "a11y": "yarn run pa11y dist/index.html"
+    "a11y": "yarn run pa11y file://$PWD/dist/index.html"
   },
   "version": "1.0.0"
 }
