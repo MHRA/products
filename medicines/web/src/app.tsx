@@ -1,10 +1,13 @@
 import React from 'react';
+import { Normalize } from 'styled-normalize';
+import Header from './components/header';
 
 const app: React.FC = () => {
   return (
-    <header>
-      <h1>Hello MIP</h1>
-    </header>
+    <>
+      <Normalize />
+      <Header />
+    </>
   );
 };
 

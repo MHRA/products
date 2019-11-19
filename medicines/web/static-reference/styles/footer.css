@@ -1,0 +1,20 @@
+footer {
+  grid-row: 3;
+  grid-column: 1 / 12;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: var(--base-space);
+}
+
+footer picture {
+  flex-basis: 25%;
+  max-width: 250px;
+}
+
+@media screen and (max-width: 768px) {
+  footer {
+    grid-row: 5;
+    grid-column: 1 / 12;
+  }
+}
