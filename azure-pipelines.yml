@@ -21,4 +21,12 @@ jobs:
       - script: |
           cargo test -v
         workingDirectory: $(Build.SourcesDirectory)/medicines
-        displayName: Run tests - medicines
+        displayName: Run tests
+      - script: |
+          yarn && yarn build
+        workingDirectory: $(Build.SourcesDirectory)/medicines/web
+        displayName: Build web
+      - script: |
+          yarn a11y
+        workingDirectory: $(Build.SourcesDirectory)/medicines/web
+        displayName: Check accessibility
