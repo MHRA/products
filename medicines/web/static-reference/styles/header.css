@@ -1,0 +1,18 @@
+header {
+  align-items: flex-end;
+  border-bottom: 4px solid var(--primary-color);
+  display: flex;
+  grid-column: 1 / 12;
+  grid-row: 1;
+  justify-content: space-between;
+  padding: var(--base-space);
+}
+
+header h1 {
+  margin: 0;
+}
+
+header picture {
+  max-width: 300px;
+  width: 100%;
+}
