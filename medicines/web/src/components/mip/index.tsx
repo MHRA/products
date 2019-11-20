@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
+import {
+  baseSpace,
+  desktopMaxWidth,
+  mobileBreakpoint,
+} from '../../styles/dimensions';
 import DrugIndex from '../drug-index';
 import DrugList, { IDrug } from '../drug-list';
 import MipText from '../mip-text';
@@ -24,12 +28,32 @@ const Row = styled.section`
 const Aside = styled.aside`
   max-width: 25%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
+
+  @media ${mobileBreakpoint} {
+    max-width: 100%;
+
+    .pdf-yellow-card-wrapper {
+      display: none;
+    }
+  }
 `;
 
 const Main = styled.main`
   max-width: 75%;
   padding: ${baseSpace};
   padding-left: calc(${baseSpace} / 2);
+
+  .pdf-yellow-card-wrapper {
+    display: none;
+  }
+
+  @media ${mobileBreakpoint} {
+    max-width: 100%;
+
+    .pdf-yellow-card-wrapper {
+      display: block;
+    }
+  }
 `;
 
 const drugs: IDrug[] = [
@@ -55,13 +79,19 @@ const Mip: React.FC = () => (
   <Row>
     <Aside>
       <Search />
-      <Pdf />
-      <YelllowCard />
+      <div className="pdf-yellow-card-wrapper">
+        <Pdf />
+        <YelllowCard />
+      </div>
     </Aside>
     <Main>
       <MipText />
       <DrugIndex />
       <DrugList drugs={drugs} />
+      <div className="pdf-yellow-card-wrapper">
+        <Pdf />
+        <YelllowCard />
+      </div>
     </Main>
   </Row>
 );
