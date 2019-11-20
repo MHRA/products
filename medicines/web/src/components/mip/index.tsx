@@ -96,4 +96,5 @@ const Mip: React.FC = () => {
   );
 };
 
+
 export default Mip;
