@@ -71,4 +71,4 @@ stages:
                     azureSubscription: $(AZURE_SUBSCRIPTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT)
-                    containerName: Build.SourceBranchName
+                    containerName: $(Build.SourceBranchName)
