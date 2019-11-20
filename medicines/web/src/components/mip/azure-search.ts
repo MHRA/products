@@ -1,7 +1,7 @@
-const azureIndex = 'azureblob-index';
-const azureService = 'rb-mhra-mip';
-const azureApiVersion = '2017-11-11';
-const azureKey = '6D6107C925CC3C284A9218EFC626C7F7';
+const azureIndex = process.env.AZURE_INDEX;
+const azureService = process.env.AZURE_SERVICE;
+const azureApiVersion = process.env.AZURE_API_VERSION;
+const azureKey = process.env.AZURE_KEY;
 
 enum DocType {
   PilLabel,
