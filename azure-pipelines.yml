@@ -6,14 +6,13 @@ variables:
   AZURE_SUBSCRIPTION: rb-non-prod
   STORAGE_ACCOUNT: rbmhramip
 
-pool:
-  vmImage: ubuntu-18.04
-
 stages:
   - stage: build
     jobs:
       # - job: services
       #   dependsOn: []
+      #   pool:
+      #     vmImage: ubuntu-latest
       #   steps:
       #     - script: |
       #         export CARGO_HOME="$HOME/.cargo"
@@ -33,6 +32,8 @@ stages:
       #       displayName: Run tests
       - job: web
         dependsOn: []
+        pool:
+          vmImage: ubuntu-latest
         steps:
           - script: |
               yarn && yarn build
@@ -55,6 +56,8 @@ stages:
   - stage: deploy
     jobs:
       - deployment:
+        pool:
+          vmImage: windows-latest
         environment: dev
         strategy:
           runOnce:
