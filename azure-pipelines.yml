@@ -35,8 +35,6 @@ stages:
               yarn && yarn build
             displayName: Build web
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
-  - stage: test
-    jobs:
       # - job: test_services
       #   steps:
       #     - script: |
@@ -49,8 +47,6 @@ stages:
               yarn a11y
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
-  - stage: publish
-    jobs:
       - job: publish
         steps:
           - task: CopyFiles@2
