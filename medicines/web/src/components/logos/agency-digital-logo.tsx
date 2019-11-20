@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const svgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
+const SvgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     id="agency-digital-logo_svg__Layer_1"
     x={0}
@@ -38,4 +38,5 @@ const svgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export default svgAgencyDigitalLogo;
+export default SvgAgencyDigitalLogo;
+

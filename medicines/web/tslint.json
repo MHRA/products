@@ -1,6 +1,11 @@
 {
   "defaultSeverity": "error",
-  "extends": ["tslint:latest", "tslint-eslint-rules", "tslint-config-prettier"],
+  "extends": [
+    "tslint:latest",
+    "tslint-eslint-rules",
+    "tslint-config-prettier",
+    "tslint-react"
+  ],
   "linterOptions": {
     "exclude": ["node_modules"]
   },
@@ -11,13 +16,21 @@
     "arrow-parens": false,
     "curly": [true, "ignore-same-line"],
     "import-name": false,
-    "interface-name": false,
-    "no-implicit-dependencies": false,
-    "no-submodule-imports": false,
+    "jsx-boolean-value": [true, "never"],
+    "jsx-no-multiline-js": false,
+    "jsx-use-translation-function": [
+      true,
+      "allow-punctuation",
+      "allow-htmlentities"
+    ],
+    "jsx-wrap-multiline": false,
+    "no-shadowed-variable": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
-    "prettier": [true, ".prettierrc.json"],
-    "variable-name": [true],
+    "prettier": [true, "./.prettierrc.json"],
+    "variable-name": {
+      "options": ["allow-pascal-case"]
+    },
     "trailing-comma": [
       true,
       {
