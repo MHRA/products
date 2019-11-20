@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
 import DrugIndex from '../drug-index';
+import DrugList, { IDrug } from '../drug-list';
 import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
@@ -31,6 +32,25 @@ const Main = styled.main`
   padding-left: calc(${baseSpace} / 2);
 `;
 
+const drugs: IDrug[] = [
+  {
+    name: 'ABACAVIR',
+    url: 'none',
+  },
+  {
+    name: 'ABACAVIR',
+    url: 'none',
+  },
+  {
+    name: 'ABACAVIR',
+    url: 'none',
+  },
+  {
+    name: 'ABACAVIR',
+    url: 'none',
+  },
+];
+
 const Mip: React.FC = () => (
   <Row>
     <Aside>
@@ -41,6 +61,7 @@ const Mip: React.FC = () => (
     <Main>
       <MipText />
       <DrugIndex />
+      <DrugList drugs={drugs} />
     </Main>
   </Row>
 );
