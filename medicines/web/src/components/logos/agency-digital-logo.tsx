@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 const SvgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -39,4 +39,3 @@ const SvgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default SvgAgencyDigitalLogo;
-
