@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import {
   baseSpace,
@@ -10,7 +10,8 @@ import DrugList, { IDrug } from '../drug-list';
 import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
-import YelllowCard from '../yellow-card';
+import YellowCard from '../yellow-card';
+import { azureSearch, IAzureSearchResult } from './azure-search';
 
 const Row = styled.section`
   display: flex;
@@ -56,44 +57,40 @@ const Main = styled.main`
   }
 `;
 
-const drugs: IDrug[] = [
-  {
-    name: 'ABACAVIR',
-    url: 'none',
-  },
-  {
-    name: 'ABACAVIR',
-    url: 'none',
-  },
-  {
-    name: 'ABACAVIR',
-    url: 'none',
-  },
-  {
-    name: 'ABACAVIR',
-    url: 'none',
-  },
-];
+const Mip: React.FC = () => {
+  const [search, setSearch] = React.useState('');
+  const [results, setResults] = React.useState<IAzureSearchResult[]>([]);
 
-const Mip: React.FC = () => (
-  <Row>
-    <Aside>
-      <Search />
-      <div className="pdf-yellow-card-wrapper">
+  const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
+    setSearch(e.currentTarget.value);
+  };
+
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setResults(await azureSearch(search));
+  };
+
+  return (
+    <Row>
+      <Aside>
+        <Search
+          search={search}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+        />
         <Pdf />
-        <YelllowCard />
-      </div>
-    </Aside>
-    <Main>
-      <MipText />
-      <DrugIndex />
-      <DrugList drugs={drugs} />
-      <div className="pdf-yellow-card-wrapper">
-        <Pdf />
-        <YelllowCard />
-      </div>
-    </Main>
-  </Row>
-);
+        <YellowCard />
+      </Aside>
+      <Main>
+        <MipText />
+        <DrugIndex />
+        <DrugList
+          drugs={results.map(drug => ({ name: drug.content, url: '' }))}
+        />
+      </Main>
+    </Row>
+  );
+};
 
 export default Mip;
