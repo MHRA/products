@@ -8,10 +8,10 @@ settings:
 
 subcommands:
   - pdf:
-      about: import a pdf from local file
+      about: import PDFs from local directory
       args:
-        - file:
-            short: f
+        - directory:
+            short: d
             required: true
             takes_value: true
-            help: filename to import
+            help: directory to import
