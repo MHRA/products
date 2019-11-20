@@ -86,7 +86,10 @@ const Mip: React.FC = () => {
         <MipText />
         <DrugIndex />
         <DrugList
-          drugs={results.map(drug => ({ name: drug.content, url: '' }))}
+          drugs={results.map(drug => ({
+            name: drug['@search.highlights'].content.join(' … '),
+            url: '',
+          }))}
         />
       </Main>
     </Row>

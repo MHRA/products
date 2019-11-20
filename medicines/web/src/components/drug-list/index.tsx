@@ -16,6 +16,11 @@ const StyledDrugList = styled.section`
 
   a {
     color: ${primaryColor};
+    text-decoration: none;
+  }
+
+  em {
+    font-weight: bold;
   }
 `;
 
@@ -29,7 +34,7 @@ const DrugList = (props: { drugs: IDrug[] }) => (
     <ul>
       {props.drugs.map(drug => (
         <li key={drug.name}>
-          <a href={drug.url}>{drug.name}</a>
+          <a href={drug.url} dangerouslySetInnerHTML={{ __html: drug.name }} />
         </li>
       ))}
     </ul>
