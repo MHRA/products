@@ -66,17 +66,17 @@ stages:
   - stage: deploy
     jobs:
       - deployment:
-          environment: dev
-          strategy:
-            runOnce:
-              deploy:
-                steps:
-                  - download: current
-                    artifact: build
-                  - task: AzureFileCopy@3
-                    inputs:
-                      sourcePath: $(Pipeline.Workspace)/build
-                      azureSubscription: $(AZURE_SUBSCRIPTION)
-                      destination: azureBlob
-                      storage: $(STORAGE_ACCOUNT)
-                      containerName: "$web"
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: build
+                - task: AzureFileCopy@3
+                  inputs:
+                    sourcePath: $(Pipeline.Workspace)/build
+                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    destination: azureBlob
+                    storage: $(STORAGE_ACCOUNT)
+                    containerName: "$web"
