@@ -3,7 +3,7 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 variables:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: 1
-  AZURE_SUBSCRIPTION: 1b0eca71-51e5-49c2-9539-c1590358c6e3
+  AZURE_SUBSCRIPTION: rb-non-prod
   STORAGE_ACCOUNT: rbmhramip
 
 pool:
