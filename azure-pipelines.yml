@@ -14,27 +14,27 @@ stages:
     jobs:
       # - job: install_rust
       #   steps:
-      #     - displayName: Install nightly Rust
-      #       script: |
+      #     - script: |
       #         export CARGO_HOME="$HOME/.cargo"
       #         curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
       #         rustup toolchain list
       #         rustc -Vv
       #         cargo -V
       #         echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+      #       displayName: Install nightly Rust
       # - job: build_services
       #   steps:
-      #     - displayName: Build services
-      #       workingDirectory: $(Build.SourcesDirectory)/medicines
-      #       script: |
+      #     - script: |
       #         cargo build -v --production
+      #       displayName: Build services
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines
       - job: build_web
         dependsOn: []
         steps:
-          - displayName: Build web
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
-            script: |
+          - script: |
               yarn && yarn build
+            displayName: Build web
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
   - stage: test
     jobs:
       # - job: test_services
@@ -47,20 +47,22 @@ stages:
         steps:
           - script: |
               yarn a11y
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
             displayName: Check accessibility
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
   - stage: publish
     jobs:
-      - task: CopyFiles@2
-        displayName: Copy Files
-        inputs:
-          SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
-          TargetFolder: $(build.artifactstagingdirectory)
-          CleanTargetFolder: true
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: $(build.artifactstagingdirectory)
-          ArtifactName: build
+      - job: publish
+        steps:
+          - task: CopyFiles@2
+            displayName: Copy Files
+            inputs:
+              SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
+              TargetFolder: $(build.artifactstagingdirectory)
+              CleanTargetFolder: true
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: $(build.artifactstagingdirectory)
+              ArtifactName: build
   - stage: deploy
     jobs:
       - deployment:
