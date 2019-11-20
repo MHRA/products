@@ -5,7 +5,7 @@ use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
 use import::DocType;
-use std::{fs, fs::DirEntry, io, path::Path};
+use std::{fs, path::Path};
 use tokio_core::reactor::Core;
 
 fn main() -> Result<(), AzureError> {
