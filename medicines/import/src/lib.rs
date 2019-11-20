@@ -32,7 +32,7 @@ pub fn upload(
     doc_type: DocType,
 ) -> Result<(), AzureError> {
     let blob_name = hash(data);
-    let container_name: &'static str = "docs";
+    let container_name = "docs";
 
     if core
         .run(client.list_containers().finalize())?
