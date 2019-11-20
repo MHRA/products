@@ -19,7 +19,7 @@
     "jsx-boolean-value": [true, "never"],
     "jsx-no-multiline-js": false,
     "jsx-use-translation-function": [
-      true,
+      false,
       "allow-punctuation",
       "allow-htmlentities"
     ],

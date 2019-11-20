@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
+import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
+import YelllowCard from '../yellow-card';
 
 const Row = styled.section`
   display: flex;
@@ -33,8 +35,11 @@ const Mip: React.FC = () => (
     <Aside>
       <Search />
       <Pdf />
+      <YelllowCard />
     </Aside>
-    <Main />
+    <Main>
+      <MipText />
+    </Main>
   </Row>
 );
 

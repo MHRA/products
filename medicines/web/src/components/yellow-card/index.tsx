@@ -1,0 +1,51 @@
+import React from 'react';
+import styled from 'styled-components';
+import { black, mhraGray30, mhraYellow } from '../../styles/colors';
+import { baseSpace } from '../../styles/dimensions';
+
+const StyledYellowCard = styled.section`
+  background-color: ${mhraGray30};
+  margin-top: ${baseSpace};
+  padding-bottom: calc(${baseSpace} / 2);
+
+  & h2 {
+    background-color: ${mhraYellow};
+    color: ${black};
+    margin-top: 0;
+    padding: calc(${baseSpace} / 2);
+    text-align: center;
+  }
+
+  & p {
+    text-align: center;
+  }
+
+  & p:first-of-type {
+    color: ${black};
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  & p:last-of-type a {
+    color: ${black};
+    text-decoration: none;
+  }
+`;
+
+const title = 'Yellow Card';
+const content = 'Report a side effect with a medicine or medical device';
+const linkText = 'mhra.gov.uk/yellowcard';
+
+const YelllowCard: React.FC = () => (
+  <StyledYellowCard>
+    <h2>{title}</h2>
+    <p>{content}</p>
+    <p>
+      <a href="https://mhra.gov.uk/yellowcard" title={title}>
+        {linkText}
+      </a>
+    </p>
+  </StyledYellowCard>
+);
+
+export default YelllowCard;
