@@ -1,6 +1,4 @@
 footer {
-  grid-row: 3;
-  grid-column: 1 / 12;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
