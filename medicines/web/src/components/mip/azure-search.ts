@@ -4,8 +4,9 @@ const azureApiVersion = process.env.AZURE_API_VERSION;
 const azureKey = process.env.AZURE_KEY;
 
 enum DocType {
-  Pil,
   PilLabel,
+  PilLabelAndLeaflet,
+  PilLeaflet,
   Spc,
 }
 

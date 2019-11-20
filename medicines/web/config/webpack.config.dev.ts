@@ -8,7 +8,7 @@ const Dotenv = require('dotenv-webpack');
 
 const config: webpack.Configuration = {
   devtool: 'inline-source-map',
-  entry: sourceIndex,
+  entry: ['whatwg-fetch', sourceIndex],
   mode: 'development',
   module: {
     rules: [
