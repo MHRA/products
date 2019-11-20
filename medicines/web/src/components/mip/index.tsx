@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
+import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
@@ -39,6 +40,7 @@ const Mip: React.FC = () => (
     </Aside>
     <Main>
       <MipText />
+      <DrugIndex />
     </Main>
   </Row>
 );
