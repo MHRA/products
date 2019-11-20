@@ -21,6 +21,7 @@ const StyledDrugList = styled.section`
 
   em {
     font-weight: bold;
+    font-style: normal;
   }
 `;
 
