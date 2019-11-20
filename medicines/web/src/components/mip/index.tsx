@@ -59,7 +59,7 @@ const Main = styled.main`
 
 const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
-  const [results, setResults] = React.useState<IAzureSearchResult[]>([]);
+  const [results, setResults] = React.useState<IDrug[]>([]);
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
@@ -68,7 +68,12 @@ const Mip: React.FC = () => {
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setResults(await azureSearch(search));
+    setResults(
+      (await azureSearch(search)).map((drug: IAzureSearchResult) => ({
+        name: drug['@search.highlights'].content.join(' … '),
+        url: '',
+      })),
+    );
   };
 
   return (
@@ -85,16 +90,10 @@ const Mip: React.FC = () => {
       <Main>
         <MipText />
         <DrugIndex />
-        <DrugList
-          drugs={results.map(drug => ({
-            name: drug['@search.highlights'].content.join(' … '),
-            url: '',
-          }))}
-        />
+        <DrugList drugs={results} />
       </Main>
     </Row>
   );
 };
-
 
 export default Mip;
