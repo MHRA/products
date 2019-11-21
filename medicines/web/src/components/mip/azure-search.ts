@@ -1,7 +1,9 @@
-const azureIndex = process.env.AZURE_INDEX;
-const azureService = process.env.AZURE_SERVICE;
 const azureApiVersion = process.env.AZURE_API_VERSION;
+const azureIndex = process.env.AZURE_INDEX;
 const azureKey = process.env.AZURE_KEY;
+const azureService = process.env.AZURE_SERVICE;
+const azureTermFuzziness = process.env.AZURE_TERM_FUZZINESS;
+const azureWordFuzziness = process.env.AZURE_WORD_FUZZINESS;
 
 enum DocType {
   PilLabel,
@@ -18,6 +20,9 @@ export interface IAzureSearchResult {
   metadata_storage_path: string;
 }
 
+const buildFuzzyQuery = (query: string): string =>
+  `${query.split(' ').join(`~${azureWordFuzziness} `)}~${azureTermFuzziness}`;
+
 const buildAzureSearchUrl = (query: string): string => {
   const url = new URL(
     `https://${azureService}.search.windows.net/indexes/${azureIndex}/docs`,
@@ -25,8 +30,9 @@ const buildAzureSearchUrl = (query: string): string => {
 
   url.searchParams.append('api-key', azureKey as string);
   url.searchParams.append('api-version', azureApiVersion as string);
-  url.searchParams.append('search', query);
   url.searchParams.append('highlight', 'content');
+  url.searchParams.append('queryType', 'full');
+  url.searchParams.append('search', query);
 
   return url.toString();
 };
@@ -47,7 +53,7 @@ const getJson = async (url: string): Promise<any> => {
 export const azureSearch = async (
   query: string,
 ): Promise<IAzureSearchResult[]> => {
-  const body = await getJson(buildAzureSearchUrl(query));
+  const body = await getJson(buildAzureSearchUrl(buildFuzzyQuery(query)));
 
   return body.value;
 };
