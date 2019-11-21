@@ -19,7 +19,7 @@ const StyledPdf = styled.section`
   }
 `;
 
-const title = `Help viewing PDF's`;
+const title = `Help viewing PDFs`;
 const help = 'Help viewing PDF files';
 const download = 'Download Acrobat reader for free';
 const adobe = 'Adobe text conversion tools';
@@ -29,13 +29,25 @@ const Pdf: React.FC = () => (
     <h2>{title}</h2>
     <ul>
       <li>
-        <a href="#">{help}</a>
+        <a href="https://helpx.adobe.com/support/acrobat.html" target="_blank">
+          {help}
+        </a>
       </li>
       <li>
-        <a href="#">{download}</a>
+        <a
+          href="http://www.adobe.com/products/acrobat/readstep2.html"
+          target="_blank"
+        >
+          {download}
+        </a>
       </li>
       <li>
-        <a href="#">{adobe}</a>
+        <a
+          href="http://www.adobe.com/products/acrobat/access_onlinetools.html"
+          target="_blank"
+        >
+          {adobe}
+        </a>
       </li>
     </ul>
   </StyledPdf>
