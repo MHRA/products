@@ -1,8 +1,8 @@
-const azureApiVersion = process.env.AZURE_API_VERSION;
-const azureIndex = process.env.AZURE_INDEX;
-const azureKey = process.env.AZURE_KEY;
-const azureService = process.env.AZURE_SERVICE;
-const azureWordFuzziness = process.env.AZURE_WORD_FUZZINESS;
+const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
+const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
+const azureSearchKey = process.env.AZURE_SEARCH_KEY;
+const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
+const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
   PilLabel,
@@ -17,13 +17,14 @@ export interface IAzureSearchResult {
   content: string;
   doc_type: DocType;
   metadata_storage_path: string;
+  metadata_storage_name: string;
 }
 
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^"~*?:\/]|\|\||&&)/gi, `\\$1`);
 
 const addAzureWordFuzziness = (word: string): string =>
-  `${word}~${azureWordFuzziness}`;
+  `${word}~${azureSearchWordFuzziness}`;
 
 const buildFuzzyQuery = (query: string): string => {
   return query
@@ -35,11 +36,11 @@ const buildFuzzyQuery = (query: string): string => {
 
 const buildAzureSearchUrl = (query: string): string => {
   const url = new URL(
-    `https://${azureService}.search.windows.net/indexes/${azureIndex}/docs`,
+    `https://${azureSearchService}.search.windows.net/indexes/${azureSearchIndex}/docs`,
   );
 
-  url.searchParams.append('api-key', azureKey as string);
-  url.searchParams.append('api-version', azureApiVersion as string);
+  url.searchParams.append('api-key', azureSearchKey as string);
+  url.searchParams.append('api-version', azureSearchApiVersion as string);
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('search', query);

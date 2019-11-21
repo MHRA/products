@@ -71,7 +71,7 @@ const Mip: React.FC = () => {
     setResults(
       (await azureSearch(search)).map((drug: IAzureSearchResult) => ({
         name: drug['@search.highlights'].content.join(' … '),
-        url: '',
+        url: atob(drug.metadata_storage_path),
       })),
     );
   };
