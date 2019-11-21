@@ -33,8 +33,8 @@ export interface IDrug {
 const DrugList = (props: { drugs: IDrug[] }) => (
   <StyledDrugList>
     <ul>
-      {props.drugs.map(drug => (
-        <li key={drug.name}>
+      {props.drugs.map((drug, i) => (
+        <li key={i}>
           <a href={drug.url} dangerouslySetInnerHTML={{ __html: drug.name }} />
         </li>
       ))}
