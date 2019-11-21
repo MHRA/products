@@ -2,7 +2,6 @@ const azureApiVersion = process.env.AZURE_API_VERSION;
 const azureIndex = process.env.AZURE_INDEX;
 const azureKey = process.env.AZURE_KEY;
 const azureService = process.env.AZURE_SERVICE;
-const azureTermFuzziness = process.env.AZURE_TERM_FUZZINESS;
 const azureWordFuzziness = process.env.AZURE_WORD_FUZZINESS;
 
 enum DocType {
@@ -21,7 +20,10 @@ export interface IAzureSearchResult {
 }
 
 const buildFuzzyQuery = (query: string): string =>
-  `${query.split(' ').join(`~${azureWordFuzziness} `)}~${azureTermFuzziness}`;
+  query
+    .split(' ')
+    .map(word => `${word}~${azureWordFuzziness}`)
+    .join(' ');
 
 const buildAzureSearchUrl = (query: string): string => {
   const url = new URL(
