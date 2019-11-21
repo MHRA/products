@@ -19,11 +19,19 @@ export interface IAzureSearchResult {
   metadata_storage_path: string;
 }
 
-const buildFuzzyQuery = (query: string): string =>
-  query
+const escapeSpecialCharacters = (word: string): string =>
+  word.replace(/([+\-!(){}\[\]^"~*?:\/]|\|\||&&)/gi, `\\$1`);
+
+const addAzureWordFuzziness = (word: string): string =>
+  `${word}~${azureWordFuzziness}`;
+
+const buildFuzzyQuery = (query: string): string => {
+  return query
     .split(' ')
-    .map(word => `${word}~${azureWordFuzziness}`)
+    .map(word => escapeSpecialCharacters(word))
+    .map(word => addAzureWordFuzziness(word))
     .join(' ');
+};
 
 const buildAzureSearchUrl = (query: string): string => {
   const url = new URL(
