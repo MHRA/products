@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--primary-font);
+  margin: 0 auto;
+  max-width: 1024px;
+  color: var(--mhra-gray);
+  font-size: var(--base-font-size);
+  line-height: 1.4;
+  padding: 0 var(--base-space);
+}
+
+img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+picture {
+  display: block;
+}

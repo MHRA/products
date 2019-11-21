@@ -1,11 +1,18 @@
 import React from 'react';
+import { Normalize } from 'styled-normalize';
+import Footer from './components/footer';
+import Header from './components/header';
+import Mip from './components/mip';
 
-const app: React.FC = () => {
+const App: React.FC = () => {
   return (
-    <header>
-      <h1>Hello MIP</h1>
-    </header>
+    <>
+      <Normalize />
+      <Header />
+      <Mip />
+      <Footer />
+    </>
   );
 };
 
-export default app;
+export default App;
