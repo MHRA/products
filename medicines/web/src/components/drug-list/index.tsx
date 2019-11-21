@@ -16,6 +16,12 @@ const StyledDrugList = styled.section`
 
   a {
     color: ${primaryColor};
+    text-decoration: none;
+  }
+
+  em {
+    font-weight: bold;
+    font-style: normal;
   }
 `;
 
@@ -27,9 +33,9 @@ export interface IDrug {
 const DrugList = (props: { drugs: IDrug[] }) => (
   <StyledDrugList>
     <ul>
-      {props.drugs.map(drug => (
-        <li key={drug.name}>
-          <a href={drug.url}>{drug.name}</a>
+      {props.drugs.map((drug, i) => (
+        <li key={i}>
+          <a href={drug.url} dangerouslySetInnerHTML={{ __html: drug.name }} />
         </li>
       ))}
     </ul>

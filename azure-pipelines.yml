@@ -3,30 +3,85 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 variables:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: 1
+  AZURE_SUBSCRIPTION: rb-non-prod
+  STORAGE_ACCOUNT: rbmhramip
 
-jobs:
-  - job: medicines
-    displayName: Build Medicines
-    pool:
-      vmImage: ubuntu-18.04
-    steps:
-      - script: |
-          export CARGO_HOME="$HOME/.cargo"
-          curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
-          rustup toolchain list
-          rustc -Vv
-          cargo -V
-          echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-        displayName: Install nightly Rust
-      - script: |
-          cargo test -v
-        workingDirectory: $(Build.SourcesDirectory)/medicines
-        displayName: Run tests
-      - script: |
-          yarn && yarn build
-        workingDirectory: $(Build.SourcesDirectory)/medicines/web
-        displayName: Build web
-      - script: |
-          yarn a11y
-        workingDirectory: $(Build.SourcesDirectory)/medicines/web
-        displayName: Check accessibility
+stages:
+  - stage: build
+    jobs:
+      - job: services
+        dependsOn: []
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - script: |
+              export CARGO_HOME="$HOME/.cargo"
+              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+              rustup toolchain list
+              rustc -Vv
+              cargo -V
+              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+            displayName: Install nightly Rust
+          # - script: |
+          #     cargo build -v --release
+          #   displayName: Build services
+          #   workingDirectory: $(Build.SourcesDirectory)/medicines
+          - script: |
+              cargo test -v
+            workingDirectory: $(Build.SourcesDirectory)/medicines
+            displayName: Run tests
+      - job: web
+        dependsOn: []
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - script: |
+              yarn && yarn build
+            displayName: Build web
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+          - script: |
+              yarn a11y
+            displayName: Check accessibility
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+          - task: CopyFiles@2
+            displayName: Copy Files
+            inputs:
+              SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
+              TargetFolder: $(build.artifactstagingdirectory)
+              CleanTargetFolder: true
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Build Artifacts
+            inputs:
+              PathtoPublish: $(build.artifactstagingdirectory)
+              ArtifactName: build
+  - stage: deploy
+    jobs:
+      - deployment:
+        pool:
+          vmImage: windows-latest
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: build
+                - task: AzureFileCopy@3
+                  displayName: Copy to Blob Storage
+                  inputs:
+                    sourcePath: $(Pipeline.Workspace)/build
+                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    destination: azureBlob
+                    storage: $(STORAGE_ACCOUNT)
+                    containerName: $(Build.SourceBranchName)
+                - task: AzureCLI@2
+                  displayName: Set bucket to be public
+                  inputs:
+                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    scriptType: ps
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az storage container set-permission `
+                        --public-access container `
+                        --name $(Build.SourceBranchName) `
+                        --account-name=$(STORAGE_ACCOUNT)

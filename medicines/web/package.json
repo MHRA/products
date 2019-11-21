@@ -1,11 +1,14 @@
 {
   "author": "Red Badger",
   "dependencies": {
+    "@types/dotenv-webpack": "^1.7.0",
+    "dotenv-webpack": "^1.7.0",
     "normalize.css": "^8.0.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "styled-components": "^4.4.1",
-    "styled-normalize": "^8.0.6"
+    "styled-normalize": "^8.0.6",
+    "whatwg-fetch": "^3.0.0"
   },
   "description": "MHRA Medicine Information Portal",
   "devDependencies": {

@@ -36,7 +36,7 @@ const title = 'Yellow Card';
 const content = 'Report a side effect with a medicine or medical device';
 const linkText = 'mhra.gov.uk/yellowcard';
 
-const YelllowCard: React.FC = () => (
+const YellowCard: React.FC = () => (
   <StyledYellowCard>
     <h2>{title}</h2>
     <p>{content}</p>
@@ -48,4 +48,4 @@ const YelllowCard: React.FC = () => (
   </StyledYellowCard>
 );
 
-export default YelllowCard;
+export default YellowCard;

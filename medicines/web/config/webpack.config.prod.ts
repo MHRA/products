@@ -3,9 +3,11 @@ import path from 'path';
 import webpack from 'webpack';
 
 const sourceIndex = path.resolve(__dirname, '../src/index.tsx');
+// tslint:disable-next-line:no-var-requires
+const Dotenv = require('dotenv-webpack');
 
 const config: webpack.Configuration = {
-  entry: sourceIndex,
+  entry: ['whatwg-fetch', sourceIndex],
   mode: 'production',
   module: {
     rules: [
@@ -30,6 +32,7 @@ const config: webpack.Configuration = {
       filename: 'index.html',
       template: 'src/index.html',
     }),
+    new Dotenv(),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
