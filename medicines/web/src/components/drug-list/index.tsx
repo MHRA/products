@@ -1,12 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  black,
-  mhraBlue10,
-  mhraBlue80,
-  primaryColor,
-  white,
-} from '../../styles/colors';
+import { black, mhraBlue10, mhraBlue80, white } from '../../styles/colors';
 import {
   baseFontSize,
   baseSpace,
