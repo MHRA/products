@@ -43,7 +43,7 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                     (r.filename.clone().to_lowercase(), r)
                 })
                 .collect::<HashMap<String, Record>>();
-            #[allow(clippy::never_loop)]
+
             for entry in fs::read_dir(dir)? {
                 let entry = entry?;
                 let path = entry.path();
