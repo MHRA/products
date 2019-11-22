@@ -20,8 +20,10 @@ pub fn upload(
     core: &mut Core,
     data: &[u8],
     doc_type: model::DocType,
+    doc_author: &str,
 ) -> Result<(), AzureError> {
     let blob_name = hash(data);
+    println!("Saved {:?} to blob storage", blob_name);
     let container_name = "docs";
 
     if core
@@ -45,6 +47,7 @@ pub fn upload(
     let mut metadata = HashMap::new();
     let d = format!("{:?}", &doc_type);
     metadata.insert("doc_type", d.as_str());
+    metadata.insert("doc_author", doc_author);
     let future = client
         .put_block_blob()
         .with_container_name(&container_name)

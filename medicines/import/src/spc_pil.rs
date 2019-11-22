@@ -18,7 +18,7 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             .expect("cannot convert OSStr to str"),
                     ) {
                         println!("{:?} {:?}", path, doc_type);
-                        storage::upload(&client, &mut core, &fs::read(path)?, doc_type)?
+                        storage::upload(&client, &mut core, &fs::read(path)?, doc_type, "")?
                     }
                 }
             }
