@@ -5,6 +5,7 @@ const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
 const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
+  Par,
   PilLabel,
   PilLabelAndLeaflet,
   PilLeaflet,
