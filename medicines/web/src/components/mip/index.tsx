@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import {
@@ -79,8 +80,10 @@ const Mip: React.FC = () => {
           fileSize: Math.ceil(doc.metadata_storage_size / 1000).toLocaleString(
             'en-GB',
           ),
-          lastUpdated: '12th April, 2019',
-          name: decodeURIComponent(doc.title || 'unknown'),
+          lastUpdated: doc.created
+            ? moment(doc.created).format('Do MMM YYYY')
+            : 'Unknown',
+          name: decodeURIComponent(doc.title || 'Unknown'),
           url: doc.metadata_storage_path,
         })),
       );
