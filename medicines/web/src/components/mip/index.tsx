@@ -6,7 +6,7 @@ import {
   mobileBreakpoint,
 } from '../../styles/dimensions';
 import DrugIndex from '../drug-index';
-import DrugList, { IDrug } from '../drug-list';
+import DrugList, { IDocument } from '../drug-list';
 import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
@@ -59,7 +59,7 @@ const Main = styled.main`
 
 const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
-  const [results, setResults] = React.useState<IDrug[]>([]);
+  const [results, setResults] = React.useState<IDocument[]>([]);
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
@@ -69,9 +69,16 @@ const Mip: React.FC = () => {
     e.preventDefault();
 
     setResults(
-      (await azureSearch(search)).map((drug: IAzureSearchResult) => ({
-        name: drug['@search.highlights'].content.join(' … '),
-        url: atob(drug.metadata_storage_path),
+      (await azureSearch(search)).map((doc: IAzureSearchResult) => ({
+        activeSubstance: 'Ibuprofen',
+        context: doc['@search.highlights'].content.join(' … '),
+        docType: doc.doc_type.toString().substr(0, 3),
+        fileSize: Math.ceil(doc.metadata_storage_size / 1000).toLocaleString(
+          'en-GB',
+        ),
+        lastUpdated: '12th April, 2019',
+        name: 'Nurofen',
+        url: atob(doc.metadata_storage_path),
       })),
     );
   };

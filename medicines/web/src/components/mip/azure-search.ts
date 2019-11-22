@@ -17,6 +17,7 @@ export interface IAzureSearchResult {
   content: string;
   doc_type: DocType;
   metadata_storage_path: string;
+  metadata_storage_size: number;
 }
 
 const escapeSpecialCharacters = (word: string): string =>

@@ -1,6 +1,12 @@
 const baseSize = 16;
+const headingSSize = 19;
+const tinyPadSize = 5;
+const largePadSize = 20;
 const mobileSize = 788;
 export const baseFontSize = `${baseSize}px`;
+export const headingSFontSize = `${headingSSize}px`;
+export const tinyPaddingSize = `${tinyPadSize}px`;
+export const largePaddingSize = `${largePadSize}px`;
 export const baseSpace = `${baseSize * 1.25}px`;
 export const desktopMaxWidth = `1024px`;
 export const mobileBreakpoint = `screen and (max-width: ${mobileSize}px)`;
