@@ -80,8 +80,8 @@ const Mip: React.FC = () => {
             'en-GB',
           ),
           lastUpdated: '12th April, 2019',
-          name: 'Nurofen',
-          url: atob(doc.metadata_storage_path),
+          name: decodeURIComponent(doc.title || 'unknown'),
+          url: doc.metadata_storage_path,
         })),
       );
     }
