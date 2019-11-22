@@ -1,7 +1,7 @@
 use crate::{model, storage};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
-use std::{fs, path::Path};
+use std::{collections::HashMap, fs, path::Path};
 use tokio_core::reactor::Core;
 
 pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureError> {
@@ -18,7 +18,10 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             .expect("cannot convert OSStr to str"),
                     ) {
                         println!("{:?} {:?}", path, doc_type);
-                        storage::upload(&client, &mut core, &fs::read(path)?, doc_type, "")?
+                        let mut metadata = HashMap::new();
+                        let d = format!("{:?}", &doc_type);
+                        metadata.insert("doc_type", d.as_str());
+                        storage::upload(&client, &mut core, &fs::read(path)?, &metadata)?
                     }
                 }
             }
