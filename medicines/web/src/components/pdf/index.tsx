@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpaceSizeCss } from '../../styles/dimensions';
 
 const StyledPdf = styled.section`
   border-top: 1px solid ${primaryColor};
   border-bottom: 1px solid ${primaryColor};
-  padding: calc(${baseSpace} / 2) 0;
+  padding: calc(${baseSpaceSizeCss} / 2) 0;
 
   & h2 {
     margin-top: 0;
@@ -14,7 +14,7 @@ const StyledPdf = styled.section`
   }
 
   & ul {
-    padding-left: calc(${baseSpace} / 2);
+    padding-left: calc(${baseSpaceSizeCss} / 2);
     margin: 0;
   }
 `;
