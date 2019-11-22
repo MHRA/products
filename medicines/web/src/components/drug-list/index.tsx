@@ -121,7 +121,10 @@ const DrugList = (props: { drugs: IDocument[] }) => (
                 <br />
                 Active substance: {drug.activeSubstance}
               </p>
-              <p className="context">{drug.context}</p>
+              <p
+                className="context"
+                dangerouslySetInnerHTML={{ __html: drug.context }}
+              />
             </a>
           </div>
         </li>
