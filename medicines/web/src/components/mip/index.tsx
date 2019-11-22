@@ -87,7 +87,6 @@ const Mip: React.FC = () => {
     }
 
     setLastSearch(search);
-    setSearch('');
   };
 
   return (
