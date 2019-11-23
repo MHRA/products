@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
-import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
+import { baseSpaceSizeCss, desktopMaxWidthCss } from '../../styles/dimensions';
 import SvgMhraLogo from '../logos/mhra-logo';
 
 const mhra = 'Medicines Information: SPC & PILs';
@@ -11,8 +11,8 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: ${desktopMaxWidth};
-  padding: ${baseSpace};
+  max-width: ${desktopMaxWidthCss};
+  padding: ${baseSpaceSizeCss};
 `;
 
 const H1 = styled.h1`

@@ -5,6 +5,7 @@ const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
 const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
+  Par,
   PilLabel,
   PilLabelAndLeaflet,
   PilLeaflet,
@@ -12,11 +13,18 @@ enum DocType {
 }
 
 export interface IAzureSearchResult {
-  '@search.score': number;
   '@search.highlights': { content: string[] };
-  content: string;
+  '@search.score': number;
+  author: string | null;
+  created: string | null;
   doc_type: DocType;
+  file_name: string | null;
+  keywords: string | null;
+  metadata_storage_name: string;
   metadata_storage_path: string;
+  metadata_storage_size: number;
+  release_state: string | null;
+  title: string | null;
 }
 
 const escapeSpecialCharacters = (word: string): string =>

@@ -1,23 +1,23 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import { black, mhraBlue90, primaryColor, white } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpaceSizeCss } from '../../styles/dimensions';
 
 const StyledSearch = styled.section`
   border-radius: 5px 5px 0 0;
   border: 1px solid ${primaryColor};
   box-sizing: border-box;
-  margin-bottom: ${baseSpace};
+  margin-bottom: ${baseSpaceSizeCss};
 
   & h2 {
     background-color: ${mhraBlue90};
     color: ${white};
     margin: 0;
-    padding: calc(${baseSpace} / 2);
+    padding: calc(${baseSpaceSizeCss} / 2);
   }
 
   & form {
-    padding: calc(${baseSpace} / 2);
+    padding: calc(${baseSpaceSizeCss} / 2);
     color: ${black};
     display: flex;
     flex-direction: column;
@@ -25,7 +25,7 @@ const StyledSearch = styled.section`
 
   & input[type='search'] {
     width: 100%;
-    margin-bottom: calc(${baseSpace} / 2);
+    margin-bottom: calc(${baseSpaceSizeCss} / 2);
   }
 
   & input[type='submit'] {

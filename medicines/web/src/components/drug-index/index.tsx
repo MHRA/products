@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { mhraBlue90, mhraGray, primaryColor } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpaceSizeCss } from '../../styles/dimensions';
 
 const StyledDrugIndex = styled.section`
   h3 {
@@ -9,7 +9,7 @@ const StyledDrugIndex = styled.section`
   }
 
   ul {
-    padding: ${baseSpace};
+    padding: ${baseSpaceSizeCss};
     margin: 0;
     list-style: none;
     display: flex;
