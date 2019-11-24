@@ -11,6 +11,7 @@ use std::{
     path::Path,
     str,
 };
+use tantivy::tokenizer::*;
 use tokio_core::reactor::Core;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -56,7 +57,7 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             let created = record.created.to_string();
                             let title = sanitize(record.title.to_string());
                             let author = sanitize(record.author.to_string());
-                            let keywords = sanitize(record.keywords.to_string());
+                            let keywords = tokenize(record.keywords.to_string());
                             metadata.insert("doc_type", d.as_str());
                             metadata.insert("file_name", &record.filename);
                             metadata.insert("title", &title);
@@ -78,11 +79,14 @@ fn is_csv(f: &DirEntry) -> bool {
     "csv" == f.path().extension().unwrap_or_default()
 }
 
-use tantivy::tokenizer::*;
-
 fn sanitize(s: String) -> String {
+    s.replace(|c: char| !c.is_ascii(), "").replace("\n", " ")
+}
+
+fn tokenize(s: String) -> String {
     let en_stem = SimpleTokenizer
         .filter(RemoveLongFilter::limit(40))
+        .filter(AsciiFoldingFilter)
         .filter(LowerCaser)
         .filter(StopWordFilter::default());
     let mut tokens: Vec<Token> = vec![];
@@ -104,17 +108,29 @@ mod test {
     use super::*;
 
     #[test]
-    fn remove_newline() {
+    fn sanitize_remove_newline() {
         assert_eq!(sanitize("newline\ntest".to_string()), "newline test");
     }
     #[test]
-    fn remove_non_ascii() {
-        assert_eq!(sanitize("emoji🙂test".to_string()), "emoji test");
+    fn sanitize_remove_non_ascii() {
+        assert_eq!(sanitize("emoji🙂 test".to_string()), "emoji test");
     }
     #[test]
-    fn sample_keywords1() {
+    fn tokenize_remove_newline() {
+        assert_eq!(tokenize("newline\ntest".to_string()), "newline test");
+    }
+    #[test]
+    fn tokenize_remove_unicode() {
+        assert_eq!(tokenize("emoji🙂 test".to_string()), "emoji test");
+    }
+    #[test]
+    fn tokenize_fold_non_ascii() {
+        assert_eq!(tokenize("Egalité".to_string()), "egalite");
+    }
+    #[test]
+    fn tokenize_sample_keywords1() {
         let s1 = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride, Ibuprofen and Phenylephrine Hydrochloride 200 mg/6.1 mg Tablets, 200 mg, 6.1 mg, cold, flu, congestion, aches, pains, headache, fever, sore throat, blocked nose, sinuses";
         let s2 = "ukpar public assessment report par national procedure ibuprofen phenylephrine hydrochloride ibuprofen phenylephrine hydrochloride 200 mg 6 1 mg tablets 200 mg 6 1 mg cold flu congestion aches pains headache fever sore throat blocked nose sinuses";
-        assert_eq!(sanitize(s1.to_string()), s2.to_string());
+        assert_eq!(tokenize(s1.to_string()), s2.to_string());
     }
 }
