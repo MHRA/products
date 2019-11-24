@@ -18,9 +18,9 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             .expect("cannot convert OSStr to str"),
                     ) {
                         println!("{:?} {:?}", path, doc_type);
-                        let mut metadata = HashMap::new();
-                        let d = format!("{:?}", &doc_type);
-                        metadata.insert("doc_type", d.as_str());
+                        let mut metadata: HashMap<&str, &str> = HashMap::new();
+                        let doc_type = format!("{:?}", &doc_type);
+                        metadata.insert("doc_type", &doc_type);
                         storage::upload(&client, &mut core, &fs::read(path)?, &metadata)?
                     }
                 }

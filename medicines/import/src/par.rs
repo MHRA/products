@@ -52,19 +52,21 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                         let key = &path.file_stem().unwrap().to_str().unwrap();
                         println!("{:?}", key);
                         if let Some(record) = records.get(&key.to_lowercase()) {
-                            let mut metadata = HashMap::new();
-                            let d = format!("{:?}", model::DocType::Par);
-                            let created = record.created.to_string();
-                            let title = sanitize(record.title.to_string());
-                            let author = sanitize(record.author.to_string());
-                            let keywords = tokenize(record.keywords.to_string());
-                            metadata.insert("doc_type", d.as_str());
-                            metadata.insert("file_name", &record.filename);
+                            let mut metadata: HashMap<&str, &str> = HashMap::new();
+                            let file_name = sanitize(&record.filename);
+                            metadata.insert("file_name", &file_name);
+                            let doc_type = format!("{:?}", model::DocType::Par);
+                            metadata.insert("doc_type", &doc_type);
+                            let title = sanitize(&record.title);
                             metadata.insert("title", &title);
-                            metadata.insert("author", &author);
-                            metadata.insert("created", &created);
-                            metadata.insert("release_state", &record.release_state);
+                            let keywords = tokenize(&record.keywords);
                             metadata.insert("keywords", &keywords);
+                            let created = record.created.to_rfc3339();
+                            metadata.insert("created", &created);
+                            let author = sanitize(&record.author);
+                            metadata.insert("author", &author);
+                            let release_state = sanitize(&record.release_state);
+                            metadata.insert("release_state", &release_state);
                             storage::upload(&client, &mut core, &fs::read(path)?, &metadata)?;
                         }
                     }
@@ -79,11 +81,14 @@ fn is_csv(f: &DirEntry) -> bool {
     "csv" == f.path().extension().unwrap_or_default()
 }
 
-fn sanitize(s: String) -> String {
-    s.replace(|c: char| !c.is_ascii(), "").replace("\n", " ")
+fn sanitize(s: &str) -> String {
+    s.replace(|c: char| !c.is_ascii(), "")
+        .replace("\n", " ")
+        .trim()
+        .to_string()
 }
 
-fn tokenize(s: String) -> String {
+fn tokenize(s: &str) -> String {
     let en_stem = SimpleTokenizer
         .filter(RemoveLongFilter::limit(40))
         .filter(AsciiFoldingFilter)
@@ -109,28 +114,32 @@ mod test {
 
     #[test]
     fn sanitize_remove_newline() {
-        assert_eq!(sanitize("newline\ntest".to_string()), "newline test");
+        assert_eq!(sanitize("newline\ntest"), "newline test");
     }
     #[test]
     fn sanitize_remove_non_ascii() {
-        assert_eq!(sanitize("emoji🙂 test".to_string()), "emoji test");
+        assert_eq!(sanitize("emoji🙂 test"), "emoji test");
+    }
+    #[test]
+    fn sanitize_trim() {
+        assert_eq!(sanitize(" test "), "test");
     }
     #[test]
     fn tokenize_remove_newline() {
-        assert_eq!(tokenize("newline\ntest".to_string()), "newline test");
+        assert_eq!(tokenize("newline\ntest"), "newline test");
     }
     #[test]
     fn tokenize_remove_unicode() {
-        assert_eq!(tokenize("emoji🙂 test".to_string()), "emoji test");
+        assert_eq!(tokenize("emoji🙂 test"), "emoji test");
     }
     #[test]
     fn tokenize_fold_non_ascii() {
-        assert_eq!(tokenize("Egalité".to_string()), "egalite");
+        assert_eq!(tokenize("Egalité"), "egalite");
     }
     #[test]
     fn tokenize_sample_keywords1() {
         let s1 = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride, Ibuprofen and Phenylephrine Hydrochloride 200 mg/6.1 mg Tablets, 200 mg, 6.1 mg, cold, flu, congestion, aches, pains, headache, fever, sore throat, blocked nose, sinuses";
         let s2 = "ukpar public assessment report par national procedure ibuprofen phenylephrine hydrochloride ibuprofen phenylephrine hydrochloride 200 mg 6 1 mg tablets 200 mg 6 1 mg cold flu congestion aches pains headache fever sore throat blocked nose sinuses";
-        assert_eq!(tokenize(s1.to_string()), s2.to_string());
+        assert_eq!(tokenize(s1), s2);
     }
 }
