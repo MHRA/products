@@ -1,35 +1,36 @@
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
-import { baseSpaceSizeCss, desktopMaxWidthCss } from '../../styles/dimensions';
+import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
 import SvgMhraLogo from '../logos/mhra-logo';
 
-const mhra = 'Medicines Information: SPC & PILs';
+const mhra = 'Medicines Information';
 
 const Header = styled.header`
-  border-bottom: 4px solid ${primaryColor};
-  display: flex;
-  justify-content: space-between;
   margin: 0 auto;
-  max-width: ${desktopMaxWidthCss};
-  padding: ${baseSpaceSizeCss};
-`;
+  max-width: ${desktopMaxWidth};
+  padding: ${baseSpace} ${baseSpace} 0;
+  border-top: 4px solid ${primaryColor};
 
-const H1 = styled.h1`
-  align-self: flex-end;
-  margin: 0;
-`;
+  picture {
+    max-width: 224px;
+    margin-bottom: 115px;
+  }
 
-const Picture = styled.picture`
-  max-width: 300px;
+  h1 {
+    margin: 0;
+    border-bottom: 4px solid ${primaryColor};
+    padding-bottom: 0.5rem;
+    font-size: 2.25rem;
+  }
 `;
 
 const header: React.FC = () => (
   <Header>
-    <Picture>
+    <picture>
       <SvgMhraLogo />
-    </Picture>
-    <H1>{mhra}</H1>
+    </picture>
+    <h1>{mhra}</h1>
   </Header>
 );
 

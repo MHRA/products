@@ -2,17 +2,15 @@ import React from 'react';
 import styled from 'styled-components';
 import { black, mhraBlue10, mhraBlue80, white } from '../../styles/colors';
 import {
-  baseFontSizeCss,
-  baseSpaceSizeCss,
-  headingFontSizeCss,
+  baseSpace,
   largePaddingSizeCss,
   tinyPaddingSizeCss,
-  titleFontSizeCss,
 } from '../../styles/dimensions';
+import { baseFontSize, h2FontSize } from '../../styles/fonts';
 
 const StyledDrugList = styled.section`
   .title {
-    font-size: ${titleFontSizeCss};
+    font-size: ${h2FontSize};
     padding: 0;
     margin: 0;
   }
@@ -34,22 +32,15 @@ const StyledDrugList = styled.section`
   }
 
   li {
-    display: -webkit-box;
-    display: -moz-box;
-    display: box;
-
-    -webkit-box-orient: horizontal;
-    -moz-box-orient: horizontal;
-    box-orient: horizontal;
-
+    display: flex;
     background-color: ${mhraBlue10};
-    padding: ${baseSpaceSizeCss};
-    margin: ${baseSpaceSizeCss} 0;
+    padding: ${baseSpace};
+    margin: ${baseSpace} 0;
   }
 
   li p {
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
   li a {
@@ -58,15 +49,13 @@ const StyledDrugList = styled.section`
   }
 
   li .left {
-    -webkit-box-flex: 0;
-    -moz-box-flex: 0;
-    box-flex: 0;
+    flex: 0;
   }
 
   li .left .icon {
     background-color: ${mhraBlue80};
     color: ${white};
-    font-size: ${headingFontSizeCss};
+    font-size: ${h2FontSize};
     font-weight: bold;
     padding: 10px 0;
     text-align: center;
@@ -74,26 +63,22 @@ const StyledDrugList = styled.section`
   }
 
   li .right {
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    box-flex: 1;
-
-    padding: 0 ${baseFontSizeCss};
-    vertical-align: top;
+    flex: 1;
+    padding: 0 ${baseFontSize};
   }
 
   li .right .drug-name {
-    font-size: ${headingFontSizeCss};
+    font-size: ${h2FontSize};
     font-weight: bold;
     padding-bottom: ${tinyPaddingSizeCss};
   }
 
   li .right .metadata {
-    font-size: ${baseFontSizeCss};
+    font-size: ${baseFontSize};
   }
 
   li .right .context {
-    font-size: ${headingFontSizeCss};
+    font-size: ${h2FontSize};
     padding-top: ${largePaddingSizeCss};
   }
 

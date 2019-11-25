@@ -7,6 +7,10 @@ body {
   font-family: Arial;
 }
 
+picture {
+  display: block;
+}
+
 img,
 svg {
   display: block;

@@ -2,9 +2,9 @@ import moment from 'moment';
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import {
-  baseSpaceSizeCss,
-  desktopMaxWidthCss,
-  mobileBreakpointCss,
+  baseSpace,
+  desktopMaxWidth,
+  mobileBreakpoint,
 } from '../../styles/dimensions';
 import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
@@ -19,7 +19,7 @@ const Row = styled.section`
   flex-wrap: wrap;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: ${desktopMaxWidthCss};
+  max-width: ${desktopMaxWidth};
   > * {
     flex-basis: 100%;
     flex-shrink: 1;
@@ -29,10 +29,9 @@ const Row = styled.section`
 
 const Aside = styled.aside`
   max-width: 25%;
-  padding: ${baseSpaceSizeCss} calc(${baseSpaceSizeCss} / 2) 0
-    ${baseSpaceSizeCss};
+  padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
 
-  @media ${mobileBreakpointCss} {
+  @media ${mobileBreakpoint} {
     max-width: 100%;
 
     .pdf-yellow-card-wrapper {
@@ -43,14 +42,14 @@ const Aside = styled.aside`
 
 const Main = styled.main`
   max-width: 75%;
-  padding: ${baseSpaceSizeCss};
-  padding-left: calc(${baseSpaceSizeCss} / 2);
+  padding: ${baseSpace};
+  padding-left: calc(${baseSpace} / 2);
 
   .pdf-yellow-card-wrapper {
     display: none;
   }
 
-  @media ${mobileBreakpointCss} {
+  @media ${mobileBreakpoint} {
     max-width: 100%;
 
     .pdf-yellow-card-wrapper {
@@ -113,7 +112,6 @@ const Mip: React.FC = () => {
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
         />
-        <Pdf />
         <YellowCard />
       </Aside>
       {lastSearch.length === 0 ? (

@@ -1,36 +1,56 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
-import { black, mhraBlue90, primaryColor, white } from '../../styles/colors';
-import { baseSpaceSizeCss } from '../../styles/dimensions';
+import {
+  black,
+  mhraBlue90,
+  mhraGray,
+  primaryColor,
+  white,
+} from '../../styles/colors';
+import { baseSpace } from '../../styles/dimensions';
 
 const StyledSearch = styled.section`
   border-radius: 5px 5px 0 0;
   border: 1px solid ${primaryColor};
   box-sizing: border-box;
-  margin-bottom: ${baseSpaceSizeCss};
+  margin-bottom: ${baseSpace};
 
-  & h2 {
+  h2 {
     background-color: ${mhraBlue90};
     color: ${white};
+    font-size: 1.1875rem;
     margin: 0;
-    padding: calc(${baseSpaceSizeCss} / 2);
+    padding: calc(${baseSpace} / 2);
   }
 
-  & form {
-    padding: calc(${baseSpaceSizeCss} / 2);
+  form {
     color: ${black};
     display: flex;
     flex-direction: column;
+    padding: ${baseSpace} calc(${baseSpace} / 2);
+    background-color: rgba(10, 50, 150, 0.1);
   }
 
-  & input[type='search'] {
+  label {
+    font-size: 1.1875rem;
+  }
+
+  input[type='search'] {
+    margin: calc(${baseSpace} / 2) 0;
     width: 100%;
-    margin-bottom: calc(${baseSpaceSizeCss} / 2);
+    border: solid 1px ${mhraGray};
   }
 
-  & input[type='submit'] {
-    max-width: 50%;
+  input[type='submit'] {
     align-self: flex-end;
+    max-width: 50%;
+    display: block;
+    padding: 0 0.5rem;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    border: solid 1px ${mhraGray};
   }
 `;
 

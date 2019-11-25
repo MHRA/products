@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray30, mhraYellow } from '../../styles/colors';
-import { baseSpaceSizeCss } from '../../styles/dimensions';
+import { baseSpace } from '../../styles/dimensions';
 
 const StyledYellowCard = styled.section`
   background-color: ${mhraGray30};
-  margin-top: ${baseSpaceSizeCss};
-  padding-bottom: calc(${baseSpaceSizeCss} / 2);
+  margin-top: ${baseSpace};
+  padding-bottom: calc(${baseSpace} / 2);
 
   & h2 {
     background-color: ${mhraYellow};
     color: ${black};
     margin-top: 0;
-    padding: calc(${baseSpaceSizeCss} / 2);
+    padding: calc(${baseSpace} / 2);
     text-align: center;
   }
 
