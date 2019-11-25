@@ -67,7 +67,17 @@ stages:
                 - download: current
                   artifact: build
                 - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage
+                  displayName: Copy to Blob Storage (master)
+                  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+                  inputs:
+                    sourcePath: $(Pipeline.Workspace)/build
+                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    destination: azureBlob
+                    storage: $(STORAGE_ACCOUNT)
+                    containerName: $web
+                - task: AzureFileCopy@3
+                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
+                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
                   inputs:
                     sourcePath: $(Pipeline.Workspace)/build
                     azureSubscription: $(AZURE_SUBSCRIPTION)
