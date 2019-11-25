@@ -9,7 +9,7 @@ variables:
 stages:
   - stage: build
     jobs:
-      - job: services-master
+      - job: services_master
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         dependsOn: []
         pool:
@@ -31,7 +31,7 @@ stages:
               cargo test -v --release
             workingDirectory: $(Build.SourcesDirectory)/medicines
             displayName: Run tests
-      - job: services-branch
+      - job: services_branch
         condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
         dependsOn: []
         pool:
