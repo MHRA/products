@@ -152,11 +152,13 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
                 <p className="drug-name">
                   {drug.name} ({drug.fileSize} KB)
                 </p>
-                <p className="metadata">
-                  Last updated: {drug.lastUpdated}
-                  <br />
-                  Active substance: {drug.activeSubstance}
-                </p>
+                <p className="metadata">Last updated: {drug.lastUpdated}</p>
+                {drug.docType && (
+                  <p className="metadata">
+                    Active substance: {drug.activeSubstance}
+                  </p>
+                )}
+
                 <p
                   className="context"
                   dangerouslySetInnerHTML={{ __html: drug.context }}

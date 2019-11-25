@@ -11,8 +11,14 @@ import MipText from '../mip-text';
 import Pdf from '../pdf';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
+import { ISuggestion } from '../search-suggestions';
 import YellowCard from '../yellow-card';
-import { azureSearch, IAzureSearchResult } from './azure-search';
+import {
+  azureSearch,
+  getSuggestions,
+  IAzureSearchResult,
+  IAzureSuggestion,
+} from './azure-search';
 
 const Row = styled.section`
   display: flex;
@@ -63,13 +69,22 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [lastSearch, setLastSearch] = React.useState('');
   const [results, setResults] = React.useState<IDocument[]>([]);
+  const [suggestions, setSuggestions] = React.useState<ISuggestion[]>([]);
 
-  const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
+  const handleSearchChange = async (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
+
+    if (search.length > 2) {
+      setSuggestions(
+        (await getSuggestions(search)).map((suggestion: IAzureSuggestion) => ({
+          value: suggestion['@search.text'],
+        })),
+      );
+    }
   };
 
-  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSearchSubmit = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
 
     if (search.length > 0) {
       setResults(
@@ -92,13 +107,21 @@ const Mip: React.FC = () => {
     setLastSearch(search);
   };
 
+  const onSelectSuggestion = async (suggestion: string) => {
+    setSearch(suggestion);
+
+    await handleSearchSubmit();
+  };
+
   return (
     <Row>
       <Aside>
         <Search
           search={search}
+          suggestions={suggestions}
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
+          onSelectSuggestion={onSelectSuggestion}
         />
         <Pdf />
         <YellowCard />

@@ -2,6 +2,7 @@ const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
 const azureSearchKey = process.env.AZURE_SEARCH_KEY;
 const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
+const azureSearchSuggester = process.env.AZURE_SEARCH_SUGGESTER;
 const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
@@ -27,6 +28,10 @@ export interface IAzureSearchResult {
   title: string | null;
 }
 
+export interface IAzureSuggestion {
+  '@search.text': string;
+}
+
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^"~*?:\/]|\|\||&&)/gi, `\\$1`);
 
@@ -41,7 +46,7 @@ const buildFuzzyQuery = (query: string): string => {
     .join(' ');
 };
 
-const buildAzureSearchUrl = (query: string): string => {
+const buildDocumentSearchUrl = (query: string): string => {
   const url = new URL(
     `https://${azureSearchService}.search.windows.net/indexes/${azureSearchIndex}/docs`,
   );
@@ -55,10 +60,28 @@ const buildAzureSearchUrl = (query: string): string => {
   return url.toString();
 };
 
-const getJson = async (url: string): Promise<any> => {
+const buildSuggestionsSearchUrl = (query: string): string => {
+  const url = new URL(
+    `https://${azureSearchService}.search.windows.net/indexes/${azureSearchIndex}/docs/suggest`,
+  );
+
+  url.searchParams.append('$top', '10');
+  url.searchParams.append('api-version', azureSearchApiVersion as string);
+  url.searchParams.append('fuzzy', 'true');
+  url.searchParams.append('search', query);
+  url.searchParams.append('suggesterName', azureSearchSuggester as string);
+
+  return url.toString();
+};
+
+const getJson = async (
+  url: string,
+  headers: { [key: string]: string } = {},
+): Promise<any> => {
   const resp: Response = await fetch(url, {
     method: 'GET',
     headers: {
+      ...headers,
       'Content-Type': 'application/json',
     },
   });
@@ -71,7 +94,17 @@ const getJson = async (url: string): Promise<any> => {
 export const azureSearch = async (
   query: string,
 ): Promise<IAzureSearchResult[]> => {
-  const body = await getJson(buildAzureSearchUrl(buildFuzzyQuery(query)));
+  const body = await getJson(buildDocumentSearchUrl(buildFuzzyQuery(query)));
+
+  return body.value;
+};
+
+export const getSuggestions = async (
+  query: string,
+): Promise<IAzureSuggestion[]> => {
+  const body = await getJson(buildSuggestionsSearchUrl(query), {
+    'api-key': azureSearchKey as string,
+  });
 
   return body.value;
 };

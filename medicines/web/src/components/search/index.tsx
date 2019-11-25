@@ -2,6 +2,7 @@ import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import { black, mhraBlue90, primaryColor, white } from '../../styles/colors';
 import { baseSpaceSizeCss } from '../../styles/dimensions';
+import SearchSuggestions, { ISuggestion } from '../search-suggestions';
 
 const StyledSearch = styled.section`
   border-radius: 5px 5px 0 0;
@@ -40,6 +41,8 @@ const labelString = 'Enter a product or active substance:';
 interface ISearchProps {
   onSearchChange: (e: FormEvent<HTMLInputElement>) => void;
   onSearchSubmit: (e: FormEvent<HTMLFormElement>) => void;
+  onSelectSuggestion: (suggestion: string) => void;
+  suggestions: ISuggestion[];
   search: string;
 }
 
@@ -56,6 +59,10 @@ const Search: React.FC<ISearchProps> = props => (
       />
       <input type="submit" value="Search" />
     </form>
+    <SearchSuggestions
+      suggestions={props.suggestions}
+      onSelectSuggestion={props.onSelectSuggestion}
+    />
   </StyledSearch>
 );
 
