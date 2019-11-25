@@ -7,8 +7,16 @@ settings:
   - ArgRequiredElseHelp
 
 subcommands:
-  - pdf:
-      about: import PDFs from local directory
+  - spcpil:
+      about: import SPCs and PILs from local directory
+      args:
+        - directory:
+            short: d
+            required: true
+            takes_value: true
+            help: directory to import
+  - par:
+      about: import PARs from local directory
       args:
         - directory:
             short: d
