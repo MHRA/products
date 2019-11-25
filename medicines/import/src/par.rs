@@ -32,7 +32,9 @@ struct Record {
 
 pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureError> {
     if dir.is_dir() {
-        if let Some(Ok(f)) = fs::read_dir(dir)?.find(|f| is_csv(f.as_ref().unwrap())) {
+        if let Some(Ok(f)) =
+            fs::read_dir(dir)?.find(|f| is_csv(f.as_ref().expect("No CSV file found!")))
+        {
             println!("Found CSV file: {:?}", f);
             let file = File::open(&f.path())?;
             let mut rdr = csv::Reader::from_reader(BufReader::new(file));
@@ -49,7 +51,11 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 let path = entry.path();
                 if let Some(ext) = path.extension() {
                     if ext == "pdf" && fs::metadata(&path)?.len() > 0 {
-                        let key = &path.file_stem().unwrap().to_str().unwrap();
+                        let key = &path
+                            .file_stem()
+                            .expect("file has no stem")
+                            .to_str()
+                            .unwrap();
                         if let Some(record) = records.get(&key.to_lowercase()) {
                             let mut metadata: HashMap<&str, &str> = HashMap::new();
                             let file_name = sanitize(&record.filename);
@@ -89,7 +95,7 @@ fn sanitize(s: &str) -> String {
 
 fn tokenize(s: &str) -> String {
     let s1 = s.replace(|c: char| !c.is_ascii(), "");
-    let en_stem = SimpleTokenizer
+    let tokenizer = SimpleTokenizer
         .filter(RemoveLongFilter::limit(40))
         .filter(LowerCaser)
         .filter(StopWordFilter::default());
@@ -98,7 +104,7 @@ fn tokenize(s: &str) -> String {
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());
         };
-        en_stem.token_stream(&s1).process(&mut add_token);
+        tokenizer.token_stream(&s1).process(&mut add_token);
     }
     tokens
         .iter()
