@@ -66,6 +66,8 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             metadata.insert("title", &title);
                             let keywords = tokenize(&record.keywords);
                             metadata.insert("keywords", &keywords);
+                            let suggestions = to_json_array(&keywords);
+                            metadata.insert("suggestions", &suggestions);
                             let created = record.created.to_rfc3339();
                             metadata.insert("created", &created);
                             let author = sanitize(&record.author);
@@ -113,6 +115,16 @@ fn tokenize(s: &str) -> String {
         .join(" ")
 }
 
+fn to_json_array(s: &str) -> String {
+    let words = s.split(",")
+        .map(|s| s.trim())
+        .map(|s| s.replace("\n", " "))
+        .map(|s| s.to_ascii_lowercase())
+        .collect::<Vec<String>>();
+
+    serde_json::to_string(&words).expect("Couldn't create JSON array.")
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -142,5 +154,11 @@ mod test {
         let s1 = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride, Ibuprofen and Phenylephrine Hydrochloride 200 mg/6.1 mg Tablets, 200 mg, 6.1 mg, cold, flu, congestion, aches, pains, headache, fever, sore throat, blocked nose, sinuses";
         let s2 = "ukpar public assessment report par national procedure ibuprofen phenylephrine hydrochloride ibuprofen phenylephrine hydrochloride 200 mg 6 1 mg tablets 200 mg 6 1 mg cold flu congestion aches pains headache fever sore throat blocked nose sinuses";
         assert_eq!(tokenize(s1), s2);
+    }
+    #[test]
+    fn jsonify_keywords() {
+        let s = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride";
+        let json = "[\"ukpar\",\"public assessment report\",\"par\",\"national procedure\",\"ibuprofen\",\"phenylephrine hydrochloride\"]";
+        assert_eq!(to_json_array(s), json);
     }
 }
