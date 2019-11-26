@@ -1,0 +1,15 @@
+name: search
+version: "0.1"
+about: Creates search datasources, indexes, and indexers from definitions
+author: Matt Doughty <matt.doughty@mhra.gov.uk>
+
+settings:
+  - ArgRequiredElseHelp
+
+subcommands:
+  - datasource:
+      about: Create a datasource from a definition.
+  - index:
+      about: Create an index from a definition.
+  - indexer:
+      about: Create an indexer from a definition.
