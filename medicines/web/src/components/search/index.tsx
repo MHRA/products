@@ -32,6 +32,7 @@ const StyledSearch = styled.section`
     margin: calc(${baseSpace} / 2) 0;
     width: 100%;
     border: solid 1px ${mhraGray};
+    padding: 0.5rem;
   }
 
   input[type='submit'] {
