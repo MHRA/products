@@ -1,29 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
-import { mhraBlue90, mhraGray, primaryColor } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { black } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
+  margin-top: 3.75rem;
+
   h2 {
     font-size: 1.5rem;
-    /* color: ${primaryColor}; */
+    margin-top: 0;
   }
 
   ul {
-    padding: ${baseSpace};
-    margin: 0;
-    list-style: none;
     display: flex;
     justify-content: space-between;
-    border: 1px solid ${mhraBlue90};
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   a {
-    color: ${mhraGray};
-  }
-
-  a:visited {
-    color: ${primaryColor};
+    color: ${black};
+    text-decoration: none;
   }
 `;
 
