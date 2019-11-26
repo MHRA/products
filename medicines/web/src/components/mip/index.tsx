@@ -68,12 +68,24 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
+  const sanitizeTitle = (title: string | null): string => {
+    let name: string;
+    if (!title) return 'Unknown';
+
+    try {
+      name = decodeURIComponent(title);
+    } catch {
+      name = title;
+    }
+    return name;
+  };
+
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (search.length > 0) {
-      setResults(
-        (await azureSearch(search)).map((doc: IAzureSearchResult) => ({
+      const searchResults = await azureSearch(search);
+      const results = searchResults.map((doc: IAzureSearchResult) => {
+        return {
           activeSubstance: 'Ibuprofen',
           context: doc['@search.highlights'].content.join(' … '),
           docType: doc.doc_type.toString().substr(0, 3),
@@ -83,10 +95,11 @@ const Mip: React.FC = () => {
           lastUpdated: doc.created
             ? moment(doc.created).format('Do MMM YYYY')
             : 'Unknown',
-          name: decodeURIComponent(doc.title || 'Unknown'),
+          name: sanitizeTitle(doc.title),
           url: doc.metadata_storage_path,
-        })),
-      );
+        };
+      });
+      setResults(results);
     }
 
     setLastSearch(search);
