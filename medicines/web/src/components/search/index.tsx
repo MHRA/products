@@ -1,22 +1,15 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
-import {
-  black,
-  mhraBlue90,
-  mhraGray,
-  primaryColor,
-  white,
-} from '../../styles/colors';
+import { black, mhraBlue90, mhraGray, white } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
 
 const StyledSearch = styled.section`
-  border-radius: 5px 5px 0 0;
-  border: 1px solid ${primaryColor};
   box-sizing: border-box;
-  margin-bottom: ${baseSpace};
+  margin-bottom: calc(${baseSpace} / 2);
 
   h2 {
     background-color: ${mhraBlue90};
+    border-radius: 5px 5px 0 0;
     color: ${white};
     font-size: 1.1875rem;
     margin: 0;
@@ -43,14 +36,14 @@ const StyledSearch = styled.section`
 
   input[type='submit'] {
     align-self: flex-end;
-    max-width: 50%;
-    display: block;
-    padding: 0 0.5rem;
     background-color: white;
-    border: 1px solid black;
     border-radius: 10px;
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid black;
     border: solid 1px ${mhraGray};
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    display: block;
+    max-width: 50%;
+    padding: 0.4rem 0.8rem;
   }
 `;
 
@@ -66,7 +59,11 @@ interface ISearchProps {
 const Search: React.FC<ISearchProps> = props => (
   <StyledSearch>
     <h2>{title}</h2>
-    <form action="" onSubmit={props.onSearchSubmit}>
+    <form
+      onSubmit={props.onSearchSubmit}
+      role="search"
+      aria-label="Search for medicines"
+    >
       <label htmlFor="search">{labelString}</label>
       <input
         type="search"

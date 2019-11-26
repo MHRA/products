@@ -4,8 +4,9 @@ import { mhraBlue90, mhraGray, primaryColor } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
 
 const StyledDrugIndex = styled.section`
-  h3 {
-    color: ${primaryColor};
+  h2 {
+    font-size: 1.5rem;
+    /* color: ${primaryColor}; */
   }
 
   ul {
@@ -58,7 +59,7 @@ const index = [
 
 const DrugIndex: React.FC = () => (
   <StyledDrugIndex>
-    <h3>List of active substances</h3>
+    <h2>List of active substances</h2>
     <nav>
       <ul>
         {index.map(character => (

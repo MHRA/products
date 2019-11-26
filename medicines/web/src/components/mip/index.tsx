@@ -8,7 +8,6 @@ import {
 } from '../../styles/dimensions';
 import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
-import Pdf from '../pdf';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
