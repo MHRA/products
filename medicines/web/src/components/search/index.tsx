@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import { black, mhraBlue90, mhraGray, white } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledSearch = styled.section`
   box-sizing: border-box;
@@ -45,6 +45,14 @@ const StyledSearch = styled.section`
     display: block;
     max-width: 50%;
     padding: 0.4rem 0.8rem;
+  }
+
+  @media ${mobileBreakpoint} {
+    margin-bottom: 0;
+
+    form {
+      padding: ${baseSpace};
+    }
   }
 `;
 

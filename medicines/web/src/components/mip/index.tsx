@@ -32,8 +32,9 @@ const Aside = styled.aside`
 
   @media ${mobileBreakpoint} {
     max-width: 100%;
+    padding: 0.3125rem;
 
-    .pdf-yellow-card-wrapper {
+    .yellow-card-wrapper {
       display: none;
     }
   }
@@ -44,14 +45,14 @@ const Main = styled.main`
   padding: ${baseSpace};
   padding-left: calc(${baseSpace} / 2);
 
-  .pdf-yellow-card-wrapper {
+  .yellow-card-wrapper {
     display: none;
   }
 
   @media ${mobileBreakpoint} {
     max-width: 100%;
 
-    .pdf-yellow-card-wrapper {
+    .yellow-card-wrapper {
       display: block;
     }
   }
@@ -111,16 +112,24 @@ const Mip: React.FC = () => {
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
         />
-        <YellowCard />
+        <div className="yellow-card-wrapper">
+          <YellowCard />
+        </div>
       </Aside>
       {lastSearch.length === 0 ? (
         <Main>
           <MipText />
-          <DrugIndex />
+          {/* <DrugIndex /> */}
+          <div className="yellow-card-wrapper">
+            <YellowCard />
+          </div>
         </Main>
       ) : (
         <Main>
           <SearchResults drugs={results} lastSearch={lastSearch} />
+          <div className="yellow-card-wrapper">
+            <YellowCard />
+          </div>
         </Main>
       )}
     </Row>

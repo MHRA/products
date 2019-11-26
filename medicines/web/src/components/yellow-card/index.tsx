@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray30, mhraYellow } from '../../styles/colors';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import SvgYellowCard from '../logos/yellow-card';
 
 const StyledYellowCard = styled.section`
@@ -27,6 +27,18 @@ const StyledYellowCard = styled.section`
     /* TODO: Ask design to check this colour */
     color: #1d70b8;
     text-decoration: none;
+  }
+
+  @media ${mobileBreakpoint} {
+    picture {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
+    p {
+      font-size: 1.1875rem;
+      padding: 0 calc(1rem / 2);
+    }
   }
 `;
 

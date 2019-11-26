@@ -1,7 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray20 } from '../../styles/colors';
-import { baseSpace, desktopMaxWidth } from '../../styles/dimensions';
+import {
+  baseSpace,
+  desktopMaxWidth,
+  mobileBreakpoint,
+} from '../../styles/dimensions';
 import SvgAgencyDigitalLogo from '../logos/agency-digital-logo';
 import SvgCrownGrey from '../logos/crown-grey';
 
@@ -27,6 +31,14 @@ const StyledFooter = styled.footer`
 
   a {
     color: ${black};
+  }
+
+  @media ${mobileBreakpoint} {
+    padding: ${baseSpace};
+
+    ul {
+      flex-direction: column;
+    }
   }
 `;
 

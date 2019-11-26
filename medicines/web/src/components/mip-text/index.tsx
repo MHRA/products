@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { mhraGray } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
 import { baseFontSize } from '../../styles/fonts';
 
 const StyledMipText = styled.section`
@@ -11,6 +11,13 @@ const StyledMipText = styled.section`
 
   p:first-of-type {
     margin-top: 0;
+  }
+
+  @media ${mobileBreakpoint} {
+    p {
+      font-size: 1rem;
+      line-height: 1.56;
+    }
   }
 `;
 
