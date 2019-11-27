@@ -7,9 +7,9 @@ settings:
   - ArgRequiredElseHelp
 
 subcommands:
-  - datasource:
+  - define_datasource:
       about: Create a datasource from a definition.
-  - index:
+  - define_index:
       about: Create an index from a definition.
-  - indexer:
+  - define_indexer:
       about: Create an indexer from a definition.
