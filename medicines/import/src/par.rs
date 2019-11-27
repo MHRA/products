@@ -66,7 +66,7 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                             metadata.insert("title", &title);
                             let keywords = tokenize(&record.keywords);
                             metadata.insert("keywords", &keywords);
-                            let suggestions = to_json_array(&keywords);
+                            let suggestions = to_json_array(&record.keywords);
                             metadata.insert("suggestions", &suggestions);
                             let created = record.created.to_rfc3339();
                             metadata.insert("created", &created);
@@ -119,8 +119,10 @@ fn to_json_array(s: &str) -> String {
     let words = s.split(",")
         .map(|s| s.trim())
         .map(|s| s.replace("\n", " "))
-        .map(|s| s.to_ascii_lowercase())
+        .map(|s| s.replace(|c: char| !c.is_ascii(), ""))
         .collect::<Vec<String>>();
+
+    println!("{:?}", words);
 
     serde_json::to_string(&words).expect("Couldn't create JSON array.")
 }

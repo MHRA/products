@@ -1,30 +1,15 @@
-use awc::Client;
-use actix_rt::System;
-use mime;
-use std::fs;
+use crate::azure_rest;
+use actix_web::client;
 
-pub fn create_index() {
+pub fn create_index() -> Result<(), client::SendRequestError> {
     let index_definition = get_index_definition();
+    let url = "https://rb-mhra-mip.search.windows.net/indexes?api-version=2019-05-06";
+    let api_key = std::env::var("API_ADMIN_KEY")
+        .expect("Set env variable API_ADMIN_KEY first!");
 
-    System::new("create_index").block_on(async {
-        let mut client = Client::default();
-
-        client
-            .post("https://rb-mhra-mip.search.windows.net/indexes?api-version=2019-05-06")
-            .set(awc::http::header::ContentType(mime::APPLICATION_JSON))
-            .header("api-key", "323AC9DC56CB64CE71C33C4A28C832A4")
-            .send_body(index_definition)
-            .await
-            .and_then(|response| {
-                println!("Response: {:?}", response);
-                Ok(())
-            })
-    });
+    azure_rest::send_json_post_request(index_definition, url, &api_key)
 }
 
 fn get_index_definition() -> String {
-    let index_definition_path = "../definitions/indexes/azureblob-index.json";
-
-    fs::read_to_string(index_definition_path)
-        .expect("Could not read index definition.")
+    include_str!("../definitions/indexes/azureblob-index.json").to_string()
 }

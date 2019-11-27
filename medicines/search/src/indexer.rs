@@ -1,26 +1,13 @@
-use actix_rt::System;
-use actix_web::{client, client::Client};
-use mime;
+use actix_web::client;
+use crate::azure_rest;
 
 pub fn create_indexer() -> Result<(), client::SendRequestError> {
     let indexer_definition = get_indexer_definition();
+    let url = "https://rb-mhra-mip.search.windows.net/indexers?api-version=2019-05-06";
+    let api_key = std::env::var("API_ADMIN_KEY")
+        .expect("Set env variable API_ADMIN_KEY first!");
 
-    System::new("create_indexer").block_on(async {
-        let client = Client::default();
-
-        let request = client
-            .post("https://rb-mhra-mip.search.windows.net/indexers?api-version=2019-05-06")
-            .set(actix_web::http::header::ContentType(mime::APPLICATION_JSON))
-            .header("api-key", "323AC9DC56CB64CE71C33C4A28C832A4");
-        println!("{:?}\n{:?}", request, indexer_definition);
-        request
-            .send_body(indexer_definition)
-            .await
-            .and_then(|response| {
-                println!("Response: {:?}", response);
-                Ok(())
-            })
-    })
+    azure_rest::send_json_post_request(indexer_definition, url, &api_key)
 }
 
 fn get_indexer_definition() -> String {
