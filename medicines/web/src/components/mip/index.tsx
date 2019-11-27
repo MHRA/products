@@ -2,13 +2,11 @@ import moment from 'moment';
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import {
-  baseSpaceSizeCss,
-  desktopMaxWidthCss,
-  mobileBreakpointCss,
+  baseSpace,
+  desktopMaxWidth,
+  mobileBreakpoint,
 } from '../../styles/dimensions';
-import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
-import Pdf from '../pdf';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
@@ -19,23 +17,28 @@ const Row = styled.section`
   flex-wrap: wrap;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: ${desktopMaxWidthCss};
+  flex-grow: 1;
+  max-width: ${desktopMaxWidth};
   > * {
     flex-basis: 100%;
     flex-shrink: 1;
     flex-grow: 1;
   }
+
+  @media ${mobileBreakpoint} {
+    display: block;
+  }
 `;
 
 const Aside = styled.aside`
   max-width: 25%;
-  padding: ${baseSpaceSizeCss} calc(${baseSpaceSizeCss} / 2) 0
-    ${baseSpaceSizeCss};
+  padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
 
-  @media ${mobileBreakpointCss} {
+  @media ${mobileBreakpoint} {
     max-width: 100%;
+    padding: 0.3125rem;
 
-    .pdf-yellow-card-wrapper {
+    .yellow-card-wrapper {
       display: none;
     }
   }
@@ -43,17 +46,17 @@ const Aside = styled.aside`
 
 const Main = styled.main`
   max-width: 75%;
-  padding: ${baseSpaceSizeCss};
-  padding-left: calc(${baseSpaceSizeCss} / 2);
+  padding: ${baseSpace};
+  padding-left: calc(${baseSpace} / 2);
 
-  .pdf-yellow-card-wrapper {
+  .yellow-card-wrapper {
     display: none;
   }
 
-  @media ${mobileBreakpointCss} {
+  @media ${mobileBreakpoint} {
     max-width: 100%;
 
-    .pdf-yellow-card-wrapper {
+    .yellow-card-wrapper {
       display: block;
     }
   }
@@ -113,17 +116,24 @@ const Mip: React.FC = () => {
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
         />
-        <Pdf />
-        <YellowCard />
+        <div className="yellow-card-wrapper">
+          <YellowCard />
+        </div>
       </Aside>
       {lastSearch.length === 0 ? (
         <Main>
           <MipText />
-          <DrugIndex />
+          {/* <DrugIndex /> */}
+          <div className="yellow-card-wrapper">
+            <YellowCard />
+          </div>
         </Main>
       ) : (
         <Main>
           <SearchResults drugs={results} lastSearch={lastSearch} />
+          <div className="yellow-card-wrapper">
+            <YellowCard />
+          </div>
         </Main>
       )}
     </Row>

@@ -1,28 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
-import { mhraBlue90, mhraGray, primaryColor } from '../../styles/colors';
-import { baseSpaceSizeCss } from '../../styles/dimensions';
+import { black } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
-  h3 {
-    color: ${primaryColor};
+  margin-top: 3.75rem;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
   }
 
   ul {
-    padding: ${baseSpaceSizeCss};
-    margin: 0;
-    list-style: none;
     display: flex;
     justify-content: space-between;
-    border: 1px solid ${mhraBlue90};
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   a {
-    color: ${mhraGray};
-  }
-
-  a:visited {
-    color: ${primaryColor};
+    color: ${black};
+    text-decoration: none;
   }
 `;
 
@@ -58,7 +56,7 @@ const index = [
 
 const DrugIndex: React.FC = () => (
   <StyledDrugIndex>
-    <h3>List of active substances</h3>
+    <h2>List of active substances</h2>
     <nav>
       <ul>
         {index.map(character => (

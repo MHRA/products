@@ -1,12 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import { mhraGray } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
+import { baseFontSize } from '../../styles/fonts';
 
 const StyledMipText = styled.section`
-  color: ${mhraGray};
+  p {
+    font-size: ${baseFontSize};
+    line-height: 1.315;
+  }
 
-  & p:first-of-type {
+  p:first-of-type {
     margin-top: 0;
+  }
+
+  @media ${mobileBreakpoint} {
+    p {
+      font-size: 1rem;
+      line-height: 1.56;
+    }
   }
 `;
 
@@ -32,7 +43,7 @@ const MipText: React.FC = () => (
     <p>
       MHRA holds data for medicines that are licensed at national level. Some
       medicines are licensed centrally by the European Medicines Agency (EMA).
-      For product information on these medicines, please consult the &nbsp;
+      For product information on these medicines, please consult the&nbsp;
       <a
         href="http://www.ema.europa.eu/ema/index.jsp?curl=pages/includes/medicines/medicines_landing_page.jsp&mid=WC0b01ac058001ce7e"
         title="European Medicines Agency"
@@ -49,7 +60,7 @@ const MipText: React.FC = () => (
     </p>
     <p>
       If you have any questions or comments on this list of product information,
-      please contact our &nbsp;
+      please contact our&nbsp;
       <a
         href="/Contactus/CustomerServices/index.htm"
         title="Customer Services Team"

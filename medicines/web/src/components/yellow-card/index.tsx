@@ -1,34 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray30, mhraYellow } from '../../styles/colors';
-import { baseSpaceSizeCss } from '../../styles/dimensions';
+import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import SvgYellowCard from '../logos/yellow-card';
 
 const StyledYellowCard = styled.section`
   background-color: ${mhraGray30};
-  margin-top: ${baseSpaceSizeCss};
-  padding-bottom: calc(${baseSpaceSizeCss} / 2);
+  padding-bottom: calc(${baseSpace} / 2);
 
-  & h2 {
+  header {
+    padding: 1rem;
     background-color: ${mhraYellow};
-    color: ${black};
-    margin-top: 0;
-    padding: calc(${baseSpaceSizeCss} / 2);
-    text-align: center;
   }
 
-  & p {
-    text-align: center;
+  p {
+    padding: 0 1rem;
   }
 
-  & p:first-of-type {
+  p:first-of-type {
     color: ${black};
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: bold;
   }
 
-  & p:last-of-type a {
-    color: ${black};
+  p:last-of-type a {
+    /* TODO: Ask design to check this colour */
+    color: #1d70b8;
     text-decoration: none;
+  }
+
+  @media ${mobileBreakpoint} {
+    picture {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
+    p {
+      font-size: 1.1875rem;
+      padding: 0 calc(1rem / 2);
+    }
   }
 `;
 
@@ -38,7 +48,11 @@ const linkText = 'mhra.gov.uk/yellowcard';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
-    <h2>{title}</h2>
+    <header role="img" aria-label="Yellow card">
+      <picture>
+        <SvgYellowCard />
+      </picture>
+    </header>
     <p>{content}</p>
     <p>
       <a href="https://mhra.gov.uk/yellowcard" title={title}>

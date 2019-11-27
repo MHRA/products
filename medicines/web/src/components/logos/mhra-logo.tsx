@@ -1,7 +1,14 @@
 import React from 'react';
 
 const SvgMhraLogo = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg width={621.581} height="46.41mm" viewBox="0 0 466.19 131.55" {...props}>
+  <svg
+    width={621.581}
+    height="46.41mm"
+    viewBox="0 0 466.19 131.55"
+    role="img"
+    {...props}
+  >
+    <title>MHRA Logo</title>
     <path
       d="M73.01 6.77A6.77 6.77 0 1166.24 0a6.77 6.77 0 016.77 6.77z"
       fill="#031f73"
