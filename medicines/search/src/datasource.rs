@@ -1,5 +1,6 @@
+use awc::Client;
 use actix_rt::System;
-use actix_web::client::Client;
+use mime;
 use std::fs;
 
 pub fn create_datasource() {
@@ -9,6 +10,21 @@ pub fn create_datasource() {
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
     let datasource_definition = get_datasource_definition(&storage_account, &storage_master_key);
+
+    System::new("create_datasource").block_on(async {
+        let mut client = Client::default();
+
+        client
+            .post("https://rb-mhra-mip.search.windows.net/datasources?api-version=2019-05-06")
+            .set(awc::http::header::ContentType(mime::APPLICATION_JSON))
+            .header("api-key", "323AC9DC56CB64CE71C33C4A28C832A4")
+            .send_body(datasource_definition)
+            .await
+            .and_then(|response| {
+                println!("Response: {:?}", response);
+                Ok(())
+            })
+    });
 }
 
 fn get_datasource_definition(storage_account: &String, storage_master_key: &String) -> String {
