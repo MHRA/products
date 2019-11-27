@@ -7,13 +7,16 @@ import {
   mobileBreakpoint,
 } from '../../styles/dimensions';
 import SvgAgencyDigitalLogo from '../logos/agency-digital-logo';
-import SvgCrownGrey from '../logos/crown-grey';
 
 const StyledFooter = styled.footer`
   background-color: ${mhraGray20};
-  padding: ${baseSpace} ${baseSpace} ${baseSpace} 3.75rem;
-  max-width: ${desktopMaxWidth};
-  margin: 0 auto;
+  width: 100%;
+
+  .wrapper {
+    padding: ${baseSpace};
+    margin: 0 auto;
+    max-width: ${desktopMaxWidth};
+  }
 
   picture {
     max-width: 250px;
@@ -44,29 +47,33 @@ const StyledFooter = styled.footer`
 
 const Footer: React.FC = () => (
   <StyledFooter>
-    <picture>
-      <SvgAgencyDigitalLogo />
-    </picture>
-    <nav>
-      <ul>
-        <li>
-          <p>
-            <a href="">Cookie Policy</a>
-          </p>
-        </li>
-        <li>
-          <p>
-            <a href="">Privacy Policy</a>
-          </p>
-        </li>
-        <li>
-          <p>
-            Built by the
-            <a href="">Medicines &amp; Healthcare products Regulatory Agency</a>
-          </p>
-        </li>
-      </ul>
-    </nav>
+    <div className="wrapper">
+      <picture>
+        <SvgAgencyDigitalLogo />
+      </picture>
+      <nav>
+        <ul>
+          <li>
+            <p>
+              <a href="">Cookie Policy</a>
+            </p>
+          </li>
+          <li>
+            <p>
+              <a href="">Privacy Policy</a>
+            </p>
+          </li>
+          <li>
+            <p>
+              Built by the&nbsp;
+              <a href="">
+                Medicines &amp; Healthcare products Regulatory Agency
+              </a>
+            </p>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </StyledFooter>
 );
 

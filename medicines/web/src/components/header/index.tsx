@@ -11,10 +11,14 @@ import SvgMhraLogo from '../logos/mhra-logo';
 const mhra = 'Medicines Information';
 
 const Header = styled.header`
-  margin: 0 auto;
-  max-width: ${desktopMaxWidth};
-  padding: ${baseSpace} ${baseSpace} 0;
   border-top: 4px solid ${primaryColor};
+  width: 100%;
+
+  .wrapper {
+    margin: 0 auto;
+    max-width: ${desktopMaxWidth};
+    padding: ${baseSpace} ${baseSpace} 0;
+  }
 
   picture {
     max-width: 224px;
@@ -45,10 +49,12 @@ const Header = styled.header`
 
 const header: React.FC = () => (
   <Header>
-    <picture>
-      <SvgMhraLogo />
-    </picture>
-    <h1>{mhra}</h1>
+    <div className="wrapper">
+      <picture>
+        <SvgMhraLogo />
+      </picture>
+      <h1>{mhra}</h1>
+    </div>
   </Header>
 );
 

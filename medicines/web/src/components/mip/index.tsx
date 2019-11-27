@@ -6,7 +6,6 @@ import {
   desktopMaxWidth,
   mobileBreakpoint,
 } from '../../styles/dimensions';
-import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
@@ -18,11 +17,16 @@ const Row = styled.section`
   flex-wrap: wrap;
   justify-content: space-between;
   margin: 0 auto;
+  flex-grow: 1;
   max-width: ${desktopMaxWidth};
   > * {
     flex-basis: 100%;
     flex-shrink: 1;
     flex-grow: 1;
+  }
+
+  @media ${mobileBreakpoint} {
+    display: block;
   }
 `;
 

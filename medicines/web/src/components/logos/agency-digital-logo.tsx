@@ -7,8 +7,10 @@ const SvgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
     y={0}
     viewBox="0 0 726.8 185.6"
     xmlSpace="preserve"
+    role="img"
     {...props}
   >
+    <title>Agency Logo</title>
     <style>{'.agency-digital-logo_svg__st1{fill:#1d1d1b}'}</style>
     <path fill="#00a297" d="M0 0h4.2v175.3H0z" />
     <path
