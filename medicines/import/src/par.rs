@@ -160,7 +160,7 @@ mod test {
     #[test]
     fn jsonify_keywords() {
         let s = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride";
-        let json = "[\"ukpar\",\"public assessment report\",\"par\",\"national procedure\",\"ibuprofen\",\"phenylephrine hydrochloride\"]";
+        let json = "[\"ukpar\",\"public assessment report\",\"par\",\"national procedure\",\"Ibuprofen\",\"Phenylephrine Hydrochloride\"]";
         assert_eq!(to_json_array(s), json);
     }
 }
