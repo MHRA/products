@@ -18,7 +18,7 @@ stages:
           - script: |
               set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
               source $HOME/.cargo/env
               rustup toolchain list
               rustup default stable
@@ -43,7 +43,7 @@ stages:
           - script: |
               set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
               source $HOME/.cargo/env
               rustup toolchain list
               rustup default nightly
