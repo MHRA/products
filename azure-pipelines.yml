@@ -16,8 +16,10 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - script: |
+              set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+              source $HOME/.cargo/env
               rustup toolchain list
               rustc -Vv
               cargo -V
@@ -38,8 +40,10 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - script: |
+              set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+              source $HOME/.cargo/env
               rustup toolchain list
               rustc -Vv
               cargo -V

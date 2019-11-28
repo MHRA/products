@@ -240,10 +240,7 @@
     {
       "name": "azure-suggester",
       "searchMode": "analyzingInfixMatching",
-      "sourceFields": [
-        "suggestions",
-        "title"
-      ]
+      "sourceFields": ["suggestions", "title"]
     }
   ],
   "scoringProfiles": [
@@ -258,9 +255,7 @@
   ],
   "defaultScoringProfile": "",
   "corsOptions": {
-    "allowedOrigins": [
-      "*"
-    ],
+    "allowedOrigins": ["*"],
     "maxAgeInSeconds": 300
   },
   "analyzers": [],

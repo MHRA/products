@@ -3,6 +3,9 @@
   "dataSourceName": "docs",
   "targetIndexName": "azureblob-index",
   "fieldMappings": [
-    { "sourceFieldName" : "suggestions", "mappingFunction" : { "name" : "jsonArrayToStringCollection" } }
+    {
+      "sourceFieldName": "suggestions",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    }
   ]
 }
