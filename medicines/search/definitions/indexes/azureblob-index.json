@@ -17,6 +17,21 @@
       "fields": []
     },
     {
+      "name": "rev_label",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": false,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "metadata_storage_path",
       "type": "Edm.String",
       "facetable": false,
@@ -39,6 +54,21 @@
       "key": false,
       "retrievable": false,
       "searchable": false,
+      "sortable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
+      "name": "product_name",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": false,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
       "sortable": false,
       "analyzer": null,
       "indexAnalyzer": null,
@@ -234,13 +264,26 @@
       "searchAnalyzer": null,
       "synonymMaps": [],
       "fields": []
+    },
+    {
+      "name": "substance_name",
+      "type": "Collection(Edm.String)",
+      "facetable": false,
+      "filterable": true,
+      "retrievable": true,
+      "searchable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
     }
   ],
   "suggesters": [
     {
       "name": "azure-suggester",
       "searchMode": "analyzingInfixMatching",
-      "sourceFields": ["suggestions", "title"]
+      "sourceFields": ["suggestions", "title", "substance_name", "product_name"]
     }
   ],
   "scoringProfiles": [
