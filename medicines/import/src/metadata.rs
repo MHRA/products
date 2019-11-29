@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::str;
 use tantivy::tokenizer::*;
 
@@ -29,14 +30,13 @@ pub fn tokenize(s: &str) -> String {
 }
 
 pub fn to_json_array(s: &str) -> String {
-    let words = s
-        .split(',')
+    let re = Regex::new(r"(,|\s+AND\s+)").unwrap();
+    let words = re
+        .split(s)
         .map(|s| s.trim())
         .map(|s| s.replace("\n", " "))
         .map(|s| s.replace(|c: char| !c.is_ascii(), ""))
         .collect::<Vec<String>>();
-
-    println!("{:?}", words);
 
     serde_json::to_string(&words).expect("Couldn't create JSON array.")
 }
@@ -74,6 +74,24 @@ mod test {
     fn jsonify_keywords() {
         let s = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride";
         let json = "[\"ukpar\",\"public assessment report\",\"par\",\"national procedure\",\"Ibuprofen\",\"Phenylephrine Hydrochloride\"]";
+        assert_eq!(to_json_array(s), json);
+    }
+    #[test]
+    fn jsonify_single_term() {
+        let s = "Phenylephrine Hydrochloride";
+        let json = "[\"Phenylephrine Hydrochloride\"]";
+        assert_eq!(to_json_array(s), json);
+    }
+    #[test]
+    fn jsonify_terms_joined_with_and() {
+        let s = "THIOPENTAL SODIUM AND SODIUM CARBONATE";
+        let json = "[\"THIOPENTAL SODIUM\",\"SODIUM CARBONATE\"]";
+        assert_eq!(to_json_array(s), json);
+    }
+    #[test]
+    fn jsonify_terms_joined_with_and_2() {
+        let s = "THIOPENTAL SODIUMANDSODIUM CARBONATE";
+        let json = "[\"THIOPENTAL SODIUMANDSODIUM CARBONATE\"]";
         assert_eq!(to_json_array(s), json);
     }
 }

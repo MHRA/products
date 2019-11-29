@@ -43,7 +43,7 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 let product_name = metadata::sanitize(&record.product_name);
                 metadata.insert("product_name", &product_name);
 
-                let substance_name = metadata::sanitize(&record.substance_name);
+                let substance_name = metadata::to_json_array(&record.substance_name);
                 metadata.insert("substance_name", &substance_name);
 
                 storage::upload(&client, &mut core, &fs::read(path)?, &metadata)?;
