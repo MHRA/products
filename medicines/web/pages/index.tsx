@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
@@ -33,12 +34,17 @@ const StyledApp = styled.div`
 
 const App: React.FC = () => {
   return (
-    <StyledApp>
-      <Normalize />
-      <Header />
-      <Mip />
-      <Footer />
-    </StyledApp>
+    <>
+      <Head>
+        <title>MHRA Medicines Information</title>
+      </Head>
+      <StyledApp>
+        <Normalize />
+        <Header />
+        <Mip />
+        <Footer />
+      </StyledApp>
+    </>
   );
 };
 
