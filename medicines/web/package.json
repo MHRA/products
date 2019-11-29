@@ -1,7 +1,7 @@
 {
   "author": "Red Badger",
   "dependencies": {
-    "@types/dotenv-webpack": "^1.7.0",
+    "dotenv": "^8.2.0",
     "moment": "^2.24.0",
     "next": "^9.1.4",
     "react": "^16.11.0",
@@ -17,7 +17,7 @@
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "^4.4.0",
-    "dotenv-webpack": "^1.7.0",
+    "babel-plugin-styled-components": "^1.10.6",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.3",
     "pa11y": "^5.3",
@@ -53,7 +53,7 @@
     "dev": "next",
     "lint": "yarn tslint",
     "start": "next start",
-    "export": "next export"
+    "export": "next export -o dist"
   },
   "version": "1.0.0"
 }
