@@ -10,7 +10,8 @@ pub fn get_pdfs(dir: &Path) -> io::Result<Vec<PathBuf>> {
         .filter_map(|entry| {
             entry
                 .metadata()
-                .map_or_else(|_e| None, |m| Some((entry, m)))
+                .map(|m| Some((entry, m)))
+                .unwrap_or_else(|_e| None)
         })
         .filter_map(|(entry, m)| if m.len() > 0 { Some(entry) } else { None })
         .map(|entry| entry.path())
