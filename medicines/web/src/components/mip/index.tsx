@@ -63,9 +63,13 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [lastSearch, setLastSearch] = React.useState('');
   const [results, setResults] = React.useState<IDocument[]>([]);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [resultCount, setResultCount] = React.useState(NaN);
+  const pageSize = 30;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
+    // TODO: Reset current page and result count
   };
 
   const sanitizeTitle = (title: string | null): string => {
@@ -83,11 +87,14 @@ const Mip: React.FC = () => {
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (search.length > 0) {
-      const searchResults = await azureSearch(search);
-      const results = searchResults.map((doc: IAzureSearchResult) => {
+      const searchResponse = await azureSearch(search, currentPage, pageSize);
+      setResultCount(searchResponse.resultCount);
+      const results = searchResponse.results.map((doc: IAzureSearchResult) => {
         return {
           activeSubstance: 'Ibuprofen',
-          context: doc['@search.highlights'].content.join(' … '),
+          context: doc['@search.highlights']
+            ? doc['@search.highlights'].content.join(' … ')
+            : '',
           docType: doc.doc_type.toString().substr(0, 3),
           fileSize: Math.ceil(doc.metadata_storage_size / 1000).toLocaleString(
             'en-GB',
