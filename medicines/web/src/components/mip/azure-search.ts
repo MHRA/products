@@ -33,14 +33,14 @@ export interface IAzureSearchResult {
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^"~*?:\/]|\|\||&&)/gi, `\\$1`);
 
-const addAzureWordFuzziness = (word: string): string =>
+const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${azureSearchWordFuzziness} ${word}^${azureSearchExactnessBoost}`;
 
 const buildFuzzyQuery = (query: string): string => {
   return query
     .split(' ')
     .map(word => escapeSpecialCharacters(word))
-    .map(word => addAzureWordFuzziness(word))
+    .map(word => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
 };
 
