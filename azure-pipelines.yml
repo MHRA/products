@@ -16,9 +16,12 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - script: |
+              set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
+              source $HOME/.cargo/env
               rustup toolchain list
+              rustup default stable
               rustc -Vv
               cargo -V
               echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
@@ -38,9 +41,12 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - script: |
+              set -xeo pipefail
               export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
+              source $HOME/.cargo/env
               rustup toolchain list
+              rustup default nightly
               rustc -Vv
               cargo -V
               echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"

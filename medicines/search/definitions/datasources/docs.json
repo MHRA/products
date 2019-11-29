@@ -1,0 +1,8 @@
+{
+  "name": "docs",
+  "type": "azureblob",
+  "credentials": {
+    "connectionString": "DefaultEndpointsProtocol=https;AccountName=ACCOUNT_NAME_PLACEHOLDER;AccountKey=ACCOUNT_KEY_PLACEHOLDER;"
+  },
+  "container": { "name": "docs" }
+}
