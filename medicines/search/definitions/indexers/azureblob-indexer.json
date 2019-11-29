@@ -2,9 +2,16 @@
   "name": "azureblob-indexer",
   "dataSourceName": "docs",
   "targetIndexName": "azureblob-index",
+  "parameters": {
+    "configuration": { "indexStorageMetadataOnlyForOversizedDocuments": true }
+  },
   "fieldMappings": [
     {
       "sourceFieldName": "suggestions",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "substance_name",
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
     }
   ]

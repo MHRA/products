@@ -27,6 +27,7 @@ export interface IAzureSearchResult {
   release_state: string | null;
   title: string | null;
   suggestions: string[];
+  substance_name: string[];
 }
 
 const escapeSpecialCharacters = (word: string): string =>
