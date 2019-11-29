@@ -59,7 +59,7 @@ const StyledDrugList = styled.section`
     font-weight: bold;
     padding: 10px 0;
     text-align: center;
-    width: 50px;
+    width: 70px;
   }
 
   li .right {
@@ -89,7 +89,7 @@ const StyledDrugList = styled.section`
 `;
 
 export interface IDocument {
-  activeSubstance: string;
+  activeSubstances: string[];
   context: string;
   docType: string;
   fileSize: string;
@@ -137,11 +137,12 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
                 <p className="drug-name">
                   {drug.name} ({drug.fileSize} KB)
                 </p>
-                <p className="metadata">
-                  Last updated: {drug.lastUpdated}
-                  <br />
-                  Active substance: {drug.activeSubstance}
-                </p>
+                <p className="metadata">Last updated: {drug.lastUpdated}</p>
+                {drug.docType !== 'Par' && (
+                  <p className="metadata">
+                    Active substances: {drug.activeSubstances.join(', ')}
+                  </p>
+                )}
                 <p
                   className="context"
                   dangerouslySetInnerHTML={{ __html: drug.context }}
