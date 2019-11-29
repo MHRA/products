@@ -22,6 +22,8 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 metadata.insert("title", &title);
                 let keywords = metadata::tokenize(&record.keywords);
                 metadata.insert("keywords", &keywords);
+                let suggestions = metadata::to_json_array(&record.keywords);
+                metadata.insert("suggestions", &suggestions);
                 let created = record.created.to_rfc3339();
                 metadata.insert("created", &created);
                 let author = metadata::sanitize(&record.author);

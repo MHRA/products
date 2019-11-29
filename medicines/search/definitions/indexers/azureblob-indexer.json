@@ -1,0 +1,11 @@
+{
+  "name": "azureblob-indexer",
+  "dataSourceName": "docs",
+  "targetIndexName": "azureblob-index",
+  "fieldMappings": [
+    {
+      "sourceFieldName": "suggestions",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    }
+  ]
+}

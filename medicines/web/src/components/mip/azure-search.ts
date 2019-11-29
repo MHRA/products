@@ -1,6 +1,7 @@
 const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
 const azureSearchKey = process.env.AZURE_SEARCH_KEY;
+const azureSearchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
 const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
@@ -25,6 +26,7 @@ export interface IAzureSearchResult {
   metadata_storage_size: number;
   release_state: string | null;
   title: string | null;
+  suggestions: string[];
 }
 
 const escapeSpecialCharacters = (word: string): string =>
@@ -51,6 +53,10 @@ const buildAzureSearchUrl = (query: string): string => {
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('search', query);
+  url.searchParams.append(
+    'scoringProfile',
+    azureSearchScoringProfile as string,
+  );
 
   return url.toString();
 };
