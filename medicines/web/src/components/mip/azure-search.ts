@@ -1,4 +1,5 @@
 const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
+const azureSearchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
 const azureSearchKey = process.env.AZURE_SEARCH_KEY;
 const azureSearchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
@@ -33,14 +34,14 @@ export interface IAzureSearchResult {
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^"~*?:\/]|\|\||&&)/gi, `\\$1`);
 
-const addAzureWordFuzziness = (word: string): string =>
-  `${word}~${azureSearchWordFuzziness}`;
+const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
+  `${word}~${azureSearchWordFuzziness} ${word}^${azureSearchExactnessBoost}`;
 
 const buildFuzzyQuery = (query: string): string => {
   return query
     .split(' ')
     .map(word => escapeSpecialCharacters(word))
-    .map(word => addAzureWordFuzziness(word))
+    .map(word => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
 };
 
