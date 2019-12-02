@@ -1,5 +1,15 @@
 {
-  "presets": ["next/babel"],
+  "presets": [
+    [
+      "next/babel",
+      {
+        "preset-env": {
+          "useBuiltIns": false,
+          "targets": "> 0.15%, not dead"
+        }
+      }
+    ]
+  ],
   "plugins": [
     [
       "styled-components",
