@@ -1,3 +1,6 @@
+// @ts-ignore
+import URL from 'url-polyfill';
+
 const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const azureSearchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
