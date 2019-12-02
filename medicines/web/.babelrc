@@ -4,9 +4,9 @@
       "next/babel",
       {
         "preset-env": {
-          "useBuiltIns": "entry",
+          "useBuiltIns": "usage",
           "targets": "defaults",
-          "corejs": 3
+          "corejs": "3"
         }
       }
     ]
