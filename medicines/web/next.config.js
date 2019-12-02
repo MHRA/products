@@ -11,5 +11,8 @@ module.exports = {
     AZURE_SEARCH_EXACTNESS_BOOST: process.env.AZURE_SEARCH_EXACTNESS_BOOST,
   },
   assetPrefix:
-    process.env.ASSET_PREFIX === 'master' ? '' : `/${process.env.ASSET_PREFIX}`,
+    process.env.ASSET_PREFIX === 'master' ||
+    process.env.ASSET_PREFIX === undefined
+      ? ''
+      : `/${process.env.ASSET_PREFIX}`,
 };
