@@ -1,6 +1,3 @@
-// @ts-ignore
-import URL from 'url-polyfill';
-
 const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const azureSearchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
@@ -82,7 +79,7 @@ const getJson = async (url: string): Promise<any> => {
 export const azureSearch = async (
   query: string,
 ): Promise<IAzureSearchResult[]> => {
-  const body = await getJson(buildAzureSearchUrl(buildFuzzyQuery(query)));
+  const body = await getJson('https://api.github.com/users/octocat');
 
   return body.value;
 };
