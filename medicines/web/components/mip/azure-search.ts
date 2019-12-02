@@ -79,7 +79,7 @@ const getJson = async (url: string): Promise<any> => {
 export const azureSearch = async (
   query: string,
 ): Promise<IAzureSearchResult[]> => {
-  const body = await getJson('https://api.github.com/users/octocat');
+  const body = await getJson(buildAzureSearchUrl(buildFuzzyQuery(query)));
 
   return body.value;
 };
