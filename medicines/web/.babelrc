@@ -5,7 +5,7 @@
       {
         "preset-env": {
           "useBuiltIns": false,
-          "targets": "> 0.15%, not dead"
+          "targets": "defaults"
         }
       }
     ]
