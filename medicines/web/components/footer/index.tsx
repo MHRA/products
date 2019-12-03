@@ -56,7 +56,9 @@ const Footer: React.FC = () => (
         <ul>
           <li>
             <p>
-              <a href="">Cookie Policy</a>
+              <Link href="cookies">
+                <a>Cookie Policy</a>
+              </Link>
             </p>
           </li>
           <li>
