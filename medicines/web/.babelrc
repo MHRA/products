@@ -5,7 +5,6 @@
       {
         "preset-env": {
           "useBuiltIns": "usage",
-          "targets": "defaults",
           "corejs": "3"
         }
       }
