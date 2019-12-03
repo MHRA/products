@@ -2,6 +2,7 @@ import Head from 'next/head';
 import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
+import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
 import Footer from '../footer';
 import Header from '../header';
 
@@ -31,6 +32,24 @@ const WithStyles = styled.div`
   }
 `;
 
+const Row = styled.section`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 0 auto;
+  flex-grow: 1;
+  max-width: ${desktopMaxWidth};
+  > * {
+    flex-basis: 100%;
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
+
+  @media ${mobileBreakpoint} {
+    display: block;
+  }
+`;
+
 interface IPageProps {
   children: React.ReactNode;
   title: string;
@@ -40,12 +59,12 @@ const App: React.FC<IPageProps> = props => {
   return (
     <>
       <Head>
-        <title>{props.title}</title>
+        <title>MHRA {props.title}</title>
       </Head>
       <WithStyles>
         <Normalize />
-        <Header />
-        {props.children}
+        <Header title={props.title} />
+        <Row>{props.children}</Row>
         <Footer />
       </WithStyles>
     </>

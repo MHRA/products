@@ -4,7 +4,7 @@ import Page from '../components/page';
 
 const App: React.FC = () => {
   return (
-    <Page title="MHRA Medicines Information">
+    <Page title="Medicines Information">
       <Mip />
     </Page>
   );

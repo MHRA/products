@@ -9,8 +9,6 @@ import {
 } from '../../styles/dimensions';
 import SvgMhraLogo from '../logos/mhra-logo';
 
-const mhra = 'Medicines Information';
-
 const Header = styled.header`
   border-top: 4px solid ${primaryColor};
   width: 100%;
@@ -48,7 +46,11 @@ const Header = styled.header`
   }
 `;
 
-const header: React.FC = () => (
+interface IHeaderProps {
+  title: string;
+}
+
+const header: React.FC<IHeaderProps> = props => (
   <Header>
     <div className="wrapper">
       <picture>
@@ -58,7 +60,7 @@ const header: React.FC = () => (
           </a>
         </Link>
       </picture>
-      <h1>{mhra}</h1>
+      <h1>{props.title}</h1>
     </div>
   </Header>
 );
