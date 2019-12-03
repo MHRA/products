@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
@@ -51,7 +52,11 @@ const header: React.FC = () => (
   <Header>
     <div className="wrapper">
       <picture>
-        <SvgMhraLogo />
+        <Link href="/">
+          <a>
+            <SvgMhraLogo />
+          </a>
+        </Link>
       </picture>
       <h1>{mhra}</h1>
     </div>
