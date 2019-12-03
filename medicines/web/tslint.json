@@ -26,6 +26,7 @@
     "jsx-wrap-multiline": false,
     "no-implicit-dependencies": false,
     "no-shadowed-variable": false,
+    "no-submodule-imports": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
     "prettier": [true, "./.prettierrc.json"],

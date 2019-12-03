@@ -1,4 +1,4 @@
-# Scripts
+# Tools
 
 ## SVGR
 

@@ -1,0 +1,22 @@
+{
+  "presets": [
+    [
+      "next/babel",
+      {
+        "preset-env": {
+          "useBuiltIns": "usage",
+          "corejs": "3"
+        }
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "styled-components",
+      {
+        "ssr": false
+      }
+    ],
+    ["@babel/plugin-proposal-optional-chaining"]
+  ]
+}
