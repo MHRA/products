@@ -70,6 +70,13 @@ const Footer: React.FC = () => (
           </li>
           <li>
             <p>
+              <Link href="accessibility">
+                <a>Accessibility Statement</a>
+              </Link>
+            </p>
+          </li>
+          <li>
+            <p>
               Built by the&nbsp;
               <a href="">
                 Medicines &amp; Healthcare products Regulatory Agency
