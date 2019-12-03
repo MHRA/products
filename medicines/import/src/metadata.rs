@@ -41,6 +41,28 @@ pub fn to_array(s: &str) -> Vec<String> {
 pub fn to_json(words: Vec<String>) -> String {
     serde_json::to_string(&words).expect("Couldn't create JSON array.")
 }
+
+pub fn create_facets_by_active_substance(
+    product: &str,
+    active_substances: Vec<String>,
+) -> Vec<String> {
+    let mut facets: Vec<String> = active_substances
+        .iter()
+        .map(|a| {
+            let first = a.chars().next().unwrap();
+            vec![
+                first.to_string(),
+                [first.to_string(), a.to_string()].join(", "),
+                [first.to_string(), a.to_string(), product.to_string()].join(", "),
+            ]
+        })
+        .flatten()
+        .collect();
+    facets.sort();
+    facets.dedup();
+    facets
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -94,5 +116,29 @@ mod test {
         let s = "THIOPENTAL SODIUMANDSODIUM CARBONATE";
         let json = "[\"THIOPENTAL SODIUMANDSODIUM CARBONATE\"]";
         assert_eq!(to_json(to_array(s)), json);
+    }
+
+    #[test]
+    fn test_create_facets_by_active_substance() {
+        let active_substances = vec![
+            "LOSARTAN POTASSIUM".to_string(),
+            "HYDROCHLOROTHIAZIDE".to_string(),
+            "L-TEST".to_string(),
+        ];
+        let product = "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS";
+        let expected = vec![
+            "H", 
+            "H, HYDROCHLOROTHIAZIDE", 
+            "H, HYDROCHLOROTHIAZIDE, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
+            "L",
+            "L, L-TEST", 
+            "L, L-TEST, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
+            "L, LOSARTAN POTASSIUM", 
+            "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
+        ];
+        assert_eq!(
+            create_facets_by_active_substance(product, active_substances),
+            expected
+        );
     }
 }
