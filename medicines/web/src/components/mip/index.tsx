@@ -90,11 +90,11 @@ const Mip: React.FC = () => {
       const results = searchResults.map((doc: IAzureSearchResult) => {
         return {
           activeSubstances: doc.substance_name,
-          context: doc['@search.highlights'].content.join(' … '),
-          docType: doc.doc_type.toString().substr(0, 3),
-          fileSize: Math.ceil(doc.metadata_storage_size / 1000).toLocaleString(
-            'en-GB',
-          ),
+          context: doc['@search.highlights']?.content.join(' … ') || '',
+          docType: doc.doc_type?.toString().substr(0, 3) || '',
+          fileSize: Math.ceil(
+            doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
+          ).toLocaleString('en-GB'),
           lastUpdated: doc.created
             ? moment(doc.created).format('Do MMM YYYY')
             : 'Unknown',

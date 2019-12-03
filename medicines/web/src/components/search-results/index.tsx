@@ -36,6 +36,8 @@ const StyledDrugList = styled.section`
     background-color: ${mhraBlue10};
     padding: ${baseSpace};
     margin: ${baseSpace} 0;
+    min-width: 1%;
+    word-wrap: break-word;
   }
 
   li p {
@@ -65,21 +67,29 @@ const StyledDrugList = styled.section`
   li .right {
     flex: 1;
     padding: 0 ${baseFontSize};
+    min-width: 1%;
+    word-wrap: break-word;
   }
 
   li .right .drug-name {
     font-size: ${h2FontSize};
     font-weight: bold;
     padding-bottom: ${tinyPaddingSizeCss};
+    min-width: 1%;
+    word-wrap: break-word;
   }
 
   li .right .metadata {
     font-size: ${baseFontSize};
+    min-width: 1%;
+    word-wrap: break-word;
   }
 
   li .right .context {
     font-size: ${h2FontSize};
     padding-top: ${largePaddingSizeCss};
+    min-width: 1%;
+    word-wrap: break-word;
   }
 
   em {
@@ -109,6 +119,28 @@ const searchResultsTitle = (lastSearch: string, noOfResults: number) => {
     ? `There are no search results for ${lastSearch}`
     : `Showing results for ${lastSearch}`;
 };
+
+const normalizeDescription = (description: string): string => {
+  const normalized = description
+    .substr(0, 300) // Cut to 300 characters.
+    .replace(/[^\w<>/\s…]/gi, '') // Remove non-word characters other than ellipsis & tags.
+    .replace(/\s+/, ''); // Replace multi-spaces with one.
+
+  if (/^\S/.test(description.substr(300))) {
+    return normalized.replace(/\s+\S*$/, '') + '…'; // Add ellipsis.
+  }
+
+  return normalized;
+};
+
+function toSentenceCase(substance: string): string {
+  return (
+    (substance as string)
+      .toLowerCase()
+      .charAt(0)
+      .toUpperCase() + substance.slice(1)
+  );
+}
 
 const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
   <StyledDrugList>
@@ -140,12 +172,17 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
                 <p className="metadata">Last updated: {drug.lastUpdated}</p>
                 {drug.docType !== 'Par' && (
                   <p className="metadata">
-                    Active substances: {drug.activeSubstances.join(', ')}
+                    Active substances:{' '}
+                    {drug.activeSubstances
+                      .map(substance => toSentenceCase(substance))
+                      .join(', ')}
                   </p>
                 )}
                 <p
                   className="context"
-                  dangerouslySetInnerHTML={{ __html: drug.context }}
+                  dangerouslySetInnerHTML={{
+                    __html: normalizeDescription(drug.context),
+                  }}
                 />
               </a>
             </div>
