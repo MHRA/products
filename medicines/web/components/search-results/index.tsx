@@ -165,26 +165,26 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
               <p className="icon">{drug.docType.toUpperCase()}</p>
             </div>
             <div className="right">
-              <a href={drug.url}>
-                <p className="drug-name">
+              <p className="drug-name">
+                <a href={drug.url}>
                   {drug.name} ({drug.fileSize} KB)
+                </a>
+              </p>
+              <p className="metadata">Last updated: {drug.lastUpdated}</p>
+              {drug.docType !== 'Par' && (
+                <p className="metadata">
+                  Active substances:{' '}
+                  {drug.activeSubstances
+                    .map(substance => toSentenceCase(substance))
+                    .join(', ')}
                 </p>
-                <p className="metadata">Last updated: {drug.lastUpdated}</p>
-                {drug.docType !== 'Par' && (
-                  <p className="metadata">
-                    Active substances:{' '}
-                    {drug.activeSubstances
-                      .map(substance => toSentenceCase(substance))
-                      .join(', ')}
-                  </p>
-                )}
-                <p
-                  className="context"
-                  dangerouslySetInnerHTML={{
-                    __html: normalizeDescription(drug.context),
-                  }}
-                />
-              </a>
+              )}
+              <p
+                className="context"
+                dangerouslySetInnerHTML={{
+                  __html: normalizeDescription(drug.context),
+                }}
+              />
             </div>
           </li>
         ))}
