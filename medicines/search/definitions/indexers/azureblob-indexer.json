@@ -13,6 +13,10 @@
     {
       "sourceFieldName": "substance_name",
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "facets",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
     }
   ]
 }
