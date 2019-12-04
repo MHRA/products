@@ -3,7 +3,7 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 variables:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: 1
-  AZURE_SUBSCRIPTION: b2f4966f-71ea-415b-9ec6-bf96d597d596
+  AZURE_SUBSCRIPTION: MHRA Development
   STORAGE_ACCOUNT: mhraproductsdev
 
 stages:
