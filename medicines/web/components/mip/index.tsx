@@ -63,6 +63,9 @@ const Mip: React.FC = () => {
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setSearch(e.currentTarget.value);
+
     if (search.length > 0) {
       const searchResults = await azureSearch(search);
       const results = searchResults.map((doc: IAzureSearchResult) => {
