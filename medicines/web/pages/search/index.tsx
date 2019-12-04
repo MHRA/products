@@ -1,21 +1,13 @@
-interface ISearchQuery {
-  [url: string]: {
-    [query: string]: {
-      [key: string]: string;
-    };
-  };
-}
+import React from 'react';
+import Mip from '../../components/mip';
+import Page from '../../components/page';
 
-const Post = ({
-  url: {
-    query: { query, page },
-  },
-}: ISearchQuery) => {
+const App: React.FC = () => {
   return (
-    <p>
-      Post: {query} | page: {page}
-    </p>
+    <Page title="Medicines Information">
+      <Mip />
+    </Page>
   );
 };
 
-export default Post;
+export default App;
