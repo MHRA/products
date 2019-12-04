@@ -9,10 +9,14 @@ module.exports = {
     AZURE_SEARCH_WORD_FUZZINESS: process.env.AZURE_SEARCH_WORD_FUZZINESS,
     AZURE_SEARCH_SCORING_PROFILE: process.env.AZURE_SEARCH_SCORING_PROFILE,
     AZURE_SEARCH_EXACTNESS_BOOST: process.env.AZURE_SEARCH_EXACTNESS_BOOST,
+    GA_TRACKING_ID:
+      process.env.SOURCE_BRANCH === 'master'
+        ? 'UA-6838115-11'
+        : 'UA-6838115-11',
   },
   assetPrefix:
-    process.env.ASSET_PREFIX === 'master' ||
-    process.env.ASSET_PREFIX === undefined
+    process.env.SOURCE_BRANCH === 'master' ||
+    process.env.SOURCE_BRANCH === undefined
       ? ''
-      : `/${process.env.ASSET_PREFIX}`,
+      : `/${process.env.SOURCE_BRANCH}`,
 };

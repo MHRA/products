@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
 import {
@@ -46,6 +47,10 @@ const Header = styled.header`
     }
   }
 `;
+
+if (process.env.GA_TRACKING_ID) {
+  ReactGA.initialize(process.env.GA_TRACKING_ID);
+}
 
 const header: React.FC = () => (
   <Header>

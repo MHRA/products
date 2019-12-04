@@ -7,6 +7,8 @@
     "next": "^9.1.4",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-ga-gtm": "^2.5.3-beta",
+    "react-hotjar": "^2.0.4",
     "styled-components": "^4.4.1",
     "styled-normalize": "^8.0.6",
     "whatwg-fetch": "^3.0.0"
