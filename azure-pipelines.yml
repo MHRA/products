@@ -83,44 +83,44 @@ stages:
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build
-  - stage: deploy
-    jobs:
-      - deployment:
-        pool:
-          vmImage: windows-latest
-        environment: dev
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: build
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage (master)
-                  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT)
-                    containerName: $web
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
-                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT)
-                    containerName: $(Build.SourceBranchName)
-                - task: AzureCLI@2
-                  displayName: Set bucket to be public
-                  inputs:
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
-                    scriptType: ps
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az storage container set-permission `
-                        --public-access container `
-                        --name $(Build.SourceBranchName) `
-                        --account-name=$(STORAGE_ACCOUNT)
+  # - stage: deploy
+  #   jobs:
+  #     - deployment:
+  #       pool:
+  #         vmImage: windows-latest
+  #       environment: dev
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - download: current
+  #                 artifact: build
+  #               - task: AzureFileCopy@3
+  #                 displayName: Copy to Blob Storage (master)
+  #                 condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #                 inputs:
+  #                   sourcePath: $(Pipeline.Workspace)/build
+  #                   azureSubscription: $(AZURE_SUBSCRIPTION)
+  #                   destination: azureBlob
+  #                   storage: $(STORAGE_ACCOUNT)
+  #                   containerName: $web
+  #               - task: AzureFileCopy@3
+  #                 displayName: Copy to Blob Storage ($(Build.SourceBranchName))
+  #                 condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #                 inputs:
+  #                   sourcePath: $(Pipeline.Workspace)/build
+  #                   azureSubscription: $(AZURE_SUBSCRIPTION)
+  #                   destination: azureBlob
+  #                   storage: $(STORAGE_ACCOUNT)
+  #                   containerName: $(Build.SourceBranchName)
+  #               - task: AzureCLI@2
+  #                 displayName: Set bucket to be public
+  #                 inputs:
+  #                   azureSubscription: $(AZURE_SUBSCRIPTION)
+  #                   scriptType: ps
+  #                   scriptLocation: inlineScript
+  #                   inlineScript: |
+  #                     az storage container set-permission `
+  #                       --public-access container `
+  #                       --name $(Build.SourceBranchName) `
+  #                       --account-name=$(STORAGE_ACCOUNT)
