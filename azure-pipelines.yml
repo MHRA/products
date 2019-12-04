@@ -3,8 +3,8 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 variables:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: 1
-  AZURE_SUBSCRIPTION: rb-non-prod
-  STORAGE_ACCOUNT: rbmhramip
+  SERVICE_CONNECTION: Azure Dev
+  STORAGE_ACCOUNT: mhraproductsdev
 
 stages:
   - stage: build
@@ -100,7 +100,7 @@ stages:
                   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
                   inputs:
                     sourcePath: $(Pipeline.Workspace)/build
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    azureSubscription: $(SERVICE_CONNECTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT)
                     containerName: $web
@@ -109,14 +109,14 @@ stages:
                   condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
                   inputs:
                     sourcePath: $(Pipeline.Workspace)/build
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    azureSubscription: $(SERVICE_CONNECTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT)
                     containerName: $(Build.SourceBranchName)
                 - task: AzureCLI@2
                   displayName: Set bucket to be public
                   inputs:
-                    azureSubscription: $(AZURE_SUBSCRIPTION)
+                    azureSubscription: $(SERVICE_CONNECTION)
                     scriptType: ps
                     scriptLocation: inlineScript
                     inlineScript: |
