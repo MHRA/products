@@ -9,10 +9,7 @@ module.exports = {
     AZURE_SEARCH_WORD_FUZZINESS: process.env.AZURE_SEARCH_WORD_FUZZINESS,
     AZURE_SEARCH_SCORING_PROFILE: process.env.AZURE_SEARCH_SCORING_PROFILE,
     AZURE_SEARCH_EXACTNESS_BOOST: process.env.AZURE_SEARCH_EXACTNESS_BOOST,
-    GA_TRACKING_ID:
-      process.env.SOURCE_BRANCH === 'master'
-        ? 'UA-6838115-11'
-        : 'UA-6838115-11',
+    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
   },
   assetPrefix:
     process.env.SOURCE_BRANCH === 'master' ||
