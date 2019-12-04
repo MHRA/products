@@ -64,8 +64,8 @@
     {
       "name": "product_name",
       "type": "Edm.String",
-      "facetable": false,
-      "filterable": false,
+      "facetable": true,
+      "filterable": true,
       "key": false,
       "retrievable": true,
       "searchable": true,
@@ -240,7 +240,7 @@
     {
       "name": "doc_type",
       "type": "Edm.String",
-      "facetable": false,
+      "facetable": true,
       "filterable": true,
       "key": false,
       "retrievable": true,
@@ -277,6 +277,19 @@
       "searchAnalyzer": null,
       "synonymMaps": [],
       "fields": []
+    },
+    {
+      "name": "facets",
+      "type": "Collection(Edm.String)",
+      "facetable": true,
+      "filterable": true,
+      "retrievable": true,
+      "searchable": false,
+      "analyzer": null,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
     }
   ],
   "suggesters": [
@@ -291,7 +304,8 @@
       "name": "preferKeywords",
       "text": {
         "weights": {
-          "keywords": 3
+          "keywords": 3,
+          "product_name": 3
         }
       }
     }
