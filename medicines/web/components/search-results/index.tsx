@@ -114,10 +114,13 @@ const emaWebsiteLink = () => (
   </a>
 );
 
-const searchResultsTitle = (lastSearch: string, noOfResults: number) => {
+const searchResultsTitle = (
+  showingResultsForTerm: string,
+  noOfResults: number,
+) => {
   return noOfResults === 0
-    ? `There are no search results for ${lastSearch}`
-    : `Showing results for ${lastSearch}`;
+    ? `There are no search results for ${showingResultsForTerm}`
+    : `Showing results for ${showingResultsForTerm}`;
 };
 
 const normalizeDescription = (description: string): string => {
@@ -142,11 +145,14 @@ function toSentenceCase(substance: string): string {
   );
 }
 
-const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
+const SearchResults = (props: {
+  drugs: IDocument[];
+  showingResultsForTerm: string;
+}) => (
   <StyledDrugList>
     <div>
       <h1 className="title">
-        {searchResultsTitle(props.lastSearch, props.drugs.length)}
+        {searchResultsTitle(props.showingResultsForTerm, props.drugs.length)}
       </h1>
       {props.drugs.length > 0 && (
         <p className="no-of-results">{props.drugs.length} results</p>
