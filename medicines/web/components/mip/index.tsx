@@ -1,4 +1,5 @@
 import moment from 'moment';
+import Router from 'next/router';
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
@@ -64,27 +65,37 @@ const Mip: React.FC = () => {
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (search.length > 0) {
-      const searchResults = await azureSearch(search);
-      const results = searchResults.map((doc: IAzureSearchResult) => {
-        return {
-          activeSubstances: doc.substance_name,
-          context: doc['@search.highlights']?.content.join(' … ') || '',
-          docType: doc.doc_type?.toString().substr(0, 3) || '',
-          fileSize: Math.ceil(
-            doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
-          ).toLocaleString('en-GB'),
-          lastUpdated: doc.created
-            ? moment(doc.created).format('Do MMM YYYY')
-            : 'Unknown',
-          name: sanitizeTitle(doc.title),
-          url: doc.metadata_storage_path,
-        };
+      Router.push({
+        pathname: '/search',
+        query: { query: search, page: 1 },
       });
-      setResults(results);
     }
-
-    setLastSearch(search);
   };
+
+  // const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   if (search.length > 0) {
+  //     const searchResults = await azureSearch(search);
+  //     const results = searchResults.map((doc: IAzureSearchResult) => {
+  //       return {
+  //         activeSubstances: doc.substance_name,
+  //         context: doc['@search.highlights']?.content.join(' … ') || '',
+  //         docType: doc.doc_type?.toString().substr(0, 3) || '',
+  //         fileSize: Math.ceil(
+  //           doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
+  //         ).toLocaleString('en-GB'),
+  //         lastUpdated: doc.created
+  //           ? moment(doc.created).format('Do MMM YYYY')
+  //           : 'Unknown',
+  //         name: sanitizeTitle(doc.title),
+  //         url: doc.metadata_storage_path,
+  //       };
+  //     });
+  //     setResults(results);
+  //   }
+
+  //   setLastSearch(search);
+  // };
 
   return (
     <>
