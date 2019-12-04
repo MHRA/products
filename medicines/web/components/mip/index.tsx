@@ -58,7 +58,7 @@ const Mip: React.FC = () => {
   const [results, setResults] = React.useState<IDocument[]>([]);
   const router = useRouter();
   const {
-    query: { query, page },
+    query: { search: searchTerm, page },
   } = router;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
@@ -69,14 +69,14 @@ const Mip: React.FC = () => {
     e.preventDefault();
     if (search.length > 0) {
       router.push({
-        pathname: '/search',
-        query: { query: search, page: 1 },
+        pathname: '/',
+        query: { search, page: 1 },
       });
     }
   };
 
-  const fetchSearchResults = async (query: string) => {
-    const searchResults = await azureSearch(query);
+  const fetchSearchResults = async (searchTerm: string) => {
+    const searchResults = await azureSearch(searchTerm);
     const results = searchResults.map((doc: IAzureSearchResult) => {
       return {
         activeSubstances: doc.substance_name,
@@ -93,17 +93,17 @@ const Mip: React.FC = () => {
       };
     });
     setResults(results);
-    setSearch(query);
-    setShowingResultsForTerm(query);
+    setSearch(searchTerm);
+    setShowingResultsForTerm(searchTerm);
   };
 
   useEffect(() => {
-    if (query && page) {
-      if (typeof query === 'string') {
-        fetchSearchResults(query);
+    if (searchTerm && page) {
+      if (typeof searchTerm === 'string') {
+        fetchSearchResults(searchTerm);
       }
     }
-  }, [query]);
+  }, [searchTerm]);
 
   return (
     <>
