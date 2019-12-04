@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
@@ -7,8 +8,6 @@ import {
   mobileBreakpoint,
 } from '../../styles/dimensions';
 import SvgMhraLogo from '../logos/mhra-logo';
-
-const mhra = 'Medicines Information';
 
 const Header = styled.header`
   border-top: 4px solid ${primaryColor};
@@ -47,13 +46,21 @@ const Header = styled.header`
   }
 `;
 
-const header: React.FC = () => (
+interface IHeaderProps {
+  title: string;
+}
+
+const header: React.FC<IHeaderProps> = props => (
   <Header>
     <div className="wrapper">
       <picture>
-        <SvgMhraLogo />
+        <Link href="/">
+          <a>
+            <SvgMhraLogo />
+          </a>
+        </Link>
       </picture>
-      <h1>{mhra}</h1>
+      <h1>{props.title}</h1>
     </div>
   </Header>
 );

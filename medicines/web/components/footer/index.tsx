@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray20 } from '../../styles/colors';
@@ -60,7 +61,9 @@ const Footer: React.FC = () => (
           </li>
           <li>
             <p>
-              <a href="">Privacy Policy</a>
+              <Link href="privacy">
+                <a>Privacy Policy</a>
+              </Link>
             </p>
           </li>
           <li>
