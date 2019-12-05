@@ -32,7 +32,7 @@ export interface IAzureSearchResult {
 }
 
 const escapeSpecialCharacters = (word: string): string =>
-  word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&)/gi, `\\$1`);
+  word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${azureSearchWordFuzziness} ${word}^${azureSearchExactnessBoost}`;
