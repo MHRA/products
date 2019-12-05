@@ -56,6 +56,8 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [results, setResults] = React.useState<IDocument[]>([]);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [resultCount, setResultCount] = React.useState(0);
   const pageSize = 50;
   const router = useRouter();
   const {
@@ -97,6 +99,7 @@ const Mip: React.FC = () => {
       };
     });
     setResults(results);
+    setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
   };
 
@@ -104,7 +107,12 @@ const Mip: React.FC = () => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
         setSearch(searchTerm);
-        fetchSearchResults(searchTerm, Number(page));
+        let parsedPage = Number(page);
+        if (parsedPage < 1) {
+          parsedPage = 1;
+        }
+        setPageNumber(parsedPage);
+        fetchSearchResults(searchTerm, parsedPage);
       }
     }
   }, [searchTerm]);
@@ -134,6 +142,9 @@ const Mip: React.FC = () => {
           <SearchResults
             drugs={results}
             showingResultsForTerm={showingResultsForTerm}
+            resultCount={resultCount}
+            page={pageNumber}
+            pageSize={pageSize}
           />
           <div className="yellow-card-wrapper">
             <YellowCard />

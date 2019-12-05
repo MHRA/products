@@ -130,6 +130,23 @@ const searchResultsTitle = (
     : `Showing results for ${showingResultsForTerm}`;
 };
 
+interface ISearchNumberingInformation {
+  page: number;
+  pageSize: number;
+  totalResultCount: number;
+  shownResultCount: number;
+}
+
+const searchResultsNumberingInformation = (
+  numbering: ISearchNumberingInformation,
+) => {
+  const zero = (numbering.page - 1) * numbering.pageSize;
+  const one = zero + 1;
+  const last = zero + numbering.shownResultCount;
+
+  return `${one} to ${last} of ${numbering.totalResultCount}`;
+};
+
 const normalizeDescription = (description: string): string => {
   const normalized = description
     .substr(0, 300) // Cut to 300 characters.
@@ -155,6 +172,9 @@ function toSentenceCase(substance: string): string {
 const SearchResults = (props: {
   drugs: IDocument[];
   showingResultsForTerm: string;
+  resultCount: number;
+  page: number;
+  pageSize: number;
 }) => (
   <StyledDrugList>
     <div>
@@ -162,7 +182,14 @@ const SearchResults = (props: {
         {searchResultsTitle(props.showingResultsForTerm, props.drugs.length)}
       </h1>
       {props.drugs.length > 0 && (
-        <p className="no-of-results">{props.drugs.length} results</p>
+        <p className="no-of-results">
+          {searchResultsNumberingInformation({
+            page: props.page,
+            pageSize: props.pageSize,
+            totalResultCount: props.resultCount,
+            shownResultCount: props.drugs.length,
+          })}
+        </p>
       )}
       <p className="ema-message">
         If the product information you are seeking does not appear below, it is
