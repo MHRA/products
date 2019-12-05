@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
@@ -33,19 +34,27 @@ const Pdf: React.FC = () => (
     <h2>{title}</h2>
     <ul>
       <li>
-        <a href={helpUrl} target="_new">
+        <ReactGA.OutboundLink eventLabel={helpLabel} to={helpUrl} target="_new">
           {helpLabel}
-        </a>
+        </ReactGA.OutboundLink>
       </li>
       <li>
-        <a href={downloadUrl} target="_new">
+        <ReactGA.OutboundLink
+          eventLabel={downloadLabel}
+          to={downloadUrl}
+          target="_new"
+        >
           {downloadLabel}
-        </a>
+        </ReactGA.OutboundLink>
       </li>
       <li>
-        <a href={toolsUrl} target="_new">
+        <ReactGA.OutboundLink
+          eventLabel={toolsLabel}
+          to={toolsUrl}
+          target="_new"
+        >
           {toolsLabel}
-        </a>
+        </ReactGA.OutboundLink>
       </li>
     </ul>
   </StyledPdf>

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { black, mhraBlue10, mhraBlue80, white } from '../../styles/colors';
 import {
@@ -179,9 +180,12 @@ const SearchResults = (props: {
             </dt>
             <dd className="right">
               <h3 className="drug-name">
-                <a href={drug.url}>
+                <ReactGA.OutboundLink
+                  eventLabel={`Downloaded PDF for ${drug.name} at ${drug.url}`}
+                  to={drug.url}
+                >
                   {drug.name} ({drug.fileSize} KB)
-                </a>
+                </ReactGA.OutboundLink>
               </h3>
               <p className="metadata">Created: {drug.created}</p>
               {drug.docType !== 'Par' && (

@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
+import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import MipText from '../mip-text';
@@ -74,6 +75,11 @@ const Mip: React.FC = () => {
         query: { search, page: 1 },
       });
     }
+
+    ReactGA.event({
+      category: 'Search',
+      action: `Searched for '${searchTerm}'`,
+    });
   };
 
   const fetchSearchResults = async (searchTerm: string) => {
