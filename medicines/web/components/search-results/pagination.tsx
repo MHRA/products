@@ -5,6 +5,16 @@ const getPaginationGroups = (pageCount: number, currentPage: number) => {
   let middleGroup: number[] = [];
   let lastGroup: number[] = [pageCount];
 
+  if (pageCount < 6) {
+    return {
+      firstGroup: Array(pageCount)
+        .fill(1)
+        .map((_, i) => i + 1),
+      middleGroup,
+      lastGroup: [],
+    };
+  }
+
   switch (currentPage) {
     case 1:
     case 2:
@@ -48,7 +58,11 @@ const Pagination = (props: {
 
   const mapper = (p: number) => {
     if (p === props.currentPage) {
-      return <li key={p}>{p}</li>;
+      return (
+        <li key={p}>
+          Page {p} of {pageCount}
+        </li>
+      );
     }
 
     return (
@@ -61,11 +75,25 @@ const Pagination = (props: {
   return (
     <nav>
       <ul>
+        {props.currentPage !== 1 ? (
+          <li>
+            <a href={paginationHref(props.currentPage - 1)}>Previous</a>
+          </li>
+        ) : (
+          ''
+        )}
         {firstGroup.map(mapper)}
         {middleGroup.length > 0 ? <li>...</li> : ''}
         {middleGroup.map(mapper)}
-        <li>...</li>
+        {lastGroup.length > 0 ? <li>...</li> : ''}
         {lastGroup.map(mapper)}
+        {props.currentPage !== pageCount ? (
+          <li>
+            <a href={paginationHref(props.currentPage + 1)}>Next</a>
+          </li>
+        ) : (
+          ''
+        )}
       </ul>
     </nav>
   );
