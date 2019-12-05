@@ -108,7 +108,7 @@ const Mip: React.FC = () => {
       if (typeof searchTerm === 'string') {
         setSearch(searchTerm);
         let parsedPage = Number(page);
-        if (parsedPage < 1) {
+        if (!parsedPage || parsedPage < 1) {
           parsedPage = 1;
         }
         setPageNumber(parsedPage);
