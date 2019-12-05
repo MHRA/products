@@ -7,6 +7,7 @@ import {
   tinyPaddingSizeCss,
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
+import Pagination from './pagination';
 
 const StyledDrugList = styled.section`
   .title {
@@ -177,12 +178,6 @@ const SearchResults = (props: {
   pageSize: number;
   searchTerm: string;
 }) => {
-  const paginationHref = (i: number) =>
-    `/?search=${props.searchTerm}&page=${i + 1}`;
-
-  const pageCount = Math.floor(props.resultCount / props.pageSize) + 1;
-  const pageArray = Array(pageCount).fill(null);
-
   return (
     <>
       <StyledDrugList>
@@ -242,19 +237,14 @@ const SearchResults = (props: {
             ))}
         </ul>
       </StyledDrugList>
-      <nav>
-        <ul>
-          {pageArray.map((_, i) => {
-            return (
-              <li key={i}>
-                <a href={paginationHref(i)}>{i + 1}</a>
-              </li>
-            );
-          })}
-      )
-     </ul>  
-     </nav>   
-  </>
-);
+      <Pagination
+        pageSize={props.pageSize}
+        resultCount={props.resultCount}
+        searchTerm={props.searchTerm}
+        currentPage={props.page}
+      />
+    </>
+  );
+};
 
 export default SearchResults;
