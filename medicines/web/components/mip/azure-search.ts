@@ -31,6 +31,11 @@ export interface IAzureSearchResult {
   substance_name: string[];
 }
 
+export interface IAzureSearchResults {
+  resultCount: number;
+  results: IAzureSearchResult[];
+}
+
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
 
@@ -45,7 +50,14 @@ const buildFuzzyQuery = (query: string): string => {
     .join(' ');
 };
 
-const buildAzureSearchUrl = (query: string): string => {
+const calculatePageStartRecord = (page: number, pageSize: number): number =>
+  pageSize * (page - 1);
+
+const buildAzureSearchUrl = (
+  query: string,
+  page: number,
+  pageSize: number,
+): string => {
   const url = new URL(
     `https://${azureSearchService}.search.windows.net/indexes/${azureSearchIndex}/docs`,
   );
@@ -54,11 +66,18 @@ const buildAzureSearchUrl = (query: string): string => {
   url.searchParams.append('api-version', azureSearchApiVersion as string);
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
+  url.searchParams.append('$count', 'true');
+  url.searchParams.append('$top', `${pageSize}`);
+  url.searchParams.append(
+    '$skip',
+    `${calculatePageStartRecord(page, pageSize)}`,
+  );
   url.searchParams.append('search', query);
   url.searchParams.append(
     'scoringProfile',
     azureSearchScoringProfile as string,
   );
+  // https://rb-mhra-mip.search.windows.net/indexes('azureblob-index')/docs?api-key=6D6107C925CC3C284A9218EFC626C7F7&api-version=2017-11-11&highlight=content&queryType=full&count=true&search=anti~1&$skip=100
 
   return url.toString();
 };
@@ -78,8 +97,14 @@ const getJson = async (url: string): Promise<any> => {
 
 export const azureSearch = async (
   query: string,
-): Promise<IAzureSearchResult[]> => {
-  const body = await getJson(buildAzureSearchUrl(buildFuzzyQuery(query)));
-
-  return body.value;
+  page: number,
+  pageSize: number,
+): Promise<IAzureSearchResults> => {
+  const body = await getJson(
+    buildAzureSearchUrl(buildFuzzyQuery(query), page, pageSize),
+  );
+  return {
+    resultCount: body['@odata.count'],
+    results: body.value,
+  };
 };

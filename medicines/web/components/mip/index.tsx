@@ -56,6 +56,7 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [results, setResults] = React.useState<IDocument[]>([]);
+  const pageSize = 50;
   const router = useRouter();
   const {
     query: { search: searchTerm, page },
@@ -78,9 +79,9 @@ const Mip: React.FC = () => {
     }
   };
 
-  const fetchSearchResults = async (searchTerm: string) => {
-    const searchResults = await azureSearch(searchTerm);
-    const results = searchResults.map((doc: IAzureSearchResult) => {
+  const fetchSearchResults = async (searchTerm: string, page: number) => {
+    const searchResults = await azureSearch(searchTerm, page, pageSize);
+    const results = searchResults.results.map((doc: IAzureSearchResult) => {
       return {
         activeSubstances: doc.substance_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
@@ -103,7 +104,7 @@ const Mip: React.FC = () => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
         setSearch(searchTerm);
-        fetchSearchResults(searchTerm);
+        fetchSearchResults(searchTerm, Number(page));
       }
     }
   }, [searchTerm]);
