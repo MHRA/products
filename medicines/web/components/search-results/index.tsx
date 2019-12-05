@@ -26,12 +26,14 @@ const StyledDrugList = styled.section`
     margin: 0;
   }
 
-  ul {
+  dl,
+  dt,
+  dd {
     list-style: none;
     padding: 0;
   }
 
-  li {
+  article {
     display: flex;
     background-color: ${mhraBlue10};
     padding: ${baseSpace};
@@ -40,21 +42,25 @@ const StyledDrugList = styled.section`
     word-wrap: break-word;
   }
 
-  li p {
+  dl p {
     margin: 0;
     padding: 0;
   }
 
-  li a {
+  dd h3 {
+    margin: 0;
+  }
+
+  dd a {
     color: ${black};
     text-decoration: none;
   }
 
-  li .left {
+  dt.left {
     flex: 0;
   }
 
-  li .left .icon {
+  dt.left .icon {
     background-color: ${mhraBlue80};
     color: ${white};
     font-size: ${h2FontSize};
@@ -64,31 +70,32 @@ const StyledDrugList = styled.section`
     width: 70px;
   }
 
-  li .right {
+  dd.right {
     flex: 1;
-    padding: 0 ${baseFontSize};
+    margin-left: 0;
     min-width: 1%;
+    padding: 0 ${baseFontSize};
     word-wrap: break-word;
   }
 
-  li .right .drug-name {
+  dd.right .drug-name {
     font-size: ${h2FontSize};
     font-weight: bold;
-    padding-bottom: ${tinyPaddingSizeCss};
     min-width: 1%;
+    padding-bottom: ${tinyPaddingSizeCss};
     word-wrap: break-word;
   }
 
-  li .right .metadata {
+  dd.right .metadata {
     font-size: ${baseFontSize};
     min-width: 1%;
     word-wrap: break-word;
   }
 
-  li .right .context {
+  dd.right .context {
     font-size: ${h2FontSize};
-    padding-top: ${largePaddingSizeCss};
     min-width: 1%;
+    padding-top: ${largePaddingSizeCss};
     word-wrap: break-word;
   }
 
@@ -157,19 +164,19 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
         information may be available at the {emaWebsiteLink()} website.
       </p>
     </div>
-    <ul>
+    <dl>
       {props.drugs.length > 0 &&
         props.drugs.map((drug, i) => (
-          <li key={i}>
-            <div className="left">
+          <article key={i}>
+            <dt className="left">
               <p className="icon">{drug.docType.toUpperCase()}</p>
-            </div>
-            <div className="right">
-              <p className="drug-name">
+            </dt>
+            <dd className="right">
+              <h3 className="drug-name">
                 <a href={drug.url}>
                   {drug.name} ({drug.fileSize} KB)
                 </a>
-              </p>
+              </h3>
               <p className="metadata">Last updated: {drug.lastUpdated}</p>
               {drug.docType !== 'Par' && (
                 <p className="metadata">
@@ -185,10 +192,10 @@ const SearchResults = (props: { drugs: IDocument[]; lastSearch: string }) => (
                   __html: normalizeDescription(drug.context),
                 }}
               />
-            </div>
-          </li>
+            </dd>
+          </article>
         ))}
-    </ul>
+    </dl>
   </StyledDrugList>
 );
 
