@@ -145,6 +145,7 @@ const Mip: React.FC = () => {
             resultCount={resultCount}
             page={pageNumber}
             pageSize={pageSize}
+            searchTerm={search}
           />
           <div className="yellow-card-wrapper">
             <YellowCard />

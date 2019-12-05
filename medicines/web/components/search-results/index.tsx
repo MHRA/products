@@ -175,61 +175,86 @@ const SearchResults = (props: {
   resultCount: number;
   page: number;
   pageSize: number;
-}) => (
-  <StyledDrugList>
-    <div>
-      <h1 className="title">
-        {searchResultsTitle(props.showingResultsForTerm, props.drugs.length)}
-      </h1>
-      {props.drugs.length > 0 && (
-        <p className="no-of-results">
-          {searchResultsNumberingInformation({
-            page: props.page,
-            pageSize: props.pageSize,
-            totalResultCount: props.resultCount,
-            shownResultCount: props.drugs.length,
+  searchTerm: string;
+}) => {
+  const paginationHref = (i: number) =>
+    `/?search=${props.searchTerm}&page=${i + 1}`;
+
+  const pageCount = Math.floor(props.resultCount / props.pageSize) + 1;
+  const pageArray = Array(pageCount).fill(null);
+
+  return (
+    <>
+      <StyledDrugList>
+        <div>
+          <h1 className="title">
+            {searchResultsTitle(
+              props.showingResultsForTerm,
+              props.drugs.length,
+            )}
+          </h1>
+          {props.drugs.length > 0 && (
+            <p className="no-of-results">
+              {searchResultsNumberingInformation({
+                page: props.page,
+                pageSize: props.pageSize,
+                totalResultCount: props.resultCount,
+                shownResultCount: props.drugs.length,
+              })}
+            </p>
+          )}
+          <p className="ema-message">
+            If the product information you are seeking does not appear below, it
+            is possible that the product holds a central European license and
+            its information may be available at the {emaWebsiteLink()} website.
+          </p>
+        </div>
+        <ul>
+          {props.drugs.length > 0 &&
+            props.drugs.map((drug, i) => (
+              <li key={i}>
+                <div className="left">
+                  <p className="icon">{drug.docType.toUpperCase()}</p>
+                </div>
+                <div className="right">
+                  <a href={drug.url}>
+                    <p className="drug-name">
+                      {drug.name} ({drug.fileSize} KB)
+                    </p>
+                    <p className="metadata">Last updated: {drug.lastUpdated}</p>
+                    {drug.docType !== 'Par' && (
+                      <p className="metadata">
+                        Active substances:{' '}
+                        {drug.activeSubstances
+                          .map(substance => toSentenceCase(substance))
+                          .join(', ')}
+                      </p>
+                    )}
+                    <p
+                      className="context"
+                      dangerouslySetInnerHTML={{
+                        __html: normalizeDescription(drug.context),
+                      }}
+                    />
+                  </a>
+                </div>
+              </li>
+            ))}
+        </ul>
+      </StyledDrugList>
+      <nav>
+        <ul>
+          {pageArray.map((_, i) => {
+            return (
+              <li key={i}>
+                <a href={paginationHref(i)}>{i + 1}</a>
+              </li>
+            );
           })}
-        </p>
-      )}
-      <p className="ema-message">
-        If the product information you are seeking does not appear below, it is
-        possible that the product holds a central European license and its
-        information may be available at the {emaWebsiteLink()} website.
-      </p>
-    </div>
-    <dl>
-      {props.drugs.length > 0 &&
-        props.drugs.map((drug, i) => (
-          <article key={i}>
-            <dt className="left">
-              <p className="icon">{drug.docType.toUpperCase()}</p>
-            </dt>
-            <dd className="right">
-              <h3 className="drug-name">
-                <a href={drug.url}>
-                  {drug.name} ({drug.fileSize} KB)
-                </a>
-              </h3>
-              <p className="metadata">Created: {drug.created}</p>
-              {drug.docType !== 'Par' && (
-                <p className="metadata">
-                  Active substances:{' '}
-                  {drug.activeSubstances
-                    .map(substance => toSentenceCase(substance))
-                    .join(', ')}
-                </p>
-              )}
-              <p
-                className="context"
-                dangerouslySetInnerHTML={{
-                  __html: normalizeDescription(drug.context),
-                }}
-              />
-            </dd>
-          </article>
-        ))}
-    </dl>
-  </StyledDrugList>
+      )
+     </ul>  
+     </nav>   
+  </>
 );
 
 export default SearchResults;
