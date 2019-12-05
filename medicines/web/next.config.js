@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
+  exportTrailingSlash: true,
   env: {
     AZURE_SEARCH_API_VERSION: process.env.AZURE_SEARCH_API_VERSION,
     AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
