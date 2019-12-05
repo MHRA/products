@@ -96,13 +96,13 @@ const Mip: React.FC = () => {
       };
     });
     setResults(results);
-    setSearch(searchTerm);
     setShowingResultsForTerm(searchTerm);
   };
 
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
+        setSearch(searchTerm);
         fetchSearchResults(searchTerm);
       }
     }
