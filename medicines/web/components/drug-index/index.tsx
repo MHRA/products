@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { black } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
-  margin-top: 3.75rem;
+  margin-top: 1rem;
 
   h2 {
     font-size: 1.5rem;
@@ -12,11 +12,14 @@ const StyledDrugIndex = styled.section`
   }
 
   ul {
-    display: flex;
     justify-content: space-between;
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  ul.horizontal {
+    display: flex;
   }
 
   a {
@@ -25,44 +28,57 @@ const StyledDrugIndex = styled.section`
   }
 `;
 
-const index = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-  '0-9',
+export const index = [
+  { value: 'A' },
+  { value: 'B' },
+  { value: 'C' },
+  { value: 'D' },
+  { value: 'E' },
+  { value: 'F' },
+  { value: 'G' },
+  { value: 'H' },
+  { value: 'I' },
+  { value: 'J' },
+  { value: 'K' },
+  { value: 'L' },
+  { value: 'M' },
+  { value: 'N' },
+  { value: 'O' },
+  { value: 'P' },
+  { value: 'Q' },
+  { value: 'R' },
+  { value: 'S' },
+  { value: 'T' },
+  { value: 'U' },
+  { value: 'V' },
+  { value: 'W' },
+  { value: 'X' },
+  { value: 'Y' },
+  { value: 'Z' },
+  { value: '0-9' },
 ];
 
-const DrugIndex: React.FC = () => (
+export interface IFacet {
+  count?: number;
+  value: string;
+}
+
+interface IIndex {
+  horizontal?: boolean;
+  items: IFacet[];
+}
+
+const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
   <StyledDrugIndex>
-    <h2>List of active substances</h2>
     <nav>
-      <ul>
-        {index.map(character => (
-          <li key={character}>
-            <Link href="#">{character}</Link>
+      <ul className={horizontal ? 'horizontal' : ''}>
+        {items.map(item => (
+          <li key={item.value}>
+            <Link href={`?substance=${item.value}`}>
+              <a>
+                {item.value} {item.count && <>({item.count})</>}
+              </a>
+            </Link>
           </li>
         ))}
       </ul>

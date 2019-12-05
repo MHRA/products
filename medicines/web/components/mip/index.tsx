@@ -3,12 +3,12 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-import DrugIndex from '../drug-index';
+import DrugIndex, { IFacet, index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
-import { azureSearch, IAzureSearchResult } from './azure-search';
+import { docSearch, facetSearch, ISearchResult } from './azure-search';
 const Aside = styled.aside`
   max-width: 25%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
@@ -30,6 +30,10 @@ const Main = styled.main`
 
   .yellow-card-wrapper {
     display: none;
+  }
+
+  h2 {
+    margin-top: 3rem;
   }
 
   @media ${mobileBreakpoint} {
@@ -54,24 +58,35 @@ const sanitizeTitle = (title: string | null): string => {
 };
 
 const Mip: React.FC = () => {
-  const [search, setSearch] = React.useState('');
-  const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
-  const [results, setResults] = React.useState<IDocument[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [resultCount, setResultCount] = React.useState(0);
   const pageSize = 10;
+  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [facetResults, setFacetResults] = React.useState<IFacet[]>([]);
+  const [search, setSearch] = React.useState('');
+  const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
+
   const router = useRouter();
+
   const {
-    query: { search: searchTerm, page },
+    query: { search: searchTerm, page, substance },
   } = router;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
 
+  const fetchFacetResults = async (searchTerm: string) => {
+    const searchResults = await facetSearch(searchTerm);
+    const filtered = searchResults.facets.filter(x =>
+      x.value.startsWith(searchTerm),
+    );
+    setFacetResults(filtered);
+  };
+
   const fetchSearchResults = async (searchTerm: string, page: number) => {
-    const searchResults = await azureSearch(searchTerm, page, pageSize);
-    const results = searchResults.results.map((doc: IAzureSearchResult) => {
+    const searchResults = await docSearch(searchTerm, page, pageSize);
+    const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
@@ -118,9 +133,13 @@ const Mip: React.FC = () => {
         fetchSearchResults(searchTerm, parsedPage);
       }
     }
-
+    if (substance) {
+      if (typeof substance === 'string') {
+        fetchFacetResults(substance);
+      }
+    }
     window.scrollTo(0, 0);
-  }, [page, searchTerm]);
+  }, [page, searchTerm, substance]);
 
   return (
     <>
@@ -134,16 +153,15 @@ const Mip: React.FC = () => {
           <YellowCard />
         </div>
       </Aside>
-      {showingResultsForTerm.length === 0 ? (
-        <Main>
-          <MipText />
-          <DrugIndex />
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      ) : (
-        <Main>
+      <Main>
+        {showingResultsForTerm.length === 0 ? (
+          <>
+            <MipText />
+            <h2>List of active substances</h2>
+            <DrugIndex items={index} horizontal />
+            {facetResults.length > 0 && <DrugIndex items={facetResults} />}
+          </>
+        ) : (
           <SearchResults
             drugs={results}
             showingResultsForTerm={showingResultsForTerm}
@@ -152,11 +170,8 @@ const Mip: React.FC = () => {
             pageSize={pageSize}
             searchTerm={search}
           />
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      )}
+        )}
+      </Main>
     </>
   );
 };
