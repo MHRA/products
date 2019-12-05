@@ -216,7 +216,7 @@ const SearchResults = (props: {
                     <p className="drug-name">
                       {drug.name} ({drug.fileSize} KB)
                     </p>
-                    <p className="metadata">Last updated: {drug.lastUpdated}</p>
+                    <p className="metadata">Created: {drug.created}</p>
                     {drug.docType !== 'Par' && (
                       <p className="metadata">
                         Active substances:{' '}
