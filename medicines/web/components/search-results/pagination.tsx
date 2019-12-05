@@ -1,4 +1,37 @@
 import React from 'react';
+import styled from 'styled-components';
+import { black } from '../../styles/colors';
+
+const StyledPagination = styled.nav`
+  ul {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0 auto;
+    max-width: 80%;
+    padding: 0;
+  }
+
+  .arrow a {
+    color: ${black};
+    text-decoration: none;
+  }
+
+  .pagination-number,
+  .middle-group {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+
+  .pagination-number li,
+  .middle-group li {
+    margin-right: 0.5rem;
+  }
+
+  li span {
+    padding-left: 0.5rem;
+  }
+`;
 
 const getPaginationGroups = (pageCount: number, currentPage: number) => {
   let firstGroup: number[] = [1];
@@ -56,11 +89,14 @@ const Pagination = (props: {
     props.currentPage,
   );
 
-  const mapper = (p: number) => {
+  const mapper = (p: number, i: number, array: number[]) => {
+    const separator = i === array.length - 1 ? '' : <span>&ndash;</span>;
+
     if (p === props.currentPage) {
       return (
         <li key={p}>
-          Page {p} of {pageCount}
+          {p}
+          {separator}
         </li>
       );
     }
@@ -68,34 +104,37 @@ const Pagination = (props: {
     return (
       <li key={p}>
         <a href={paginationHref(p)}>{p}</a>
+        {separator}
       </li>
     );
   };
 
   return (
-    <nav>
+    <StyledPagination>
       <ul>
         {props.currentPage !== 1 ? (
-          <li>
+          <li className="arrow">
             <a href={paginationHref(props.currentPage - 1)}>Previous</a>
           </li>
         ) : (
-          ''
+          <li className="arrow" />
         )}
-        {firstGroup.map(mapper)}
-        {middleGroup.length > 0 ? <li>...</li> : ''}
-        {middleGroup.map(mapper)}
-        {lastGroup.length > 0 ? <li>...</li> : ''}
-        {lastGroup.map(mapper)}
+        <div className="pagination-number">
+          {firstGroup.map(mapper)}
+          {middleGroup.length > 0 ? <li>&hellip;</li> : ''}
+          <div className="middle-group">{middleGroup.map(mapper)}</div>
+          {lastGroup.length > 0 ? <li>&hellip;</li> : ''}
+          {lastGroup.map(mapper)}
+        </div>
         {props.currentPage !== pageCount ? (
-          <li>
+          <li className="arrow">
             <a href={paginationHref(props.currentPage + 1)}>Next</a>
           </li>
         ) : (
-          ''
+          <li className="arrow" />
         )}
       </ul>
-    </nav>
+    </StyledPagination>
   );
 };
 
