@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { black } from '../../styles/colors';
@@ -61,7 +62,7 @@ const DrugIndex: React.FC = () => (
       <ul>
         {index.map(character => (
           <li key={character}>
-            <a href="#">{character}</a>
+            <Link href="#">{character}</Link>
           </li>
         ))}
       </ul>

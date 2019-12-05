@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import DrugIndex from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
@@ -136,7 +137,7 @@ const Mip: React.FC = () => {
       {showingResultsForTerm.length === 0 ? (
         <Main>
           <MipText />
-          {/* <DrugIndex /> */}
+          <DrugIndex />
           <div className="yellow-card-wrapper">
             <YellowCard />
           </div>
