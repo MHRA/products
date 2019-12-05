@@ -88,8 +88,8 @@ const Mip: React.FC = () => {
         fileSize: Math.ceil(
           doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
         ).toLocaleString('en-GB'),
-        lastUpdated: doc.created
-          ? moment(doc.created).format('Do MMM YYYY')
+        created: doc.created
+          ? moment(doc.created).format('DD MMMM YYYY')
           : 'Unknown',
         name: sanitizeTitle(doc.title),
         url: doc.metadata_storage_path,

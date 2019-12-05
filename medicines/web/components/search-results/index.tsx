@@ -110,7 +110,7 @@ export interface IDocument {
   context: string;
   docType: string;
   fileSize: string;
-  lastUpdated: string;
+  created: string;
   name: string;
   url: string;
 }
@@ -183,7 +183,7 @@ const SearchResults = (props: {
                   {drug.name} ({drug.fileSize} KB)
                 </a>
               </h3>
-              <p className="metadata">Last updated: {drug.lastUpdated}</p>
+              <p className="metadata">Created: {drug.created}</p>
               {drug.docType !== 'Par' && (
                 <p className="metadata">
                   Active substances:{' '}
