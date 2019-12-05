@@ -204,14 +204,14 @@ const SearchResults = (props: {
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
-        <ul>
+        <dl>
           {props.drugs.length > 0 &&
             props.drugs.map((drug, i) => (
-              <li key={i}>
-                <div className="left">
+              <article key={i}>
+                <dt className="left">
                   <p className="icon">{drug.docType.toUpperCase()}</p>
-                </div>
-                <div className="right">
+                </dt>
+                <dd className="right">
                   <a href={drug.url}>
                     <p className="drug-name">
                       {drug.name} ({drug.fileSize} KB)
@@ -232,10 +232,10 @@ const SearchResults = (props: {
                       }}
                     />
                   </a>
-                </div>
-              </li>
+                </dd>
+              </article>
             ))}
-        </ul>
+        </dl>
       </StyledDrugList>
       <Pagination
         pageSize={props.pageSize}

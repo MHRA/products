@@ -1,15 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
-import { black } from '../../styles/colors';
+import { black, mhraBlue } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledPagination = styled.nav`
   ul {
     display: flex;
     justify-content: space-between;
     list-style: none;
-    margin: 0 auto;
+    margin: 40px auto 20px;
     max-width: 80%;
     padding: 0;
+  }
+
+  a {
+    color: ${mhraBlue};
   }
 
   .arrow a {
@@ -30,6 +35,10 @@ const StyledPagination = styled.nav`
 
   li span {
     padding-left: 0.5rem;
+  }
+
+  @media ${mobileBreakpoint} {
+    font-size: 0.875rem;
   }
 `;
 
