@@ -92,7 +92,6 @@ const Mip: React.FC = () => {
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSearch(e.currentTarget.value);
 
     if (search.length > 0) {
       rerouteSearchResults(1);

@@ -172,11 +172,11 @@ function toSentenceCase(substance: string): string {
 
 const SearchResults = (props: {
   drugs: IDocument[];
-  showingResultsForTerm: string;
-  resultCount: number;
   page: number;
   pageSize: number;
+  resultCount: number;
   searchTerm: string;
+  showingResultsForTerm: string;
 }) => {
   return (
     <>
@@ -193,8 +193,8 @@ const SearchResults = (props: {
               {searchResultsNumberingInformation({
                 page: props.page,
                 pageSize: props.pageSize,
-                totalResultCount: props.resultCount,
                 shownResultCount: props.drugs.length,
+                totalResultCount: props.resultCount,
               })}
             </p>
           )}
@@ -239,10 +239,10 @@ const SearchResults = (props: {
       </StyledDrugList>
       {props.resultCount > props.pageSize ? (
         <Pagination
+          currentPage={props.page}
           pageSize={props.pageSize}
           resultCount={props.resultCount}
           searchTerm={props.searchTerm}
-          currentPage={props.page}
         />
       ) : (
         ''
