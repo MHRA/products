@@ -156,6 +156,11 @@ const Mip: React.FC = () => {
           setShowingResultsForTerm('');
         })();
       }
+    } else {
+      setResults([]);
+      setSearch('');
+      setShowingResultsForTerm('');
+      setSubstances([]);
     }
     window.scrollTo(0, 0);
   }, [page, searchTerm, substance]);
