@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
+import { IProduct } from '../../model/substance';
 import { black } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
@@ -28,34 +29,34 @@ const StyledDrugIndex = styled.section`
   }
 `;
 
-export const index = [
-  { value: 'A' },
-  { value: 'B' },
-  { value: 'C' },
-  { value: 'D' },
-  { value: 'E' },
-  { value: 'F' },
-  { value: 'G' },
-  { value: 'H' },
-  { value: 'I' },
-  { value: 'J' },
-  { value: 'K' },
-  { value: 'L' },
-  { value: 'M' },
-  { value: 'N' },
-  { value: 'O' },
-  { value: 'P' },
-  { value: 'Q' },
-  { value: 'R' },
-  { value: 'S' },
-  { value: 'T' },
-  { value: 'U' },
-  { value: 'V' },
-  { value: 'W' },
-  { value: 'X' },
-  { value: 'Y' },
-  { value: 'Z' },
-  { value: '0-9' },
+export const index: IProduct[] = [
+  { name: 'A' },
+  { name: 'B' },
+  { name: 'C' },
+  { name: 'D' },
+  { name: 'E' },
+  { name: 'F' },
+  { name: 'G' },
+  { name: 'H' },
+  { name: 'I' },
+  { name: 'J' },
+  { name: 'K' },
+  { name: 'L' },
+  { name: 'M' },
+  { name: 'N' },
+  { name: 'O' },
+  { name: 'P' },
+  { name: 'Q' },
+  { name: 'R' },
+  { name: 'S' },
+  { name: 'T' },
+  { name: 'U' },
+  { name: 'V' },
+  { name: 'W' },
+  { name: 'X' },
+  { name: 'Y' },
+  { name: 'Z' },
+  { name: '0-9' },
 ];
 
 export interface IFacet {
@@ -65,7 +66,7 @@ export interface IFacet {
 
 interface IIndex {
   horizontal?: boolean;
-  items: IFacet[];
+  items: IProduct[];
 }
 
 const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
@@ -73,10 +74,10 @@ const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
     <nav>
       <ul className={horizontal ? 'horizontal' : ''}>
         {items.map(item => (
-          <li key={item.value}>
-            <Link href={`?substance=${item.value}`}>
+          <li key={item.name}>
+            <Link href={`?substance=${item.name}`}>
               <a>
-                {item.value} {item.count && <>({item.count})</>}
+                {item.name} {item.count && <>({item.count})</>}
               </a>
             </Link>
           </li>

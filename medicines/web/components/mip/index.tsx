@@ -2,6 +2,7 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
+import { IProduct } from '../../model/substance';
 import {
   docSearch,
   facetSearch,
@@ -71,6 +72,7 @@ const Mip: React.FC = () => {
   const [facetResults, setFacetResults] = React.useState<IFacet[]>([]);
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
+  const [products, setSubstances] = React.useState<IProduct[]>([]);
 
   const router = useRouter();
 
@@ -142,8 +144,13 @@ const Mip: React.FC = () => {
     if (substance) {
       if (typeof substance === 'string') {
         (async () => {
-          const facets = await substanceLoader.load(substance);
-          setFacetResults(facets);
+          const ss = await substanceLoader.load(substance.charAt(0));
+          const products = ss.find(s => s.name === substance);
+          if (products) {
+            setSubstances(products.products);
+          } else {
+            setSubstances(ss);
+          }
         })();
       }
     }
@@ -168,7 +175,7 @@ const Mip: React.FC = () => {
             <MipText />
             <h2>List of active substances</h2>
             <DrugIndex items={index} horizontal />
-            {facetResults.length > 0 && <DrugIndex items={facetResults} />}
+            {products.length > 0 && <DrugIndex items={products} />}
           </>
         ) : (
           <SearchResults
