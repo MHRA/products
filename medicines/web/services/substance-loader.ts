@@ -12,12 +12,14 @@ const substanceLoader = new DataLoader<string, ISubstance[]>(async keys => {
         .forEach(f => {
           const xs = f.value
             .replace(/\s+/g, ' ')
-            .split(', ')
+            .split(', ', 3)
             .slice(1);
           if (xs.length > 0) {
             const s = xs[0];
             if (ss[s] === undefined) {
-              ss[s] = { name: s, count: f.count, products: [] };
+              if (s !== k) {
+                ss[s] = { name: s, count: f.count, products: [] };
+              }
             } else {
               ss[s].products?.push({ name: xs[1], count: f.count });
             }

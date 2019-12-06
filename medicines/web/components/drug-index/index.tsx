@@ -56,7 +56,16 @@ export const index: IProduct[] = [
   { name: 'X' },
   { name: 'Y' },
   { name: 'Z' },
-  { name: '0-9' },
+  { name: '0' },
+  { name: '1' },
+  { name: '2' },
+  { name: '3' },
+  { name: '4' },
+  { name: '5' },
+  { name: '6' },
+  { name: '7' },
+  { name: '8' },
+  { name: '9' },
 ];
 
 export interface IFacet {
