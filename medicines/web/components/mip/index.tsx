@@ -58,7 +58,7 @@ const Mip: React.FC = () => {
   const [results, setResults] = React.useState<IDocument[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [resultCount, setResultCount] = React.useState(0);
-  const pageSize = 50;
+  const pageSize = 20;
   const router = useRouter();
   const {
     query: { search: searchTerm, page },
