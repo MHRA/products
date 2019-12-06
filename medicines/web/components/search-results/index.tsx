@@ -176,7 +176,6 @@ const SearchResults = (props: {
   resultCount: number;
   page: number;
   pageSize: number;
-  paginationCallback: (pageNo: number) => void;
   searchTerm: string;
 }) => {
   return (
@@ -243,7 +242,6 @@ const SearchResults = (props: {
         resultCount={props.resultCount}
         searchTerm={props.searchTerm}
         currentPage={props.page}
-        callback={props.paginationCallback}
       />
     </>
   );

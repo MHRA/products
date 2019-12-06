@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { black, mhraBlue } from '../../styles/colors';
+import { mhraBlue } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledPagination = styled.nav`
@@ -88,11 +89,7 @@ const Pagination = (props: {
   resultCount: number;
   pageSize: number;
   currentPage: number;
-  callback: (pageNo: number) => void;
 }) => {
-  const paginationHref = (p: number) =>
-    `/?search=${props.searchTerm}&page=${p}`;
-
   const pageCount = Math.floor(props.resultCount / props.pageSize) + 1;
   const { firstGroup, middleGroup, lastGroup } = getPaginationGroups(
     pageCount,
@@ -113,20 +110,27 @@ const Pagination = (props: {
 
     return (
       <li key={page}>
-        {/* tslint:disable-next-line:jsx-no-lambda */}
-        <a onClick={_ => props.callback(page)}>{page}</a>
+        <Link href={getSearchPage(page)}>
+          <a>{page}</a>
+        </Link>
         {separator}
       </li>
     );
   };
+
+  const getSearchPage = (pageNo: number) => ({
+    pathname: '/',
+    query: { search: props.searchTerm, page: pageNo },
+  });
 
   return (
     <StyledPagination>
       <ul className="pagination">
         {props.currentPage !== 1 ? (
           <li className="arrow">
-            {/* tslint:disable-next-line:jsx-no-lambda */}
-            <a onClick={_ => props.callback(props.currentPage - 1)}>Previous</a>
+            <Link href={getSearchPage(props.currentPage - 1)}>
+              <a>Previous</a>
+            </Link>
           </li>
         ) : (
           <li className="arrow" />
@@ -142,8 +146,9 @@ const Pagination = (props: {
         </div>
         {props.currentPage !== pageCount ? (
           <li className="arrow">
-            {/* tslint:disable-next-line:jsx-no-lambda */}
-            <a onClick={_ => props.callback(props.currentPage + 1)}>Next</a>
+            <Link href={getSearchPage(props.currentPage + 1)}>
+              <a>Next</a>
+            </Link>
           </li>
         ) : (
           <li className="arrow" />
