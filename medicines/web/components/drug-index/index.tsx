@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct } from '../../model/substance';
+import { IProduct, isIndex, isSubstance } from '../../model/substance';
 import { black } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
@@ -75,7 +75,13 @@ const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
       <ul className={horizontal ? 'horizontal' : ''}>
         {items.map(item => (
           <li key={item.name}>
-            <Link href={`?substance=${item.name}`}>
+            <Link
+              href={`?${
+                isSubstance(item) || isIndex(item)
+                  ? 'substance'
+                  : 'page=1&search'
+              }=${item.name}`}
+            >
               <a>
                 {item.name} {item.count && <>({item.count})</>}
               </a>
