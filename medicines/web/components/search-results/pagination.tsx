@@ -43,7 +43,16 @@ const StyledPagination = styled.nav`
   }
 `;
 
-const getPaginationGroups = (pageCount: number, currentPage: number) => {
+interface IPaginationGroups {
+  firstGroup: number[];
+  middleGroup: number[];
+  lastGroup: number[];
+}
+
+const getPaginationGroups = (
+  pageCount: number,
+  currentPage: number,
+): IPaginationGroups => {
   let firstGroup: number[] = [1];
   let middleGroup: number[] = [];
   let lastGroup: number[] = [pageCount];
