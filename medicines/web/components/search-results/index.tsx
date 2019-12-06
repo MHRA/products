@@ -237,12 +237,16 @@ const SearchResults = (props: {
             ))}
         </dl>
       </StyledDrugList>
-      <Pagination
-        pageSize={props.pageSize}
-        resultCount={props.resultCount}
-        searchTerm={props.searchTerm}
-        currentPage={props.page}
-      />
+      {props.resultCount > props.pageSize ? (
+        <Pagination
+          pageSize={props.pageSize}
+          resultCount={props.resultCount}
+          searchTerm={props.searchTerm}
+          currentPage={props.page}
+        />
+      ) : (
+        ''
+      )}
     </>
   );
 };
