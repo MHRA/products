@@ -181,9 +181,14 @@ const Mip: React.FC = () => {
         {showingResultsForTerm.length === 0 ? (
           <>
             <MipText />
-            <h2>List of active substances</h2>
-            <DrugIndex items={index} horizontal />
-            {products.length > 0 && <DrugIndex items={products} />}
+            <DrugIndex
+              title="List of active substances"
+              items={index}
+              horizontal
+            />
+            {products.length > 0 && (
+              <DrugIndex title={`${substance || '...'}`} items={products} />
+            )}
           </>
         ) : (
           <SearchResults

@@ -18,9 +18,16 @@ const StyledDrugIndex = styled.section`
     margin: 0;
     padding: 0;
   }
+  ul > li {
+    padding-top: 10px;
+  }
 
   ul.horizontal {
     display: flex;
+  }
+
+  ul.horizontal > li {
+    padding-top: 0;
   }
 
   a {
@@ -74,13 +81,15 @@ export interface IFacet {
 }
 
 interface IIndex {
+  title: string;
   horizontal?: boolean;
   items: IProduct[];
 }
 
-const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
+const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => (
   <StyledDrugIndex>
     <nav>
+      <h2>{title}</h2>
       <ul className={horizontal ? 'horizontal' : ''}>
         {items.map(item => (
           <li key={item.name}>
@@ -89,10 +98,10 @@ const DrugIndex: React.FC<IIndex> = ({ items, horizontal }) => (
                 isSubstance(item) || isIndex(item)
                   ? 'substance'
                   : 'page=1&search'
-              }=${item.name}`}
+              }=${encodeURIComponent(item.name)}`}
             >
               <a>
-                {item.name} {item.count && <>({item.count})</>}
+                {item.name} {item.count && <>({item.count} files)</>}
               </a>
             </Link>
           </li>
