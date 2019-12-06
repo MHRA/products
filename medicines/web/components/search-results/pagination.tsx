@@ -13,15 +13,6 @@ const StyledPagination = styled.nav`
     padding: 0;
   }
 
-  a {
-    color: ${mhraBlue};
-  }
-
-  .arrow a {
-    color: ${black};
-    text-decoration: none;
-  }
-
   .pagination-number,
   .middle-group {
     display: flex;
@@ -39,6 +30,15 @@ const StyledPagination = styled.nav`
 
   @media ${mobileBreakpoint} {
     font-size: 0.875rem;
+  }
+
+  .pagination a {
+    color: ${mhraBlue};
+    text-decoration: underline;
+  }
+
+  .pagination a:hover {
+    cursor: pointer;
   }
 `;
 
@@ -88,6 +88,7 @@ const Pagination = (props: {
   resultCount: number;
   pageSize: number;
   currentPage: number;
+  callback: (pageNo: number) => void;
 }) => {
   const paginationHref = (p: number) =>
     `/?search=${props.searchTerm}&page=${p}`;
@@ -98,21 +99,22 @@ const Pagination = (props: {
     props.currentPage,
   );
 
-  const mapper = (p: number, i: number, array: number[]) => {
+  const createPaginationButton = (page: number, i: number, array: number[]) => {
     const separator = i === array.length - 1 ? '' : <span>&ndash;</span>;
 
-    if (p === props.currentPage) {
+    if (page === props.currentPage) {
       return (
-        <li key={p}>
-          {p}
+        <li key={page}>
+          {page}
           {separator}
         </li>
       );
     }
 
     return (
-      <li key={p}>
-        <a href={paginationHref(p)}>{p}</a>
+      <li key={page}>
+        {/* tslint:disable-next-line:jsx-no-lambda */}
+        <a onClick={_ => props.callback(page)}>{page}</a>
         {separator}
       </li>
     );
@@ -120,24 +122,28 @@ const Pagination = (props: {
 
   return (
     <StyledPagination>
-      <ul>
+      <ul className="pagination">
         {props.currentPage !== 1 ? (
           <li className="arrow">
-            <a href={paginationHref(props.currentPage - 1)}>Previous</a>
+            {/* tslint:disable-next-line:jsx-no-lambda */}
+            <a onClick={_ => props.callback(props.currentPage - 1)}>Previous</a>
           </li>
         ) : (
           <li className="arrow" />
         )}
         <div className="pagination-number">
-          {firstGroup.map(mapper)}
+          {firstGroup.map(createPaginationButton)}
           {middleGroup.length > 0 ? <li>&hellip;</li> : ''}
-          <div className="middle-group">{middleGroup.map(mapper)}</div>
+          <div className="middle-group">
+            {middleGroup.map(createPaginationButton)}
+          </div>
           {lastGroup.length > 0 ? <li>&hellip;</li> : ''}
-          {lastGroup.map(mapper)}
+          {lastGroup.map(createPaginationButton)}
         </div>
         {props.currentPage !== pageCount ? (
           <li className="arrow">
-            <a href={paginationHref(props.currentPage + 1)}>Next</a>
+            {/* tslint:disable-next-line:jsx-no-lambda */}
+            <a onClick={_ => props.callback(props.currentPage + 1)}>Next</a>
           </li>
         ) : (
           <li className="arrow" />

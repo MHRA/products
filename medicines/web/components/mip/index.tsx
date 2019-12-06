@@ -68,19 +68,6 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setSearch(e.currentTarget.value);
-
-    if (search.length > 0) {
-      router.push({
-        pathname: '/',
-        query: { search, page: 1 },
-      });
-    }
-  };
-
   const fetchSearchResults = async (searchTerm: string, page: number) => {
     const searchResults = await azureSearch(searchTerm, page, pageSize);
     const results = searchResults.results.map((doc: IAzureSearchResult) => {
@@ -103,6 +90,22 @@ const Mip: React.FC = () => {
     setShowingResultsForTerm(searchTerm);
   };
 
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSearch(e.currentTarget.value);
+
+    if (search.length > 0) {
+      rerouteSearchResults(1);
+    }
+  };
+
+  const rerouteSearchResults = (pageNo: number) => {
+    router.push({
+      pathname: '/',
+      query: { search, page: pageNo },
+    });
+  };
+
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
@@ -115,7 +118,9 @@ const Mip: React.FC = () => {
         fetchSearchResults(searchTerm, parsedPage);
       }
     }
-  }, [searchTerm]);
+
+    window.scrollTo(0, 0);
+  }, [page, searchTerm]);
 
   return (
     <>
@@ -145,6 +150,7 @@ const Mip: React.FC = () => {
             resultCount={resultCount}
             page={pageNumber}
             pageSize={pageSize}
+            paginationCallback={rerouteSearchResults}
             searchTerm={search}
           />
           <div className="yellow-card-wrapper">
