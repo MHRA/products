@@ -112,6 +112,7 @@ const Mip: React.FC = () => {
     setResults(results);
     setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
+    setSubstances([]);
   };
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -140,8 +141,7 @@ const Mip: React.FC = () => {
         setPageNumber(parsedPage);
         fetchSearchResults(searchTerm, parsedPage);
       }
-    }
-    if (substance) {
+    } else if (substance) {
       if (typeof substance === 'string') {
         (async () => {
           const ss = await substanceLoader.load(substance.charAt(0));
@@ -151,6 +151,9 @@ const Mip: React.FC = () => {
           } else {
             setSubstances(ss);
           }
+          setResults([]);
+          setSearch('');
+          setShowingResultsForTerm('');
         })();
       }
     }
