@@ -78,7 +78,7 @@ const buildSearchUrl = (
   return url.toString();
 };
 
-export interface IAzureFacetResult {
+export interface IFacetResult {
   facets: Array<{ count: number; value: string }>;
 }
 
@@ -125,8 +125,8 @@ export const docSearch = async (
 
 export const facetSearch = async (
   query: string,
-): Promise<IAzureFacetResult> => {
+): Promise<[string, IFacetResult]> => {
   const body = await getJson(buildFacetUrl(query));
 
-  return body['@search.facets'];
+  return [query, body['@search.facets']];
 };

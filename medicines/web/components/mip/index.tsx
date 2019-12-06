@@ -2,13 +2,19 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
+import {
+  docSearch,
+  facetSearch,
+  ISearchResult,
+} from '../../services/azure-search';
+import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { IFacet, index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
-import { docSearch, facetSearch, ISearchResult } from './azure-search';
+
 const Aside = styled.aside`
   max-width: 25%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
@@ -78,7 +84,7 @@ const Mip: React.FC = () => {
 
   const fetchFacetResults = async (searchTerm: string) => {
     const searchResults = await facetSearch(searchTerm);
-    const filtered = searchResults.facets.filter(x =>
+    const filtered = searchResults[1].facets.filter(x =>
       x.value.startsWith(searchTerm),
     );
     setFacetResults(filtered);
@@ -135,7 +141,10 @@ const Mip: React.FC = () => {
     }
     if (substance) {
       if (typeof substance === 'string') {
-        fetchFacetResults(substance);
+        (async () => {
+          const facets = await substanceLoader.load(substance);
+          setFacetResults(facets);
+        })();
       }
     }
     window.scrollTo(0, 0);
