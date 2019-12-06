@@ -7,6 +7,7 @@ import {
   tinyPaddingSizeCss,
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
+import Pagination from './pagination';
 
 const StyledDrugList = styled.section`
   .title {
@@ -130,6 +131,23 @@ const searchResultsTitle = (
     : `Showing results for ${showingResultsForTerm}`;
 };
 
+interface ISearchNumberingInformation {
+  page: number;
+  pageSize: number;
+  totalResultCount: number;
+  shownResultCount: number;
+}
+
+const searchResultsNumberingInformation = (
+  numbering: ISearchNumberingInformation,
+) => {
+  const zero = (numbering.page - 1) * numbering.pageSize;
+  const one = zero + 1;
+  const last = zero + numbering.shownResultCount;
+
+  return `${one} to ${last} of ${numbering.totalResultCount}`;
+};
+
 const normalizeDescription = (description: string): string => {
   const normalized = description
     .substr(0, 300) // Cut to 300 characters.
@@ -154,55 +172,83 @@ function toSentenceCase(substance: string): string {
 
 const SearchResults = (props: {
   drugs: IDocument[];
+  page: number;
+  pageSize: number;
+  resultCount: number;
+  searchTerm: string;
   showingResultsForTerm: string;
-}) => (
-  <StyledDrugList>
-    <div>
-      <h1 className="title">
-        {searchResultsTitle(props.showingResultsForTerm, props.drugs.length)}
-      </h1>
-      {props.drugs.length > 0 && (
-        <p className="no-of-results">{props.drugs.length} results</p>
+}) => {
+  return (
+    <>
+      <StyledDrugList>
+        <div>
+          <h1 className="title">
+            {searchResultsTitle(
+              props.showingResultsForTerm,
+              props.drugs.length,
+            )}
+          </h1>
+          {props.drugs.length > 0 && (
+            <p className="no-of-results">
+              {searchResultsNumberingInformation({
+                page: props.page,
+                pageSize: props.pageSize,
+                shownResultCount: props.drugs.length,
+                totalResultCount: props.resultCount,
+              })}
+            </p>
+          )}
+          <p className="ema-message">
+            If the product information you are seeking does not appear below, it
+            is possible that the product holds a central European license and
+            its information may be available at the {emaWebsiteLink()} website.
+          </p>
+        </div>
+        <dl>
+          {props.drugs.length > 0 &&
+            props.drugs.map((drug, i) => (
+              <article key={i}>
+                <dt className="left">
+                  <p className="icon">{drug.docType.toUpperCase()}</p>
+                </dt>
+                <dd className="right">
+                  <a href={drug.url}>
+                    <p className="drug-name">
+                      {drug.name} ({drug.fileSize} KB)
+                    </p>
+                    <p className="metadata">Created: {drug.created}</p>
+                    {drug.docType !== 'Par' && (
+                      <p className="metadata">
+                        Active substances:{' '}
+                        {drug.activeSubstances
+                          .map(substance => toSentenceCase(substance))
+                          .join(', ')}
+                      </p>
+                    )}
+                    <p
+                      className="context"
+                      dangerouslySetInnerHTML={{
+                        __html: normalizeDescription(drug.context),
+                      }}
+                    />
+                  </a>
+                </dd>
+              </article>
+            ))}
+        </dl>
+      </StyledDrugList>
+      {props.resultCount > props.pageSize ? (
+        <Pagination
+          currentPage={props.page}
+          pageSize={props.pageSize}
+          resultCount={props.resultCount}
+          searchTerm={props.searchTerm}
+        />
+      ) : (
+        ''
       )}
-      <p className="ema-message">
-        If the product information you are seeking does not appear below, it is
-        possible that the product holds a central European license and its
-        information may be available at the {emaWebsiteLink()} website.
-      </p>
-    </div>
-    <dl>
-      {props.drugs.length > 0 &&
-        props.drugs.map((drug, i) => (
-          <article key={i}>
-            <dt className="left">
-              <p className="icon">{drug.docType.toUpperCase()}</p>
-            </dt>
-            <dd className="right">
-              <h3 className="drug-name">
-                <a href={drug.url}>
-                  {drug.name} ({drug.fileSize} KB)
-                </a>
-              </h3>
-              <p className="metadata">Created: {drug.created}</p>
-              {drug.docType !== 'Par' && (
-                <p className="metadata">
-                  Active substances:{' '}
-                  {drug.activeSubstances
-                    .map(substance => toSentenceCase(substance))
-                    .join(', ')}
-                </p>
-              )}
-              <p
-                className="context"
-                dangerouslySetInnerHTML={{
-                  __html: normalizeDescription(drug.context),
-                }}
-              />
-            </dd>
-          </article>
-        ))}
-    </dl>
-  </StyledDrugList>
-);
+    </>
+  );
+};
 
 export default SearchResults;

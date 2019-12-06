@@ -56,6 +56,9 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [results, setResults] = React.useState<IDocument[]>([]);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [resultCount, setResultCount] = React.useState(0);
+  const pageSize = 20;
   const router = useRouter();
   const {
     query: { search: searchTerm, page },
@@ -65,22 +68,9 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setSearch(e.currentTarget.value);
-
-    if (search.length > 0) {
-      router.push({
-        pathname: '/',
-        query: { search, page: 1 },
-      });
-    }
-  };
-
-  const fetchSearchResults = async (searchTerm: string) => {
-    const searchResults = await azureSearch(searchTerm);
-    const results = searchResults.map((doc: IAzureSearchResult) => {
+  const fetchSearchResults = async (searchTerm: string, page: number) => {
+    const searchResults = await azureSearch(searchTerm, page, pageSize);
+    const results = searchResults.results.map((doc: IAzureSearchResult) => {
       return {
         activeSubstances: doc.substance_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
@@ -96,17 +86,40 @@ const Mip: React.FC = () => {
       };
     });
     setResults(results);
-    setSearch(searchTerm);
+    setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
+  };
+
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (search.length > 0) {
+      rerouteSearchResults(1);
+    }
+  };
+
+  const rerouteSearchResults = (pageNo: number) => {
+    router.push({
+      pathname: '',
+      query: { search, page: pageNo },
+    });
   };
 
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
-        fetchSearchResults(searchTerm);
+        setSearch(searchTerm);
+        let parsedPage = Number(page);
+        if (!parsedPage || parsedPage < 1) {
+          parsedPage = 1;
+        }
+        setPageNumber(parsedPage);
+        fetchSearchResults(searchTerm, parsedPage);
       }
     }
-  }, [searchTerm]);
+
+    window.scrollTo(0, 0);
+  }, [page, searchTerm]);
 
   return (
     <>
@@ -133,6 +146,10 @@ const Mip: React.FC = () => {
           <SearchResults
             drugs={results}
             showingResultsForTerm={showingResultsForTerm}
+            resultCount={resultCount}
+            page={pageNumber}
+            pageSize={pageSize}
+            searchTerm={search}
           />
           <div className="yellow-card-wrapper">
             <YellowCard />
