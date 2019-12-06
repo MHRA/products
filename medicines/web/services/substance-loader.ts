@@ -10,7 +10,10 @@ const substanceLoader = new DataLoader<string, ISubstance[]>(async keys => {
       f.facets
         .filter(x => x.value.startsWith(k))
         .forEach(f => {
-          const xs = f.value.split(', ').slice(1);
+          const xs = f.value
+            .replace(/\s+/g, ' ')
+            .split(', ')
+            .slice(1);
           if (xs.length > 0) {
             const s = xs[0];
             if (ss[s] === undefined) {
