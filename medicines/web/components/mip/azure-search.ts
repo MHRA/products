@@ -77,7 +77,6 @@ const buildAzureSearchUrl = (
     'scoringProfile',
     azureSearchScoringProfile as string,
   );
-  // https://rb-mhra-mip.search.windows.net/indexes('azureblob-index')/docs?api-key=6D6107C925CC3C284A9218EFC626C7F7&api-version=2017-11-11&highlight=content&queryType=full&count=true&search=anti~1&$skip=100
 
   return url.toString();
 };

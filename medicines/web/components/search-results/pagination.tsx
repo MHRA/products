@@ -119,7 +119,7 @@ const Pagination = (props: {
   };
 
   const getSearchPage = (pageNo: number) => ({
-    pathname: '/',
+    pathname: '',
     query: { search: props.searchTerm, page: pageNo },
   });
 
