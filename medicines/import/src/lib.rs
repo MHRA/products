@@ -5,7 +5,7 @@ extern crate serde_derive;
 
 mod csv;
 mod date_de;
-mod hash;
+pub mod hash;
 mod metadata;
 mod model;
 mod report;
