@@ -12,6 +12,14 @@ NAMESPACES = {"wcm": "http://www.stellent.com/wcm-data/ns/8.0.0"}
 SITE_ROOT_DIRECTIVE = "[!--$ssServerRelativeSiteRoot--]"
 HTTP_ROOT_DIRECTIVE = "[!--$HttpRelativeWebRoot--]"
 
+# Map of CON codes which serve as redirects to known URLs.
+CON_CODE_URL_MAP = {
+    "CON123123": (
+        "https://www.gov.uk/drug-safety-update/"
+        "addiction-to-benzodiazepines-and-codeine"
+    )
+}
+
 
 class MHRAMarkdownConverter(markdownify.MarkdownConverter):
     """MHRA learning module HTML to Markdown converter."""
@@ -76,9 +84,14 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         # Handle links to pages like [!--$ssServerRelativeSiteRoot--]Something/CON123
         if el["href"].startswith(SITE_ROOT_DIRECTIVE):
             path = Path(el["href"])
-            el["href"] = str(Path("stellent") / Path(path.stem + ".unknown"))
-            self.stellent_assets_to_download.add(path.stem)
-            self.assets_with_unknown_type.add(path.stem)
+
+            if path.stem in CON_CODE_URL_MAP:
+                el["href"] = CON_CODE_URL_MAP[path.stem]
+
+            else:
+                el["href"] = str(Path("stellent") / Path(path.stem + ".unknown"))
+                self.stellent_assets_to_download.add(path.stem)
+                self.assets_with_unknown_type.add(path.stem)
 
         # Handle links to pages like [!--$HttpRelativeWebRoot--]/something/abc123.pdf
         if el["href"].startswith(HTTP_ROOT_DIRECTIVE):

@@ -57,6 +57,18 @@ def test_site_root_directive_href():
     assert md_converter.stellent_assets_to_download == set(["ABC123"])
     assert md_converter.assets_with_unknown_type == set()
 
+    # Test with known content redirection.
+    result = html_to_markdown(
+        '<a href="[!--$ssServerRelativeSiteRoot--]'
+        'Safetyinformation/DrugSafetyUpdate/CON123123">'
+        "Known content redirection</a>"
+    )
+    assert (
+        "[Known content redirection]"
+        "(https://www.gov.uk/drug-safety-update/"
+        "addiction-to-benzodiazepines-and-codeine)"
+    ) in result
+
     # Test with unknown content.
     md_converter = learning_importer.MHRAMarkdownConverter()
     result = md_converter.convert(
