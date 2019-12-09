@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
-import { anchorColour } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledDrugIndex = styled.section`
   margin-top: 1rem;
@@ -27,7 +27,7 @@ const StyledDrugIndex = styled.section`
   }
 
   ul.horizontal > li {
-    padding-top: 0;
+    line-height: 2;
   }
 
   a {
@@ -42,6 +42,15 @@ const StyledDrugIndex = styled.section`
     text-decoration: underline;
     font-size: 1.1875rem;
     font-weight: normal;
+  }
+
+  @media ${mobileBreakpoint} {
+    ul.horizontal {
+      flex-wrap: wrap;
+    }
+    ul.horizontal > li {
+      flex-basis: 10%;
+    }
   }
 `;
 

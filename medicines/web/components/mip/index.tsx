@@ -97,6 +97,7 @@ const Mip: React.FC = () => {
     const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
+        product: doc.product_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
         docType: doc.doc_type?.toString().substr(0, 3) || '',
         fileSize: Math.ceil(
