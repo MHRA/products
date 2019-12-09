@@ -34,7 +34,6 @@ const WithStyles = styled.div`
   a {
     color: ${anchorColour};
     text-decoration: none;
-    font-weight: bold;
   }
 `;
 

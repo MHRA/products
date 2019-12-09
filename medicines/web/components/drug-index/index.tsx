@@ -30,12 +30,18 @@ const StyledDrugIndex = styled.section`
     padding-top: 0;
   }
 
+  a {
+    font-weight: bold;
+  }
+
   .substance-name {
     margin-bottom: 30px;
   }
+
   .substance-name a {
     text-decoration: underline;
     font-size: 1.1875rem;
+    font-weight: normal;
   }
 `;
 
@@ -89,34 +95,38 @@ interface IIndex {
   items: IProduct[];
 }
 
-const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => (
-  <StyledDrugIndex>
-    <nav>
-      <h2>{title}</h2>
-      <ul className={horizontal ? 'horizontal' : ''}>
-        {items.map(item => {
-          return (
-            <li
-              key={item.name}
-              className={isSubstance(item) ? 'substance-name' : ''}
-            >
-              <Link
-                href={`?${
-                  isSubstance(item) || isIndex(item)
-                    ? 'substance'
-                    : 'page=1&search'
-                }=${encodeURIComponent(item.name)}`}
-              >
-                <a>
-                  {item.name} {item.count && <>({item.count} files)</>}
-                </a>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  </StyledDrugIndex>
-);
+const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
+  if (items === undefined || items.length === 0) {
+    return <></>;
+  }
+
+  const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
+
+  return (
+    <StyledDrugIndex>
+      <nav>
+        {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
+
+        <ul className={horizontal ? 'horizontal' : ''}>
+          {items.map(item => {
+            return (
+              <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+                <Link
+                  href={`?${
+                    level < 2 ? 'substance' : 'page=1&search'
+                  }=${encodeURIComponent(item.name)}`}
+                >
+                  <a>
+                    {item.name} {item.count && <>({item.count} files)</>}
+                  </a>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </StyledDrugIndex>
+  );
+};
 
 export default DrugIndex;

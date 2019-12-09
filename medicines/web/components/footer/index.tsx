@@ -33,8 +33,9 @@ const StyledFooter = styled.footer`
     padding-right: 1.875rem;
   }
 
-  a {
+  ul li a {
     color: ${black};
+    text-decoration: underline;
   }
 
   @media ${mobileBreakpoint} {
