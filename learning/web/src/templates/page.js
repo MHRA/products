@@ -1,13 +1,14 @@
 import React from "react"
 import { graphql } from "gatsby"
 
+import { MDXRenderer } from "gatsby-plugin-mdx"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
 
 class ModuleTemplate extends React.Component {
   render() {
-    const post = this.props.data.markdownRemark
+    const post = this.props.data.mdx
     const siteTitle = this.props.data.site.siteMetadata.title
 
     return (
@@ -36,7 +37,7 @@ class ModuleTemplate extends React.Component {
               {post.frontmatter.date}
             </p>
           </header>
-          <section dangerouslySetInnerHTML={{ __html: post.html }} />
+          <MDXRenderer>{post.body}</MDXRenderer>
           <hr
             style={{
               marginBottom: rhythm(1),
@@ -57,14 +58,11 @@ export const pageQuery = graphql`
         title
       }
     }
-    markdownRemark(fields: { slug: { eq: $slug } }) {
+    mdx(fields: { slug: { eq: $slug } }) {
       id
-      excerpt(pruneLength: 160)
-      html
+      body
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
-        description
       }
     }
   }

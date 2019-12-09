@@ -20,6 +20,18 @@ exports.createPages = async ({ graphql, actions }) => {
             }
           }
         }
+        allMdx {
+          edges {
+            node {
+              fields {
+                slug
+              }
+              frontmatter {
+                title
+              }
+            }
+          }
+        }
       }
     `
   )
@@ -57,6 +69,15 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
       name: `slug`,
       node,
       value,
+    })
+  }
+
+  if (node.internal.type === "Mdx") {
+    const value = createFilePath({ node, getNode })
+    createNodeField({
+      name: "slug",
+      node,
+      value: `${value}`,
     })
   }
 }

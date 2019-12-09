@@ -6,7 +6,11 @@ module: "hello-word"
 page: 0
 ---
 
+import { GoThreeBars, GoX } from "react-icons/go"
+
 This is my first post on my new fake blog! How exciting!
+
+<GoThreeBars/>
 
 I'm sure I'll write a lot more interesting things in the future.
 
