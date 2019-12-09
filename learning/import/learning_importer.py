@@ -1,5 +1,6 @@
 """Learning module importer."""
 
+import json
 import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -31,6 +32,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         super().__init__(**kwargs)
         self.stellent_assets_to_download = set()
         self.assets_with_unknown_type = set()
+        self.index = dict()
 
     def convert(self, html):
         """Add footnotes to the end of converted document."""
@@ -193,8 +195,8 @@ def import_row(row, index, out_dir, con_code):
     html = f"<h1>{title}</h1>" + html
 
     # Write HTML
-    outfile = Path(out_dir) / Path(f"{stem}.html")
-    outfile.write_text(html)
+    html_outfile = Path(out_dir) / Path(f"{stem}.html")
+    html_outfile.write_text(html)
 
     # Inject expanders into HTML
     html = inject_expanders(html)
@@ -207,6 +209,9 @@ def import_row(row, index, out_dir, con_code):
     markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
     outfile = Path(out_dir) / Path(f"{stem}.mdx")
     outfile.write_text(markdown)
+
+    # Return title and filename.
+    return title, html_outfile
 
 
 def validate_con_code(context, param, value):  # pylint: disable=unused-argument
@@ -234,14 +239,19 @@ def learning_importer(xml_file, con_code, out_dir):
             out_dir.mkdir()
 
     xml = etree.parse(xml_file)
+    sitemap = []
     with click.progressbar(
         xml.findall("//wcm:row", namespaces=NAMESPACES),
         label="Extracting pages from XML",
     ) as rows:
         for index, row in enumerate(rows):
-            import_row(row, index, out_dir, con_code)
+            title, outfile = import_row(row, index, out_dir, con_code)
+            sitemap.append({"name": title, "link": str(outfile)})
 
     click.echo("Done!")
+
+    outfile = Path(out_dir) / Path("sitemap.json")
+    outfile.write_text(json.dumps(sitemap))
 
     num_assets = len(md_converter.stellent_assets_to_download)
     asset_path = out_dir / Path("stellent")
