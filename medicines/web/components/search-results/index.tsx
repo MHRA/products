@@ -213,15 +213,13 @@ const SearchResults = (props: {
                 </dt>
                 <dd className="right">
                   {drug.product ? (
-                    <>
-                      <a href={drug.url}>
-                        <p className="drug-name">{drug.product}</p>
-                        <p className="metadata">
-                          {drug.name} ({drug.fileSize} KB)
-                        </p>
-                        <br />
-                      </a>
-                    </>
+                    <a href={drug.url}>
+                      <p className="drug-name">{drug.product}</p>
+                      <p className="metadata">
+                        {drug.name} ({drug.fileSize} KB)
+                      </p>
+                      <br />
+                    </a>
                   ) : (
                     <>
                       <a className="drug-name" href={drug.url}>
