@@ -4,7 +4,6 @@ use azure_sdk_storage_blob::{
     prelude::*,
 };
 use azure_sdk_storage_core::prelude::*;
-use sha1;
 use std::collections::HashMap;
 use tokio_core::reactor::Core;
 
