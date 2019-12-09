@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
-import { black } from '../../styles/colors';
+import { anchorColour } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
   margin-top: 1rem;
@@ -30,9 +30,12 @@ const StyledDrugIndex = styled.section`
     padding-top: 0;
   }
 
-  a {
-    color: ${black};
-    text-decoration: none;
+  .substance-name {
+    margin-bottom: 30px;
+  }
+  .substance-name a {
+    text-decoration: underline;
+    font-size: 1.1875rem;
   }
 `;
 
@@ -91,21 +94,26 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => (
     <nav>
       <h2>{title}</h2>
       <ul className={horizontal ? 'horizontal' : ''}>
-        {items.map(item => (
-          <li key={item.name}>
-            <Link
-              href={`?${
-                isSubstance(item) || isIndex(item)
-                  ? 'substance'
-                  : 'page=1&search'
-              }=${encodeURIComponent(item.name)}`}
+        {items.map(item => {
+          return (
+            <li
+              key={item.name}
+              className={isSubstance(item) ? 'substance-name' : ''}
             >
-              <a>
-                {item.name} {item.count && <>({item.count} files)</>}
-              </a>
-            </Link>
-          </li>
-        ))}
+              <Link
+                href={`?${
+                  isSubstance(item) || isIndex(item)
+                    ? 'substance'
+                    : 'page=1&search'
+                }=${encodeURIComponent(item.name)}`}
+              >
+                <a>
+                  {item.name} {item.count && <>({item.count} files)</>}
+                </a>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   </StyledDrugIndex>
