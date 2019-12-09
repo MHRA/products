@@ -27,7 +27,7 @@ const StyledDrugIndex = styled.section`
   }
 
   ul.horizontal > li {
-    padding-top: 0;
+    line-height: 2;
   }
 
   a {
