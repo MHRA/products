@@ -129,12 +129,37 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         return str(el)
 
 
+md_converter = MHRAMarkdownConverter()
+
+
 def validate_con_code(context, param, value):  # pylint: disable=unused-argument
     """Validate CON code."""
     if not re.search(r"^CON\d+$", value):
         raise click.BadParameter("CON_CODE must be in the format CON123.")
 
     return value
+
+
+def import_row(row, index, out_dir, con_code):
+    """Handle import of a row element."""
+    # Generate base filename which is used to set up links between pages.
+    stem = con_code + "_" + str(index + 1)
+
+    # Extract data from XML.
+    title = row.find("wcm:element[@name='Head']", namespaces=NAMESPACES).text
+    html = row.find("wcm:element[@name='Body']", namespaces=NAMESPACES).text
+    html = f"<h1>{title}</h1>" + html
+
+    # Write HTML
+    outfile = Path(out_dir) / Path(f"{stem}.html")
+    outfile.write_text(html)
+
+    # Write Markdown
+    front_matter = {"title": title}
+    front_matter = yaml.dump(front_matter)
+    markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
+    outfile = Path(out_dir) / Path(f"{stem}.markdown")
+    outfile.write_text(markdown)
 
 
 @click.command()
@@ -147,14 +172,11 @@ def validate_con_code(context, param, value):  # pylint: disable=unused-argument
 )
 def learning_importer(xml_file, con_code, out_dir):
     """Convert XML_FILE containing CON_CODE to a series of Markdown files in OUT_DIR."""
-    # pylint: disable=too-many-locals
     if not out_dir:
         out_dir = Path() / Path(con_code)
         if not out_dir.exists():
             click.echo(f"Creating output directory {out_dir}.")
             out_dir.mkdir()
-
-    md_converter = MHRAMarkdownConverter()
 
     xml = etree.parse(xml_file)
     with click.progressbar(
@@ -162,24 +184,7 @@ def learning_importer(xml_file, con_code, out_dir):
         label="Extracting pages from XML",
     ) as rows:
         for index, row in enumerate(rows):
-            # Generate base filename which is used to set up links between pages.
-            stem = con_code + "_" + str(index + 1)
-
-            # Extract data from XML.
-            title = row.find("wcm:element[@name='Head']", namespaces=NAMESPACES).text
-            html = row.find("wcm:element[@name='Body']", namespaces=NAMESPACES).text
-            html = f"<h1>{title}</h1>" + html
-
-            # Write HTML
-            outfile = Path(out_dir) / Path(f"{stem}.html")
-            outfile.write_text(html)
-
-            # Write Markdown
-            front_matter = {"title": title}
-            front_matter = yaml.dump(front_matter)
-            markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
-            outfile = Path(out_dir) / Path(f"{stem}.markdown")
-            outfile.write_text(markdown)
+            import_row(row, index, out_dir, con_code)
 
     click.echo("Done!")
 
