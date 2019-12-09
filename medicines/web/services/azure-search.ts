@@ -8,9 +8,7 @@ const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
   Par,
-  PilLabel,
-  PilLabelAndLeaflet,
-  PilLeaflet,
+  Pil,
   Spc,
 }
 
@@ -25,10 +23,11 @@ export interface ISearchResult {
   metadata_storage_name: string;
   metadata_storage_path: string;
   metadata_storage_size: number;
+  product_name: string;
   release_state: string | null;
-  title: string | null;
-  suggestions: string[];
   substance_name: string[];
+  suggestions: string[];
+  title: string | null;
 }
 
 export interface ISearchResults {

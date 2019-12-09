@@ -109,10 +109,11 @@ const StyledDrugList = styled.section`
 export interface IDocument {
   activeSubstances: string[];
   context: string;
+  created: string;
   docType: string;
   fileSize: string;
-  created: string;
   name: string;
+  product: string;
   url: string;
 }
 
@@ -213,11 +214,20 @@ const SearchResults = (props: {
                 </dt>
                 <dd className="right">
                   <a href={drug.url}>
-                    <p className="drug-name">
-                      {drug.name} ({drug.fileSize} KB)
-                    </p>
+                    {drug.product ? (
+                      <>
+                        <p className="drug-name">{drug.product}</p>
+                        <p className="metadata">
+                          {drug.name} ({drug.fileSize} KB)
+                        </p>
+                      </>
+                    ) : (
+                      <p className="drug-name">
+                        {drug.name} ({drug.fileSize} KB)
+                      </p>
+                    )}
                     <p className="metadata">Created: {drug.created}</p>
-                    {drug.docType !== 'Par' && (
+                    {drug.activeSubstances && (
                       <p className="metadata">
                         Active substances:{' '}
                         {drug.activeSubstances

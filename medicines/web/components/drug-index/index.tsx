@@ -2,7 +2,6 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
-import { anchorColour } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
   margin-top: 1rem;
