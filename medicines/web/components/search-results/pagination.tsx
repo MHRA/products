@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { mhra70, mhraBlue, mhrawhite, primaryColor } from '../../styles/colors';
+import { mhra70, mhraBlue, mhraWhite, primaryColor } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { getPaginationGroups } from './pagination-groups';
 
@@ -44,7 +44,7 @@ const StyledPagination = styled.nav`
   }
 
   .arrow a {
-    color: ${mhrawhite};
+    color: ${mhraWhite};
     background-color: ${primaryColor};
     padding: 12px 15px;
     border-radius: 6px;
