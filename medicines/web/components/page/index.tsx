@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
+import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
 
@@ -63,6 +64,7 @@ const App: React.FC<IPageProps> = props => {
       </Head>
       <WithStyles>
         <Normalize />
+        <CookieBanner />
         <Header title={props.title} />
         <Row>{props.children}</Row>
         <Footer />
