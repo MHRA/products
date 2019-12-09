@@ -27,12 +27,12 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
     def __init__(self, **kwargs):
         """Initialise converter."""
         super().__init__(**kwargs)
-        self.footnotes = []
         self.stellent_assets_to_download = set()
         self.assets_with_unknown_type = set()
 
     def convert(self, html):
         """Add footnotes to the end of converted document."""
+        self.footnotes = []  # pylint: disable=attribute-defined-outside-init
         markdown = super().convert(html)
         for index, footnote in enumerate(self.footnotes):
             footnote_index = index + 1  # footnotes use 1-based index
@@ -48,6 +48,8 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         Handle Stellent's directives in URLs.
         """
+        # pylint: disable=too-complex
+
         # If the anchor has the class glossary, convert it into a footnote.
         try:
             if "glossary" in el["class"]:
