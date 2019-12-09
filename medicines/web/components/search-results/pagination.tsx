@@ -46,9 +46,16 @@ const StyledPagination = styled.nav`
   .arrow a {
     color: ${mhrawhite};
     background-color: ${primaryColor};
-    padding: 0.5rem;
-    border-radius: 0.25rem;
+    padding: 12px 15px;
+    border-radius: 6px;
     text-decoration: none;
+  }
+
+  @media ${mobileBreakpoint} {
+    .arrow a {
+      padding: 7px 10px;
+      border-radius: 4px;
+    }
   }
 `;
 
