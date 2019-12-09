@@ -76,7 +76,7 @@ const Mip: React.FC = () => {
         context: doc['@search.highlights']?.content.join(' … ') || '',
         docType: doc.doc_type?.toString().substr(0, 3) || '',
         fileSize: Math.ceil(
-          doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
+          (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
         ).toLocaleString('en-GB'),
         created: doc.created
           ? moment(doc.created).format('DD MMMM YYYY')
