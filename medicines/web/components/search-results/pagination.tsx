@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { mhraBlue, mhrawhite, primaryColor } from '../../styles/colors';
+import { mhra70, mhraBlue, mhrawhite, primaryColor } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { getPaginationGroups } from './pagination-groups';
 
@@ -49,6 +49,10 @@ const StyledPagination = styled.nav`
     padding: 12px 15px;
     border-radius: 6px;
     text-decoration: none;
+  }
+
+  .arrow a:hover {
+    background-color: ${mhra70};
   }
 
   @media ${mobileBreakpoint} {
