@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { mhra, mrha10 } from '../../styles/colors';
+import { mhra, mhra10 } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledCookieBanner = styled.aside`
-  background-color: ${mrha10};
+  background-color: ${mhra10};
   padding: 0 10px 20px;
 
   div {
@@ -16,12 +16,12 @@ const StyledCookieBanner = styled.aside`
   p {
     color: ${mhra};
     font-size: 1.1875rem;
-    line-height: 1.4736842105;
+    line-height: 28px;
   }
 
   button {
     appearance: none;
-    background-color: ${mrha10};
+    background-color: ${mhra10};
     border-radius: 5px;
     border: 1px solid ${mhra};
     color: ${mhra};
@@ -33,12 +33,13 @@ const StyledCookieBanner = styled.aside`
   button:focus,
   button:active {
     background-color: ${mhra};
-    color: ${mrha10};
+    color: ${mhra10};
   }
 
   @media ${mobileBreakpoint} {
     p {
       font-size: 1rem;
+      line-height: 24px;
     }
 
     button {
