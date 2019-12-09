@@ -78,7 +78,7 @@ const StyledDrugList = styled.section`
     word-wrap: break-word;
   }
 
-  dd.right .drug-name {
+  dd.right .title {
     font-size: ${h2FontSize};
     font-weight: bold;
     min-width: 1%;
@@ -86,9 +86,17 @@ const StyledDrugList = styled.section`
     word-wrap: break-word;
   }
 
+  dd.right .subtitle {
+    font-size: ${baseFontSize};
+    min-width: 1%;
+    padding-bottom: 0.2rem;
+    word-wrap: break-word;
+  }
+
   dd.right .metadata {
     font-size: ${baseFontSize};
     min-width: 1%;
+    padding-bottom: 0.1rem;
     word-wrap: break-word;
   }
 
@@ -212,22 +220,17 @@ const SearchResults = (props: {
                   <p className="icon">{drug.docType.toUpperCase()}</p>
                 </dt>
                 <dd className="right">
-                  {drug.product ? (
+                  {drug.product != null ? (
                     <a href={drug.url}>
-                      <p className="drug-name">{drug.product}</p>
-                      <p className="metadata">
-                        {drug.name} ({drug.fileSize} KB)
-                      </p>
-                      <br />
+                      <p className="title">{drug.product}</p>
+                      <p className="subtitle">{drug.name}</p>
                     </a>
                   ) : (
-                    <>
-                      <a className="drug-name" href={drug.url}>
-                        {drug.name}
-                      </a>
-                      <p className="metadata">File size: {drug.fileSize} KB</p>
-                    </>
+                    <a href={drug.url}>
+                      <p className="title">{drug.name}</p>
+                    </a>
                   )}
+                  <p className="metadata">File size: {drug.fileSize} KB</p>
                   <p className="metadata">Created: {drug.created}</p>
                   {drug.activeSubstances != null &&
                     drug.activeSubstances.length > 0 && (
