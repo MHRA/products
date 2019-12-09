@@ -1,9 +1,11 @@
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { black } from '../../styles/colors';
+import { IProduct, isIndex, isSubstance } from '../../model/substance';
+import { anchorColour } from '../../styles/colors';
 
 const StyledDrugIndex = styled.section`
-  margin-top: 3.75rem;
+  margin-top: 1rem;
 
   h2 {
     font-size: 1.5rem;
@@ -11,62 +13,120 @@ const StyledDrugIndex = styled.section`
   }
 
   ul {
-    display: flex;
     justify-content: space-between;
     list-style: none;
     margin: 0;
     padding: 0;
   }
+  ul > li {
+    padding-top: 10px;
+  }
+
+  ul.horizontal {
+    display: flex;
+  }
+
+  ul.horizontal > li {
+    padding-top: 0;
+  }
 
   a {
-    color: ${black};
-    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .substance-name {
+    margin-bottom: 30px;
+  }
+
+  .substance-name a {
+    text-decoration: underline;
+    font-size: 1.1875rem;
+    font-weight: normal;
   }
 `;
 
-const index = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-  '0-9',
+export const index: IProduct[] = [
+  { name: 'A' },
+  { name: 'B' },
+  { name: 'C' },
+  { name: 'D' },
+  { name: 'E' },
+  { name: 'F' },
+  { name: 'G' },
+  { name: 'H' },
+  { name: 'I' },
+  { name: 'J' },
+  { name: 'K' },
+  { name: 'L' },
+  { name: 'M' },
+  { name: 'N' },
+  { name: 'O' },
+  { name: 'P' },
+  { name: 'Q' },
+  { name: 'R' },
+  { name: 'S' },
+  { name: 'T' },
+  { name: 'U' },
+  { name: 'V' },
+  { name: 'W' },
+  { name: 'X' },
+  { name: 'Y' },
+  { name: 'Z' },
+  { name: '0' },
+  { name: '1' },
+  { name: '2' },
+  { name: '3' },
+  { name: '4' },
+  { name: '5' },
+  { name: '6' },
+  { name: '7' },
+  { name: '8' },
+  { name: '9' },
 ];
 
-const DrugIndex: React.FC = () => (
-  <StyledDrugIndex>
-    <h2>List of active substances</h2>
-    <nav>
-      <ul>
-        {index.map(character => (
-          <li key={character}>
-            <a href="#">{character}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </StyledDrugIndex>
-);
+export interface IFacet {
+  count?: number;
+  value: string;
+}
+
+interface IIndex {
+  title: string;
+  horizontal?: boolean;
+  items: IProduct[];
+}
+
+const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
+  if (items === undefined || items.length === 0) {
+    return <></>;
+  }
+
+  const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
+
+  return (
+    <StyledDrugIndex>
+      <nav>
+        {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
+
+        <ul className={horizontal ? 'horizontal' : ''}>
+          {items.map(item => {
+            return (
+              <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+                <Link
+                  href={`?${
+                    level < 2 ? 'substance' : 'page=1&search'
+                  }=${encodeURIComponent(item.name)}`}
+                >
+                  <a>
+                    {item.name} {item.count && <>({item.count} files)</>}
+                  </a>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </StyledDrugIndex>
+  );
+};
 
 export default DrugIndex;

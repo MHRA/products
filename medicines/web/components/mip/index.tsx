@@ -2,12 +2,20 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
+import { IProduct } from '../../model/substance';
+import {
+  docSearch,
+  facetSearch,
+  ISearchResult,
+} from '../../services/azure-search';
+import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import DrugIndex, { IFacet, index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
-import { azureSearch, IAzureSearchResult } from './azure-search';
+
 const Aside = styled.aside`
   max-width: 25%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
@@ -29,6 +37,10 @@ const Main = styled.main`
 
   .yellow-card-wrapper {
     display: none;
+  }
+
+  h2 {
+    margin-top: 3rem;
   }
 
   @media ${mobileBreakpoint} {
@@ -53,24 +65,36 @@ const sanitizeTitle = (title: string | null): string => {
 };
 
 const Mip: React.FC = () => {
-  const [search, setSearch] = React.useState('');
-  const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
-  const [results, setResults] = React.useState<IDocument[]>([]);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [resultCount, setResultCount] = React.useState(0);
   const pageSize = 10;
+  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [facetResults, setFacetResults] = React.useState<IFacet[]>([]);
+  const [search, setSearch] = React.useState('');
+  const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
+  const [products, setSubstances] = React.useState<IProduct[]>([]);
+
   const router = useRouter();
+
   const {
-    query: { search: searchTerm, page },
+    query: { search: searchTerm, page, substance },
   } = router;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
 
+  const fetchFacetResults = async (searchTerm: string) => {
+    const searchResults = await facetSearch(searchTerm);
+    const filtered = searchResults[1].facets.filter(x =>
+      x.value.startsWith(searchTerm),
+    );
+    setFacetResults(filtered);
+  };
+
   const fetchSearchResults = async (searchTerm: string, page: number) => {
-    const searchResults = await azureSearch(searchTerm, page, pageSize);
-    const results = searchResults.results.map((doc: IAzureSearchResult) => {
+    const searchResults = await docSearch(searchTerm, page, pageSize);
+    const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
@@ -88,6 +112,7 @@ const Mip: React.FC = () => {
     setResults(results);
     setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
+    setSubstances([]);
   };
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -116,10 +141,29 @@ const Mip: React.FC = () => {
         setPageNumber(parsedPage);
         fetchSearchResults(searchTerm, parsedPage);
       }
+    } else if (substance) {
+      if (typeof substance === 'string') {
+        (async () => {
+          const ss = await substanceLoader.load(substance.charAt(0));
+          const products = ss.find(s => s.name === substance);
+          if (products) {
+            setSubstances(products.products);
+          } else {
+            setSubstances(ss);
+          }
+          setResults([]);
+          setSearch('');
+          setShowingResultsForTerm('');
+        })();
+      }
+    } else {
+      setResults([]);
+      setSearch('');
+      setShowingResultsForTerm('');
+      setSubstances([]);
     }
-
     window.scrollTo(0, 0);
-  }, [page, searchTerm]);
+  }, [page, searchTerm, substance]);
 
   return (
     <>
@@ -133,16 +177,20 @@ const Mip: React.FC = () => {
           <YellowCard />
         </div>
       </Aside>
-      {showingResultsForTerm.length === 0 ? (
-        <Main>
-          <MipText />
-          {/* <DrugIndex /> */}
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      ) : (
-        <Main>
+      <Main>
+        {showingResultsForTerm.length === 0 ? (
+          <>
+            <MipText />
+            <DrugIndex
+              title="List of active substances"
+              items={index}
+              horizontal
+            />
+            {products.length > 0 && (
+              <DrugIndex title={`${substance || '...'}`} items={products} />
+            )}
+          </>
+        ) : (
           <SearchResults
             drugs={results}
             showingResultsForTerm={showingResultsForTerm}
@@ -151,11 +199,8 @@ const Mip: React.FC = () => {
             pageSize={pageSize}
             searchTerm={search}
           />
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      )}
+        )}
+      </Main>
     </>
   );
 };

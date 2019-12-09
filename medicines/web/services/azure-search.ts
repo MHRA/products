@@ -1,10 +1,10 @@
-const azureSearchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
-const azureSearchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
-const azureSearchIndex = process.env.AZURE_SEARCH_INDEX;
-const azureSearchKey = process.env.AZURE_SEARCH_KEY;
-const azureSearchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
-const azureSearchService = process.env.AZURE_SEARCH_SERVICE;
-const azureSearchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
+const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
+const searchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
+const searchIndex = process.env.AZURE_SEARCH_INDEX;
+const searchKey = process.env.AZURE_SEARCH_KEY;
+const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
+const searchService = process.env.AZURE_SEARCH_SERVICE;
+const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 enum DocType {
   Par,
@@ -14,7 +14,7 @@ enum DocType {
   Spc,
 }
 
-export interface IAzureSearchResult {
+export interface ISearchResult {
   '@search.highlights': { content: string[] };
   '@search.score': number;
   author: string | null;
@@ -31,16 +31,16 @@ export interface IAzureSearchResult {
   substance_name: string[];
 }
 
-export interface IAzureSearchResults {
+export interface ISearchResults {
   resultCount: number;
-  results: IAzureSearchResult[];
+  results: ISearchResult[];
 }
 
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
-  `${word}~${azureSearchWordFuzziness} ${word}^${azureSearchExactnessBoost}`;
+  `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
 
 const buildFuzzyQuery = (query: string): string => {
   return query
@@ -53,17 +53,17 @@ const buildFuzzyQuery = (query: string): string => {
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-const buildAzureSearchUrl = (
+const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
 ): string => {
   const url = new URL(
-    `https://${azureSearchService}.search.windows.net/indexes/${azureSearchIndex}/docs`,
+    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
   );
 
-  url.searchParams.append('api-key', azureSearchKey as string);
-  url.searchParams.append('api-version', azureSearchApiVersion as string);
+  url.searchParams.append('api-key', searchKey as string);
+  url.searchParams.append('api-version', searchApiVersion as string);
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('$count', 'true');
@@ -73,10 +73,25 @@ const buildAzureSearchUrl = (
     `${calculatePageStartRecord(page, pageSize)}`,
   );
   url.searchParams.append('search', query);
-  url.searchParams.append(
-    'scoringProfile',
-    azureSearchScoringProfile as string,
+  url.searchParams.append('scoringProfile', searchScoringProfile as string);
+
+  return url.toString();
+};
+
+export interface IFacetResult {
+  facets: Array<{ count: number; value: string }>;
+}
+
+const buildFacetUrl = (query: string): string => {
+  const url = new URL(
+    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
   );
+
+  url.searchParams.append('api-key', searchKey as string);
+  url.searchParams.append('api-version', searchApiVersion as string);
+  url.searchParams.append('facet', 'facets,count:50000,sort:value');
+  url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
+  url.searchParams.append('$top', '0');
 
   return url.toString();
 };
@@ -94,16 +109,24 @@ const getJson = async (url: string): Promise<any> => {
   }
 };
 
-export const azureSearch = async (
+export const docSearch = async (
   query: string,
   page: number,
   pageSize: number,
-): Promise<IAzureSearchResults> => {
+): Promise<ISearchResults> => {
   const body = await getJson(
-    buildAzureSearchUrl(buildFuzzyQuery(query), page, pageSize),
+    buildSearchUrl(buildFuzzyQuery(query), page, pageSize),
   );
   return {
     resultCount: body['@odata.count'],
     results: body.value,
   };
+};
+
+export const facetSearch = async (
+  query: string,
+): Promise<[string, IFacetResult]> => {
+  const body = await getJson(buildFacetUrl(query));
+
+  return [query, body['@search.facets']];
 };
