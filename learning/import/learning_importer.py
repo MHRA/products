@@ -6,6 +6,7 @@ from urllib.parse import parse_qs, urlparse
 
 import click
 import markdownify
+import yaml
 from lxml import etree
 
 NAMESPACES = {"wcm": "http://www.stellent.com/wcm-data/ns/8.0.0"}
@@ -146,13 +147,14 @@ def validate_con_code(context, param, value):  # pylint: disable=unused-argument
 )
 def learning_importer(xml_file, con_code, out_dir):
     """Convert XML_FILE containing CON_CODE to a series of Markdown files in OUT_DIR."""
+    # pylint: disable=too-many-locals
     if not out_dir:
         out_dir = Path() / Path(con_code)
         if not out_dir.exists():
             click.echo(f"Creating output directory {out_dir}.")
             out_dir.mkdir()
 
-    markdown_converter = MHRAMarkdownConverter()
+    md_converter = MHRAMarkdownConverter()
 
     xml = etree.parse(xml_file)
     with click.progressbar(
@@ -173,24 +175,27 @@ def learning_importer(xml_file, con_code, out_dir):
             outfile.write_text(html)
 
             # Write Markdown
+            front_matter = {"title": title}
+            front_matter = yaml.dump(front_matter)
+            markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
             outfile = Path(out_dir) / Path(f"{stem}.markdown")
-            outfile.write_text(markdown_converter.convert(html))
+            outfile.write_text(markdown)
 
     click.echo("Done!")
 
-    num_assets = len(markdown_converter.stellent_assets_to_download)
+    num_assets = len(md_converter.stellent_assets_to_download)
     asset_path = out_dir / Path("stellent")
     click.echo(
         f"{num_assets} assets to manually download from Stellent to {asset_path}."
     )
-    for asset in markdown_converter.stellent_assets_to_download:
+    for asset in md_converter.stellent_assets_to_download:
         click.echo(f" * {asset}")
 
-    if markdown_converter.assets_with_unknown_type:
-        num_assets = len(markdown_converter.assets_with_unknown_type)
+    if md_converter.assets_with_unknown_type:
+        num_assets = len(md_converter.assets_with_unknown_type)
         click.echo(f"{num_assets} assets with unknown types.")
         click.echo("Extensions for these assets have been set to `.unknown`.")
-        for asset in markdown_converter.assets_with_unknown_type:
+        for asset in md_converter.assets_with_unknown_type:
             click.echo(f" * {asset}")
 
 
