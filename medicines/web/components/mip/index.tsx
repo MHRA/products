@@ -79,7 +79,7 @@ const Mip: React.FC = () => {
           (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
         ).toLocaleString('en-GB'),
         created: doc.created
-          ? moment(doc.created).format('DD MMMM YYYY')
+          ? moment(doc.created).format('D MMMM YYYY')
           : 'Unknown',
         name: sanitizeTitle(doc.title),
         url: doc.metadata_storage_path,
