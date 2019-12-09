@@ -2,6 +2,7 @@
 
 import click
 import pytest
+from bs4 import BeautifulSoup
 
 import learning_importer
 
@@ -131,3 +132,77 @@ def test_invalid_con_code(con_code):
     """Test invalid CON codes."""
     with pytest.raises(click.BadParameter):
         learning_importer.validate_con_code(None, None, con_code)
+
+
+def test_inject_expanders():
+    """Test injecting Expander elements."""
+    # Test paragraph style markup.
+    expected_html = """<html>
+<body>
+<p>Before</p>
+<Expander>
+  <Title>Click for <strong>good times</strong></Title>
+  <Body>
+    <p><strong>Good times!</strong></p>
+    <p>The <em>best</em> times.</p>
+  </Body>
+</Expander>
+<p>After</p>
+</body>
+</html>
+"""
+    expected_soup = BeautifulSoup(expected_html, "xml")
+
+    source_html = """<p>Before</p>
+<p><a onclick="showhide('foobar');">Click for <strong>good times</strong></a></p>
+<div id="foobar">
+  <p><strong>Good times!</strong></p>
+  <p>The <em>best</em> times.</p>
+  <p><a onclick="showhide('foobar');" title="Close"><strong>Close</strong></a></p>
+</div>
+<p>After</p>
+"""
+
+    processed_html = learning_importer.inject_expanders(source_html)
+    processed_soup = BeautifulSoup(processed_html, "xml")
+
+    assert processed_soup.prettify() == expected_soup.prettify()
+
+    # Test with li element style.
+    expected_html = """<html>
+<body>
+<ul>
+  <li>Before</li>
+  <li>
+    <Expander>
+      <Title>Click for <strong>good times</strong></Title>
+      <Body>
+        <p><strong>Good times!</strong></p>
+        <p>The <em>best</em> times.</p>
+      </Body>
+    </Expander>
+  </li>
+  <li>After</li>
+</body>
+</html>
+"""
+    expected_soup = BeautifulSoup(expected_html, "xml")
+
+    source_html = """<ul>
+<li>Before</li>
+<li>
+  <a onclick="showhide('foobar');">Click for <strong>good times</strong></a>
+  <div id="foobar">
+    <p><strong>Good times!</strong></p>
+    <p>The <em>best</em> times.</p>
+    <p><a onclick="showhide('foobar');" title="Close"><strong>Close</strong></a></p>
+  </div>
+</li>
+<li>After</li>
+</ul>
+"""
+
+    processed_html = learning_importer.inject_expanders(source_html)
+    processed_soup = BeautifulSoup(processed_html, "xml")
+
+    assert processed_soup.prettify() == expected_soup.prettify()

@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import click
 import markdownify
 import yaml
+from bs4 import BeautifulSoup
 from lxml import etree
 
 NAMESPACES = {"wcm": "http://www.stellent.com/wcm-data/ns/8.0.0"}
@@ -50,6 +51,10 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         Handle Stellent's directives in URLs.
         """
         # pylint: disable=too-complex
+
+        # Add an empty href if required.
+        if el.get("href") is None:
+            el["href"] = ""
 
         # If the anchor has the class glossary, convert it into a footnote.
         try:
@@ -128,16 +133,53 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         """Return table HTML."""
         return str(el)
 
+    def convert_expander(
+        self, el, text
+    ):  # pylint: disable=no-self-use, unused-argument
+        """Return expander HTML."""
+        el.name = "Expander"
+        el.title.name = "Title"
+        el.body.name = "Body"
+        return str(el)
+
 
 md_converter = MHRAMarkdownConverter()
 
 
-def validate_con_code(context, param, value):  # pylint: disable=unused-argument
-    """Validate CON code."""
-    if not re.search(r"^CON\d+$", value):
-        raise click.BadParameter("CON_CODE must be in the format CON123.")
+def inject_expanders(html):
+    """Inject Expander components into HTML."""
+    soup = BeautifulSoup(html, "lxml")
+    showhide_re = re.compile(r"^showhide\(['\"]([^'\"]*)['\"]\)")
 
-    return value
+    # Remove all close links.
+    for close_tag in soup.find_all("a", onclick=showhide_re, title="Close"):
+        assert len(close_tag.parent.contents) == 1
+        close_tag.parent.extract()
+
+    # Process all remaining links which match showhide_re.
+    for a_tag in soup.find_all("a", onclick=showhide_re):
+        # If a_tag is a lone sibling, use it's parent as the Expander component.
+        # If it's not, create an Expander component and move a_tag inside it.
+        if len(a_tag.parent.contents) == 1:
+            expander_tag = a_tag.parent
+            expander_tag.name = "Expander"
+        else:
+            expander_tag = soup.new_tag("Expander")
+            a_tag.parent.append(expander_tag)
+            expander_tag.append(a_tag)
+
+        # Find body and convert it into a component.
+        body_id = showhide_re.search(a_tag["onclick"])[1]
+        body_tag = soup.find(id=body_id)
+        body_tag.name = "Body"
+        body_tag.attrs = {}
+        expander_tag.append(body_tag)
+
+        # Use a_tag as title component.
+        a_tag.name = "Title"
+        a_tag.attrs = {}
+
+    return str(soup)
 
 
 def import_row(row, index, out_dir, con_code):
@@ -154,12 +196,25 @@ def import_row(row, index, out_dir, con_code):
     outfile = Path(out_dir) / Path(f"{stem}.html")
     outfile.write_text(html)
 
-    # Write Markdown
+    # Inject expanders into HTML
+    html = inject_expanders(html)
+    outfile = Path(out_dir) / Path(f"{stem}.htmlx")
+    outfile.write_text(html)
+
+    # Write MDX
     front_matter = {"title": title}
     front_matter = yaml.dump(front_matter)
     markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
-    outfile = Path(out_dir) / Path(f"{stem}.markdown")
+    outfile = Path(out_dir) / Path(f"{stem}.mdx")
     outfile.write_text(markdown)
+
+
+def validate_con_code(context, param, value):  # pylint: disable=unused-argument
+    """Validate CON code."""
+    if not re.search(r"^CON\d+$", value):
+        raise click.BadParameter("CON_CODE must be in the format CON123.")
+
+    return value
 
 
 @click.command()
