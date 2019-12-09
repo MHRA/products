@@ -10,6 +10,18 @@ module.exports = {
     AZURE_SEARCH_SCORING_PROFILE: process.env.AZURE_SEARCH_SCORING_PROFILE,
     AZURE_SEARCH_EXACTNESS_BOOST: process.env.AZURE_SEARCH_EXACTNESS_BOOST,
   },
+  webpack: config => {
+    config.module.rules.push({
+      test: /\.(md)$/,
+      use: [
+        { loader: 'html-loader' },
+        {
+          loader: 'markdown-loader',
+        },
+      ],
+    });
+    return config;
+  },
   assetPrefix:
     process.env.ASSET_PREFIX === 'master' ||
     process.env.ASSET_PREFIX === undefined
