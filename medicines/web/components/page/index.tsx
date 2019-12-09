@@ -34,6 +34,9 @@ const WithStyles = styled.div`
   a {
     color: ${anchorColour};
     text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 

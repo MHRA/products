@@ -53,7 +53,6 @@ const StyledDrugList = styled.section`
   }
 
   dd a {
-    color: ${black};
     text-decoration: none;
   }
 
@@ -213,21 +212,27 @@ const SearchResults = (props: {
                   <p className="icon">{drug.docType.toUpperCase()}</p>
                 </dt>
                 <dd className="right">
-                  <a href={drug.url}>
-                    {drug.product ? (
-                      <>
+                  {drug.product ? (
+                    <>
+                      <a href={drug.url}>
                         <p className="drug-name">{drug.product}</p>
                         <p className="metadata">
                           {drug.name} ({drug.fileSize} KB)
                         </p>
-                      </>
-                    ) : (
-                      <p className="drug-name">
-                        {drug.name} ({drug.fileSize} KB)
-                      </p>
-                    )}
-                    <p className="metadata">Created: {drug.created}</p>
-                    {drug.activeSubstances && (
+                        <br />
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <a className="drug-name" href={drug.url}>
+                        {drug.name}
+                      </a>
+                      <p className="metadata">File size: {drug.fileSize} KB</p>
+                    </>
+                  )}
+                  <p className="metadata">Created: {drug.created}</p>
+                  {drug.activeSubstances != null &&
+                    drug.activeSubstances.length > 0 && (
                       <p className="metadata">
                         Active substances:{' '}
                         {drug.activeSubstances
@@ -235,13 +240,12 @@ const SearchResults = (props: {
                           .join(', ')}
                       </p>
                     )}
-                    <p
-                      className="context"
-                      dangerouslySetInnerHTML={{
-                        __html: normalizeDescription(drug.context),
-                      }}
-                    />
-                  </a>
+                  <p
+                    className="context"
+                    dangerouslySetInnerHTML={{
+                      __html: normalizeDescription(drug.context),
+                    }}
+                  />
                 </dd>
               </article>
             ))}
