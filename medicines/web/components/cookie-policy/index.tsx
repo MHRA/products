@@ -29,6 +29,13 @@ const StyledCookieBanner = styled.aside`
     padding: 10px 20px;
   }
 
+  button:hover,
+  button:focus,
+  button:active {
+    background-color: ${mhra};
+    color: ${mrha10};
+  }
+
   @media ${mobileBreakpoint} {
     p {
       font-size: 1rem;
