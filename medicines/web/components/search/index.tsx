@@ -1,6 +1,14 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
-import { black, mhraBlue90, mhraGray, white } from '../../styles/colors';
+import {
+  black,
+  mhra70,
+  mhraBlue90,
+  mhraGray,
+  mhraWhite,
+  primaryColor,
+  white,
+} from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledSearch = styled.section`
@@ -24,23 +32,33 @@ const StyledSearch = styled.section`
     background-color: rgba(10, 50, 150, 0.1);
   }
 
-  input[type='search'] {
+  .searchbar {
     margin: calc(${baseSpace} / 2) 0;
+    display: flex;
+    > input {
+      padding: 0.5rem;
+    }
+  }
+
+  input[type='search'] {
     width: 100%;
     border: solid 1px ${mhraGray};
-    padding: 0.5rem;
+    margin-right: 0.5rem;
   }
 
   input[type='submit'] {
-    align-self: flex-end;
-    background-color: white;
-    border-radius: 10px;
-    border: 1px solid black;
-    border: solid 1px ${mhraGray};
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
     display: block;
+    cursor: pointer;
+    color: ${mhraWhite};
+    background-color: ${primaryColor};
+    align-self: flex-end;
     max-width: 50%;
-    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+
+    &:hover {
+      background-color: ${mhra70};
+    }
   }
 
   @media ${mobileBreakpoint} {
@@ -68,13 +86,15 @@ const Search: React.FC<ISearchProps> = props => (
       aria-label="Search for medicines"
     >
       <label htmlFor="search">{labelString}</label>
-      <input
-        type="search"
-        id="search"
-        value={props.search}
-        onChange={props.onSearchChange}
-      />
-      <input type="submit" value="Search" />
+      <div className="searchbar">
+        <input
+          type="search"
+          id="search"
+          value={props.search}
+          onChange={props.onSearchChange}
+        />
+        <input type="submit" value="Search" />
+      </div>
     </form>
   </StyledSearch>
 );
