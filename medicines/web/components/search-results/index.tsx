@@ -196,7 +196,7 @@ const SearchResults = (props: {
 
   const handleOnCheck = (event: ChangeEvent<HTMLInputElement>): void => {
     if (event.target.checked) {
-      setShowDisclaimerWarning(false);
+      setTimeout(() => setShowDisclaimerWarning(false), 1000);
     }
   };
 
