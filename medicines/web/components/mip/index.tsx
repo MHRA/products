@@ -85,22 +85,6 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (search.length > 0) {
-      router.push({
-        pathname: '/',
-        query: { search, page: 1 },
-      });
-    }
-
-    ReactGA.event({
-      category: 'Search',
-      action: `Searched for '${searchTerm}'`,
-    });
-  }
-
   const fetchFacetResults = async (searchTerm: string) => {
     const searchResults = await facetSearch(searchTerm);
     const filtered = searchResults[1].facets.filter(x =>
@@ -139,6 +123,11 @@ const Mip: React.FC = () => {
     if (search.length > 0) {
       rerouteSearchResults(1);
     }
+
+    ReactGA.event({
+      category: 'Search',
+      action: `Searched for '${search}'`,
+    });
   };
 
   const rerouteSearchResults = (pageNo: number) => {
