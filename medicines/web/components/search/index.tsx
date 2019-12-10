@@ -57,7 +57,7 @@ const StyledSearch = styled.section`
     border-radius: 6px;
     text-decoration: none;
     -webkit-appearance: none;
-    border: none;
+    border: solid 1px ${mhra70};
 
     &:hover {
       background-color: ${mhra70};
