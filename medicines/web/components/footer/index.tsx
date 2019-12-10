@@ -83,14 +83,6 @@ const Footer: React.FC = () => (
               </Link>
             </p>
           </li>
-          <li>
-            <p>
-              Built by the&nbsp;
-              <a href="">
-                Medicines &amp; Healthcare products Regulatory Agency
-              </a>
-            </p>
-          </li>
         </ul>
       </nav>
     </div>
