@@ -1,12 +1,13 @@
 import React from "react"
 import styled from "styled-components"
+import { black } from "../utils/colors"
 
 const StyledH1 = styled.h1`
-  color: red;
+  color: ${black};
 `
 
 const StyledA = styled.a`
-  color: #000;
+  color: ${black};
 `
 
 const H1 = props => <StyledH1 {...props} />

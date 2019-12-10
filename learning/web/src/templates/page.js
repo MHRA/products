@@ -8,8 +8,6 @@ import { components } from "../utils/mdx-components"
 import { rhythm } from "../utils/typography"
 import { MDXProvider } from "@mdx-js/react"
 
-console.log(components)
-
 class ModuleTemplate extends React.Component {
   render() {
     const post = this.props.data.mdx
@@ -26,7 +24,6 @@ class ModuleTemplate extends React.Component {
             <h1
               style={{
                 marginTop: rhythm(1),
-                marginBottom: 0,
               }}
             >
               {post.frontmatter.title}

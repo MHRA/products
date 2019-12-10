@@ -8,18 +8,6 @@ exports.createPages = async ({ graphql, actions }) => {
   const result = await graphql(
     `
       {
-        allMarkdownRemark {
-          edges {
-            node {
-              fields {
-                slug
-              }
-              frontmatter {
-                title
-              }
-            }
-          }
-        }
         allMdx {
           edges {
             node {
@@ -41,13 +29,9 @@ exports.createPages = async ({ graphql, actions }) => {
   }
 
   // Create module pages.
-  const allPages = result.data.allMarkdownRemark.edges
+  const allPages = result.data.allMdx.edges
 
   allPages.forEach((page, index) => {
-    // const previous =
-    //   index === allPages.length - 1 ? null : allPages[index + 1].node
-    // const next = index === 0 ? null : allPages[index - 1].node
-
     createPage({
       path: page.node.fields.slug,
       component: pageTemplate,
@@ -62,15 +46,6 @@ exports.createPages = async ({ graphql, actions }) => {
 
 exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions
-
-  if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({ node, getNode })
-    createNodeField({
-      name: `slug`,
-      node,
-      value,
-    })
-  }
 
   if (node.internal.type === "Mdx") {
     const value = createFilePath({ node, getNode })

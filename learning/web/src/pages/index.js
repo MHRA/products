@@ -5,12 +5,12 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import styled from "styled-components"
-import { mhraGray50, mhraGray40, black } from "../utils/colors"
+import { mhraBlue10, mhraGray40, mhraBlue90, black } from "../utils/colors"
 import { GoChevronRight } from "react-icons/go"
 
 const HomepageLink = styled.div`
   a {
-    background-color: ${mhraGray50};
+    background-color: ${mhraBlue10};
     display: flex;
     align-items: center;
     min-height: ${rhythm(4)};
@@ -20,8 +20,9 @@ const HomepageLink = styled.div`
     color: ${black};
     font-size: 1.2em;
     &:hover {
-      text-decoration: underline;
+      padding-top: 4px;
       background-color: ${mhraGray40};
+      border-bottom: 4px solid ${mhraBlue90};
     }
   }
   margin-bottom: ${rhythm(1)};
@@ -51,7 +52,7 @@ class ModulesIndex extends React.Component {
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-        {modules.map(({ name: title, link, description }) => {
+        {modules.map(({ name: title, link }) => {
           return (
             <HomepageLink>
               <Link key={link} style={{ boxShadow: `none` }} to={link}>
@@ -60,9 +61,6 @@ class ModulesIndex extends React.Component {
                   <GoChevronRight size={"1.2em"} />
                 </Icon>
               </Link>
-              {/* <p>
-                {description}
-              </p> */}
             </HomepageLink>
           )
         })}
@@ -78,21 +76,6 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         title
-      }
-    }
-    allMarkdownRemark(sort: { fields: [frontmatter___title] }) {
-      edges {
-        node {
-          excerpt
-          fields {
-            slug
-          }
-
-          frontmatter {
-            title
-            description
-          }
-        }
       }
     }
     allModulesJson {
