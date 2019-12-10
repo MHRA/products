@@ -1,5 +1,4 @@
 import React, { ChangeEvent } from 'react';
-import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { useSessionStorage } from '../../hooks';
 import { mhraBlue10, mhraBlue80, white, mhraGray10 } from '../../styles/colors';
@@ -226,7 +225,6 @@ const SearchResults = (props: {
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
-
         {showDisclaimerWarning ? (
           <Disclaimer onDisclaimerCheck={handleOnCheck} />
         ) : (
@@ -239,7 +237,7 @@ const SearchResults = (props: {
                   </dt>
                   <dd className="right">
                     {drug.product != null ? (
-                      <a href={drug.url}>
+                      <a href={drug.url} download="x">
                         <p className="title">{drug.product}</p>
                         <p className="subtitle">{drug.name}</p>
                       </a>
@@ -248,6 +246,17 @@ const SearchResults = (props: {
                         <p className="title">{drug.name}</p>
                       </a>
                     )}
+                    <p className="metadata">File size: {drug.fileSize} KB</p>
+                    <p className="metadata">Created: {drug.created}</p>
+                    {drug.activeSubstances != null &&
+                      drug.activeSubstances.length > 0 && (
+                        <p className="metadata">
+                          Active substances:{' '}
+                          {drug.activeSubstances
+                            .map(substance => toSentenceCase(substance))
+                            .join(', ')}
+                        </p>
+                      )}
                     <p className="metadata">File size: {drug.fileSize} KB</p>
                     {drug.activeSubstances != null &&
                       drug.activeSubstances.length > 0 && (

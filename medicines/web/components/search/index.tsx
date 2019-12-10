@@ -14,6 +14,7 @@ import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 const StyledSearch = styled.section`
   box-sizing: border-box;
   margin-bottom: calc(${baseSpace} / 2);
+  background-color: rgba(10, 50, 150, 0.1);
 
   h2 {
     background-color: ${mhraBlue90};
@@ -29,7 +30,6 @@ const StyledSearch = styled.section`
     display: flex;
     flex-direction: column;
     padding: ${baseSpace} calc(${baseSpace} / 2);
-    background-color: rgba(10, 50, 150, 0.1);
   }
 
   .searchbar {
@@ -99,6 +99,7 @@ const Search: React.FC<ISearchProps> = props => (
         <input type="submit" value="Search" />
       </div>
     </form>
+    {props.children}
   </StyledSearch>
 );
 

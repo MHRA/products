@@ -4,11 +4,7 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import {
-  docSearch,
-  facetSearch,
-  ISearchResult,
-} from '../../services/azure-search';
+import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { IFacet, index } from '../drug-index';
@@ -18,7 +14,7 @@ import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
 
 const Aside = styled.aside`
-  max-width: 25%;
+  max-width: 100%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
 
   @media ${mobileBreakpoint} {
@@ -32,7 +28,7 @@ const Aside = styled.aside`
 `;
 
 const Main = styled.main`
-  max-width: 75%;
+  max-width: 100%;
   padding: ${baseSpace};
   padding-left: calc(${baseSpace} / 2);
 
@@ -91,8 +87,8 @@ const Mip: React.FC = () => {
       return {
         activeSubstances: doc.substance_name,
         product: doc.product_name,
-        context: doc['@search.highlights']?.content.join(' … ') || '',
-        docType: doc.doc_type?.toString().substr(0, 3) || '',
+        context: doc['@search.highlights'] ?.content.join(' … ') || '',
+        docType: doc.doc_type ?.toString().substr(0, 3) || '',
         fileSize: Math.ceil(
           (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
         ).toLocaleString('en-GB'),
@@ -177,7 +173,9 @@ const Mip: React.FC = () => {
           search={search}
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
-        />
+        >
+          <DrugIndex title="Active substances" items={index} horizontal />
+        </Search>
         <div className="yellow-card-wrapper">
           <YellowCard />
         </div>
@@ -196,19 +194,19 @@ const Mip: React.FC = () => {
             ) : products.length > 0 ? (
               <DrugIndex title={`${substance || '...'}`} items={products} />
             ) : (
-              <p>Nothing found for "{substance}"</p>
-            )}
+                  <p>Nothing found for "{substance}"</p>
+                )}
           </>
         ) : (
-          <SearchResults
-            drugs={results}
-            showingResultsForTerm={showingResultsForTerm}
-            resultCount={resultCount}
-            page={pageNumber}
-            pageSize={pageSize}
-            searchTerm={search}
-          />
-        )}
+            <SearchResults
+              drugs={results}
+              showingResultsForTerm={showingResultsForTerm}
+              resultCount={resultCount}
+              page={pageNumber}
+              pageSize={pageSize}
+              searchTerm={search}
+            />
+          )}
         <div className="yellow-card-wrapper">
           <YellowCard />
         </div>

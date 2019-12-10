@@ -2,9 +2,8 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
-import { mobileBreakpoint } from '../../styles/dimensions';
 
-const StyledDrugIndex = styled.section`
+const StyledDrugIndex = styled.nav`
   margin-top: 1rem;
 
   h2 {
@@ -16,7 +15,7 @@ const StyledDrugIndex = styled.section`
     justify-content: space-between;
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 10px;
   }
   ul > li {
     padding-top: 10px;
@@ -42,15 +41,6 @@ const StyledDrugIndex = styled.section`
     text-decoration: underline;
     font-size: 1.1875rem;
     font-weight: normal;
-  }
-
-  @media ${mobileBreakpoint} {
-    ul.horizontal {
-      flex-wrap: wrap;
-    }
-    ul.horizontal > li {
-      flex-basis: 10%;
-    }
   }
 `;
 
@@ -123,23 +113,21 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   return (
     <StyledDrugIndex>
-      <nav>
-        {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
+      {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
 
-        <ul className={horizontal ? 'horizontal' : ''}>
-          {items.map(item => {
-            return (
-              <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
-                <Link href={searchLink(item)}>
-                  <a>
-                    {item.name} {item.count && <>({item.count} files)</>}
-                  </a>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <ul className={horizontal ? 'horizontal' : ''}>
+        {items.map(item => {
+          return (
+            <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+              <Link href={searchLink(item)}>
+                <a>
+                  {item.name} {item.count && <>({item.count} files)</>}
+                </a>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </StyledDrugIndex>
   );
 };
