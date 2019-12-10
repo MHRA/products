@@ -44,6 +44,7 @@ const StyledSearch = styled.section`
     width: 100%;
     border: solid 1px ${mhraGray};
     margin-right: 0.5rem;
+    min-width: 0;
   }
 
   input[type='submit'] {
@@ -55,6 +56,8 @@ const StyledSearch = styled.section`
     max-width: 50%;
     border-radius: 6px;
     text-decoration: none;
+    -webkit-appearance: none;
+    border: none;
 
     &:hover {
       background-color: ${mhra70};
