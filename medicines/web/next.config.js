@@ -27,4 +27,5 @@ module.exports = {
     process.env.ASSET_PREFIX === undefined
       ? ''
       : `/${process.env.ASSET_PREFIX}`,
+  exportTrailingSlash: true,
 };
