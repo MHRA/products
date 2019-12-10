@@ -134,13 +134,14 @@ const Mip: React.FC = () => {
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
-        setSearch(searchTerm);
+        const trimmedTerm = searchTerm.trim();
+        setSearch(trimmedTerm);
         let parsedPage = Number(page);
         if (!parsedPage || parsedPage < 1) {
           parsedPage = 1;
         }
         setPageNumber(parsedPage);
-        fetchSearchResults(searchTerm, parsedPage);
+        fetchSearchResults(trimmedTerm, parsedPage);
       }
     } else if (substance) {
       if (typeof substance === 'string') {
