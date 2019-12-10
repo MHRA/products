@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
