@@ -41,22 +41,10 @@ const WithStyles = styled.div`
   }
 `;
 
-const Row = styled.section`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+const Wrapper = styled.section`
   margin: 0 auto;
-  flex-grow: 1;
   max-width: ${desktopMaxWidth};
-  > * {
-    flex-basis: 100%;
-    flex-shrink: 1;
-    flex-grow: 1;
-  }
-
-  @media ${mobileBreakpoint} {
-    display: block;
-  }
+  // padding: 0 1.25rem;
 `;
 
 interface IPageProps {
@@ -74,7 +62,7 @@ const App: React.FC<IPageProps> = props => {
         <Normalize />
         <CookieBanner />
         <Header title={props.title} />
-        <Row>{props.children}</Row>
+        <Wrapper>{props.children}</Wrapper>
         <Footer />
       </WithStyles>
     </>

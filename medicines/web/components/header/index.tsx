@@ -5,6 +5,7 @@ import { primaryColor } from '../../styles/colors';
 import {
   baseSpace,
   desktopMaxWidth,
+  halfBaseSpace,
   mobileBreakpoint,
 } from '../../styles/dimensions';
 import SvgMhraLogo from '../logos/mhra-logo';
@@ -16,7 +17,7 @@ const Header = styled.header`
   .wrapper {
     margin: 0 auto;
     max-width: ${desktopMaxWidth};
-    padding: ${baseSpace} ${baseSpace} 0;
+    padding: ${baseSpace} ${halfBaseSpace} 0 ${baseSpace};
   }
 
   picture {

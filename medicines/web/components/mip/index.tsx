@@ -7,7 +7,7 @@ import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-import DrugIndex, { IFacet, index } from '../drug-index';
+import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
@@ -16,6 +16,12 @@ import YellowCard from '../yellow-card';
 const Aside = styled.aside`
   max-width: 100%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
+
+  .search {
+    background-color: rgba(10, 50, 150, 0.1);
+    margin-bottom: 20px;
+    padding: ${baseSpace} calc(${baseSpace} / 2);
+  }
 
   @media ${mobileBreakpoint} {
     max-width: 100%;
@@ -30,7 +36,6 @@ const Aside = styled.aside`
 const Main = styled.main`
   max-width: 100%;
   padding: ${baseSpace};
-  padding-left: calc(${baseSpace} / 2);
 
   .yellow-card-wrapper {
     display: none;
@@ -169,13 +174,18 @@ const Mip: React.FC = () => {
   return (
     <>
       <Aside>
-        <Search
-          search={search}
-          onSearchChange={handleSearchChange}
-          onSearchSubmit={handleSearchSubmit}
-        >
-          <DrugIndex title="Active substances" items={index} horizontal />
-        </Search>
+        <div className="search">
+          <Search
+            search={search}
+            onSearchChange={handleSearchChange}
+            onSearchSubmit={handleSearchSubmit}
+          />
+          <DrugIndex
+            title="or find by active substance:"
+            items={index}
+            horizontal
+          />
+        </div>
         <div className="yellow-card-wrapper">
           <YellowCard />
         </div>

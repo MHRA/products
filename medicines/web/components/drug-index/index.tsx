@@ -4,8 +4,6 @@ import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
 
 const StyledDrugIndex = styled.nav`
-  margin-top: 1rem;
-
   h2 {
     font-size: 1.5rem;
     margin-top: 0;
@@ -17,12 +15,18 @@ const StyledDrugIndex = styled.nav`
     margin: 0;
     padding: 0 10px;
   }
+
   ul > li {
     padding-top: 10px;
   }
 
+  p.horizontal {
+    margin: 0;
+  }
+
   ul.horizontal {
     display: flex;
+    padding-left: 0;
   }
 
   ul.horizontal > li {
@@ -113,8 +117,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   return (
     <StyledDrugIndex>
-      {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
-
+      {level === 0 ? <p className="horizontal">{title}</p> : <h3>{title}</h3>}
       <ul className={horizontal ? 'horizontal' : ''}>
         {items.map(item => {
           return (
