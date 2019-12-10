@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { black } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
+
+interface IDisclaimerProps {
+  onDisclaimerCheck: (event: ChangeEvent<HTMLInputElement>) => void;
+}
 
 const StyledDisclaimer = styled.section`
   margin-top: 50px;
@@ -49,7 +53,7 @@ const StyledDisclaimer = styled.section`
   }
 `;
 
-const Disclaimer: React.FC = () => (
+const Disclaimer: React.FC<IDisclaimerProps> = props => (
   <StyledDisclaimer>
     <div>
       <h3>Disclaimer:</h3>
@@ -80,7 +84,12 @@ const Disclaimer: React.FC = () => (
       </p>
     </div>
     <form>
-      <input type="checkbox" name="agree" id="agree" />
+      <input
+        type="checkbox"
+        name="agree"
+        id="agree"
+        onChange={props.onDisclaimerCheck}
+      />
       <label htmlFor="agree">I have read and understand the disclaimer.</label>
     </form>
   </StyledDisclaimer>
