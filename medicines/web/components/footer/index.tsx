@@ -33,8 +33,9 @@ const StyledFooter = styled.footer`
     padding-right: 1.875rem;
   }
 
-  a {
+  ul li a {
     color: ${black};
+    text-decoration: underline;
   }
 
   @media ${mobileBreakpoint} {
@@ -63,7 +64,7 @@ const Footer: React.FC = () => (
           </li>
           <li>
             <p>
-              <Link href="privacy">
+              <Link href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice">
                 <a>Privacy Policy</a>
               </Link>
             </p>
@@ -77,8 +78,9 @@ const Footer: React.FC = () => (
           </li>
           <li>
             <p>
-              Built by the&nbsp;
-              <a href="">Medicines and Healthcare products Regulatory Agency</a>
+              <Link href="about">
+                <a>About this service</a>
+              </Link>
             </p>
           </li>
         </ul>

@@ -2,6 +2,7 @@
   "author": "Red Badger",
   "dependencies": {
     "core-js": "^3.4.7",
+    "dataloader": "^2.0.0",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
     "next": "^9.1.4",
@@ -20,8 +21,10 @@
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "^4.4.0",
     "babel-plugin-styled-components": "^1.10.6",
+    "html-loader": "^0.5.5",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.3",
+    "markdown-loader": "^5.1.0",
     "pa11y": "^5.3",
     "prettier": "^1.19.1",
     "ts-node": "^8.5.0",

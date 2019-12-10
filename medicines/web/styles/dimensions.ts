@@ -1,4 +1,4 @@
-const tinyPaddingSize = 5;
+const tinyPaddingSize = 8;
 const largePaddingSize = 20;
 const mobileSize = 788;
 export const tinyPaddingSizeCss = `${tinyPaddingSize}px`;
