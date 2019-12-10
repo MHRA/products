@@ -24,10 +24,6 @@ const StyledSearch = styled.section`
     background-color: rgba(10, 50, 150, 0.1);
   }
 
-  label {
-    font-size: 1.1875rem;
-  }
-
   input[type='search'] {
     margin: calc(${baseSpace} / 2) 0;
     width: 100%;
@@ -56,7 +52,6 @@ const StyledSearch = styled.section`
   }
 `;
 
-const title = 'Search SPC and PILs';
 const labelString = 'Enter a product or active substance:';
 
 interface ISearchProps {
@@ -67,7 +62,6 @@ interface ISearchProps {
 
 const Search: React.FC<ISearchProps> = props => (
   <StyledSearch>
-    <h2>{title}</h2>
     <form
       onSubmit={props.onSearchSubmit}
       role="search"
