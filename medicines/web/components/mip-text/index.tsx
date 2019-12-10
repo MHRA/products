@@ -4,12 +4,15 @@ import { mobileBreakpoint } from '../../styles/dimensions';
 import { baseFontSize } from '../../styles/fonts';
 
 // @ts-ignore
-import homepage from '../copy/homepage.md';
+import homepage from '../../copy/homepage.md';
 
 const StyledMipText = styled.section`
-  p {
+  p,
+  ul li {
     font-size: ${baseFontSize};
-    line-height: 1.315;
+    line-height: 1.47;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
   }
 
   p:first-of-type {
@@ -17,7 +20,8 @@ const StyledMipText = styled.section`
   }
 
   @media ${mobileBreakpoint} {
-    p {
+    p,
+    ul li {
       font-size: 1rem;
       line-height: 1.56;
     }
