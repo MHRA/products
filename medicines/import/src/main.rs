@@ -11,6 +11,13 @@ use tokio_core::reactor::Core;
 fn main() -> Result<(), AzureError> {
     let yaml = load_yaml!("cli.yaml");
     let matches = App::from_yaml(yaml).get_matches();
+    let verbosity: i8;
+    match matches.occurrences_of("verbose") {
+        0 => verbosity = 0,
+        1 => verbosity = 1,
+        2 | _ => verbosity = 2,
+    };
+
     match matches.subcommand() {
         ("spcpil", Some(m)) => {
             let path = m
@@ -18,7 +25,7 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            spc_pil::import(dir, client, core)?
+            spc_pil::import(dir, client, core, verbosity)?
         }
         ("par", Some(m)) => {
             let path = m
@@ -26,7 +33,7 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            par::import(dir, client, core)?
+            par::import(dir, client, core, verbosity)?
         }
         _ => println!("yaml is incorrect: pdf is currently the only subcommand"),
     }

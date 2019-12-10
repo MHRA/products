@@ -5,11 +5,10 @@ use std::{collections::HashMap, fs, path::Path, str};
 use tokio_core::reactor::Core;
 use crate::{hash::hash, report::Report};
 
-pub fn import<'a>(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureError> {
+pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(dir) {
-        let mut report = Report::new();
+        let mut report = Report::new(verbosity);
         for path in pdf::get_pdfs(dir)? {
-            println!("Processing {}...", path.to_str().unwrap());
             let key = path
                 .file_stem()
                 .expect("file has no stem")
@@ -25,7 +24,6 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core) -> Result<(), Azur
                 metadata.insert("release_state", &release_state);
 
                 if release_state != "Y" {
-                    println!("Skipping {} because it is not released.", file_name);
                     report.add_skipped_unreleased(&file_name, &release_state);
                     continue;
                 }
@@ -66,15 +64,13 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core) -> Result<(), Azur
                 let hash = hash(&file_data);
 
                 if (report).already_uploaded_file_with_hash(&hash) {
-                    println!("Skipping {} because it is a duplicate.", file_name);
                     report.add_skipped_duplicate(&file_name, &hash);
                     continue;
                 }
 
-                storage::upload(&hash, &client, &mut core, &file_data, &metadata)?;
+                storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
                 report.add_uploaded(&file_name, &hash);
             } else {
-                println!("Skipping {} because it does not have metadata.", path.to_str().unwrap());
                 report.add_skipped_incomplete(key);
             }
         }

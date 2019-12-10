@@ -5,16 +5,15 @@ use std::{collections::HashMap, fs, path::Path, str};
 use tokio_core::reactor::Core;
 use crate::{hash::hash, report::Report};
 
-pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureError> {
+pub fn import(dir: &Path, client: Client, mut core: Core, verbosity: i8) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(dir) {
-        let mut report = Report::new();
+        let mut report = Report::new(verbosity);
         for path in pdf::get_pdfs(dir)? {
             let key = path
                 .file_stem()
                 .expect("file has no stem")
                 .to_str()
                 .unwrap();
-            println!("Processing {}...", path.to_str().unwrap());
             if let Some(record) = records.get(&key.to_lowercase()) {
                 let mut metadata: HashMap<&str, &str> = HashMap::new();
                 let file_name = metadata::sanitize(&record.filename);
@@ -24,7 +23,6 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 let doc_type = format!("{:?}", model::DocType::Par);
 
                 if release_state != "Y" {
-                    println!("Skipping {} because it is not released.", file_name);
                     report.add_skipped_unreleased(&file_name, &release_state);
                     continue;
                 }
@@ -45,15 +43,13 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 let hash = hash(&file_data);
 
                 if report.already_uploaded_file_with_hash(&hash) {
-                    println!("Skipping {} because it is a duplicate.", file_name);
                     report.add_skipped_duplicate(&file_name, &hash);
                     continue;
                 }
 
-                storage::upload(&hash, &client, &mut core, &file_data, &metadata)?;
+                storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
                 report.add_uploaded(&file_name, &hash);
             } else {
-                println!("Skipping {} because it does not have metadata.", path.to_str().unwrap());
                 report.add_skipped_incomplete(path.to_str().unwrap());
             }
         }

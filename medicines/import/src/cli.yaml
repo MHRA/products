@@ -6,6 +6,13 @@ author: Stuart Harris <stuart.harris@red-badger.com>
 settings:
   - ArgRequiredElseHelp
 
+args:
+  - verbose:
+      help: outputs more debug data to the command line
+      short: v
+      multiple: true
+      global: true
+
 subcommands:
   - spcpil:
       about: import SPCs and PILs from local directory

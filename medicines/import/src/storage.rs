@@ -14,9 +14,17 @@ pub fn upload(
     core: &mut Core,
     data: &[u8],
     metadata: &HashMap<&str, &str>,
+    verbosity: i8
 ) -> Result<(), AzureError> {
-    println!("Saving {:?} to blob storage...", blob_name);
     let container_name = "docs";
+
+    if verbosity >= 2 {
+        println!("---------------");
+        println!("Blob storage name for file is:");
+        println!("{}", blob_name);
+        println!("Metadata for file is:");
+        println!("{:?}", metadata);
+    }
 
     if core
         .run(client.list_containers().finalize())?
