@@ -11,7 +11,7 @@ import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import Pagination from './pagination';
 
-const StyledDrugList = styled.section`
+const StyledDrugList = styled.div`
   .title {
     font-size: ${h2FontSize};
     padding: 0;

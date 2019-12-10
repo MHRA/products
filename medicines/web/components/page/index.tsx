@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 import { anchorColour, mhra } from '../../styles/colors';
-import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
+import { desktopMaxWidth } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
@@ -41,7 +41,7 @@ const WithStyles = styled.div`
   }
 `;
 
-const Wrapper = styled.section`
+const Wrapper = styled.main`
   margin: 0 auto;
   max-width: ${desktopMaxWidth};
   width: 100%;
