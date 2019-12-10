@@ -5,7 +5,7 @@ import { mhra70 } from '../styles/colors';
 import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
-import accessibility from './accessibility.md';
+import accessibility from '../copy/accessibility.md';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
