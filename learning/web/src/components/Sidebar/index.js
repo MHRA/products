@@ -38,10 +38,6 @@ const SidebarStyled = styled.ul`
   }
 
   li {
-    &:first-child {
-      height: 100%;
-    }
-    height: ${rhythm(1.2)};
     position: relative;
     &.current {
       &:before {
@@ -142,15 +138,14 @@ class Sidebar extends Component {
           const renderEntries = entries => {
             return entries.map(entry => {
               const { link, module, name, id } = entry
-              const current = location.pathname === `/${link}`
-
+              const current = location.pathname === `${link}`
               return (
                 <li
                   key={id ? id : uuid()}
                   className={!module && current ? "current" : undefined}
                 >
                   {!module && link ? (
-                    <Link to={`/${link}`}>{name}</Link>
+                    <Link to={`${link}`}>{name}</Link>
                   ) : (
                     <>{name}</>
                   )}
