@@ -122,7 +122,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
               <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
                 <Link
                   href={`?${
-                    level < 2 ? 'substance' : 'page=1&search'
+                    level < 2 ? 'substance' : '&product=true&page=1&search'
                   }=${encodeURIComponent(item.name)}`}
                 >
                   <a>
