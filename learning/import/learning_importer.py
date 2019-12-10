@@ -9,8 +9,8 @@ import click
 import markdownify
 import yaml
 from bs4 import BeautifulSoup
-from markdown import markdown
 from lxml import etree
+from markdown import markdown
 
 NAMESPACES = {"wcm": "http://www.stellent.com/wcm-data/ns/8.0.0"}
 SITE_ROOT_DIRECTIVE = "[!--$ssServerRelativeSiteRoot--]"
@@ -40,12 +40,12 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
     def convert(self, html):
         """Add footnotes to the end of converted document."""
         self.footnotes = []  # pylint: disable=attribute-defined-outside-init
-        markdown = super().convert(html)
+        content = super().convert(html)
         for index, footnote in enumerate(self.footnotes):
             footnote_index = index + 1  # footnotes use 1-based index
-            markdown += f"\n\n[^{footnote_index}]: {footnote}\n"
+            content += f"\n\n[^{footnote_index}]: {footnote}\n"
 
-        return markdown
+        return content
 
     def convert_a(self, el, text):
         """
@@ -134,42 +134,49 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         return super().process_text(text)
 
-    def convert_table_cell(self, cell_tag):
-        """
-        For each table cell, run its contents through the HTML to Markdown conversion
-        process, then convert it back into HTML.
-
-        This will ensure links inside tables are processed.
-        """
+    def remove_table_cell_attrs(self, cell_tag):  # pylint: disable=no-self-use
+        """Remove unwanted attributes from table cells."""
         for attr_to_delete in ["width", "valign", "style"]:
             if attr_to_delete in cell_tag.attrs:
                 del cell_tag.attrs[attr_to_delete]
 
-        cell_markdown = self.process_tag(cell_tag, children_only=True)
-        cell_tag.clear()
-        if cell_markdown:
-            soup = BeautifulSoup(markdown(cell_markdown), "lxml")
-            for tag in soup.body.contents:
-                cell_tag.append(tag)
+    def process_html(self, tag):
+        """
+        Run element contents through the HTML to Markdown conversion process, then
+        convert it back into HTML.
+
+        This will ensure elements inside the tag are processed so we don't get broken
+        links to glossary terms, etc.
+        """
+        tag_markdown = self.process_tag(tag, children_only=True)
+        tag.clear()
+        if tag_markdown:
+            soup = BeautifulSoup(markdown(tag_markdown), "lxml")
+            for child_tag in soup.body.contents:
+                tag.append(child_tag)
 
     # pylint: disable=no-self-use, unused-argument
     def convert_table(self, table_tag, text):
+        """Convert a table."""
         table_tag.attrs = {}
         for row_tag in table_tag.find_all("tr"):
             row_tag.attrs = {}
             for header_tag in row_tag.find_all("th"):
-                self.convert_table_cell(header_tag)
+                self.remove_table_cell_attrs(header_tag)
+                self.process_html(header_tag)
             for cell_tag in row_tag.find_all("td"):
-                self.convert_table_cell(cell_tag)
+                self.remove_table_cell_attrs(cell_tag)
+                self.process_html(cell_tag)
 
         return "\n\n" + table_tag.prettify() + "\n\n"
-
 
     def convert_expander(
         self, el, text
     ):  # pylint: disable=no-self-use, unused-argument
         """Return expander HTML."""
         el.name = "Expander"
+        self.process_html(el.title)
+        self.process_html(el.body)
         el.title.name = "Title"
         el.body.name = "Body"
         return "\n\n" + el.prettify() + "\n\n"
@@ -227,7 +234,7 @@ def import_row(row, index, md_converter, out_dir, con_code, path_to_expander_com
     # Generate MDX
     front_matter = {"title": title}
     front_matter = yaml.dump(front_matter)
-    markdown = (
+    mdx = (
         f"---\n{front_matter}---\n\n"
         + f"import Expander from '{path_to_expander_component}'\n\n"
         + md_converter.convert(html)
@@ -235,7 +242,7 @@ def import_row(row, index, md_converter, out_dir, con_code, path_to_expander_com
 
     # Write MDX
     outfile = Path(out_dir) / Path(f"{stem}.mdx")
-    outfile.write_text(markdown)
+    outfile.write_text(mdx)
 
     # Return title and filename.
     return title, stem
