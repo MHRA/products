@@ -4,7 +4,11 @@ import { graphql } from "gatsby"
 import { MDXRenderer } from "gatsby-plugin-mdx"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { rhythm, scale } from "../utils/typography"
+import { components } from "../utils/mdx-components"
+import { rhythm } from "../utils/typography"
+import { MDXProvider } from "@mdx-js/react"
+
+console.log(components)
 
 class ModuleTemplate extends React.Component {
   render() {
@@ -27,17 +31,11 @@ class ModuleTemplate extends React.Component {
             >
               {post.frontmatter.title}
             </h1>
-            <p
-              style={{
-                ...scale(-1 / 5),
-                display: `block`,
-                marginBottom: rhythm(1),
-              }}
-            >
-              {post.frontmatter.date}
-            </p>
           </header>
-          <MDXRenderer>{post.body}</MDXRenderer>
+          <MDXProvider components={components}>
+            <MDXRenderer>{post.body}</MDXRenderer>
+          </MDXProvider>
+
           <hr
             style={{
               marginBottom: rhythm(1),

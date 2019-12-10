@@ -4,8 +4,36 @@ import { Link, graphql } from "gatsby"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
+import styled from "styled-components"
+import { mhraGray50, mhraGray40, black } from "../utils/colors"
+import { GoChevronRight } from "react-icons/go"
 
-class ModuleIndex extends React.Component {
+const HomepageLink = styled.div`
+  a {
+    background-color: ${mhraGray50};
+    display: flex;
+    align-items: center;
+    min-height: ${rhythm(4)};
+    justify-content: left;
+    padding: 0 ${rhythm(1.4)};
+    text-decoration: none;
+    color: ${black};
+    font-size: 1.2em;
+    &:hover {
+      text-decoration: underline;
+      background-color: ${mhraGray40};
+    }
+  }
+  margin-bottom: ${rhythm(1)};
+`
+
+const Icon = styled.span`
+  display: flex;
+  flex-direction: row-reverse;
+  flex: 1;
+`
+
+class ModulesIndex extends React.Component {
   render() {
     const { data } = this.props
     const siteTitle = data.site.siteMetadata.title
@@ -25,22 +53,17 @@ class ModuleIndex extends React.Component {
         </p>
         {modules.map(({ name: title, link, description }) => {
           return (
-            <article key={link}>
-              <header>
-                <h3
-                  style={{
-                    marginBottom: rhythm(1 / 4),
-                  }}
-                >
-                  <Link style={{ boxShadow: `none` }} to={link}>
-                    {title}
-                  </Link>
-                </h3>
-              </header>
-              <section>
-                <p>{description}</p>
-              </section>
-            </article>
+            <HomepageLink>
+              <Link key={link} style={{ boxShadow: `none` }} to={link}>
+                {title}
+                <Icon>
+                  <GoChevronRight size={"1.2em"} />
+                </Icon>
+              </Link>
+              {/* <p>
+                {description}
+              </p> */}
+            </HomepageLink>
           )
         })}
       </Layout>
@@ -48,7 +71,7 @@ class ModuleIndex extends React.Component {
   }
 }
 
-export default ModuleIndex
+export default ModulesIndex
 
 export const pageQuery = graphql`
   query {

@@ -4,7 +4,7 @@ import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
 
 import { GoThreeBars, GoX } from "react-icons/go"
-import { sizes } from "../../utils/theme"
+import { sizes, media } from "../../utils/theme"
 import { black, mhraGray90, mhraBlue } from "../../utils/colors"
 import uuid from "uuid/v4"
 
@@ -17,6 +17,10 @@ const SidebarStyled = styled.ul`
   width: 100%;
   font-size: ${rhythm(0.8)};
   color: ${mhraGray90};
+
+  ${media.desktop`
+    border-bottom:none;
+  `}
 
   &.hidden {
     display: none;

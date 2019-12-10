@@ -13,7 +13,7 @@
     "module": "antipsychotics",
     "link": "antipsychotics/",
     "items": [
-      { "name": "0 contens", "link": "antipsychotics/" },
+      { "name": "0 contents", "link": "antipsychotics/" },
       { "name": "1 introduction", "link": "antipsychotics/CON155606_2/" },
       { "name": "1.1 introduction", "link": "antipsychotics/CON155606_3/" },
       { "name": "2 Class members", "link": "antipsychotics/CON155606_4/" }

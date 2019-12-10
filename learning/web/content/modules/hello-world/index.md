@@ -8,6 +8,8 @@ page: 0
 
 import { GoThreeBars, GoX } from "react-icons/go"
 
+# Header 1
+
 This is my first post on my new fake blog! How exciting!
 
 <GoThreeBars/>
