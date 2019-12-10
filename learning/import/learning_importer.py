@@ -9,6 +9,7 @@ import click
 import markdownify
 import yaml
 from bs4 import BeautifulSoup
+from markdown import markdown
 from lxml import etree
 
 NAMESPACES = {"wcm": "http://www.stellent.com/wcm-data/ns/8.0.0"}
@@ -133,9 +134,36 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         return super().process_text(text)
 
-    def convert_table(self, el, text):  # pylint: disable=no-self-use, unused-argument
-        """Return table HTML."""
-        return "\n\n" + el.prettify() + "\n\n"
+    def convert_table_cell(self, cell_tag):
+        """
+        For each table cell, run its contents through the HTML to Markdown conversion
+        process, then convert it back into HTML.
+
+        This will ensure links inside tables are processed.
+        """
+        for attr_to_delete in ["width", "valign", "style"]:
+            if attr_to_delete in cell_tag.attrs:
+                del cell_tag.attrs[attr_to_delete]
+
+        cell_markdown = self.process_tag(cell_tag, children_only=True)
+        cell_tag.clear()
+        if cell_markdown:
+            soup = BeautifulSoup(markdown(cell_markdown), "lxml")
+            for tag in soup.body.contents:
+                cell_tag.append(tag)
+
+    # pylint: disable=no-self-use, unused-argument
+    def convert_table(self, table_tag, text):
+        table_tag.attrs = {}
+        for row_tag in table_tag.find_all("tr"):
+            row_tag.attrs = {}
+            for header_tag in row_tag.find_all("th"):
+                self.convert_table_cell(header_tag)
+            for cell_tag in row_tag.find_all("td"):
+                self.convert_table_cell(cell_tag)
+
+        return "\n\n" + table_tag.prettify() + "\n\n"
+
 
     def convert_expander(
         self, el, text
