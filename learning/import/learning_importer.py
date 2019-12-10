@@ -155,8 +155,9 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             for child_tag in soup.body.contents:
                 tag.append(child_tag)
 
-    # pylint: disable=no-self-use, unused-argument
-    def convert_table(self, table_tag, text):
+    def convert_table(
+        self, table_tag, text
+    ):  # pylint: disable=no-self-use, unused-argument
         """Convert a table."""
         table_tag.attrs = {}
         for row_tag in table_tag.find_all("tr"):
@@ -175,11 +176,8 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
     ):  # pylint: disable=no-self-use, unused-argument
         """Return expander HTML."""
         el.name = "Expander"
-        self.process_html(el.title)
-        self.process_html(el.body)
-        el.title.name = "Title"
-        el.body.name = "Body"
-        return "\n\n" + el.prettify() + "\n\n"
+        self.process_html(el)
+        return el.prettify() + "\n\n"
 
 
 def inject_expanders(html):
@@ -193,27 +191,19 @@ def inject_expanders(html):
         close_tag.parent.extract()
 
     # Process all remaining links which match showhide_re.
-    for a_tag in soup.find_all("a", onclick=showhide_re):
-        # If a_tag is a lone sibling, use it's parent as the Expander component.
-        # If it's not, create an Expander component and move a_tag inside it.
-        if len(a_tag.parent.contents) == 1:
-            expander_tag = a_tag.parent
-            expander_tag.name = "Expander"
-        else:
-            expander_tag = soup.new_tag("Expander")
-            a_tag.parent.append(expander_tag)
-            expander_tag.append(a_tag)
+    for expander_tag in soup.find_all("a", onclick=showhide_re):
+        # Set up Expander component.
+        expander_tag.name = "Expander"
+        body_id = showhide_re.search(expander_tag["onclick"])[1]
+        expander_tag.attrs = {}
 
-        # Find body and convert it into a component.
-        body_id = showhide_re.search(a_tag["onclick"])[1]
+        # Add title to Expander component.
+        expander_tag.attrs["title"] = expander_tag.text
+        expander_tag.clear()
+
+        # Find body and move it into the Expander component.
         body_tag = soup.find(id=body_id)
-        body_tag.name = "Body"
-        body_tag.attrs = {}
         expander_tag.append(body_tag)
-
-        # Use a_tag as title component.
-        a_tag.name = "Title"
-        a_tag.attrs = {}
 
     return str(soup)
 

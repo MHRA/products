@@ -150,13 +150,14 @@ def test_inject_expanders():
     expected_html = """<html>
 <body>
 <p>Before</p>
-<Expander>
-  <Title>Click for <strong>good times</strong></Title>
-  <Body>
-    <p><strong>Good times!</strong></p>
-    <p>The <em>best</em> times.</p>
-  </Body>
-</Expander>
+<p>
+  <Expander title="Click for good times">
+    <div id="foobar">
+      <p><strong>Good times!</strong></p>
+      <p>The <em>best</em> times.</p>
+    </div>
+  </Expander>
+</p>
 <p>After</p>
 </body>
 </html>
@@ -184,12 +185,11 @@ def test_inject_expanders():
 <ul>
   <li>Before</li>
   <li>
-    <Expander>
-      <Title>Click for <strong>good times</strong></Title>
-      <Body>
+    <Expander title="Click for good times">
+      <div id="foobar">
         <p><strong>Good times!</strong></p>
         <p>The <em>best</em> times.</p>
-      </Body>
+      </div>
     </Expander>
   </li>
   <li>After</li>
