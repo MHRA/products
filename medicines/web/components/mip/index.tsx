@@ -127,7 +127,7 @@ const Mip: React.FC = () => {
   const rerouteSearchResults = (pageNo: number) => {
     router.push({
       pathname: router.route,
-      query: { search, page: pageNo },
+      query: { search: search.trim(), page: pageNo },
     });
   };
 
