@@ -44,7 +44,7 @@ const StyledYellowCard = styled.section`
 
 const title = 'Yellow Card';
 const content = 'Report a side effect with a medicine or medical device';
-const linkText = 'mhra.gov.uk/yellowcard';
+const linkText = 'yellowcard.mhra.gov.uk';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
@@ -55,7 +55,7 @@ const YellowCard: React.FC = () => (
     </header>
     <p>{content}</p>
     <p>
-      <a href="https://mhra.gov.uk/yellowcard" title={title}>
+      <a href="https://yellowcard.mhra.gov.uk/" title={title}>
         {linkText}
       </a>
     </p>
