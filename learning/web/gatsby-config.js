@@ -45,6 +45,7 @@ module.exports = {
     },
     `gatsby-plugin-styled-components`,
     `gatsby-remark-images`,
+    `gatsby-remark-copy-linked-files`,
     {
       resolve: `gatsby-plugin-mdx`,
       options: {
@@ -57,6 +58,7 @@ module.exports = {
               wrapperStyle: () => `margin: 0;`,
             },
           },
+          `gatsby-remark-copy-linked-files`,
         ],
       },
     },
