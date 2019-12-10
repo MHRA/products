@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
+import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import {
@@ -122,6 +123,11 @@ const Mip: React.FC = () => {
     if (search.length > 0) {
       rerouteSearchResults(1);
     }
+
+    ReactGA.event({
+      category: 'Search',
+      action: `Searched for '${search}'`,
+    });
   };
 
   const rerouteSearchResults = (pageNo: number) => {
