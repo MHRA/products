@@ -8,6 +8,7 @@ import {
   tinyPaddingSizeCss,
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
+import Disclaimer from '../disclaimer';
 import Pagination from './pagination';
 
 const StyledDrugList = styled.section`
@@ -213,6 +214,8 @@ const SearchResults = (props: {
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
+        <Disclaimer />
+
         <dl>
           {props.drugs.length > 0 &&
             props.drugs.map((drug, i) => (
