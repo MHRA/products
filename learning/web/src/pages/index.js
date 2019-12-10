@@ -5,7 +5,7 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import styled from "styled-components"
-import { mhraBlue10, mhraGray40, mhraBlue90, black } from "../utils/colors"
+import { mhraBlue10, mhraBlue90, black } from "../utils/colors"
 import { GoChevronRight } from "react-icons/go"
 
 const HomepageLink = styled.div`
@@ -21,7 +21,6 @@ const HomepageLink = styled.div`
     font-size: 1.2em;
     &:hover {
       padding-top: 4px;
-      background-color: ${mhraGray40};
       border-bottom: 4px solid ${mhraBlue90};
     }
   }
@@ -55,7 +54,7 @@ class ModulesIndex extends React.Component {
         {modules.map(({ name: title, link }) => {
           return (
             <HomepageLink>
-              <Link key={link} style={{ boxShadow: `none` }} to={link}>
+              <Link key={link} to={link}>
                 {title}
                 <Icon>
                   <GoChevronRight size={"1.2em"} />

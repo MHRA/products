@@ -5,10 +5,10 @@ import { rhythm } from "../utils/typography"
 import SvgMhraLogo from "./Logos/mhra-logo"
 import SvgAgencyDigitalLogo from "./Logos/agency-digital-logo"
 import styled from "styled-components"
-import { media } from "../utils/theme"
+import { media, sizes } from "../utils/theme"
 import Sidebar from "./Sidebar"
 
-const maxWidth = rhythm(44)
+const maxWidth = `${sizes.desktop / 16}em`
 const paddingTopBottom = rhythm(1.5)
 const paddingLeftRight = rhythm(3 / 4)
 
@@ -16,6 +16,18 @@ const Header = styled.header`
   padding: ${paddingTopBottom} 0 0 0;
   max-width: ${maxWidth};
   margin: 0 auto;
+  h1 {
+    margin-bottom: ${paddingTopBottom};
+    margin-top: ${paddingTopBottom};
+  }
+  a {
+    display: inline-block;
+  }
+`
+
+const HeaderLogo = styled.picture`
+  display: block;
+  max-width: ${rhythm(8)};
 `
 
 const Content = styled.div`
@@ -31,8 +43,12 @@ const Main = styled.main`
   flex: 2;
 `
 
-const Body = styled.div`
+const LayoutStyled = styled.div`
   border-top: 4px solid rgb(15, 18, 144);
+`
+
+const LayoutGutter = styled.div`
+  padding: 0 ${paddingLeftRight};
 `
 
 const Aside = styled.aside`
@@ -44,9 +60,8 @@ const Aside = styled.aside`
   `};
 `
 
-const Wrapper = styled.div`
-  margin-left: auto;
-  margin-right: auto;
+const FooterContentWrapper = styled.div`
+  margin: 0 auto;
   max-width: ${maxWidth};
 `
 
@@ -54,6 +69,11 @@ const Footer = styled.footer`
   background-color: #ebebeb;
   padding: ${paddingTopBottom} ${paddingLeftRight};
   margin-top: 4em;
+`
+
+const FooterLogo = styled.picture`
+  display: block;
+  max-width: ${rhythm(10)};
 `
 
 const FooterNav = styled.nav`
@@ -80,10 +100,10 @@ const FooterNav = styled.nav`
 `
 
 const HeaderLogoLink = () => (
-  <Link style={{ display: "inline-block" }} to={`/`}>
-    <picture>
-      <SvgMhraLogo style={{ maxWidth: rhythm(8) }} />
-    </picture>
+  <Link to={`/`}>
+    <HeaderLogo>
+      <SvgMhraLogo />
+    </HeaderLogo>
   </Link>
 )
 
@@ -97,14 +117,7 @@ class Layout extends React.Component {
       header = (
         <>
           <HeaderLogoLink />
-          <h1
-            style={{
-              marginBottom: paddingTopBottom,
-              marginTop: paddingTopBottom,
-            }}
-          >
-            {title}
-          </h1>
+          <h1>{title}</h1>
         </>
       )
     } else {
@@ -115,8 +128,8 @@ class Layout extends React.Component {
       )
     }
     return (
-      <Body>
-        <div style={{ padding: `0 ${paddingLeftRight}` }}>
+      <LayoutStyled>
+        <LayoutGutter>
           <Header>{header}</Header>
 
           <Content>
@@ -127,13 +140,13 @@ class Layout extends React.Component {
             )}
             <Main>{children}</Main>
           </Content>
-        </div>
+        </LayoutGutter>
 
         <Footer>
-          <Wrapper>
-            <picture>
-              <SvgAgencyDigitalLogo style={{ maxWidth: rhythm(10) }} />
-            </picture>
+          <FooterContentWrapper>
+            <FooterLogo>
+              <SvgAgencyDigitalLogo />
+            </FooterLogo>
             <FooterNav>
               <ul>
                 <li>
@@ -159,9 +172,9 @@ class Layout extends React.Component {
                 </li>
               </ul>
             </FooterNav>
-          </Wrapper>
+          </FooterContentWrapper>
         </Footer>
-      </Body>
+      </LayoutStyled>
     )
   }
 }
