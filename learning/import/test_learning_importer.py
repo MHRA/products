@@ -54,7 +54,7 @@ def test_site_root_directive_href():
         '<a href="[!--$ssServerRelativeSiteRoot--]Opendocuments/OpenPDFdocuments/'
         'ABC123">ABC 123 document</a>'
     )
-    assert "[ABC 123 document](stellent/ABC123.pdf)" in result
+    assert "[ABC 123 document](../assets/ABC123.pdf)" in result
     assert md_converter.stellent_assets_to_download == set(["ABC123"])
     assert md_converter.assets_with_unknown_type == set()
 
@@ -76,7 +76,7 @@ def test_site_root_directive_href():
         '<a href="[!--$ssServerRelativeSiteRoot--]A/Bunch/Of/Things/'
         'ABC123">ABC 123 thing</a>'
     )
-    assert "[ABC 123 thing](stellent/ABC123.unknown)" in result
+    assert "[ABC 123 thing](../assets/ABC123.unknown)" in result
     assert md_converter.stellent_assets_to_download == set(["ABC123"])
     assert md_converter.assets_with_unknown_type == set(["ABC123"])
 
@@ -104,7 +104,7 @@ def test_http_relative_web_root_directive_href():
         "<a href='[!--$HttpRelativeWebRoot--]/something/abc123.pdf'>"
         "ABC 123 document</a>"
     )
-    assert "[ABC 123 document](stellent/abc123.pdf)" in result
+    assert "[ABC 123 document](../assets/abc123.pdf)" in result
     assert md_converter.stellent_assets_to_download == set(["abc123"])
 
 
@@ -117,7 +117,7 @@ def test_web_layout_url_src():
         "<img src=\"[!--$ssWeblayoutUrl('ab/cd/abc123.jpg')--]\" />"
         "<img src=\"[!--$ssWeblayoutUrl('ab/cd/xyz789.jpg')--]\" />"
     )
-    assert '![ABC 123](stellent/abc123.jpg "Image for ABC 123")' in result
+    assert '![ABC 123](../assets/abc123.jpg "Image for ABC 123")' in result
     assert md_converter.stellent_assets_to_download == set(["abc123", "xyz789"])
 
 

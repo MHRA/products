@@ -78,7 +78,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             SITE_ROOT_DIRECTIVE + "Opendocuments/OpenPDFdocuments"
         ):
             path = Path(el["href"])
-            el["href"] = str(Path("stellent") / Path(path.stem + ".pdf"))
+            el["href"] = f"../assets/{path.stem}.pdf"
             self.stellent_assets_to_download.add(path.stem)
 
         # Handle links to pages like /something/CON123?useSecondary=&showpage=456 or
@@ -99,14 +99,14 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
                 el["href"] = CON_CODE_URL_MAP[path.stem]
 
             else:
-                el["href"] = str(Path("stellent") / Path(path.stem + ".unknown"))
+                el["href"] = f"../assets/{path.stem}.unknown"
                 self.stellent_assets_to_download.add(path.stem)
                 self.assets_with_unknown_type.add(path.stem)
 
         # Handle links to pages like [!--$HttpRelativeWebRoot--]/something/abc123.pdf
         if el["href"].startswith(HTTP_ROOT_DIRECTIVE):
             path = Path(el["href"])
-            el["href"] = str(Path("stellent") / Path(path.name))
+            el["href"] = f"../assets/{path.name}"
             self.stellent_assets_to_download.add(path.stem)
 
         return super().convert_a(el, text)
@@ -118,7 +118,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             img_src = Path(
                 el["src"].replace("[!--$ssWeblayoutUrl('", "").replace("')--]", "")
             )
-            el["src"] = Path("stellent") / img_src.name
+            el["src"] = f"../assets/{img_src.name}"
             self.stellent_assets_to_download.add(img_src.stem)
 
         return super().convert_img(el, text)
@@ -239,25 +239,22 @@ def learning_importer(xml_file, con_code, out_dir):
             out_dir.mkdir()
 
     xml = etree.parse(xml_file)
-    sitemap = []
+    modules = []
     with click.progressbar(
         xml.findall("//wcm:row", namespaces=NAMESPACES),
         label="Extracting pages from XML",
     ) as rows:
         for index, row in enumerate(rows):
             title, outfile = import_row(row, index, out_dir, con_code)
-            sitemap.append({"name": title, "link": str(outfile)})
+            modules.append({"name": title, "link": str(outfile)})
 
     click.echo("Done!")
 
-    outfile = Path(out_dir) / Path("sitemap.json")
-    outfile.write_text(json.dumps(sitemap))
+    outfile = Path(out_dir) / Path("modules.json")
+    outfile.write_text(json.dumps(modules))
 
     num_assets = len(md_converter.stellent_assets_to_download)
-    asset_path = out_dir / Path("stellent")
-    click.echo(
-        f"{num_assets} assets to manually download from Stellent to {asset_path}."
-    )
+    click.echo(f"{num_assets} assets to manually download from Stellent to assets.")
     for asset in md_converter.stellent_assets_to_download:
         click.echo(f" * {asset}")
 
