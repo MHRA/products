@@ -50,3 +50,7 @@ Navigate to the correct directory and run the following command:
 ```
 $  cargo run par -d /path/to/pdfs/
 ```
+
+### Verbosity options
+
+Passing `-v` or `-vv` will show more information about the running process at the cost of a slight hit to performance.

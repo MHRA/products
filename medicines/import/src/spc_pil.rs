@@ -3,9 +3,11 @@ use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use std::{collections::HashMap, fs, path::Path, str};
 use tokio_core::reactor::Core;
+use crate::{hash::hash, report::Report};
 
-pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureError> {
+pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(dir) {
+        let mut report = Report::new(verbosity);
         for path in pdf::get_pdfs(dir)? {
             let key = path
                 .file_stem()
@@ -17,6 +19,14 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
 
                 let file_name = metadata::sanitize(&record.filename);
                 metadata.insert("file_name", &file_name);
+
+                let release_state = metadata::sanitize(&record.release_state);
+                metadata.insert("release_state", &release_state);
+
+                if release_state != "Y" {
+                    report.add_skipped_unreleased(&file_name, &release_state);
+                    continue;
+                }
 
                 let doc_type = format!(
                     "{:?}",
@@ -37,9 +47,6 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 let created = record.created.to_rfc3339();
                 metadata.insert("created", &created);
 
-                let release_state = metadata::sanitize(&record.release_state);
-                metadata.insert("release_state", &release_state);
-
                 let product_name = metadata::sanitize(&record.product_name);
                 metadata.insert("product_name", &product_name);
 
@@ -53,9 +60,21 @@ pub fn import(dir: &Path, client: Client, mut core: Core) -> Result<(), AzureErr
                 ));
                 metadata.insert("facets", &facets);
 
-                storage::upload(&client, &mut core, &fs::read(path)?, &metadata)?;
+                let file_data = fs::read(path)?;
+                let hash = hash(&file_data);
+
+                if (report).already_uploaded_file_with_hash(&hash) {
+                    report.add_skipped_duplicate(&file_name, &hash);
+                    continue;
+                }
+
+                storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                report.add_uploaded(&file_name, &hash);
+            } else {
+                report.add_skipped_incomplete(key);
             }
         }
+        report.print_report();
     }
     Ok(())
 }

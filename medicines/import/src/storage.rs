@@ -4,26 +4,27 @@ use azure_sdk_storage_blob::{
     prelude::*,
 };
 use azure_sdk_storage_core::prelude::*;
-use sha1;
 use std::collections::HashMap;
 use tokio_core::reactor::Core;
 
-pub fn hash(bytes: &[u8]) -> String {
-    let mut m = sha1::Sha1::new();
-    m.update(bytes);
-    m.digest().to_string()
-}
-
 #[allow(clippy::implicit_hasher)]
 pub fn upload(
+    blob_name: &str,
     client: &Client,
     core: &mut Core,
     data: &[u8],
     metadata: &HashMap<&str, &str>,
+    verbosity: i8
 ) -> Result<(), AzureError> {
-    let blob_name = hash(data);
-    println!("Saving {:?} to blob storage...", blob_name);
     let container_name = "docs";
+
+    if verbosity >= 2 {
+        println!("---------------");
+        println!("Blob storage name for file is:");
+        println!("{}", blob_name);
+        println!("Metadata for file is:");
+        println!("{:?}", metadata);
+    }
 
     if core
         .run(client.list_containers().finalize())?
@@ -43,7 +44,6 @@ pub fn upload(
 
     // calculate md5 too!
     let digest = md5::compute(&data[..]);
-    println!("{:?}", metadata);
     let future = client
         .put_block_blob()
         .with_container_name(&container_name)
