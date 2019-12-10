@@ -13,7 +13,7 @@ const StyledDrugIndex = styled.nav`
     justify-content: space-between;
     list-style: none;
     margin: 0;
-    padding: 0 10px;
+    padding: 0;
   }
 
   ul > li {

@@ -44,7 +44,7 @@ const WithStyles = styled.div`
 const Wrapper = styled.section`
   margin: 0 auto;
   max-width: ${desktopMaxWidth};
-  // padding: 0 1.25rem;
+  width: 100%;
 `;
 
 interface IPageProps {

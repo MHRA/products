@@ -6,7 +6,11 @@ import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
-import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import {
+  baseSpace,
+  desktopMaxWidth,
+  mobileBreakpoint,
+} from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
@@ -14,7 +18,8 @@ import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
 
 const Aside = styled.aside`
-  max-width: 100%;
+  width: 100%;
+  max-width: ${desktopMaxWidth};
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
 
   .search {
@@ -34,7 +39,8 @@ const Aside = styled.aside`
 `;
 
 const Main = styled.main`
-  max-width: 100%;
+  width: 100%;
+  max-width: ${desktopMaxWidth};
   padding: ${baseSpace};
 
   .yellow-card-wrapper {
