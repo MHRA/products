@@ -3,12 +3,20 @@ import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
+import { IProduct } from '../../model/substance';
+import {
+  docSearch,
+  facetSearch,
+  ISearchResult,
+} from '../../services/azure-search';
+import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import DrugIndex, { IFacet, index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
-import { azureSearch, IAzureSearchResult } from './azure-search';
+
 const Aside = styled.aside`
   max-width: 25%;
   padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
@@ -30,6 +38,10 @@ const Main = styled.main`
 
   .yellow-card-wrapper {
     display: none;
+  }
+
+  h2 {
+    margin-top: 3rem;
   }
 
   @media ${mobileBreakpoint} {
@@ -54,12 +66,19 @@ const sanitizeTitle = (title: string | null): string => {
 };
 
 const Mip: React.FC = () => {
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [resultCount, setResultCount] = React.useState(0);
+  const pageSize = 10;
+  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [facetResults, setFacetResults] = React.useState<IFacet[]>([]);
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
-  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [products, setSubstances] = React.useState<IProduct[]>([]);
+
   const router = useRouter();
+
   const {
-    query: { search: searchTerm, page },
+    query: { search: searchTerm, page, substance },
   } = router;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
@@ -80,37 +99,90 @@ const Mip: React.FC = () => {
       category: 'Search',
       action: `Searched for '${searchTerm}'`,
     });
+  }
+
+  const fetchFacetResults = async (searchTerm: string) => {
+    const searchResults = await facetSearch(searchTerm);
+    const filtered = searchResults[1].facets.filter(x =>
+      x.value.startsWith(searchTerm),
+    );
+    setFacetResults(filtered);
   };
 
-  const fetchSearchResults = async (searchTerm: string) => {
-    const searchResults = await azureSearch(searchTerm);
-    const results = searchResults.map((doc: IAzureSearchResult) => {
+  const fetchSearchResults = async (searchTerm: string, page: number) => {
+    const searchResults = await docSearch(searchTerm, page, pageSize);
+    const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
+        product: doc.product_name,
         context: doc['@search.highlights']?.content.join(' … ') || '',
         docType: doc.doc_type?.toString().substr(0, 3) || '',
         fileSize: Math.ceil(
-          doc.metadata_storage_size ? doc.metadata_storage_size : 0 / 1000,
+          (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
         ).toLocaleString('en-GB'),
         created: doc.created
-          ? moment(doc.created).format('DD MMMM YYYY')
+          ? moment(doc.created).format('D MMMM YYYY')
           : 'Unknown',
         name: sanitizeTitle(doc.title),
         url: doc.metadata_storage_path,
       };
     });
     setResults(results);
-    setSearch(searchTerm);
+    setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
+    setSubstances([]);
+  };
+
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (search.length > 0) {
+      rerouteSearchResults(1);
+    }
+  };
+
+  const rerouteSearchResults = (pageNo: number) => {
+    router.push({
+      pathname: router.route,
+      query: { search: search.trim(), page: pageNo },
+    });
   };
 
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
-        fetchSearchResults(searchTerm);
+        const trimmedTerm = searchTerm.trim();
+        setSearch(trimmedTerm);
+        let parsedPage = Number(page);
+        if (!parsedPage || parsedPage < 1) {
+          parsedPage = 1;
+        }
+        setPageNumber(parsedPage);
+        fetchSearchResults(trimmedTerm, parsedPage);
       }
+    } else if (substance) {
+      if (typeof substance === 'string') {
+        (async () => {
+          const ss = await substanceLoader.load(substance.charAt(0));
+          const products = ss.find(s => s.name === substance);
+          if (products) {
+            setSubstances(products.products);
+          } else {
+            setSubstances(ss);
+          }
+          setResults([]);
+          setSearch('');
+          setShowingResultsForTerm('');
+        })();
+      }
+    } else {
+      setResults([]);
+      setSearch('');
+      setShowingResultsForTerm('');
+      setSubstances([]);
     }
-  }, [searchTerm]);
+    window.scrollTo(0, 0);
+  }, [page, searchTerm, substance]);
 
   return (
     <>
@@ -124,25 +196,33 @@ const Mip: React.FC = () => {
           <YellowCard />
         </div>
       </Aside>
-      {showingResultsForTerm.length === 0 ? (
-        <Main>
-          <MipText />
-          {/* <DrugIndex /> */}
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      ) : (
-        <Main>
+      <Main>
+        {showingResultsForTerm.length === 0 ? (
+          <>
+            <MipText />
+            <DrugIndex
+              title="List of active substances"
+              items={index}
+              horizontal
+            />
+            {products.length > 0 && (
+              <DrugIndex title={`${substance || '...'}`} items={products} />
+            )}
+          </>
+        ) : (
           <SearchResults
             drugs={results}
             showingResultsForTerm={showingResultsForTerm}
+            resultCount={resultCount}
+            page={pageNumber}
+            pageSize={pageSize}
+            searchTerm={search}
           />
-          <div className="yellow-card-wrapper">
-            <YellowCard />
-          </div>
-        </Main>
-      )}
+        )}
+        <div className="yellow-card-wrapper">
+          <YellowCard />
+        </div>
+      </Main>
     </>
   );
 };

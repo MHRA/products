@@ -2,7 +2,9 @@ import Head from 'next/head';
 import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
+import { anchorColour } from '../../styles/colors';
 import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
+import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
 
@@ -29,6 +31,13 @@ const WithStyles = styled.div`
     display: block;
     height: auto;
     max-width: 100%;
+  }
+  a {
+    color: ${anchorColour};
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -63,6 +72,7 @@ const App: React.FC<IPageProps> = props => {
       </Head>
       <WithStyles>
         <Normalize />
+        <CookieBanner />
         <Header title={props.title} />
         <Row>{props.children}</Row>
         <Footer />

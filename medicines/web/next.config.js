@@ -12,6 +12,18 @@ module.exports = {
     GOOGLE_GTM_CONTAINER_ID: process.env.GOOGLE_GTM_CONTAINER_ID,
     GOOGLE_TRACKING_ID: process.env.GOOGLE_TRACKING_ID,
   },
+  webpack: config => {
+    config.module.rules.push({
+      test: /\.(md)$/,
+      use: [
+        { loader: 'html-loader' },
+        {
+          loader: 'markdown-loader',
+        },
+      ],
+    });
+    return config;
+  },
   assetPrefix:
     process.env.ASSET_PREFIX === 'master' ||
     process.env.ASSET_PREFIX === undefined

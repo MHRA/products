@@ -6,7 +6,7 @@ use std::{
 pub fn get_pdfs(dir: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(fs::read_dir(dir)?
         .filter_map(Result::ok)
-        .filter(|entry| entry.path().extension().map(|s| s == "pdf").is_some())
+        .filter(|entry| entry.path().extension().unwrap() == "pdf")
         .filter_map(|entry| {
             entry
                 .metadata()

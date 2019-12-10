@@ -5,8 +5,10 @@ extern crate serde_derive;
 
 mod csv;
 mod date_de;
+pub mod hash;
 mod metadata;
 mod model;
+mod report;
 pub mod par;
 pub mod pdf;
 pub mod spc_pil;

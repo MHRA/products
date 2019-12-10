@@ -5,7 +5,7 @@ import { mhra70 } from '../styles/colors';
 import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
-import accessibility from '../copy/accessibility.md';
+import about from '../copy/about.md';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
@@ -15,12 +15,16 @@ const StyledMain = styled.main`
   a {
     color: ${mhra70};
   }
+
+  ul li {
+    list-style: none;
+  }
 `;
 
 const App: React.FC = () => {
   return (
-    <Page title="Accessibility Statement">
-      <StyledMain dangerouslySetInnerHTML={{ __html: accessibility }} />
+    <Page title="Products">
+      <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
     </Page>
   );
 };
