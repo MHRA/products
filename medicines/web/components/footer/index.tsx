@@ -78,9 +78,7 @@ const Footer: React.FC = () => (
           <li>
             <p>
               Built by the&nbsp;
-              <a href="">
-                Medicines &amp; Healthcare products Regulatory Agency
-              </a>
+              <a href="">Medicines and Healthcare products Regulatory Agency</a>
             </p>
           </li>
         </ul>
