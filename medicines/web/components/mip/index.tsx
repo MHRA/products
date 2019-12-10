@@ -202,6 +202,9 @@ const Mip: React.FC = () => {
             searchTerm={search}
           />
         )}
+        <div className="yellow-card-wrapper">
+          <YellowCard />
+        </div>
       </Main>
     </>
   );
