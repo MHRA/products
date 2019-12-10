@@ -27,9 +27,11 @@ CON_CODE_URL_MAP = {
 class MHRAMarkdownConverter(markdownify.MarkdownConverter):
     """MHRA learning module HTML to Markdown converter."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, content_prefix, asset_prefix, **kwargs):
         """Initialise converter."""
         super().__init__(**kwargs)
+        self.content_prefix = content_prefix
+        self.asset_prefix = asset_prefix
         self.stellent_assets_to_download = set()
         self.assets_with_unknown_type = set()
         self.index = dict()
@@ -78,7 +80,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             SITE_ROOT_DIRECTIVE + "Opendocuments/OpenPDFdocuments"
         ):
             path = Path(el["href"])
-            el["href"] = f"../assets/{path.stem}.pdf"
+            el["href"] = self.asset_prefix + path.stem + ".pdf"
             self.stellent_assets_to_download.add(path.stem)
 
         # Handle links to pages like /something/CON123?useSecondary=&showpage=456 or
@@ -87,9 +89,9 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         query = parse_qs(url.query)
         if "showpage" in query:
             path = Path(url.path)
-            el["href"] = path.stem + "_" + query["showpage"][0]
+            el["href"] = self.content_prefix + path.stem + "_" + query["showpage"][0]
             if url.fragment:
-                el["href"] += f"#{url.fragment}"
+                el["href"] += "#" + url.fragment
 
         # Handle links to pages like [!--$ssServerRelativeSiteRoot--]Something/CON123
         if el["href"].startswith(SITE_ROOT_DIRECTIVE):
@@ -99,14 +101,14 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
                 el["href"] = CON_CODE_URL_MAP[path.stem]
 
             else:
-                el["href"] = f"../assets/{path.stem}.unknown"
+                el["href"] = self.asset_prefix + path.stem + ".unknown"
                 self.stellent_assets_to_download.add(path.stem)
                 self.assets_with_unknown_type.add(path.stem)
 
         # Handle links to pages like [!--$HttpRelativeWebRoot--]/something/abc123.pdf
         if el["href"].startswith(HTTP_ROOT_DIRECTIVE):
             path = Path(el["href"])
-            el["href"] = f"../assets/{path.name}"
+            el["href"] = self.asset_prefix + path.name
             self.stellent_assets_to_download.add(path.stem)
 
         return super().convert_a(el, text)
@@ -118,7 +120,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             img_src = Path(
                 el["src"].replace("[!--$ssWeblayoutUrl('", "").replace("')--]", "")
             )
-            el["src"] = f"../assets/{img_src.name}"
+            el["src"] = self.asset_prefix + img_src.name
             self.stellent_assets_to_download.add(img_src.stem)
 
         return super().convert_img(el, text)
@@ -133,7 +135,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
     def convert_table(self, el, text):  # pylint: disable=no-self-use, unused-argument
         """Return table HTML."""
-        return str(el)
+        return "\n\n" + el.prettify() + "\n\n"
 
     def convert_expander(
         self, el, text
@@ -142,10 +144,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         el.name = "Expander"
         el.title.name = "Title"
         el.body.name = "Body"
-        return str(el)
-
-
-md_converter = MHRAMarkdownConverter()
+        return "\n\n" + el.prettify() + "\n\n"
 
 
 def inject_expanders(html):
@@ -184,7 +183,8 @@ def inject_expanders(html):
     return str(soup)
 
 
-def import_row(row, index, out_dir, con_code):
+# pylint: disable=too-many-arguments
+def import_row(row, index, md_converter, out_dir, con_code, path_to_expander_component):
     """Handle import of a row element."""
     # Generate base filename which is used to set up links between pages.
     stem = con_code + "_" + str(index + 1)
@@ -192,7 +192,6 @@ def import_row(row, index, out_dir, con_code):
     # Extract data from XML.
     title = row.find("wcm:element[@name='Head']", namespaces=NAMESPACES).text
     html = row.find("wcm:element[@name='Body']", namespaces=NAMESPACES).text
-    html = f"<h1>{title}</h1>" + html
 
     # Inject expanders into HTML
     html = inject_expanders(html)
@@ -202,7 +201,7 @@ def import_row(row, index, out_dir, con_code):
     front_matter = yaml.dump(front_matter)
     markdown = (
         f"---\n{front_matter}---\n\n"
-        + "import Expander from '../components/expander'\n\n"
+        + f"import Expander from '{path_to_expander_component}'\n\n"
         + md_converter.convert(html)
     )
 
@@ -211,7 +210,7 @@ def import_row(row, index, out_dir, con_code):
     outfile.write_text(markdown)
 
     # Return title and filename.
-    return title, str(Path(out_dir) / Path(stem))
+    return title, stem
 
 
 def validate_con_code(context, param, value):  # pylint: disable=unused-argument
@@ -224,22 +223,41 @@ def validate_con_code(context, param, value):  # pylint: disable=unused-argument
 
 @click.command()
 @click.argument("xml_file", type=click.File("rb"))
-@click.argument("con_code", type=click.STRING, callback=validate_con_code)
 @click.argument(
-    "out_dir",
-    required=False,
-    type=click.Path(file_okay=False, dir_okay=True, writable=True),
+    "out_dir", type=click.Path(file_okay=False, dir_okay=True, writable=True)
 )
-def learning_importer(xml_file, con_code, out_dir):
-    """Convert XML_FILE containing CON_CODE to a series of Markdown files in OUT_DIR."""
-    if not out_dir:
-        out_dir = Path() / Path(con_code)
-    else:
-        out_dir = Path(out_dir)
+@click.argument("con_code", type=click.STRING, callback=validate_con_code)
+@click.argument("content_url_prefix", type=click.STRING)
+@click.argument("asset_url_prefix", type=click.STRING)
+@click.argument(
+    "path_to_expander_component", type=click.STRING, default="../../components/expander"
+)
+def learning_importer(
+    xml_file,
+    out_dir,
+    con_code,
+    content_url_prefix,
+    asset_url_prefix,
+    path_to_expander_component,
+):  # pylint: disable=too-many-arguments, too-many-locals
+    """
+    Convert XML_FILE to a series of MDX files in OUT_DIR.
 
+    Files will be named CON_CODE_1, CON_CODE_2, etc.
+
+    Links to content and assets will be prefixed with CONTENT_URL_PREFIX and
+    ASSET_URL_PREFIX respectively.
+
+    Expander component will be loaded from PATH_TO_EXPANDER_COMPONENT.
+    """
+    out_dir = Path(out_dir)
     if not out_dir.exists():
         click.echo(f"Creating output directory {out_dir}.")
         out_dir.mkdir()
+
+    md_converter = MHRAMarkdownConverter(
+        content_prefix=content_url_prefix, asset_prefix=asset_url_prefix
+    )
 
     xml = etree.parse(xml_file)
     modules = []
@@ -248,16 +266,20 @@ def learning_importer(xml_file, con_code, out_dir):
         label="Extracting pages from XML",
     ) as rows:
         for index, row in enumerate(rows):
-            title, outfile = import_row(row, index, out_dir, con_code)
-            modules.append({"name": title, "link": str(outfile)})
+            name, content_stem = import_row(
+                row, index, md_converter, out_dir, con_code, path_to_expander_component
+            )
+            modules.append({"name": name, "link": content_url_prefix + content_stem})
 
     click.echo("Done!")
 
     outfile = Path(out_dir) / Path("modules.json")
-    outfile.write_text(json.dumps(modules))
+    outfile.write_text(json.dumps(modules, indent=2))
 
     num_assets = len(md_converter.stellent_assets_to_download)
-    click.echo(f"{num_assets} assets to manually download from Stellent to assets.")
+    click.echo(
+        f"{num_assets} assets to manually download from Stellent to {asset_url_prefix}."
+    )
     for asset in md_converter.stellent_assets_to_download:
         click.echo(f" * {asset}")
 

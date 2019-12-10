@@ -19,10 +19,15 @@ Get some help:
 
 ```
 $ pipenv run python learning_importer.py --help
-Usage: learning_importer.py [OPTIONS] XML_FILE CON_CODE [OUT_DIR]
+Usage: learning_importer.py [OPTIONS] XML_FILE OUT_DIR CON_CODE
+                            CONTENT_URL_PREFIX ASSET_URL_PREFIX
 
-  Convert XML_FILE containing CON_CODE to a series of Markdown files in
-  OUT_DIR.
+  Convert XML_FILE to a series of MDX files in OUT_DIR.
+
+  Files will be named CON_CODE_1, CON_CODE_2, etc.
+
+  Links to content and assets will be prefixed with CONTENT_URL_PREFIX and
+  ASSET_URL_PREFIX respectively.
 
 Options:
   --help  Show this message and exit.

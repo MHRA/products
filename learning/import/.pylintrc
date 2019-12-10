@@ -1,6 +1,6 @@
 [MASTER]
 load-plugins = pylint.extensions.mccabe, pylint.extensions.bad_builtin
-good-names = el, md_converter
+good-names = el
 
 [GENERAL]
 extension-pkg-whitelist = lxml.etree
