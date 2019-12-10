@@ -4,7 +4,7 @@ The MHRA products website allows you to find:
 - The description of the medicinal product’s properties and how it can be used
 - Scientific reports about new marketing authorisations for medicines
 
-You can look for any word, phrase or PIL number using the search tool.
+You can look for any word, phrase or PL number using the search tool.
 
 You can also use the A-Z list to find the active substance.
 
