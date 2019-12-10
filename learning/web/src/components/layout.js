@@ -5,10 +5,10 @@ import { rhythm } from "../utils/typography"
 import SvgMhraLogo from "./Logos/mhra-logo"
 import SvgAgencyDigitalLogo from "./Logos/agency-digital-logo"
 import styled from "styled-components"
-import { media, sizes } from "../utils/theme"
+import { media } from "../utils/theme"
 import Sidebar from "./Sidebar"
 
-const maxWidth = `${sizes.desktop / 16}em`
+const maxWidth = `${1024 / 16}em`
 const paddingTopBottom = rhythm(1.5)
 const paddingLeftRight = rhythm(3 / 4)
 
@@ -22,6 +22,15 @@ const Header = styled.header`
   }
   a {
     display: inline-block;
+  }
+  .visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap; /* added line */
   }
 `
 
@@ -104,6 +113,7 @@ const HeaderLogoLink = () => (
     <HeaderLogo>
       <SvgMhraLogo />
     </HeaderLogo>
+    <span className="visually-hidden">Home</span>
   </Link>
 )
 

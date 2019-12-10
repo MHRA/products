@@ -20,8 +20,8 @@ const HomepageLink = styled.div`
     color: ${black};
     font-size: 1.2em;
     &:hover {
-      padding-top: 4px;
-      border-bottom: 4px solid ${mhraBlue90};
+      padding-top: 0.25rem;
+      border-bottom: 0.25rem solid ${mhraBlue90};
     }
   }
   margin-bottom: ${rhythm(1)};

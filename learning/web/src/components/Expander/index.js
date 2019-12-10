@@ -10,11 +10,11 @@ const ExpanderStyled = styled.div`
 const Button = styled.button`
   color: ${mhrawhite};
   font-weight: normal;
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: ${mhraBlue};
   padding: 0.5em 1em;
   border: 0;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   cursor: pointer;
 `
 

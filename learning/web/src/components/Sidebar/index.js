@@ -5,7 +5,7 @@ import { rhythm } from "../../utils/typography"
 
 import { GoThreeBars, GoX } from "react-icons/go"
 import { sizes, media } from "../../utils/theme"
-import { black, mhraGray90, mhraBlue } from "../../utils/colors"
+import { black, mhraBlue } from "../../utils/colors"
 import uuid from "uuid/v4"
 
 const SidebarStyled = styled.ul`
@@ -13,10 +13,11 @@ const SidebarStyled = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0 ${rhythm(3 / 4)} ${rhythm(1)};
-  border-bottom: 2px solid ${mhraBlue};
+  border-bottom: 0.125rem solid ${mhraBlue};
   width: 100%;
-  font-size: ${rhythm(0.8)};
-  color: ${mhraGray90};
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: ${black};
 
   ${media.desktop`
     border-bottom:none;
@@ -27,11 +28,12 @@ const SidebarStyled = styled.ul`
   }
 
   ul {
-    margin: 1em 0 0;
+    margin: 1.2em 0 0;
     list-style: none;
     &.modules {
       a {
-        font-size: ${rhythm(0.7)};
+        font-weight: normal;
+        font-size: 1rem;
         color: ${black};
       }
     }
@@ -45,7 +47,7 @@ const SidebarStyled = styled.ul`
         background: ${mhraBlue};
         position: absolute;
         height: 100%;
-        width: 4px;
+        width: 0.25rem;
         left: ${rhythm((3 / 4) * -1)};
       }
     }
