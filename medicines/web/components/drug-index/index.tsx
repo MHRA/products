@@ -111,6 +111,16 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
 
+  const searchLink = (item: IProduct) => {
+    if (level < 2) {
+      return `?substance=${encodeURIComponent(item.name)}${
+        item.name.length === 1 ? '&index=true' : ''
+      }`;
+    }
+
+    return `?${'&product=true&page=1&search'}=${encodeURIComponent(item.name)}`;
+  };
+
   return (
     <StyledDrugIndex>
       <nav>
@@ -120,11 +130,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
           {items.map(item => {
             return (
               <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
-                <Link
-                  href={`?${
-                    level < 2 ? 'substance' : 'page=1&search'
-                  }=${encodeURIComponent(item.name)}`}
-                >
+                <Link href={searchLink(item)}>
                   <a>
                     {item.name} {item.count && <>({item.count} files)</>}
                   </a>
