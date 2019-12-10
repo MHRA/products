@@ -87,7 +87,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         query = parse_qs(url.query)
         if "showpage" in query:
             path = Path(url.path)
-            el["href"] = path.stem + "_" + query["showpage"][0] + ".html"
+            el["href"] = path.stem + "_" + query["showpage"][0]
             if url.fragment:
                 el["href"] += f"#{url.fragment}"
 
@@ -194,24 +194,24 @@ def import_row(row, index, out_dir, con_code):
     html = row.find("wcm:element[@name='Body']", namespaces=NAMESPACES).text
     html = f"<h1>{title}</h1>" + html
 
-    # Write HTML
-    html_outfile = Path(out_dir) / Path(f"{stem}.html")
-    html_outfile.write_text(html)
-
     # Inject expanders into HTML
     html = inject_expanders(html)
-    outfile = Path(out_dir) / Path(f"{stem}.htmlx")
-    outfile.write_text(html)
 
-    # Write MDX
+    # Generate MDX
     front_matter = {"title": title}
     front_matter = yaml.dump(front_matter)
-    markdown = f"---\n{front_matter}---\n\n" + md_converter.convert(html)
+    markdown = (
+        f"---\n{front_matter}---\n\n"
+        + "import Expander from '../components/expander'\n\n"
+        + md_converter.convert(html)
+    )
+
+    # Write MDX
     outfile = Path(out_dir) / Path(f"{stem}.mdx")
     outfile.write_text(markdown)
 
     # Return title and filename.
-    return title, html_outfile
+    return title, str(Path(out_dir) / Path(stem))
 
 
 def validate_con_code(context, param, value):  # pylint: disable=unused-argument
@@ -234,9 +234,12 @@ def learning_importer(xml_file, con_code, out_dir):
     """Convert XML_FILE containing CON_CODE to a series of Markdown files in OUT_DIR."""
     if not out_dir:
         out_dir = Path() / Path(con_code)
-        if not out_dir.exists():
-            click.echo(f"Creating output directory {out_dir}.")
-            out_dir.mkdir()
+    else:
+        out_dir = Path(out_dir)
+
+    if not out_dir.exists():
+        click.echo(f"Creating output directory {out_dir}.")
+        out_dir.mkdir()
 
     xml = etree.parse(xml_file)
     modules = []

@@ -29,14 +29,14 @@ def test_slash_learning_module_href():
         '<a href="/some-learning-module/ABC123?useSecondary=&showpage=456">'
         "Page 456 of ABC 123</a>"
     )
-    assert "[Page 456 of ABC 123](ABC123_456.html)" in result
+    assert "[Page 456 of ABC 123](ABC123_456)" in result
 
     # Also test with weird encoded ampersand thing.
     result = html_to_markdown(
         '<a href="/some-learning-module/ABC123?useSecondary=&#38;showpage=456">'
         "Page 456 of ABC 123</a>"
     )
-    assert "[Page 456 of ABC 123](ABC123_456.html)" in result
+    assert "[Page 456 of ABC 123](ABC123_456)" in result
 
 
 def test_site_root_directive_href():
@@ -46,7 +46,7 @@ def test_site_root_directive_href():
         'ABC123?useSecondary=&#38;showpage=456">'
         "Page 456 of ABC 123</a>"
     )
-    assert "[Page 456 of ABC 123](ABC123_456.html)" in result
+    assert "[Page 456 of ABC 123](ABC123_456)" in result
 
     # Test with PDF content.
     md_converter = learning_importer.MHRAMarkdownConverter()
@@ -87,14 +87,14 @@ def test_sslink_directive_href():
         "<a href='[!--$ssLink(\"ABC123?useSecondary=&#38;showpage=456\")--]'>"
         "Page 456 of ABC 123</a>"
     )
-    assert "[Page 456 of ABC 123](ABC123_456.html)" in result
+    assert "[Page 456 of ABC 123](ABC123_456)" in result
 
     # Test with fragment.
     result = html_to_markdown(
         "<a href='[!--$ssLink(\"ABC123?useSecondary=&#38;showpage=456#fragment\")--]'>"
         "Page 456 of ABC 123</a>"
     )
-    assert "[Page 456 of ABC 123](ABC123_456.html#fragment)" in result
+    assert "[Page 456 of ABC 123](ABC123_456#fragment)" in result
 
 
 def test_http_relative_web_root_directive_href():
