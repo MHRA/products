@@ -73,7 +73,7 @@ const Mip: React.FC = () => {
   const [results, setResults] = React.useState<IDocument[]>([]);
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
-  const [products, setSubstances] = React.useState<IProduct[]>([]);
+  const [products, setProducts] = React.useState<IProduct[] | null>(null);
 
   const router = useRouter();
 
@@ -106,7 +106,7 @@ const Mip: React.FC = () => {
     setResults(results);
     setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
-    setSubstances([]);
+    setProducts([]);
   };
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -148,16 +148,16 @@ const Mip: React.FC = () => {
       if (typeof substance === 'string') {
         (async () => {
           setHasIntro(false);
-          const ss = await substanceLoader.load(substance.charAt(0));
-          const products = ss.find(s => s.name === substance);
-          if (products) {
-            setSubstances(products.products);
-          } else {
-            setSubstances(ss);
-          }
           setResults([]);
           setSearch('');
           setShowingResultsForTerm('');
+          const ss = await substanceLoader.load(substance.charAt(0));
+          const products = ss.find(s => s.name === substance);
+          if (products) {
+            setProducts(products.products);
+          } else {
+            setProducts(ss);
+          }
         })();
       }
     } else {
@@ -165,7 +165,7 @@ const Mip: React.FC = () => {
       setResults([]);
       setSearch('');
       setShowingResultsForTerm('');
-      setSubstances([]);
+      setProducts(null);
     }
     window.scrollTo(0, 0);
   }, [page, searchTerm, substance]);
@@ -191,8 +191,12 @@ const Mip: React.FC = () => {
               items={index}
               horizontal
             />
-            {products.length > 0 && (
+            {products == null ? (
+              <></>
+            ) : products.length > 0 ? (
               <DrugIndex title={`${substance || '...'}`} items={products} />
+            ) : (
+              <p>Nothing found for "{substance}"</p>
             )}
           </>
         ) : (
