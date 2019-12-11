@@ -31,8 +31,10 @@ pub fn tokenize(s: &str) -> String {
 
 pub fn to_array(s: &str) -> Vec<String> {
     let re = Regex::new(r"(,|\s+AND\s+)").unwrap();
+    let pattern_spaces = Regex::new(r"(\s+)").unwrap();
     re.split(s)
         .map(|s| s.trim())
+        .map(|s| pattern_spaces.replace_all(s, " "))
         .map(|s| s.replace("\n", " "))
         .map(|s| s.replace(|c: char| !c.is_ascii(), ""))
         .collect()
@@ -108,6 +110,12 @@ mod test {
     #[test]
     fn jsonify_terms_joined_with_and() {
         let s = "THIOPENTAL SODIUM AND SODIUM CARBONATE";
+        let json = "[\"THIOPENTAL SODIUM\",\"SODIUM CARBONATE\"]";
+        assert_eq!(to_json(to_array(s)), json);
+    }
+    #[test]
+    fn jsonify_terms_with_multiple_spaces() {
+        let s = "THIOPENTAL   SODIUM AND SODIUM  CARBONATE";
         let json = "[\"THIOPENTAL SODIUM\",\"SODIUM CARBONATE\"]";
         assert_eq!(to_json(to_array(s)), json);
     }

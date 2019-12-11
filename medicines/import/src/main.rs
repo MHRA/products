@@ -17,7 +17,7 @@ fn main() -> Result<(), AzureError> {
         1 => verbosity = 1,
         2 | _ => verbosity = 2,
     };
-
+    let dryrun = matches.is_present("dryrun");
     match matches.subcommand() {
         ("spcpil", Some(m)) => {
             let path = m
@@ -25,7 +25,7 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            spc_pil::import(dir, client, core, verbosity)?
+            spc_pil::import(dir, client, core, verbosity, dryrun)?
         }
         ("par", Some(m)) => {
             let path = m
@@ -33,7 +33,7 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            par::import(dir, client, core, verbosity)?
+            par::import(dir, client, core, verbosity, dryrun)?
         }
         _ => println!("yaml is incorrect: pdf is currently the only subcommand"),
     }

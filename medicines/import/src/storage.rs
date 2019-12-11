@@ -16,7 +16,8 @@ pub fn upload(
     metadata: &HashMap<&str, &str>,
     verbosity: i8
 ) -> Result<(), AzureError> {
-    let container_name = "docs";
+    let container_name = std::env::var("STORAGE_CONTAINER")
+        .expect("Set env variable STORAGE_CONTAINER first!");
 
     if verbosity >= 2 {
         println!("---------------");
@@ -36,7 +37,7 @@ pub fn upload(
         core.run(
             client
                 .create_container()
-                .with_container_name(container_name)
+                .with_container_name(&container_name)
                 .with_public_access(PublicAccess::Blob)
                 .finalize(),
         )?;
