@@ -58,7 +58,7 @@ def test_site_root_directive_href():
         '<a href="[!--$ssServerRelativeSiteRoot--]Opendocuments/OpenPDFdocuments/'
         'ABC123">ABC 123 document</a>'
     )
-    assert "[ABC 123 document](/asset/ABC123.pdf)" in result
+    assert "[ABC 123 document](/asset/abc123.pdf)" in result
     assert md_converter.stellent_assets_to_download == set(["ABC123"])
     assert md_converter.assets_with_unknown_type == set()
 
@@ -82,7 +82,7 @@ def test_site_root_directive_href():
         '<a href="[!--$ssServerRelativeSiteRoot--]A/Bunch/Of/Things/'
         'ABC123">ABC 123 thing</a>'
     )
-    assert "[ABC 123 thing](/asset/ABC123.unknown)" in result
+    assert "[ABC 123 thing](/asset/abc123.unknown)" in result
     assert md_converter.stellent_assets_to_download == set(["ABC123"])
     assert md_converter.assets_with_unknown_type == set(["ABC123"])
 

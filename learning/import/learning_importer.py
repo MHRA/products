@@ -81,7 +81,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             SITE_ROOT_DIRECTIVE + "Opendocuments/OpenPDFdocuments"
         ):
             path = Path(el["href"])
-            el["href"] = self.asset_prefix + path.stem + ".pdf"
+            el["href"] = self.asset_prefix + path.stem.lower() + ".pdf"
             self.stellent_assets_to_download.add(path.stem)
 
         # Handle links to pages like /something/CON123?useSecondary=&showpage=456 or
@@ -102,14 +102,14 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
                 el["href"] = CON_CODE_URL_MAP[path.stem]
 
             else:
-                el["href"] = self.asset_prefix + path.stem + ".unknown"
+                el["href"] = self.asset_prefix + path.stem.lower() + ".unknown"
                 self.stellent_assets_to_download.add(path.stem)
                 self.assets_with_unknown_type.add(path.stem)
 
         # Handle links to pages like [!--$HttpRelativeWebRoot--]/something/abc123.pdf
         if el["href"].startswith(HTTP_ROOT_DIRECTIVE):
             path = Path(el["href"])
-            el["href"] = self.asset_prefix + path.name
+            el["href"] = self.asset_prefix + path.name.lower()
             self.stellent_assets_to_download.add(path.stem)
 
         return super().convert_a(el, text)
@@ -121,7 +121,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             img_src = Path(
                 el["src"].replace("[!--$ssWeblayoutUrl('", "").replace("')--]", "")
             )
-            el["src"] = self.asset_prefix + img_src.name
+            el["src"] = self.asset_prefix + img_src.name.lower()
             self.stellent_assets_to_download.add(img_src.stem)
 
         return super().convert_img(el, text)
@@ -140,44 +140,47 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             if attr_to_delete in cell_tag.attrs:
                 del cell_tag.attrs[attr_to_delete]
 
-    def process_html(self, tag):
-        """
-        Run element contents through the HTML to Markdown conversion process, then
-        convert it back into HTML.
-
-        This will ensure elements inside the tag are processed so we don't get broken
-        links to glossary terms, etc.
-        """
-        tag_markdown = self.process_tag(tag, children_only=True)
+    def markdown_to_html(self, tag, text):  # pylint: disable=no-self-use
+        """Convert the processed content back into HTML."""
         tag.clear()
-        if tag_markdown:
-            soup = BeautifulSoup(markdown(tag_markdown), "lxml")
+        if text:
+            soup = BeautifulSoup(markdown(text), "lxml")
             for child_tag in soup.body.contents:
                 tag.append(child_tag)
 
-    def convert_table(
-        self, table_tag, text
-    ):  # pylint: disable=no-self-use, unused-argument
+    def convert_table(self, table_tag, text):
         """Convert a table."""
         table_tag.attrs = {}
         for row_tag in table_tag.find_all("tr"):
             row_tag.attrs = {}
             for header_tag in row_tag.find_all("th"):
                 self.remove_table_cell_attrs(header_tag)
-                self.process_html(header_tag)
+                self.markdown_to_html(header_tag, text)
             for cell_tag in row_tag.find_all("td"):
                 self.remove_table_cell_attrs(cell_tag)
-                self.process_html(cell_tag)
+                self.markdown_to_html(cell_tag, text)
 
         return "\n\n" + table_tag.prettify() + "\n\n"
 
-    def convert_expander(
-        self, el, text
-    ):  # pylint: disable=no-self-use, unused-argument
+    def convert_expander(self, el, text):
         """Return expander HTML."""
         el.name = "Expander"
-        self.process_html(el)
-        return el.prettify() + "\n\n"
+
+        # Collect footnotes from text.
+        footnotes = []
+        for match in re.finditer(r"\[\^(\d+)\]", text):
+            footnotes.append(match[0])
+
+        # Replace footnotes with links.
+        text = re.sub(
+            r"\[\^(\d+)\]",
+            r"<sup><a href='#fn-\1' class='footnote-ref'>\1</a></sup>",
+            text,
+        )
+
+        self.markdown_to_html(el, text)
+
+        return el.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
 
 
 def inject_expanders(html):
