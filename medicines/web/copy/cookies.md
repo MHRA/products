@@ -8,7 +8,7 @@ You can find out more about [how to manage cookies](https://ico.org.uk/for-the-
 
 We use necessary cookies to make our website work. These enable core functionality such as security, network management and accessibility.
 
-You can disable these in your browser settings, but these may affect how the website functions
+You can disable these in your browser settings, but these may affect how the website functions.
 
 ## Google Analytics cookies
 
