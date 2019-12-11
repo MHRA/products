@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlparse
 import click
 import markdownify
 import yaml
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from lxml import etree
 from markdown import markdown
 
@@ -134,12 +134,6 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         return super().process_text(text)
 
-    def remove_table_cell_attrs(self, cell_tag):  # pylint: disable=no-self-use
-        """Remove unwanted attributes from table cells."""
-        for attr_to_delete in ["width", "valign", "style"]:
-            if attr_to_delete in cell_tag.attrs:
-                del cell_tag.attrs[attr_to_delete]
-
     def markdown_to_html(self, tag, text):  # pylint: disable=no-self-use
         """Convert the processed content back into HTML."""
         tag.clear()
@@ -148,17 +142,37 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
             for child_tag in soup.body.contents:
                 tag.append(child_tag)
 
+    def convert_td(self, cell_tag, text):
+        """Convert a table cell."""
+        for attr_to_delete in ["width", "valign", "style"]:
+            if attr_to_delete in cell_tag.attrs:
+                del cell_tag.attrs[attr_to_delete]
+
+        self.markdown_to_html(cell_tag, text)
+
+        return cell_tag.prettify()
+
+    def convert_th(self, header_tag, text):
+        """Convert a table heading cell."""
+        return self.convert_td(header_tag, text)
+
+    def convert_tr(self, row_tag, text):
+        """Convert a table row."""
+        row_tag.attrs = {}
+
+        for el in row_tag.children:
+            if isinstance(el, NavigableString):
+                text += self.process_text(str(el))
+            else:
+                text += self.process_tag(el)
+
+        return row_tag.prettify()
+
     def convert_table(self, table_tag, text):
         """Convert a table."""
         table_tag.attrs = {}
-        for row_tag in table_tag.find_all("tr"):
-            row_tag.attrs = {}
-            for header_tag in row_tag.find_all("th"):
-                self.remove_table_cell_attrs(header_tag)
-                self.markdown_to_html(header_tag, text)
-            for cell_tag in row_tag.find_all("td"):
-                self.remove_table_cell_attrs(cell_tag)
-                self.markdown_to_html(cell_tag, text)
+
+        self.markdown_to_html(table_tag, text)
 
         return "\n\n" + table_tag.prettify() + "\n\n"
 
@@ -297,6 +311,7 @@ def learning_importer(
             name, content_stem = import_row(
                 row, index, md_converter, out_dir, con_code, path_to_expander_component
             )
+
             modules.append({"name": name, "link": content_url_prefix + content_stem})
 
     click.echo("Done!")
