@@ -28,5 +28,5 @@ We also publish [Safety Public Assessment Reports][spar]
 
 [Further information about SPC-PILs and PARs][about]
 
-[spar]: www.legislation.gov.uk/uksi/2018/952/regulation/4/made
+[spar]: https://www.legislation.gov.uk/uksi/2018/952/regulation/4/made
 [about]: /about
