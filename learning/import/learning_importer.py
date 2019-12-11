@@ -176,6 +176,10 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         return "\n\n" + table_tag.prettify() + "\n\n"
 
+    def convert_sub(self, sub_tag, text):
+        """Convert subscript text."""
+        return str(sub_tag)
+
     def convert_expander(self, el, text):
         """Return expander HTML."""
         el.name = "Expander"
