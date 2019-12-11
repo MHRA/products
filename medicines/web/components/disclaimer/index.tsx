@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React, { ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { black } from '../../styles/colors';
@@ -58,6 +59,9 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
     <div>
       <h3>Disclaimer:</h3>
       <p>
+        Please read and confirm the below information, which refers to accessing SPC or PIL documents.
+      </p>
+      <p>
         I understand that this information is a copy of the Summary of Product
         Characteristics and patient information leaflet for a medicine, which
         outline the conditions under which the medicine should be used and
@@ -75,7 +79,10 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         contact their doctor or pharmacist. Patients should not stop taking any
         prescribed medicines without first speaking to a healthcare
         professional. Suspected adverse reactions to a medicine can be reported
-        to us on a Yellow Card
+        to us on a&nbsp;
+          <Link href="https://yellowcard.mhra.gov.uk/">
+            <a>Yellow Card.</a>
+          </Link>
       </p>
       <p>
         I understand that the MHRA has used its best endeavours in publishing
