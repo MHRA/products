@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { black, mhraGray30, mhraYellow } from '../../styles/colors';
+import {
+  black,
+  mhra70,
+  mhraGray30,
+  mhraWhite,
+  mhraYellow,
+  primaryColor,
+} from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import SvgYellowCard from '../logos/yellow-card';
 
@@ -23,10 +30,16 @@ const StyledYellowCard = styled.section`
     font-weight: bold;
   }
 
-  p:last-of-type a {
-    /* TODO: Ask design to check this colour */
-    color: #1d70b8;
+  a.primary-button {
+    color: ${mhraWhite};
+    background-color: ${primaryColor};
+    padding: 12px 15px;
+    border-radius: 6px;
     text-decoration: none;
+  }
+
+  a.primary-button:hover {
+    background-color: ${mhra70};
   }
 
   @media ${mobileBreakpoint} {
@@ -44,7 +57,7 @@ const StyledYellowCard = styled.section`
 
 const title = 'Yellow Card';
 const content = 'Report a side effect with a medicine or medical device';
-const linkText = 'yellowcard.mhra.gov.uk';
+const linkText = 'Start now';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
@@ -55,7 +68,11 @@ const YellowCard: React.FC = () => (
     </header>
     <p>{content}</p>
     <p>
-      <a href="https://yellowcard.mhra.gov.uk/" title={title}>
+      <a
+        className="primary-button"
+        href="https://yellowcard.mhra.gov.uk/"
+        title={title}
+      >
         {linkText}
       </a>
     </p>
