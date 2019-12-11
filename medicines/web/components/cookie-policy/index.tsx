@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { mhra, mhra10 } from '../../styles/colors';
+import { mhra, mhra10, mhraGray10 } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledCookieBanner = styled.aside`
-  background-color: ${mhra10};
   padding: 0 10px 20px;
+  background-color: ${mhraGray10};
 
   div {
     margin: auto;
@@ -14,7 +14,6 @@ const StyledCookieBanner = styled.aside`
   }
 
   p {
-    color: ${mhra};
     font-size: 1.1875rem;
     line-height: 28px;
   }
