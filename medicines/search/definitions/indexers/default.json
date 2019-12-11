@@ -1,7 +1,7 @@
 {
-  "name": "azureblob-indexer",
-  "dataSourceName": "docs",
-  "targetIndexName": "azureblob-index",
+  "name": "INDEXER_NAME_PLACEHOLDER",
+  "dataSourceName": "DATASOURCE_NAME_PLACEHOLDER",
+  "targetIndexName": "INDEX_NAME_PLACEHOLDER",
   "parameters": {
     "configuration": { "indexStorageMetadataOnlyForOversizedDocuments": true }
   },

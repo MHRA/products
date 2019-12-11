@@ -7,9 +7,19 @@ settings:
   - ArgRequiredElseHelp
 
 subcommands:
-  - define_datasource:
+  - create_datasource:
       about: Create a datasource from a definition.
-  - define_index:
+  - delete_datasource:
+      about: Delete a datasource.
+  - create_index:
       about: Create an index from a definition.
-  - define_indexer:
+  - delete_index:
+      about: Delete an index.
+  - create_indexer:
       about: Create an indexer from a definition.
+  - delete_indexer:
+      about: Delete an indexer.
+  - reset_indexer:
+      about: Reset an indexer.
+  - run_indexer:
+      about: Run an indexer.
