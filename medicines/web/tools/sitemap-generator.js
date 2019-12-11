@@ -4,6 +4,7 @@ const moment = require('moment');
 
 const pagesDir = path.resolve('./pages');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
+const robotsFile = path.resolve('./dist/robots.txt');
 
 const BASE_URL = 'https://products.gov.uk';
 const YYY_MM_DD = 'YYYY-MM-DD';
@@ -53,9 +54,20 @@ const createSiteMapString = async () => {
   return sitemapXml;
 };
 
+const robotString = `
+User-agent: *
+
+Sitemap: ${BASE_URL}/sitemap.xml
+`;
+
 const start = async () => {
   const sitemapXml = await createSiteMapString();
-  fs.writeFile(sitemapFile, sitemapXml);
+  await fs.writeFile(sitemapFile, sitemapXml);
+  await fs.writeFile(robotsFile, robotString);
 };
 
-start();
+if (!module.parent) {
+  start().then(() => console.log('Created sitemap.xml 🗺  & robots.txt 🤖'));
+}
+
+module.exports = start;

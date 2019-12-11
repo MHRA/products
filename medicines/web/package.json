@@ -61,7 +61,8 @@
     "dev": "next",
     "lint": "yarn tslint",
     "start": "next start",
-    "export": "next export -o dist"
+    "export": "next export -o dist && yarn sitemap",
+    "sitemap": "node ./tools/sitemap-generator.js"
   },
   "version": "1.0.0"
 }
