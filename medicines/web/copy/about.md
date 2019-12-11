@@ -10,9 +10,7 @@ medicinal product’s properties and the conditions attached to its use.
 A PIL will be based on an SPC.
 
 We publish the most up-to-date information for a medicine according to
-its licence history.
-
-PILs can be updated several times during the product’s lifecycle,so
+its licence history. PILs can be updated several times during the product’s lifecycle, so
 the leaflet a patient gets with their medicine could be different to
 the one found here.
 
