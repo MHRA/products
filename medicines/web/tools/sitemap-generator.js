@@ -1,10 +1,13 @@
 const fs = require('fs').promises;
 const path = require('path');
+const moment = require('moment');
 
 const pagesDir = path.resolve('./pages');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
 
 const BASE_URL = 'https://products.gov.uk';
+const YYY_MM_DD = 'YYYY-MM-DD';
+const CHANGE_FREQUENCY = 'daily';
 
 const createPathsObj = async () => {
   const allFiles = await fs.readdir(pagesDir);
@@ -25,34 +28,27 @@ const createPathsObj = async () => {
   );
 };
 
-const formatDate = date => {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-};
-
 const createSiteMapString = async () => {
   const pathsObj = await createPathsObj();
 
-  console.log({ pathsObj });
+  const urls = `${Object.keys(pathsObj)
+    .map(
+      path =>
+        `<url>
+          <loc>${BASE_URL}${path}</loc>
+          <lastmod>${moment(pathsObj[path].lastModified).format(
+            YYY_MM_DD,
+          )}</lastmod>
+          <changefreq>${CHANGE_FREQUENCY}</changefreq>
+        </url>
+        `,
+    )
+    .join('')}`;
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
-    ${Object.keys(pathsObj)
-      .map(
-        path => `<url>
-      <loc>${BASE_URL}${path}</loc>
-      <lastmod>${formatDate(new Date(pathsObj[path].lastModified))}</lastmod>
-    </url>`,
-      )
-      .join('\n    ')}
-  </urlset>`;
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
+      ${urls}
+    </urlset>`;
 
   return sitemapXml;
 };
