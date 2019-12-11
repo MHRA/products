@@ -6,6 +6,7 @@ import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledCookieBanner = styled.aside`
   padding: 0 10px 20px;
+  color: ${mhra};
   background-color: ${mhraGray10};
 
   div {
