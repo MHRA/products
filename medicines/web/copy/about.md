@@ -7,7 +7,7 @@ and provide information on how a medicine should be used safely.
 
 Summaries of Product Characteristics (SPCs) are a description of a
 medicinal product’s properties and the conditions attached to its use.
-A PIL will be based on a SPC.
+A PIL will be based on an SPC.
 
 We publish the most up-to-date information for a medicine according to
 its licence history. PILs can be updated several times during the product’s lifecycle, so
