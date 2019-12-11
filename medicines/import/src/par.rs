@@ -1,14 +1,21 @@
 use crate::{csv, metadata, model, pdf, storage};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
-use std::{collections::HashMap, fs, path::Path, str};
+use indicatif::{HumanDuration, ProgressBar};
+use std::{collections::HashMap, fs, path::Path, str, time::Instant};
 use tokio_core::reactor::Core;
 use crate::{hash::hash, report::Report};
 
-pub fn import(dir: &Path, client: Client, mut core: Core, verbosity: i8) -> Result<(), AzureError> {
+pub fn import(dir: &Path, client: Client, mut core: Core, verbosity: i8, dryrun: bool) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(dir) {
+        if dryrun {
+            println!("This is a dry run, nothing will be uploaded!");
+        }
+        let started = Instant::now();
         let mut report = Report::new(verbosity);
-        for path in pdf::get_pdfs(dir)? {
+        let pdfs = pdf::get_pdfs(dir).expect("Could not load any PDFs.");
+        let bar = ProgressBar::new(pdfs.len() as u64);
+        for path in pdfs {
             let key = path
                 .file_stem()
                 .expect("file has no stem")
@@ -47,12 +54,19 @@ pub fn import(dir: &Path, client: Client, mut core: Core, verbosity: i8) -> Resu
                     continue;
                 }
 
-                storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                if false == dryrun {
+                    storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                }
                 report.add_uploaded(&file_name, &hash);
             } else {
                 report.add_skipped_incomplete(path.to_str().unwrap());
             }
+            if verbosity == 0 {
+                bar.inc(1);
+            }
         }
+        bar.finish();
+        println!("Importing PARs finished in {}", HumanDuration(started.elapsed()));
         report.print_report();
     }
     Ok(())

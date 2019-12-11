@@ -12,6 +12,10 @@ args:
       short: v
       multiple: true
       global: true
+  - dryrun:
+      help: runs the script without uploading anything to storage for real
+      short: r
+      global: true
 
 subcommands:
   - spcpil:

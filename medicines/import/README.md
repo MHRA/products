@@ -27,6 +27,7 @@ $  cargo test
 There are two environment variables which need to be set to run the Import tool:
 
 - `STORAGE_ACCOUNT` - The Azure blob storage account to upload documents to;
+- `STORAGE_CONTAINER` - This is the name of the Azure blob storage container to upload to;
 - `STORAGE_MASTER_KEY` - This is a write access key.
 
 You can find both of these in the [Azure portal](https://portal.azure.com). Navigate to your Storage Account, then choose Access Keys on the left navigation panel.
@@ -51,6 +52,14 @@ Navigate to the correct directory and run the following command:
 $  cargo run par -d /path/to/pdfs/
 ```
 
-### Verbosity options
+### Other Command Line Options
+
+#### Verbosity (-v, -vv)
 
 Passing `-v` or `-vv` will show more information about the running process at the cost of a slight hit to performance.
+
+**Note:** The progress bar will not be shown if verbosity is enabled.
+
+#### Dry Runs (-r)
+
+Passing `-r` will do a dry run import, which will not upload anything to Azure blob storage.
