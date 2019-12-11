@@ -60,6 +60,6 @@ Passing `-v` or `-vv` will show more information about the running process at th
 
 **Note:** The progress bar will not be shown if verbosity is enabled.
 
-#### Dry Runs (-r)
+#### Dry Runs (-n)
 
-Passing `-r` will do a dry run import, which will not upload anything to Azure blob storage.
+Passing `-n` will do a dry run import, which will not upload anything to Azure blob storage.
