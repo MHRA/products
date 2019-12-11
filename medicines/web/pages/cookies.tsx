@@ -14,6 +14,25 @@ const StyledMain = styled.main`
   a {
     color: ${mhra70};
   }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  thead {
+    border-bottom: 1px solid;
+  }
+
+  th {
+    text-align: start;
+  }
+
+  table,
+  th,
+  td {
+    padding: 1rem;
+  }
 `;
 
 const App: React.FC = () => {
