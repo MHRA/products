@@ -37,7 +37,7 @@ This email will go to our News, Digital and Content Team.
 
 The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies
 (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’).
-If you’re not happy with how we respond to your complaint, [contact the Equality Advisory and Support Service (EASS)][1].
+If you’re not happy with how we respond to your complaint, [contact the Equality Advisory and Support Service (EASS)][4].
 
 ## Technical information about this website’s accessibility
 
@@ -86,3 +86,4 @@ It was last updated on <span style='color: red'>date when it was last updated</s
 [1]: mailto:webupdates@mhra.gov.uk
 [2]: https://www.legislation.gov.uk/uksi/2018/952/regulation/4/made
 [3]: https://www.w3.org/TR/WCAG21/
+[4]: https://www.equalityadvisoryservice.com/
