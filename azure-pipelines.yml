@@ -138,7 +138,7 @@ stages:
                     azureSubscription: $(SERVICE_CONNECTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT_PRODUCTS)
-                    containerName: $web
+                    containerName: $(Build.SourceBranchName)
                 - task: AzureCLI@2
                   displayName: Set bucket to be public
                   inputs:
@@ -178,7 +178,7 @@ stages:
                     azureSubscription: $(SERVICE_CONNECTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT_CPD)
-                    containerName: $(Build.SourceBranchName)
+                    containerName: $web
                 - task: AzureCLI@2
                   displayName: Set bucket to be public
                   inputs:
