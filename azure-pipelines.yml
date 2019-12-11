@@ -10,80 +10,80 @@ variables:
 stages:
   - stage: build
     jobs:
-      - job: services_master
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default beta
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install stable Rust
-          - script: |
-              cargo build -v --release
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v --release
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
-      - job: services_branch
-        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default nightly
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install nightly Rust
-          - script: |
-              cargo build -v
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
-      - job: web
-        dependsOn: []
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - script: |
-              export ASSET_PREFIX=$(Build.SourceBranchName) && yarn && yarn build && yarn export
-            displayName: Build web
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
-          - script: |
-              yarn a11y
-            displayName: Check accessibility
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
-          - task: CopyFiles@2
-            displayName: Copy Files
-            inputs:
-              SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
-              TargetFolder: $(build.artifactstagingdirectory)
-              CleanTargetFolder: true
-          - task: PublishBuildArtifacts@1
-            displayName: Publish Build Artifacts
-            inputs:
-              PathtoPublish: $(build.artifactstagingdirectory)
-              ArtifactName: build-medicines
+      # - job: services_master
+      #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      #   dependsOn: []
+      #   pool:
+      #     vmImage: ubuntu-latest
+      #   steps:
+      #     - script: |
+      #         set -xeo pipefail
+      #         export CARGO_HOME="$HOME/.cargo"
+      #         curl https://sh.rustup.rs -sSf | sh -s -- -y
+      #         source $HOME/.cargo/env
+      #         rustup toolchain list
+      #         rustup default beta
+      #         rustc -Vv
+      #         cargo -V
+      #         echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+      #       displayName: Install stable Rust
+      #     - script: |
+      #         cargo build -v --release
+      #       displayName: Build services
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines
+      #     - script: |
+      #         cargo test -v --release
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines
+      #       displayName: Run tests
+      # - job: services_branch
+      #   condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+      #   dependsOn: []
+      #   pool:
+      #     vmImage: ubuntu-latest
+      #   steps:
+      #     - script: |
+      #         set -xeo pipefail
+      #         export CARGO_HOME="$HOME/.cargo"
+      #         curl https://sh.rustup.rs -sSf | sh -s -- -y
+      #         source $HOME/.cargo/env
+      #         rustup toolchain list
+      #         rustup default nightly
+      #         rustc -Vv
+      #         cargo -V
+      #         echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+      #       displayName: Install nightly Rust
+      #     - script: |
+      #         cargo build -v
+      #       displayName: Build services
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines
+      #     - script: |
+      #         cargo test -v
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines
+      #       displayName: Run tests
+      # - job: web
+      #   dependsOn: []
+      #   pool:
+      #     vmImage: ubuntu-latest
+      #   steps:
+      #     - script: |
+      #         export ASSET_PREFIX=$(Build.SourceBranchName) && yarn && yarn build && yarn export
+      #       displayName: Build web
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines/web
+      #     - script: |
+      #         yarn a11y
+      #       displayName: Check accessibility
+      #       workingDirectory: $(Build.SourcesDirectory)/medicines/web
+      #     - task: CopyFiles@2
+      #       displayName: Copy Files
+      #       inputs:
+      #         SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
+      #         TargetFolder: $(build.artifactstagingdirectory)
+      #         CleanTargetFolder: true
+      #     - task: PublishBuildArtifacts@1
+      #       displayName: Publish Build Artifacts
+      #       inputs:
+      #         PathtoPublish: $(build.artifactstagingdirectory)
+      #         ArtifactName: build-medicines
       - job: learning_web
         dependsOn: []
         pool:
@@ -138,7 +138,7 @@ stages:
                     azureSubscription: $(SERVICE_CONNECTION)
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT_PRODUCTS)
-                    containerName: $(Build.SourceBranchName)
+                    containerName: $web
                 - task: AzureCLI@2
                   displayName: Set bucket to be public
                   inputs:
