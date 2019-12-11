@@ -67,10 +67,10 @@ const sanitizeTitle = (title: string | null): string => {
 
 const Mip: React.FC = () => {
   const [pageNumber, setPageNumber] = React.useState(1);
+  const [hasIntro, setHasIntro] = React.useState(true);
   const [resultCount, setResultCount] = React.useState(0);
   const pageSize = 10;
   const [results, setResults] = React.useState<IDocument[]>([]);
-  const [facetResults, setFacetResults] = React.useState<IFacet[]>([]);
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [products, setSubstances] = React.useState<IProduct[]>([]);
@@ -83,14 +83,6 @@ const Mip: React.FC = () => {
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
-  };
-
-  const fetchFacetResults = async (searchTerm: string) => {
-    const searchResults = await facetSearch(searchTerm);
-    const filtered = searchResults[1].facets.filter(x =>
-      x.value.startsWith(searchTerm),
-    );
-    setFacetResults(filtered);
   };
 
   const fetchSearchResults = async (searchTerm: string, page: number) => {
@@ -140,18 +132,22 @@ const Mip: React.FC = () => {
   useEffect(() => {
     if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
-        const trimmedTerm = searchTerm.trim();
-        setSearch(trimmedTerm);
-        let parsedPage = Number(page);
-        if (!parsedPage || parsedPage < 1) {
-          parsedPage = 1;
-        }
-        setPageNumber(parsedPage);
-        fetchSearchResults(trimmedTerm, parsedPage);
+        (async () => {
+          setHasIntro(false);
+          const trimmedTerm = searchTerm.trim();
+          setSearch(trimmedTerm);
+          let parsedPage = Number(page);
+          if (!parsedPage || parsedPage < 1) {
+            parsedPage = 1;
+          }
+          setPageNumber(parsedPage);
+          await fetchSearchResults(trimmedTerm, parsedPage);
+        })();
       }
     } else if (substance) {
       if (typeof substance === 'string') {
         (async () => {
+          setHasIntro(false);
           const ss = await substanceLoader.load(substance.charAt(0));
           const products = ss.find(s => s.name === substance);
           if (products) {
@@ -165,6 +161,7 @@ const Mip: React.FC = () => {
         })();
       }
     } else {
+      setHasIntro(true);
       setResults([]);
       setSearch('');
       setShowingResultsForTerm('');
@@ -188,7 +185,7 @@ const Mip: React.FC = () => {
       <Main>
         {showingResultsForTerm.length === 0 ? (
           <>
-            <MipText />
+            {hasIntro && <MipText />}
             <DrugIndex
               title="List of active substances"
               items={index}
