@@ -8,7 +8,10 @@ Requires [pipenv](https://pipenv.readthedocs.io/), which can be installed via `b
 
 ```
 pipenv install
-pipenv run python learning_importer.py /path/to/export.xml CON123
+pipenv run python learning_importer.py ./in_data/benzodiazepines.xml ../web/content/modules/benzodiazepines CON234573 /benzodiazepines/ ../../assets/ ../../../src/components/Expander
+pipenv run python learning_importer.py ./in_data/antipsychotics.xml ../web/content/modules/antipsychotics CON155606 /antipsychotics/ ../../assets/ ../../../src/components/Expander
+pipenv run python learning_importer.py ./in_data/opioids.xml ../web/content/modules/opioids CON143740 /opioids/ ../../assets/ ../../../src/components/Expander
+pipenv run python learning_importer.py ./in_data/ssri.xml ../web/content/modules/ssri CON146583 /ssri/ ../../assets/ ../../../src/components/Expander
 ```
 
 The CON number is an ID which identifies this learning module in Stellent.
@@ -21,6 +24,7 @@ Get some help:
 $ pipenv run python learning_importer.py --help
 Usage: learning_importer.py [OPTIONS] XML_FILE OUT_DIR CON_CODE
                             CONTENT_URL_PREFIX ASSET_URL_PREFIX
+                            [PATH_TO_EXPANDER_COMPONENT]
 
   Convert XML_FILE to a series of MDX files in OUT_DIR.
 
@@ -29,6 +33,8 @@ Usage: learning_importer.py [OPTIONS] XML_FILE OUT_DIR CON_CODE
   Links to content and assets will be prefixed with CONTENT_URL_PREFIX and
   ASSET_URL_PREFIX respectively.
 
+  Expander component will be loaded from PATH_TO_EXPANDER_COMPONENT.
+
 Options:
   --help  Show this message and exit.
 ```
@@ -36,35 +42,31 @@ Options:
 Run an import:
 
 ```
-$ pipenv run python learning_importer.py /path/to/export.xml CON234573
-Extracting pages from XML  [####################################]  100%          
+$ pipenv run python learning_importer.py in_data/ssri.xml ../web/content/modules/ssri CON146583 /ssri/ ../../assets/ ../../../src/components/Expander
+Extracting pages from XML  [####################################]  100%
 Done!
-17 assets to manually download from Stellent to CON234573/stellent.
- * con247106
- * con247109
- * con146653
- * con247110
- * con247105
- * con247107
- * con247112
+18 assets to manually download from Stellent to ../../assets/.
  * con134939
- * con2024428
- * con247111
- * con236837
+ * con134799
+ * con134800
+ * con131992
+ * con132004
+ * con126283
+ * con134942
+ * con131999
+ * con131996
+ * con134806
+ * con134797
+ * con134798
+ * con134940
+ * con132003
+ * con132000
+ * con131886
  * con131833
- * con247104
- * con236838
- * CON123123
- * con247108
- * con236839
-1 assets with unknown types.
-Extensions for these assets have been set to `.unknown`.
- * CON123123
+ * con132009
 ```
 
-Here, 17 assets needs to be manually downloaded from Stellent.
-
-Also, the asset `CON123123` is of an unknown format and needs to be investigated, then links to the asset need to be manually fixed.
+Here, 18 assets needs to be manually downloaded from Stellent.
 
 # Linting, Testing and Whatnot
 
