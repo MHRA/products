@@ -7,7 +7,7 @@ const pagesDir = path.resolve('./dist');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
 const robotsFile = path.resolve('./dist/robots.txt');
 
-const BASE_URL = 'https://products.gov.uk';
+const BASE_URL = 'https://products.mhra.gov.uk';
 const YYY_MM_DD = 'YYYY-MM-DD';
 const CHANGE_FREQUENCY = 'daily';
 
