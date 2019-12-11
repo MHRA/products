@@ -92,6 +92,12 @@ stages:
           - script: |
               yarn && yarn build
             displayName: Build learning web
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+            workingDirectory: $(Build.SourcesDirectory)/learning/web
+          - script: |
+              export PATH_PREFIX=$(Build.SourceBranchName) && yarn && yarn build
+            displayName: Build learning web
+            condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
           # - script: |
           #     yarn a11y

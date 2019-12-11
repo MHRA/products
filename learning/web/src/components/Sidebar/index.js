@@ -159,7 +159,7 @@ class Sidebar extends Component {
 
           const loop = modules => {
             const currentModule = modules.filter(entry => {
-              return entry.module === location.pathname.split("/")[1]
+              return location.pathname.split("/").includes(entry.module)
             })
             return renderEntries(currentModule)
           }
