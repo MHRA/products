@@ -237,7 +237,7 @@ const SearchResults = (props: {
                   </dt>
                   <dd className="right">
                     {drug.product != null ? (
-                      <a href={drug.url} download="x">
+                      <a href={drug.url}>
                         <p className="title">{drug.product}</p>
                         <p className="subtitle">{drug.name}</p>
                       </a>
@@ -247,7 +247,6 @@ const SearchResults = (props: {
                       </a>
                     )}
                     <p className="metadata">File size: {drug.fileSize} KB</p>
-                    <p className="metadata">Created: {drug.created}</p>
                     {drug.activeSubstances != null &&
                       drug.activeSubstances.length > 0 && (
                         <p className="metadata">
