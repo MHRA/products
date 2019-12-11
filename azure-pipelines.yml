@@ -84,7 +84,7 @@ stages:
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build-medicines
-      - job: learning web
+      - job: learning_web
         dependsOn: []
         pool:
           vmImage: ubuntu-latest
