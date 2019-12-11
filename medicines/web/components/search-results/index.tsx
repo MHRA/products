@@ -249,7 +249,6 @@ const SearchResults = (props: {
                       </a>
                     )}
                     <p className="metadata">File size: {drug.fileSize} KB</p>
-                    <p className="metadata">Created: {drug.created}</p>
                     {drug.activeSubstances != null &&
                       drug.activeSubstances.length > 0 && (
                         <p className="metadata">
