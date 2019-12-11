@@ -57,11 +57,11 @@
   "private": false,
   "scripts": {
     "a11y": "yarn run pa11y file://$PWD/dist/index.html",
-    "build": "next build",
+    "build": "next build && yarn sitemap",
     "dev": "next",
     "lint": "yarn tslint",
     "start": "next start",
-    "export": "next export -o dist && yarn sitemap",
+    "export": "next export -o dist",
     "sitemap": "node ./tools/sitemap-generator.js"
   },
   "version": "1.0.0"

@@ -1,8 +1,9 @@
 const fs = require('fs').promises;
+const { readdirSync } = require('fs');
 const path = require('path');
 const moment = require('moment');
 
-const pagesDir = path.resolve('./pages');
+const pagesDir = path.resolve('./dist');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
 const robotsFile = path.resolve('./dist/robots.txt');
 
@@ -11,11 +12,13 @@ const YYY_MM_DD = 'YYYY-MM-DD';
 const CHANGE_FREQUENCY = 'daily';
 
 const createPathsObj = async () => {
-  const allFiles = await fs.readdir(pagesDir);
-  const pages = allFiles
-    .filter(file => !file.startsWith('_'))
-    .map(file => file.slice(0, -4))
-    .map(file => (file === 'index' ? '/' : `/${file}`));
+  const pages = readdirSync(pagesDir, {
+    withFileTypes: true,
+  })
+    .filter(dirent => dirent.isDirectory())
+    .map(dir => dir.name)
+    .filter(dirs => !dirs.startsWith('_'))
+    .map(dir => (dir === 'index' ? '/' : `/${dir}`));
 
   return pages.reduce(
     (acc, pageRoute) =>
