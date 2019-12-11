@@ -84,5 +84,5 @@ This statement was prepared on <span style='color: red'>date when it was first p
 It was last updated on <span style='color: red'>date when it was last updated</span>.
 
 [1]: mailto:webupdates@mhra.gov.uk
-[2]: www.legislation.gov.uk/uksi/2018/952/regulation/4/made
+[2]: https://www.legislation.gov.uk/uksi/2018/952/regulation/4/made
 [3]: https://www.w3.org/TR/WCAG21/
