@@ -1,6 +1,8 @@
+use crate::{
+    azure_rest,
+    env::{get_from_env, API_ADMIN_KEY, DATASOURCE_NAME, INDEXER_NAME, INDEX_NAME, SEARCH_SERVICE},
+};
 use actix_web::client;
-use crate::{azure_rest, env::get_from_env};
-use crate::env::{API_ADMIN_KEY, DATASOURCE_NAME, INDEX_NAME, INDEXER_NAME, SEARCH_SERVICE};
 
 pub fn create_indexer() -> Result<(), client::SendRequestError> {
     let api_key = get_from_env(API_ADMIN_KEY);
@@ -12,7 +14,7 @@ pub fn create_indexer() -> Result<(), client::SendRequestError> {
         get_raw_indexer_definition(),
         &datasource_name,
         &index_name,
-        &indexer_name
+        &indexer_name,
     );
     let url = get_base_url(&search_service);
 
@@ -54,7 +56,7 @@ fn get_indexer_definition(
     raw_indexer_definition: String,
     datasource_name: &str,
     index_name: &str,
-    indexer_name: &str
+    indexer_name: &str,
 ) -> String {
     raw_indexer_definition
         .replace("DATASOURCE_NAME_PLACEHOLDER", datasource_name)
@@ -85,41 +87,45 @@ fn get_reset_url(search_service: &str, indexer_name: &str) -> String {
         .replace("INDEXER_NAME_PLACEHOLDER", &indexer_name)
 }
 
-#[test]
-fn test_get_base_url() {
-    assert_eq!(
-        get_base_url("service_name"),
-        "https://service_name.search.windows.net/indexers?api-version=2019-05-06".to_string()
-    );
-}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_get_base_url() {
+        assert_eq!(
+            get_base_url("service_name"),
+            "https://service_name.search.windows.net/indexers?api-version=2019-05-06".to_string()
+        );
+    }
 
-#[test]
-fn test_get_resource_url() {
-    assert_eq!(
-        get_resource_url("service_name", "indexer_name"),
-        "https://service_name.search.windows.net/indexers/indexer_name?api-version=2019-05-06".to_string()
-    );
-}
+    #[test]
+    fn test_get_resource_url() {
+        assert_eq!(
+            get_resource_url("service_name", "indexer_name"),
+            "https://service_name.search.windows.net/indexers/indexer_name?api-version=2019-05-06"
+                .to_string()
+        );
+    }
 
-#[test]
-fn test_get_run_url() {
-    assert_eq!(
+    #[test]
+    fn test_get_run_url() {
+        assert_eq!(
         get_run_url("service_name", "indexer_name"),
         "https://service_name.search.windows.net/indexers/indexer_name/run?api-version=2019-05-06".to_string()
     );
-}
+    }
 
-#[test]
-fn test_get_reset_url() {
-    assert_eq!(
+    #[test]
+    fn test_get_reset_url() {
+        assert_eq!(
         get_reset_url("service_name", "indexer_name"),
         "https://service_name.search.windows.net/indexers/indexer_name/reset?api-version=2019-05-06".to_string()
     );
-}
+    }
 
-#[test]
-fn test_get_index_definition() {
-    let indexer_raw_definition = r###"{
+    #[test]
+    fn test_get_index_definition() {
+        let indexer_raw_definition = r###"{
       "name": "INDEXER_NAME_PLACEHOLDER",
       "dataSourceName": "DATASOURCE_NAME_PLACEHOLDER",
       "targetIndexName": "INDEX_NAME_PLACEHOLDER",
@@ -142,14 +148,14 @@ fn test_get_index_definition() {
       ]
     }"###;
 
-    let indexer_replaced = get_indexer_definition(
-        indexer_raw_definition.to_string(),
-        "datasource_name",
-        "index_name",
-        "indexer_name"
-    );
+        let indexer_replaced = get_indexer_definition(
+            indexer_raw_definition.to_string(),
+            "datasource_name",
+            "index_name",
+            "indexer_name",
+        );
 
-    let indexer_expected = r###"{
+        let indexer_expected = r###"{
       "name": "indexer_name",
       "dataSourceName": "datasource_name",
       "targetIndexName": "index_name",
@@ -170,7 +176,9 @@ fn test_get_index_definition() {
           "mappingFunction": { "name": "jsonArrayToStringCollection" }
         }
       ]
-    }"###.to_string();
+    }"###
+            .to_string();
 
-    assert_eq!(indexer_replaced, indexer_expected);
+        assert_eq!(indexer_replaced, indexer_expected);
+    }
 }

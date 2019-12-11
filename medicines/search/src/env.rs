@@ -1,7 +1,7 @@
 extern crate rand;
 
-use std::env;
 use self::rand::Rng;
+use std::env;
 
 pub const API_ADMIN_KEY: &str = "API_ADMIN_KEY";
 pub const DATASOURCE_NAME: &str = "DATASOURCE_NAME";
@@ -17,20 +17,24 @@ pub fn get_from_env(environment_variable: &str) -> String {
         .expect(format!("Set env variable {} first!", environment_variable).as_ref())
 }
 
-#[test]
-fn test_get_env_var() {
-    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const RANDOM_LEN: u8 = 20;
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_get_env_var() {
+        const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const RANDOM_LEN: u8 = 20;
 
-    let mut rng = rand::thread_rng();
+        let mut rng = rand::thread_rng();
 
-    let random_env_var: String = (0..RANDOM_LEN)
-        .map(|_| {
-            let i = rng.gen_range(0, CHARSET.len());
-            CHARSET[i] as char
-        })
-        .collect();
+        let random_env_var: String = (0..RANDOM_LEN)
+            .map(|_| {
+                let i = rng.gen_range(0, CHARSET.len());
+                CHARSET[i] as char
+            })
+            .collect();
 
-    env::set_var(&random_env_var, "found");
-    assert_eq!(get_from_env(&random_env_var), "found");
+        env::set_var(&random_env_var, "found");
+        assert_eq!(get_from_env(&random_env_var), "found");
+    }
 }

@@ -1,6 +1,11 @@
+use crate::{
+    azure_rest,
+    env::{
+        get_from_env, API_ADMIN_KEY, DATASOURCE_NAME, SEARCH_SERVICE, STORAGE_ACCOUNT,
+        STORAGE_CONTAINER, STORAGE_MASTER_KEY,
+    },
+};
 use actix_web::client;
-use crate::{azure_rest, env::get_from_env};
-use crate::env::{SEARCH_SERVICE, API_ADMIN_KEY, DATASOURCE_NAME, STORAGE_ACCOUNT, STORAGE_CONTAINER, STORAGE_MASTER_KEY};
 
 pub fn create_datasource() -> Result<(), client::SendRequestError> {
     let search_service = get_from_env(SEARCH_SERVICE);
@@ -16,7 +21,7 @@ pub fn create_datasource() -> Result<(), client::SendRequestError> {
         &datasource_name,
         &storage_account,
         &storage_container,
-        &storage_master_key
+        &storage_master_key,
     );
 
     azure_rest::make_post_request_with_body(datasource_definition, &url, &api_key)
@@ -51,7 +56,7 @@ fn get_datasource_definition(
     datasource_name: &str,
     storage_account: &str,
     storage_container: &str,
-    storage_master_key: &str
+    storage_master_key: &str,
 ) -> String {
     datasource_definition
         .replace("DATASOURCE_NAME_PLACEHOLDER", &datasource_name)
@@ -60,25 +65,29 @@ fn get_datasource_definition(
         .replace("ACCOUNT_KEY_PLACEHOLDER", &storage_master_key)
 }
 
-#[test]
-fn test_get_base_url() {
-    assert_eq!(
-        get_base_url("service_name"),
-        "https://service_name.search.windows.net/datasources?api-version=2019-05-06".to_string()
-    );
-}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_get_base_url() {
+        assert_eq!(
+            get_base_url("service_name"),
+            "https://service_name.search.windows.net/datasources?api-version=2019-05-06"
+                .to_string()
+        );
+    }
 
-#[test]
-fn test_get_resource_url() {
-    assert_eq!(
+    #[test]
+    fn test_get_resource_url() {
+        assert_eq!(
         get_resource_url("service_name", "datasource_name"),
         "https://service_name.search.windows.net/datasources/datasource_name?api-version=2019-05-06".to_string()
     );
-}
+    }
 
-#[test]
-fn test_get_datasource_definition() {
-    let datasource_raw_json = r###"{
+    #[test]
+    fn test_get_datasource_definition() {
+        let datasource_raw_json = r###"{
       "name": "DATASOURCE_NAME_PLACEHOLDER",
       "type": "azureblob",
       "credentials": {
@@ -87,15 +96,15 @@ fn test_get_datasource_definition() {
       "container": { "name": "STORAGE_CONTAINER_PLACEHOLDER" }
     }"###;
 
-    let datasource_replaced = get_datasource_definition(
-        datasource_raw_json.to_string(),
-        "datasource_name",
-        "storage_account",
-        "storage_container",
-        "storage_master_key"
-    );
+        let datasource_replaced = get_datasource_definition(
+            datasource_raw_json.to_string(),
+            "datasource_name",
+            "storage_account",
+            "storage_container",
+            "storage_master_key",
+        );
 
-    let expected_replaced = r###"{
+        let expected_replaced = r###"{
       "name": "datasource_name",
       "type": "azureblob",
       "credentials": {
@@ -104,5 +113,6 @@ fn test_get_datasource_definition() {
       "container": { "name": "storage_container" }
     }"###.to_string();
 
-    assert_eq!(datasource_replaced, expected_replaced);
+        assert_eq!(datasource_replaced, expected_replaced);
+    }
 }

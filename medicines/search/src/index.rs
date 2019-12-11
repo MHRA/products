@@ -1,6 +1,8 @@
-use crate::{azure_rest, env::get_from_env};
+use crate::{
+    azure_rest,
+    env::{get_from_env, API_ADMIN_KEY, INDEX_NAME, SEARCH_SERVICE},
+};
 use actix_web::client;
-use crate::env::{SEARCH_SERVICE, INDEX_NAME, API_ADMIN_KEY};
 
 pub fn create_index() -> Result<(), client::SendRequestError> {
     let search_service = get_from_env(SEARCH_SERVICE);
@@ -37,29 +39,32 @@ fn get_raw_index_definition() -> String {
 }
 
 fn get_index_definition(raw_index_definition: String, index_name: &str) -> String {
-    raw_index_definition
-        .replace("INDEX_NAME_PLACEHOLDER", index_name)
+    raw_index_definition.replace("INDEX_NAME_PLACEHOLDER", index_name)
 }
 
-#[test]
-fn test_get_base_url() {
-    assert_eq!(
-        get_base_url("service_name"),
-        "https://service_name.search.windows.net/indexes?api-version=2019-05-06".to_string()
-    );
-}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_get_base_url() {
+        assert_eq!(
+            get_base_url("service_name"),
+            "https://service_name.search.windows.net/indexes?api-version=2019-05-06".to_string()
+        );
+    }
 
-#[test]
-fn test_get_resource_url() {
-    assert_eq!(
-        get_resource_url("service_name", "index_name"),
-        "https://service_name.search.windows.net/indexes/index_name?api-version=2019-05-06".to_string()
-    );
-}
+    #[test]
+    fn test_get_resource_url() {
+        assert_eq!(
+            get_resource_url("service_name", "index_name"),
+            "https://service_name.search.windows.net/indexes/index_name?api-version=2019-05-06"
+                .to_string()
+        );
+    }
 
-#[test]
-fn test_get_index_definition() {
-    let index_raw_definition = r###"{
+    #[test]
+    fn test_get_index_definition() {
+        let index_raw_definition = r###"{
       "name": "INDEX_NAME_PLACEHOLDER",
       "fields": [
         {
@@ -109,9 +114,9 @@ fn test_get_index_definition() {
       "@odata.etag": "\"0x8D77267697666D4\""
     }"###;
 
-    let index_replaced = get_index_definition(index_raw_definition.to_string(), "index_name");
+        let index_replaced = get_index_definition(index_raw_definition.to_string(), "index_name");
 
-    let index_expected_replaced = r###"{
+        let index_expected_replaced = r###"{
       "name": "index_name",
       "fields": [
         {
@@ -159,7 +164,9 @@ fn test_get_index_definition() {
       "tokenFilters": [],
       "tokenizers": [],
       "@odata.etag": "\"0x8D77267697666D4\""
-    }"###.to_string();
+    }"###
+            .to_string();
 
-    assert_eq!(index_replaced, index_expected_replaced);
+        assert_eq!(index_replaced, index_expected_replaced);
+    }
 }
