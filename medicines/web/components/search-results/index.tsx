@@ -222,7 +222,7 @@ const SearchResults = (props: {
           )}
           <p className="ema-message">
             If the product information you are seeking does not appear below, it
-            is possible that the product holds a central European license and
+            is possible that the product holds a central European licence and
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
