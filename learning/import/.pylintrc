@@ -1,0 +1,15 @@
+[MASTER]
+load-plugins = pylint.extensions.mccabe, pylint.extensions.bad_builtin
+good-names = el
+
+[GENERAL]
+extension-pkg-whitelist = lxml.etree
+
+[REPORTS]
+output-format = colorized
+
+[FORMAT]
+max-line-length=88
+
+[MESSAGES CONTROL]
+disable = bad-continuation  # https://github.com/PyCQA/pylint/issues/289

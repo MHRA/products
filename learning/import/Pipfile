@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "==19.3b0"
+isort = "*"
+pytest = "*"
+pylint = "*"
+
+[packages]
+click = "*"
+lxml = "*"
+markdownify = "*"
+pyyaml = "*"
+beautifulsoup4 = "*"
+markdown = "*"
+
+[requires]
+python_version = "3.7"

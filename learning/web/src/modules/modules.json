@@ -1,0 +1,502 @@
+[
+  {
+    "name": "Antipsychotics",
+    "module": "antipsychotics",
+    "link": "/antipsychotics/CON155606_1",
+    "items": [
+      {
+        "name": "Contents",
+        "link": "/antipsychotics/CON155606_1"
+      },
+      {
+        "name": "1. Introduction",
+        "link": "/antipsychotics/CON155606_2"
+      },
+      {
+        "name": "1.1 Class members",
+        "link": "/antipsychotics/CON155606_3"
+      },
+      {
+        "name": "2 Prescribing points",
+        "link": "/antipsychotics/CON155606_4"
+      },
+      {
+        "name": "2.1 Adherence to treatment",
+        "link": "/antipsychotics/CON155606_5"
+      },
+      {
+        "name": "2.2 Children and adolescents",
+        "link": "/antipsychotics/CON155606_6"
+      },
+      {
+        "name": "3. Principal risks and risk-reduction measures",
+        "link": "/antipsychotics/CON155606_7"
+      },
+      {
+        "name": "3.1 Gastrointestinal adverse effects",
+        "link": "/antipsychotics/CON155606_8"
+      },
+      {
+        "name": "3.2 Central nervous system adverse effects",
+        "link": "/antipsychotics/CON155606_9"
+      },
+      {
+        "name": "3.2.1 Sedation and sleep disturbances",
+        "link": "/antipsychotics/CON155606_10"
+      },
+      {
+        "name": "3.2.2 Extrapyramidal side effects: introduction",
+        "link": "/antipsychotics/CON155606_11"
+      },
+      {
+        "name": "3.2.2.1 Extrapyramidal side effects: acute dystonia",
+        "link": "/antipsychotics/CON155606_12"
+      },
+      {
+        "name": "3.2.2.2 Extrapyramidal side effects: akathisia",
+        "link": "/antipsychotics/CON155606_13"
+      },
+      {
+        "name": "3.2.2.3 Extrapyramidal side effects: parkinsonism",
+        "link": "/antipsychotics/CON155606_14"
+      },
+      {
+        "name": "3.2.2.4 Extrapyramidal side effects: tardive dyskinesia",
+        "link": "/antipsychotics/CON155606_15"
+      },
+      {
+        "name": "3.2.3 Neuroleptic malignant syndrome",
+        "link": "/antipsychotics/CON155606_16"
+      },
+      {
+        "name": "3.2.4 Convulsions",
+        "link": "/antipsychotics/CON155606_17"
+      },
+      {
+        "name": "3.3 Cardiovascular adverse effects",
+        "link": "/antipsychotics/CON155606_18"
+      },
+      {
+        "name": "3.3.1 Blood pressure changes",
+        "link": "/antipsychotics/CON155606_19"
+      },
+      {
+        "name": "3.3.2 Cerebrovascular events such as stroke",
+        "link": "/antipsychotics/CON155606_20"
+      },
+      {
+        "name": "3.3.3 Cardiac rhythm disorders\u2014QT interval prolongation",
+        "link": "/antipsychotics/CON155606_21"
+      },
+      {
+        "name": "3.3.4 Venous thromboembolism",
+        "link": "/antipsychotics/CON155606_22"
+      },
+      {
+        "name": "3.4 Metabolic adverse effects",
+        "link": "/antipsychotics/CON155606_23"
+      },
+      {
+        "name": "3.5 Hyperprolactinaemia and sexual adverse effects",
+        "link": "/antipsychotics/CON155606_24"
+      },
+      {
+        "name": "3.6 Blood disorders",
+        "link": "/antipsychotics/CON155606_25"
+      },
+      {
+        "name": "3.7 Temperature regulation",
+        "link": "/antipsychotics/CON155606_26"
+      },
+      {
+        "name": "3.8 Adverse effects on the skin",
+        "link": "/antipsychotics/CON155606_27"
+      },
+      {
+        "name": "3.9 Adverse effects on the eye",
+        "link": "/antipsychotics/CON155606_28"
+      },
+      {
+        "name": "3.10 Antimuscarinic adverse effects",
+        "link": "/antipsychotics/CON155606_29"
+      },
+      {
+        "name": "3.11 Dependence and withdrawal",
+        "link": "/antipsychotics/CON155606_30"
+      },
+      {
+        "name": "3.12 Important drug interactions",
+        "link": "/antipsychotics/CON155606_31"
+      },
+      {
+        "name": "4. Precautions and risks associated with special uses of antipsychotics",
+        "link": "/antipsychotics/CON155606_32"
+      },
+      {
+        "name": "4.1 Elderly patients with dementia",
+        "link": "/antipsychotics/CON155606_33"
+      },
+      {
+        "name": "4.2 Pregnancy and breastfeeding",
+        "link": "/antipsychotics/CON155606_34"
+      },
+      {
+        "name": "4.3 Prolonged-release antipsychotic injections",
+        "link": "/antipsychotics/CON155606_35"
+      },
+      {
+        "name": "4.4 Antipsychotic injections for immediate effect",
+        "link": "/antipsychotics/CON155606_36"
+      },
+      {
+        "name": "4.5 Clozapine",
+        "link": "/antipsychotics/CON155606_37"
+      },
+      {
+        "name": "5. Key points",
+        "link": "/antipsychotics/CON155606_38"
+      },
+      {
+        "name": "6. Further information",
+        "link": "/antipsychotics/CON155606_39"
+      },
+      {
+        "name": "7. Summary of licensed indications of antipsychotics for adults",
+        "link": "/antipsychotics/CON155606_40"
+      },
+      {
+        "name": "8. Classification of antipsychotics",
+        "link": "/antipsychotics/CON155606_41"
+      },
+      {
+        "name": "9. Structural formulae of selected antipsychotics",
+        "link": "/antipsychotics/CON155606_42"
+      },
+      {
+        "name": "10. Self-assessment questions",
+        "link": "/antipsychotics/CON155606_43"
+      },
+      {
+        "name": "10.1. Feedback on self-assessment questions",
+        "link": "/antipsychotics/CON155606_44"
+      },
+      {
+        "name": "11. Glossary",
+        "link": "/antipsychotics/CON155606_45"
+      },
+      {
+        "name": "12. Module evaluation",
+        "link": "/antipsychotics/CON155606_46"
+      }
+    ]
+  },
+  {
+    "name": "Benzodiazepines",
+    "module": "benzodiazepines",
+    "link": "/benzodiazepines/CON234573_1",
+    "items": [
+      {
+        "name": "Contents",
+        "link": "/benzodiazepines/CON234573_1"
+      },
+      {
+        "name": "Introduction",
+        "link": "/benzodiazepines/CON234573_2"
+      },
+      {
+        "name": "1.1 Class members",
+        "link": "/benzodiazepines/CON234573_3"
+      },
+      {
+        "name": "2. Prescribing points",
+        "link": "/benzodiazepines/CON234573_4"
+      },
+      {
+        "name": "3. Principal risks and risk-reduction measures",
+        "link": "/benzodiazepines/CON234573_5"
+      },
+      {
+        "name": "3.1 Sedation and other adverse CNS effects",
+        "link": "/benzodiazepines/CON234573_6"
+      },
+      {
+        "name": "3.2 Respiratory adverse effects",
+        "link": "/benzodiazepines/CON234573_7"
+      },
+      {
+        "name": "3.3 Cardiovascular adverse effects",
+        "link": "/benzodiazepines/CON234573_8"
+      },
+      {
+        "name": "3.4 Memory impairment",
+        "link": "/benzodiazepines/CON234573_9"
+      },
+      {
+        "name": "3.5 \u2018Paradoxical effects\u2019",
+        "link": "/benzodiazepines/CON234573_10"
+      },
+      {
+        "name": "3.6 Dependence and withdrawal",
+        "link": "/benzodiazepines/CON234573_11"
+      },
+      {
+        "name": "3.7 Overdose",
+        "link": "/benzodiazepines/CON234573_12"
+      },
+      {
+        "name": "3.8 Important drug interactions",
+        "link": "/benzodiazepines/CON234573_13"
+      },
+      {
+        "name": "4. Precautions and risks associated with special uses of benzodiazepines",
+        "link": "/benzodiazepines/CON234573_14"
+      },
+      {
+        "name": "4.1 Pregnancy and breastfeeding",
+        "link": "/benzodiazepines/CON234573_15"
+      },
+      {
+        "name": "4.2 Elderly",
+        "link": "/benzodiazepines/CON234573_16"
+      },
+      {
+        "name": "4.3 Benzodiazepines for the management of alcohol withdrawal",
+        "link": "/benzodiazepines/CON234573_17"
+      },
+      {
+        "name": "5. Key points",
+        "link": "/benzodiazepines/CON234573_18"
+      },
+      {
+        "name": "6. Further information",
+        "link": "/benzodiazepines/CON234573_19"
+      },
+      {
+        "name": "7. Appendix: Benzodiazepine prescribing trends",
+        "link": "/benzodiazepines/CON234573_20"
+      },
+      {
+        "name": "8. Self-assessment questions",
+        "link": "/benzodiazepines/CON234573_21"
+      },
+      {
+        "name": "8.1 Feedback on self-assessment questions",
+        "link": "/benzodiazepines/CON234573_22"
+      },
+      {
+        "name": "9. Glossary",
+        "link": "/benzodiazepines/CON234573_23"
+      },
+      {
+        "name": "10. Module evaluation",
+        "link": "/benzodiazepines/CON234573_24"
+      }
+    ]
+  },
+  {
+    "name": "Opioids",
+    "module": "opioids",
+    "link": "/opioids/CON143740_1",
+    "items": [
+      {
+        "name": "Contents",
+        "link": "/opioids/CON143740_1"
+      },
+      {
+        "name": "1. Introduction",
+        "link": "/opioids/CON143740_2"
+      },
+      {
+        "name": "2. Class members",
+        "link": "/opioids/CON143740_3"
+      },
+      {
+        "name": "3. Prescribing points",
+        "link": "/opioids/CON143740_4"
+      },
+      {
+        "name": "4. Principal risks and risk-reduction measures",
+        "link": "/opioids/CON143740_5"
+      },
+      {
+        "name": "4.1. Gastrointestinal adverse effects",
+        "link": "/opioids/CON143740_6"
+      },
+      {
+        "name": "4.2. Central nervous system and psychiatric effects",
+        "link": "/opioids/CON143740_7"
+      },
+      {
+        "name": "4.3. Cardiovascular adverse effects",
+        "link": "/opioids/CON143740_8"
+      },
+      {
+        "name": "4.4. Respiratory adverse effects",
+        "link": "/opioids/CON143740_9"
+      },
+      {
+        "name": "4.5. Effects on the skin",
+        "link": "/opioids/CON143740_10"
+      },
+      {
+        "name": "4.6. Other adverse effects",
+        "link": "/opioids/CON143740_11"
+      },
+      {
+        "name": "4.7. Dependence and withdrawal",
+        "link": "/opioids/CON143740_12"
+      },
+      {
+        "name": "4.8. Important drug interactions",
+        "link": "/opioids/CON143740_13"
+      },
+      {
+        "name": "4.9. Pregnancy and breastfeeding",
+        "link": "/opioids/CON143740_14"
+      },
+      {
+        "name": "4.10. Overdose",
+        "link": "/opioids/CON143740_15"
+      },
+      {
+        "name": "5. Further information and MHRA alerts on opioids",
+        "link": "/opioids/CON143740_16"
+      },
+      {
+        "name": "6. Self-assessment questions",
+        "link": "/opioids/CON143740_17"
+      },
+      {
+        "name": "8. Module evaluation",
+        "link": "/opioids/CON143740_18"
+      },
+      {
+        "name": "7. Glossary of terms",
+        "link": "/opioids/CON143740_19"
+      }
+    ]
+  },
+  {
+    "name": "Ssri",
+    "module": "ssri",
+    "link": "/ssri/CON146583_1",
+    "items": [
+      {
+        "name": "Contents",
+        "link": "/ssri/CON146583_1"
+      },
+      {
+        "name": "1. Introduction",
+        "link": "/ssri/CON146583_2"
+      },
+      {
+        "name": "2. Class members and licensed uses",
+        "link": "/ssri/CON146583_3"
+      },
+      {
+        "name": "3. Prescribing points",
+        "link": "/ssri/CON146583_4"
+      },
+      {
+        "name": "4. Principal risks",
+        "link": "/ssri/CON146583_5"
+      },
+      {
+        "name": "4.1. Gastrointestinal adverse effects",
+        "link": "/ssri/CON146583_6"
+      },
+      {
+        "name": "4.2. Central nervous system adverse effects",
+        "link": "/ssri/CON146583_7"
+      },
+      {
+        "name": "4.3. Psychiatric adverse effects",
+        "link": "/ssri/CON146583_8"
+      },
+      {
+        "name": "4.4. Sexual dysfunction",
+        "link": "/ssri/CON146583_9"
+      },
+      {
+        "name": "4.5. Other common adverse effects",
+        "link": "/ssri/CON146583_10"
+      },
+      {
+        "name": "4.6. Withdrawal (discontinuation) effects",
+        "link": "/ssri/CON146583_11"
+      },
+      {
+        "name": "4.7. Serotonin syndrome",
+        "link": "/ssri/CON146583_12"
+      },
+      {
+        "name": "4.8. Hypomania/mania or psychosis",
+        "link": "/ssri/CON146583_13"
+      },
+      {
+        "name": "4.9. Suicide risk and severe agitation",
+        "link": "/ssri/CON146583_14"
+      },
+      {
+        "name": "4.10. Hyponatraemia",
+        "link": "/ssri/CON146583_15"
+      },
+      {
+        "name": "4.11 Haemorrhage, particularly gastrointestinal",
+        "link": "/ssri/CON146583_16"
+      },
+      {
+        "name": "4.12 Convulsions",
+        "link": "/ssri/CON146583_17"
+      },
+      {
+        "name": "4.13 Bone fractures",
+        "link": "/ssri/CON146583_18"
+      },
+      {
+        "name": "4.14 Antimuscarinic (anticholinergic) effects",
+        "link": "/ssri/CON146583_19"
+      },
+      {
+        "name": "4.15 Cardiac rhythm disorders\u2014QT interval prolongation",
+        "link": "/ssri/CON146583_20"
+      },
+      {
+        "name": "4.16 Important drug interactions",
+        "link": "/ssri/CON146583_21"
+      },
+      {
+        "name": "4.17 Pregnancy and breast-feeding",
+        "link": "/ssri/CON146583_22"
+      },
+      {
+        "name": "4.18 Overdose",
+        "link": "/ssri/CON146583_23"
+      },
+      {
+        "name": "5. Key points",
+        "link": "/ssri/CON146583_24"
+      },
+      {
+        "name": "6 Self-assessment",
+        "link": "/ssri/CON146583_25"
+      },
+      {
+        "name": "7 Case study",
+        "link": "/ssri/CON146583_26"
+      },
+      {
+        "name": "8. Further information&#160;&#160;&#160;&#160;",
+        "link": "/ssri/CON146583_27"
+      },
+      {
+        "name": "9. Glossary of terms",
+        "link": "/ssri/CON146583_28"
+      },
+      {
+        "name": "10. Module evaluation",
+        "link": "/ssri/CON146583_29"
+      }
+    ]
+  }
+]
