@@ -1,7 +1,8 @@
 import React, { Component } from "react"
-import { graphql, StaticQuery, Link } from "gatsby"
+import { graphql, StaticQuery } from "gatsby"
 import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
+import Link from "../../components/Link"
 
 import { GoThreeBars, GoX } from "react-icons/go"
 import { sizes, media } from "../../utils/theme"
@@ -34,13 +35,13 @@ const SidebarStyled = styled.ul`
       a {
         font-weight: normal;
         font-size: 1rem;
-        color: ${black};
       }
     }
   }
 
   li {
     position: relative;
+    line-height: 1.25rem;
     &.current {
       &:before {
         content: " ";
@@ -53,13 +54,13 @@ const SidebarStyled = styled.ul`
     }
   }
 
-  a {
+  /* a {
     text-decoration: none;
 
     &:hover {
       text-decoration: underline;
     }
-  }
+  } */
 `
 
 const Burger = styled.a`

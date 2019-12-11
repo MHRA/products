@@ -1,14 +1,14 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
-import { mhraBlue, mhrawhite } from "../../utils/colors"
+import { mhraBlue, white } from "../../utils/colors"
 
 const ExpanderStyled = styled.div`
   margin-bottom: ${rhythm(0.5)};
 `
 
 const Button = styled.button`
-  color: ${mhrawhite};
+  color: ${white};
   font-weight: normal;
   font-size: 0.875rem;
   background-color: ${mhraBlue};
