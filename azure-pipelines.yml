@@ -65,7 +65,19 @@ stages:
           vmImage: ubuntu-latest
         steps:
           - script: |
-              export ASSET_PREFIX=$(Build.SourceBranchName) && yarn && yarn build && yarn export
+              export ASSET_PREFIX=$(Build.SourceBranchName)
+              export AZURE_SEARCH_API_VERSION=2017-11-11
+              export AZURE_SEARCH_EXACTNESS_BOOST=4
+              export AZURE_SEARCH_INDEX=products-index
+              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+              export AZURE_SEARCH_SERVICE=mhraproductsdev
+              export AZURE_SEARCH_WORD_FUZZINESS=1
+              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+              export GOOGLE_TRACKING_ID=UA-6838115-11
+              yarn
+              yarn build
+              yarn export
             displayName: Build web
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
           - script: |
