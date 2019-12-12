@@ -1,5 +1,3 @@
-import getConfig from 'next/config';
-import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { black, mhraGray20 } from '../../styles/colors';
@@ -8,6 +6,7 @@ import {
   desktopMaxWidth,
   mobileBreakpoint,
 } from '../../styles/dimensions';
+import Link from '../link';
 import SvgAgencyDigitalLogo from '../logos/agency-digital-logo';
 
 const StyledFooter = styled.footer`
@@ -62,12 +61,7 @@ const Footer: React.FC = () => (
         <ul>
           <li>
             <p>
-              <Link
-                href={{
-                  pathname:
-                    getConfig().publicRuntimeConfig.baseUrl + '/cookies',
-                }}
-              >
+              <Link href="/cookies">
                 <a>Cookie Policy</a>
               </Link>
             </p>
