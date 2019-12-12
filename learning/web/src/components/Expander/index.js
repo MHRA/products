@@ -34,7 +34,7 @@ const Body = styled.div`
   position: relative;
   display: block;
   background-color: ${mhraGray10};
-  padding: 1.875rem;
+  padding: 3.3125rem;
   margin: 1em 0;
   &.hidden {
     display: none;

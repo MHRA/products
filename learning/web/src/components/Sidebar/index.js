@@ -1,73 +1,91 @@
 import React, { Component } from "react"
 import { graphql, StaticQuery } from "gatsby"
 import styled from "styled-components"
-import { rhythm } from "../../utils/typography"
 import Link from "../../components/Link"
 
-import { GoThreeBars, GoX } from "react-icons/go"
+import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md"
 import { sizes, media } from "../../utils/theme"
-import { black, mhraBlue } from "../../utils/colors"
+import { rhythm } from "../../utils/typography"
+import { mhraBlue, anchorColour, white, mhraGray10 } from "../../utils/colors"
 import uuid from "uuid/v4"
 
+const Aside = styled.aside`
+  flex: 0 0 ${rhythm(14)};
+  margin: 0 0 ${rhythm(2)};
+  background-color: ${mhraGray10};
+  ${media.desktop`
+    background: none;
+    padding-right: ${rhythm(1)};
+  `};
+`
+
 const SidebarStyled = styled.ul`
-  display: inline-block;
   list-style: none;
   margin: 0;
-  padding: 0 ${rhythm(3 / 4)} ${rhythm(1)};
-  border-bottom: 0.125rem solid ${mhraBlue};
+  padding-bottom: 1em;
+  border-bottom: 4px solid ${mhraBlue};
   width: 100%;
-  font-size: 1.125rem;
-  font-weight: bold;
-  color: ${black};
-
-  ${media.desktop`
-    border-bottom:none;
-  `}
+  font-weight: normal;
+  font-size: 1rem;
 
   &.hidden {
     display: none;
   }
 
-  ul {
-    margin: 1.2em 0 0;
-    list-style: none;
-    &.modules {
-      a {
-        font-weight: normal;
-        font-size: 1rem;
-      }
-    }
-  }
-
   li {
     position: relative;
+    margin: 0.5rem 0;
     line-height: 1.25rem;
+    a {
+      padding: 0.5rem 1.25rem;
+      display: block;
+      cursor: pointer;
+      text-decoration: none;
+    }
     &.current {
-      &:before {
-        content: " ";
-        background: ${mhraBlue};
-        position: absolute;
-        height: 100%;
-        width: 0.25rem;
-        left: ${rhythm((3 / 4) * -1)};
+      border-left: 6px solid ${anchorColour};
+      a {
+        font-weight: bold;
+        padding-left: 0.875rem;
       }
     }
   }
 
-  /* a {
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
+  ${media.desktop`
+    border-bottom:none;
+    margin: 0.375rem 0;
+    li {
+      a {
+        padding: 0.375rem 1.25rem;
+      }
+      &:active,
+      &:hover {
+        background-color: ${white};
+        a {
+          text-decoration: underline;
+        }
+      }
     }
-  } */
+  `}
 `
 
-const Burger = styled.a`
-  position: absolute;
-  top: ${rhythm(1)};
-  right: ${rhythm(1)};
+const MobileNav = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+`
+
+const MobileNavButton = styled.button`
+  background: ${mhraBlue};
+  color: ${white};
+  display: flex;
+  padding: 0.6em 0.6em 0.6em 1.4em;
+  border: 0;
+  line-height: 2em;
   cursor: pointer;
+  span {
+    margin-right: 0.5rem;
+  }
+
   &.hidden {
     display: none;
   }
@@ -132,12 +150,6 @@ class Sidebar extends Component {
         render={data => {
           const modules = data.allModulesJson.nodes
 
-          const getItems = entry => {
-            if (entry.items && entry.items.length) {
-              return <ul className="modules">{renderEntries(entry.items)}</ul>
-            }
-          }
-
           const renderEntries = entries => {
             return entries.map(entry => {
               const { link, module, name, id } = entry
@@ -152,35 +164,39 @@ class Sidebar extends Component {
                   ) : (
                     <>{name}</>
                   )}
-                  {getItems(entry)}
                 </li>
               )
             })
           }
 
-          const loop = modules => {
+          const getCurrentModuleItems = modules => {
             const currentModule = modules.filter(entry => {
               return location.pathname.split("/").includes(entry.module)
-            })
-            return renderEntries(currentModule)
+            })[0]
+            if (currentModule.items && currentModule.items.length) {
+              return renderEntries(currentModule.items)
+            }
           }
 
           return (
-            <>
-              <Burger
-                onClick={this.toggleOpen}
-                className={width < sizes.desktop ? undefined : "hidden"}
-              >
-                {open ? (
-                  <GoX size={"2em"}></GoX>
-                ) : (
-                  <GoThreeBars size={"2em"}></GoThreeBars>
-                )}
-              </Burger>
+            <Aside>
+              <MobileNav>
+                <MobileNavButton
+                  className={width < sizes.desktop ? undefined : "hidden"}
+                  onClick={this.toggleOpen}
+                >
+                  <span>Contents</span>
+                  {open ? (
+                    <MdArrowDropUp size={"2em"}></MdArrowDropUp>
+                  ) : (
+                    <MdArrowDropDown size={"2em"}></MdArrowDropDown>
+                  )}
+                </MobileNavButton>
+              </MobileNav>
               <SidebarStyled className={open ? "" : "hidden"}>
-                {loop(modules)}
+                {getCurrentModuleItems(modules)}
               </SidebarStyled>
-            </>
+            </Aside>
           )
         }}
       />
