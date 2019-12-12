@@ -10,6 +10,7 @@ interface IDisclaimerProps {
 
 const StyledDisclaimer = styled.section`
   margin-top: 50px;
+  margin-bottom: 50px;
   div {
     border-radius: 10px;
     background-color: rgba(254, 212, 50, 0.5);
@@ -59,7 +60,8 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
     <div>
       <h3>Disclaimer:</h3>
       <p>
-        Please read and confirm the below information, which refers to accessing SPC or PIL documents.
+        Please read and confirm the below information, which refers to accessing
+        SPC or PIL documents.
       </p>
       <p>
         I understand that this information is a copy of the Summary of Product
@@ -80,9 +82,9 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         prescribed medicines without first speaking to a healthcare
         professional. Suspected adverse reactions to a medicine can be reported
         to us on a&nbsp;
-          <Link href="https://yellowcard.mhra.gov.uk/">
-            <a>Yellow Card.</a>
-          </Link>
+        <Link href="https://yellowcard.mhra.gov.uk/">
+          <a>Yellow Card.</a>
+        </Link>
       </p>
       <p>
         I understand that the MHRA has used its best endeavours in publishing
