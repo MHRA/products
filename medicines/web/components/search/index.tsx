@@ -28,8 +28,6 @@ const StyledSearch = styled.section`
     color: ${black};
     display: flex;
     flex-direction: column;
-    padding: ${baseSpace} calc(${baseSpace} / 2);
-    background-color: rgba(10, 50, 150, 0.1);
   }
 
   .searchbar {

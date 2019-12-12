@@ -4,9 +4,7 @@ import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
-const StyledDrugIndex = styled.section`
-  margin-top: 1rem;
-
+const StyledDrugIndex = styled.nav`
   h2 {
     font-size: 1.5rem;
     margin-top: 0;
@@ -18,12 +16,18 @@ const StyledDrugIndex = styled.section`
     margin: 0;
     padding: 0;
   }
+
   ul > li {
     padding-top: 10px;
   }
 
+  p.horizontal {
+    margin: 0;
+  }
+
   ul.horizontal {
     display: flex;
+    padding-left: 0;
   }
 
   ul.horizontal > li {
@@ -49,7 +53,7 @@ const StyledDrugIndex = styled.section`
       flex-wrap: wrap;
     }
     ul.horizontal > li {
-      flex-basis: 10%;
+      flex-basis: 15%;
     }
   }
 `;
@@ -123,23 +127,20 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   return (
     <StyledDrugIndex>
-      <nav>
-        {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
-
-        <ul className={horizontal ? 'horizontal' : ''}>
-          {items.map(item => {
-            return (
-              <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
-                <Link href={searchLink(item)}>
-                  <a>
-                    {item.name} {item.count && <>({item.count} files)</>}
-                  </a>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      {level === 0 ? <p className="horizontal">{title}</p> : <h3>{title}</h3>}
+      <ul className={horizontal ? 'horizontal' : ''}>
+        {items.map(item => {
+          return (
+            <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+              <Link href={searchLink(item)}>
+                <a>
+                  {item.name} {item.count && <>({item.count} files)</>}
+                </a>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </StyledDrugIndex>
   );
 };
