@@ -1,5 +1,11 @@
 require('dotenv').config();
 
+const baseUrl =
+  process.env.ASSET_PREFIX === 'master' ||
+  process.env.ASSET_PREFIX === undefined
+    ? ''
+    : `/${process.env.ASSET_PREFIX}`;
+
 module.exports = {
   env: {
     AZURE_SEARCH_API_VERSION: process.env.AZURE_SEARCH_API_VERSION,
@@ -24,17 +30,9 @@ module.exports = {
     });
     return config;
   },
-  assetPrefix:
-    process.env.ASSET_PREFIX === 'master' ||
-    process.env.ASSET_PREFIX === undefined
-      ? ''
-      : `/${process.env.ASSET_PREFIX}`,
   exportTrailingSlash: true,
+  assetPrefix: baseUrl,
   publicRuntimeConfig: {
-    baseUrl:
-      process.env.ASSET_PREFIX === 'master' ||
-      process.env.ASSET_PREFIX === undefined
-        ? ''
-        : `/${process.env.ASSET_PREFIX}`,
+    baseUrl,
   },
 };
