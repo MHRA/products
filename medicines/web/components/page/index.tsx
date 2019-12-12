@@ -2,7 +2,7 @@ import Head from 'next/head';
 import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
-import { anchorColour } from '../../styles/colors';
+import { anchorColour, mhra } from '../../styles/colors';
 import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
@@ -34,9 +34,9 @@ const WithStyles = styled.div`
   }
   a {
     color: ${anchorColour};
-    text-decoration: none;
+    text-decoration: underline;
     &:hover {
-      text-decoration: underline;
+      color: ${mhra};
     }
   }
 `;

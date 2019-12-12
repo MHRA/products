@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { useSessionStorage } from '../../hooks';
-import { mhraBlue10, mhraBlue80, white } from '../../styles/colors';
+import { mhraBlue10, mhraBlue80, white, mhraGray10 } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -39,7 +39,7 @@ const StyledDrugList = styled.section`
 
   article {
     display: flex;
-    background-color: ${mhraBlue10};
+    background-color: ${mhraGray10};
     padding: ${baseSpace};
     margin: ${baseSpace} 0;
     min-width: 1%;
@@ -222,7 +222,7 @@ const SearchResults = (props: {
           )}
           <p className="ema-message">
             If the product information you are seeking does not appear below, it
-            is possible that the product holds a central European license and
+            is possible that the product holds a central European licence and
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>

@@ -55,7 +55,7 @@
     "url": "git+https://github.com/MHRA/products.git"
   },
   "scripts": {
-    "build": "gatsby build",
+    "build": "gatsby build --prefix-paths",
     "dev": "gatsby develop",
     "pretty": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "yarn run develop",

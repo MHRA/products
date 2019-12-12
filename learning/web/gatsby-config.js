@@ -1,4 +1,5 @@
 module.exports = {
+  pathPrefix: process.env.PATH_PREFIX || "/",
   siteMetadata: {
     title: `Continuous Professional Development`,
     author: `MHRA`,
