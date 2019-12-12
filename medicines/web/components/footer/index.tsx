@@ -44,6 +44,10 @@ const StyledFooter = styled.footer`
     ul {
       flex-direction: column;
     }
+
+    .wrapper {
+      padding: 0;
+    }
   }
 `;
 

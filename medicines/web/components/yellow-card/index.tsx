@@ -8,7 +8,11 @@ import {
   mhraYellow,
   primaryColor,
 } from '../../styles/colors';
-import { halfBaseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import {
+  baseSpace,
+  halfBaseSpace,
+  mobileBreakpoint,
+} from '../../styles/dimensions';
 import SvgYellowCard from '../logos/yellow-card';
 
 const StyledYellowCard = styled.section`
@@ -16,6 +20,7 @@ const StyledYellowCard = styled.section`
   background-color: ${mhraGray30};
   padding: 0;
   margin: 0;
+  margin-bottom: ${baseSpace};
 
   header {
     padding: 1rem;
@@ -70,6 +75,8 @@ const StyledYellowCard = styled.section`
     p {
       font-size: 1.1875rem;
       padding: ${halfBaseSpace};
+      text-align: center;
+      margin: 0 auto;
     }
   }
 `;
