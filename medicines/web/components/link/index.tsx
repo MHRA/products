@@ -1,19 +1,20 @@
 import getConfig from 'next/config';
 import Link, { LinkProps } from 'next/link';
+import { UrlObject } from 'url';
 
-class MhraLink extends Link {
-  constructor(props: LinkProps) {
-    const newProps: LinkProps = { ...props };
-
-    if (typeof props.href === 'string') {
-      newProps.href = getConfig().publicRuntimeConfig.baseUrl + props.href;
-    } else {
-      newProps.href = {
-        pathname: getConfig().publicRuntimeConfig.baseUrl + props.href.pathname,
-      };
-    }
-    super(newProps);
+type Url = string | UrlObject;
+const MhraLink: React.FC<LinkProps> = props => {
+  let href: Url;
+  if (typeof props.href === 'string') {
+    href = getConfig().publicRuntimeConfig.baseUrl + props.href;
+  } else {
+    href = {
+      ...props.href,
+      pathname: getConfig().publicRuntimeConfig.baseUrl + props.href.pathname,
+    };
   }
-}
+
+  return <Link {...props} href={href} />;
+};
 
 export default MhraLink;
