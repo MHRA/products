@@ -75,7 +75,7 @@ const StyledSearch = styled.section`
   }
 `;
 
-const labelString = 'Enter a product or active substance:';
+const labelString = 'Enter a product, active substance, or PL number:';
 
 interface ISearchProps {
   onSearchChange: (e: FormEvent<HTMLInputElement>) => void;
