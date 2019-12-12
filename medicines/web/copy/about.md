@@ -45,8 +45,9 @@ by either the European Medicines Agency (EMA) or the responsible
 authority of another EU member state. The PARs for these medicines can
 be found on the following websites:
 
-- [European Medicines Agency (EMA)][ema medicine]
-- [Head of Medicines Agency][head of med]
+[European Medicines Agency (EMA)][ema medicine]
+
+[Head of Medicines Agency][head of med]
 
 ### Changes to PARs
 
