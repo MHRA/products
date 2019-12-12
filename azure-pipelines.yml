@@ -12,8 +12,8 @@ stages:
     dependsOn: []
     jobs:
       - job: web
-      dependsOn: []
-      pool:
+        dependsOn: []
+        pool:
           vmImage: ubuntu-latest
         steps:
           - script: |
