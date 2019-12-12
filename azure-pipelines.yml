@@ -8,58 +8,9 @@ variables:
   STORAGE_ACCOUNT_CPD: mhracpddev
 
 stages:
-  - stage: build
+  - stage: web
+    dependsOn: []
     jobs:
-      - job: services_master
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default beta
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install stable Rust
-          - script: |
-              cargo build -v --release
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v --release
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
-      - job: services_branch
-        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default nightly
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install nightly Rust
-          - script: |
-              cargo build -v
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
       - job: web
         dependsOn: []
         pool:
@@ -126,7 +77,8 @@ stages:
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build-learning
-  - stage: deploy
+  - stage: deploy_web
+    dependsOn: [web]
     jobs:
       - deployment: DeployProductsWeb
         displayName: Deploy Products Web
@@ -208,3 +160,56 @@ stages:
                         --public-access container `
                         --name $(Build.SourceBranchName) `
                         --account-name=$(STORAGE_ACCOUNT_CPD)
+  - stage: services
+    dependsOn: []
+    jobs:
+      - job: services_master
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        dependsOn: []
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - script: |
+              set -xeo pipefail
+              export CARGO_HOME="$HOME/.cargo"
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
+              source $HOME/.cargo/env
+              rustup toolchain list
+              rustup default beta
+              rustc -Vv
+              cargo -V
+              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+            displayName: Install stable Rust
+          - script: |
+              cargo build -v --release
+            displayName: Build services
+            workingDirectory: $(Build.SourcesDirectory)/medicines
+          - script: |
+              cargo test -v --release
+            workingDirectory: $(Build.SourcesDirectory)/medicines
+            displayName: Run tests
+      - job: services_branch
+        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+        dependsOn: []
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - script: |
+              set -xeo pipefail
+              export CARGO_HOME="$HOME/.cargo"
+              curl https://sh.rustup.rs -sSf | sh -s -- -y
+              source $HOME/.cargo/env
+              rustup toolchain list
+              rustup default nightly
+              rustc -Vv
+              cargo -V
+              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+            displayName: Install nightly Rust
+          - script: |
+              cargo build -v
+            displayName: Build services
+            workingDirectory: $(Build.SourcesDirectory)/medicines
+          - script: |
+              cargo test -v
+            workingDirectory: $(Build.SourcesDirectory)/medicines
+            displayName: Run tests
