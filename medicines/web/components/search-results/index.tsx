@@ -242,7 +242,10 @@ const SearchResults = (props: {
           </p>
         </div>
         {showDisclaimerWarning ? (
-          <Disclaimer onDisclaimerCheck={handleOnCheck} />
+          <Disclaimer
+            onDisclaimerCheck={handleOnCheck}
+            searchTerm={props.searchTerm}
+          />
         ) : (
           <dl>
             {props.drugs.length > 0 &&

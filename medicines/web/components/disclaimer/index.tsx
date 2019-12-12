@@ -6,6 +6,7 @@ import { baseSpace } from '../../styles/dimensions';
 
 interface IDisclaimerProps {
   onDisclaimerCheck: (event: ChangeEvent<HTMLInputElement>) => void;
+  searchTerm: string;
 }
 
 const StyledDisclaimer = styled.section`
@@ -26,7 +27,7 @@ const StyledDisclaimer = styled.section`
     font-size: 0.875rem;
   }
 
-  p:last-of-type {
+  div p:last-of-type {
     margin-bottom: 0;
   }
 
@@ -57,12 +58,12 @@ const StyledDisclaimer = styled.section`
 
 const Disclaimer: React.FC<IDisclaimerProps> = props => (
   <StyledDisclaimer>
+    <p>
+      Please read the following information and tick the box to proceed to view
+      the product information in pdf format.
+    </p>
     <div>
       <h3>Disclaimer:</h3>
-      <p>
-        Please read and confirm the below information, which refers to accessing
-        SPC or PIL documents.
-      </p>
       <p>
         I understand that this information is a copy of the Summary of Product
         Characteristics and patient information leaflet for a medicine, which
@@ -92,6 +93,10 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         to date version for this product.
       </p>
     </div>
+    <p>
+      To view details for <em>{props.searchTerm}</em>, please read and accept
+      the disclaimer.
+    </p>
     <form>
       <input
         type="checkbox"
