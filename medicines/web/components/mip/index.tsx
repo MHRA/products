@@ -158,6 +158,9 @@ const Mip: React.FC = () => {
           horizontal
         />
       </div>
+      <div className="yellow-card-wrapper">
+        <YellowCard />
+      </div>
       <div>
         {showingResultsForTerm.length === 0 ? (
           <>
@@ -181,9 +184,6 @@ const Mip: React.FC = () => {
           />
         )}
       </div>{' '}
-      <div className="yellow-card-wrapper">
-        <YellowCard />
-      </div>
     </StyledMip>
   );
 };
