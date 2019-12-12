@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { useSessionStorage } from '../../hooks';
-import { mhraBlue10, mhraBlue80, white, mhraGray10 } from '../../styles/colors';
+import { mhraBlue10, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -246,16 +246,6 @@ const SearchResults = (props: {
                         <p className="title">{drug.name}</p>
                       </a>
                     )}
-                    <p className="metadata">File size: {drug.fileSize} KB</p>
-                    {drug.activeSubstances != null &&
-                      drug.activeSubstances.length > 0 && (
-                        <p className="metadata">
-                          Active substances:{' '}
-                          {drug.activeSubstances
-                            .map(substance => toSentenceCase(substance))
-                            .join(', ')}
-                        </p>
-                      )}
                     <p className="metadata">File size: {drug.fileSize} KB</p>
                     {drug.activeSubstances != null &&
                       drug.activeSubstances.length > 0 && (
