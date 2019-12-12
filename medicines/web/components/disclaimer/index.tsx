@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React, { ChangeEvent } from 'react';
 import styled from 'styled-components';
-import { black } from '../../styles/colors';
+import { anchorColour, black, mhra } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
 
 interface IDisclaimerProps {
@@ -28,6 +28,13 @@ const StyledDisclaimer = styled.section`
 
   p:last-of-type {
     margin-bottom: 0;
+  }
+
+  a {
+    color: ${anchorColour};
+    &:hover {
+      color: ${mhra};
+    }
   }
 
   form {
@@ -81,10 +88,14 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         contact their doctor or pharmacist. Patients should not stop taking any
         prescribed medicines without first speaking to a healthcare
         professional. Suspected adverse reactions to a medicine can be reported
-        to us on a&nbsp;
-        <Link href="https://yellowcard.mhra.gov.uk/">
-          <a>Yellow Card.</a>
-        </Link>
+        to us on a{' '}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://yellowcard.mhra.gov.uk/"
+        >
+          Yellow Card.
+        </a>
       </p>
       <p>
         I understand that the MHRA has used its best endeavours in publishing
