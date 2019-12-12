@@ -15,7 +15,7 @@ the leaflet a patient gets with their medicine could be different to
 the one found here.
 
 We hold data for medicines licensed at a national (UK) level. Some
-medicines are licensed centrally by the European Medicines Agency
+medicines are licensed by the European Medicines Agency
 (EMA). For product information on these medicines, [use the EMA website][ema].
 
 Once a marketing authorisation has been cancelled, the product

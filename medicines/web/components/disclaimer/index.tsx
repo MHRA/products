@@ -70,8 +70,8 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         information on its known safety.
       </p>
       <p>
-        I understand that this information may be updated several times within
-        its shelf life, and that there could be differences between the version
+        I understand that this information may be updated several times during
+        the product’s lifecycle, and that there could be differences between the
         of the information shown here and other information in the public
         domain.
       </p>
