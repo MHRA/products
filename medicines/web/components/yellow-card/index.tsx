@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-<<<<<<< HEAD
 import {
   black,
   mhra70,
@@ -9,11 +8,7 @@ import {
   mhraYellow,
   primaryColor,
 } from '../../styles/colors';
-import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-=======
-import { black, mhraGray30, mhraYellow } from '../../styles/colors';
 import { halfBaseSpace, mobileBreakpoint } from '../../styles/dimensions';
->>>>>>> Break two column layout to 1 column and move druglist to search component
 import SvgYellowCard from '../logos/yellow-card';
 
 const StyledYellowCard = styled.section`
@@ -37,19 +32,12 @@ const StyledYellowCard = styled.section`
     margin: 0;
   }
 
-<<<<<<< HEAD
   a.primary-button {
     color: ${mhraWhite};
     background-color: ${primaryColor};
     padding: 12px 15px;
     border-radius: 6px;
     text-decoration: none;
-=======
-  p:last-of-type {
-    margin-top: 0.5rem;
-    font-weight: normal;
-    font-size: 1rem;
->>>>>>> Break two column layout to 1 column and move druglist to search component
   }
 
   a.primary-button:hover {
@@ -80,27 +68,18 @@ const YellowCard: React.FC = () => (
         <SvgYellowCard />
       </picture>
     </header>
-<<<<<<< HEAD
-    <p>{content}</p>
-    <p>
-      <a
-        className="primary-button"
-        href="https://yellowcard.mhra.gov.uk/"
-        title={title}
-      >
-        {linkText}
-      </a>
-    </p>
-=======
     <div>
       <p>{content}</p>
       <p>
-        <a href="https://yellowcard.mhra.gov.uk/" title={title}>
+        <a
+          className="primary-button"
+          href="https://yellowcard.mhra.gov.uk/"
+          title={title}
+        >
           {linkText}
         </a>
       </p>
     </div>
->>>>>>> Break two column layout to 1 column and move druglist to search component
   </StyledYellowCard>
 );
 
