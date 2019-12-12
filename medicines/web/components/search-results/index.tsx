@@ -224,9 +224,28 @@ const SearchResults = (props: {
             is possible that the product holds a European licence and
             its information may be available at the {emaWebsiteLink()} website.
           </p>
+          <p>
+            Before a medicine can be sold in the UK, a number of licenses are
+            essential. Products with a UK marketing authorisation have a licence
+            number in the format ‘PL 12345/0001’. The first 2 characters are
+            always the letters ‘PL’, and this can be found on the packaging of
+            the product.
+          </p>
+          <p>
+            You can identify the product in the list below using the PL number.
+          </p>
+          <p>
+            The information about a medicine will be updated when new evidence
+            become available. This may mean that there are differences between
+            the information in the pack and the information here. The most
+            up-to-date information will be available on this site.
+          </p>
         </div>
         {showDisclaimerWarning && props.drugs.length > 0 ? (
-          <Disclaimer onDisclaimerCheck={handleOnCheck} />
+          <Disclaimer
+            onDisclaimerCheck={handleOnCheck}
+            searchTerm={props.searchTerm}
+          />
         ) : (
           <dl>
             {props.drugs.length > 0 &&
