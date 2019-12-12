@@ -225,7 +225,7 @@ const SearchResults = (props: {
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
-        {showDisclaimerWarning ? (
+        {showDisclaimerWarning && props.drugs.length > 0 ? (
           <Disclaimer onDisclaimerCheck={handleOnCheck} />
         ) : (
           <dl>
