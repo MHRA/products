@@ -1,7 +1,14 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
-import { mhraBlue, white, mhraGray10, black } from "../../utils/colors"
+import {
+  mhraBlue,
+  white,
+  mhraGray10,
+  black,
+  mhraGreen,
+  mhraRed,
+} from "../../utils/colors"
 import { MdClose } from "react-icons/md"
 
 const ExpanderStyled = styled.div`
@@ -39,6 +46,14 @@ const Body = styled.div`
   &.hidden {
     display: none;
   }
+
+  .incorrect {
+    color: ${mhraRed};
+  }
+
+  .correct {
+    color: ${mhraGreen};
+  }
 `
 
 const Expander = ({ title, children }) => {
@@ -60,4 +75,5 @@ const Expander = ({ title, children }) => {
     </ExpanderStyled>
   )
 }
+
 export default Expander
