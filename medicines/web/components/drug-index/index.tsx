@@ -127,17 +127,25 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
         {level === 0 ? <h2>{title}</h2> : <h3>{title}</h3>}
 
         <ul className={horizontal ? 'horizontal' : ''}>
-          {items.map(item => {
-            return (
-              <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
-                <Link href={searchLink(item)}>
-                  <a>
-                    {item.name} {item.count && <>({item.count} files)</>}
-                  </a>
-                </Link>
-              </li>
-            );
-          })}
+          {items
+            .filter(
+              item =>
+                item.name !== 'NOT APPLICABLE' && item.name !== 'NOT SPECIFIED',
+            )
+            .map(item => {
+              return (
+                <li
+                  key={item.name}
+                  className={level > 0 ? 'substance-name' : ''}
+                >
+                  <Link href={searchLink(item)}>
+                    <a>
+                      {item.name} {item.count && <>({item.count} files)</>}
+                    </a>
+                  </Link>
+                </li>
+              );
+            })}
         </ul>
       </nav>
     </StyledDrugIndex>
