@@ -65,4 +65,4 @@ details of significant safety changes to a marketing authorisation.
 [customer services]: https://www.gov.uk/guidance/contact-mhra#customer-services
 [ema medicine]: https://www.ema.europa.eu/en/medicines/field_ema_web_categories%253Aname_field/Human/ema_group_types/ema_medicine
 [head of med]: http://mri.medagencies.org/Human/
-[spar]: http://www.mhra.gov.uk/safety-public-assessment-reports/index.htm
+[spar]: https://www.gov.uk/guidance/safety-public-assessment-reports
