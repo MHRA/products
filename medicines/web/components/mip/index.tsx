@@ -65,8 +65,8 @@ const Mip: React.FC = () => {
       return {
         activeSubstances: doc.substance_name,
         product: doc.product_name,
-        context: doc['@search.highlights'] ?.content.join(' … ') || '',
-        docType: doc.doc_type ?.toString().substr(0, 3) || '',
+        context: doc['@search.highlights']?.content.join(' … ') || '',
+        docType: doc.doc_type?.toString().substr(0, 3) || '',
         fileSize: Math.ceil(
           (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
         ).toLocaleString('en-GB'),
@@ -158,39 +158,31 @@ const Mip: React.FC = () => {
           horizontal
         />
       </div>
-      <div className="yellow-card-wrapper">
-        <YellowCard />
-      </div>
       <div>
         {showingResultsForTerm.length === 0 ? (
           <>
             {hasIntro && <MipText />}
-            <DrugIndex
-              title="List of active substances"
-              items={index}
-              horizontal
-            />
             {products == null ? (
               <></>
             ) : products.length > 0 ? (
               <DrugIndex title={`${substance || '...'}`} items={products} />
             ) : (
-                  <p>Nothing found for "{substance}"</p>
-                )}
+              <p>Nothing found for "{substance}"</p>
+            )}
           </>
         ) : (
-            <SearchResults
-              drugs={results}
-              showingResultsForTerm={showingResultsForTerm}
-              resultCount={resultCount}
-              page={pageNumber}
-              pageSize={pageSize}
-              searchTerm={search}
-            />
-          )}
-        <div className="yellow-card-wrapper">
-          <YellowCard />
-        </div>
+          <SearchResults
+            drugs={results}
+            showingResultsForTerm={showingResultsForTerm}
+            resultCount={resultCount}
+            page={pageNumber}
+            pageSize={pageSize}
+            searchTerm={search}
+          />
+        )}
+      </div>{' '}
+      <div className="yellow-card-wrapper">
+        <YellowCard />
       </div>
     </StyledMip>
   );
