@@ -4,52 +4,26 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import {
-  docSearch,
-  facetSearch,
-  ISearchResult,
-} from '../../services/azure-search';
+import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
-import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-import DrugIndex, { IFacet, index } from '../drug-index';
+import { baseSpace } from '../../styles/dimensions';
+import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
 
-const Aside = styled.aside`
-  max-width: 25%;
-  padding: ${baseSpace} calc(${baseSpace} / 2) 0 ${baseSpace};
-
-  @media ${mobileBreakpoint} {
-    max-width: 100%;
-    padding: 0.3125rem;
-
-    .yellow-card-wrapper {
-      display: none;
-    }
+const StyledMip = styled.section`
+  width: 100%;
+  padding: 1.25rem 0.625rem 0 1.25rem;
+  .search {
+    background-color: rgba(10, 50, 150, 0.1);
+    margin-bottom: 20px;
+    padding: ${baseSpace} calc(${baseSpace} / 2);
   }
-`;
-
-const Main = styled.main`
-  max-width: 75%;
-  padding: ${baseSpace};
-  padding-left: calc(${baseSpace} / 2);
 
   .yellow-card-wrapper {
-    display: none;
-  }
-
-  h2 {
-    margin-top: 3rem;
-  }
-
-  @media ${mobileBreakpoint} {
-    max-width: 100%;
-
-    .yellow-card-wrapper {
-      display: block;
-    }
+    margin-bottom: ${baseSpace};
   }
 `;
 
@@ -171,26 +145,26 @@ const Mip: React.FC = () => {
   }, [page, searchTerm, substance]);
 
   return (
-    <>
-      <Aside>
+    <StyledMip>
+      <div className="search">
         <Search
           search={search}
           onSearchChange={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
         />
-        <div className="yellow-card-wrapper">
-          <YellowCard />
-        </div>
-      </Aside>
-      <Main>
+        <DrugIndex
+          title="or find by active substance:"
+          items={index}
+          horizontal
+        />
+      </div>
+      <div className="yellow-card-wrapper">
+        <YellowCard />
+      </div>
+      <div>
         {showingResultsForTerm.length === 0 ? (
           <>
             {hasIntro && <MipText />}
-            <DrugIndex
-              title="List of active substances"
-              items={index}
-              horizontal
-            />
             {products == null ? (
               <></>
             ) : products.length > 0 ? (
@@ -209,11 +183,8 @@ const Mip: React.FC = () => {
             searchTerm={search}
           />
         )}
-        <div className="yellow-card-wrapper">
-          <YellowCard />
-        </div>
-      </Main>
-    </>
+      </div>{' '}
+    </StyledMip>
   );
 };
 

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 import { anchorColour, mhra } from '../../styles/colors';
-import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
+import { desktopMaxWidth } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
@@ -41,22 +41,10 @@ const WithStyles = styled.div`
   }
 `;
 
-const Row = styled.section`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+const Wrapper = styled.main`
   margin: 0 auto;
-  flex-grow: 1;
   max-width: ${desktopMaxWidth};
-  > * {
-    flex-basis: 100%;
-    flex-shrink: 1;
-    flex-grow: 1;
-  }
-
-  @media ${mobileBreakpoint} {
-    display: block;
-  }
+  width: 100%;
 `;
 
 interface IPageProps {
@@ -74,7 +62,7 @@ const App: React.FC<IPageProps> = props => {
         <Normalize />
         <CookieBanner />
         <Header title={props.title} />
-        <Row>{props.children}</Row>
+        <Wrapper>{props.children}</Wrapper>
         <Footer />
       </WithStyles>
     </>

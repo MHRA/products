@@ -1,8 +1,7 @@
 import React, { ChangeEvent } from 'react';
-import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { useSessionStorage } from '../../hooks';
-import { mhraBlue10, mhraBlue80, white, mhraGray10 } from '../../styles/colors';
+import { mhraBlue10, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -12,7 +11,7 @@ import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import Pagination from './pagination';
 
-const StyledDrugList = styled.section`
+const StyledDrugList = styled.div`
   .title {
     font-size: ${h2FontSize};
     padding: 0;
@@ -226,7 +225,6 @@ const SearchResults = (props: {
             its information may be available at the {emaWebsiteLink()} website.
           </p>
         </div>
-
         {showDisclaimerWarning ? (
           <Disclaimer onDisclaimerCheck={handleOnCheck} />
         ) : (
