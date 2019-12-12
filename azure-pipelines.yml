@@ -77,7 +77,7 @@ stages:
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build-learning
-  - stage: deploy-web
+  - stage: deploy_web
     dependsOn: [web]
     jobs:
       - deployment: DeployProductsWeb
