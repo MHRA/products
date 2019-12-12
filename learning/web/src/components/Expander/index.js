@@ -1,14 +1,22 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { rhythm } from "../../utils/typography"
-import { mhraBlue, mhrawhite } from "../../utils/colors"
+import {
+  mhraBlue,
+  white,
+  mhraGray10,
+  black,
+  mhraGreen,
+  mhraRed,
+} from "../../utils/colors"
+import { MdClose } from "react-icons/md"
 
 const ExpanderStyled = styled.div`
   margin-bottom: ${rhythm(0.5)};
 `
 
 const Button = styled.button`
-  color: ${mhrawhite};
+  color: ${white};
   font-weight: normal;
   font-size: 0.875rem;
   background-color: ${mhraBlue};
@@ -18,11 +26,33 @@ const Button = styled.button`
   cursor: pointer;
 `
 
+const CloseButton = styled.button`
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: ${black};
+  background: none;
+  padding: 1em;
+  border: 0;
+  cursor: pointer;
+`
+
 const Body = styled.div`
+  position: relative;
   display: block;
-  padding: ${rhythm(1)};
+  background-color: ${mhraGray10};
+  padding: 3.3125rem;
+  margin: 1em 0;
   &.hidden {
     display: none;
+  }
+
+  .incorrect {
+    color: ${mhraRed};
+  }
+
+  .correct {
+    color: ${mhraGreen};
   }
 `
 
@@ -36,8 +66,14 @@ const Expander = ({ title, children }) => {
   return (
     <ExpanderStyled>
       <Button onClick={toggleOpen}>{title}</Button>
-      <Body className={open ? undefined : "hidden"}>{children}</Body>
+      <Body className={open ? undefined : "hidden"}>
+        <CloseButton onClick={toggleOpen}>
+          <MdClose />
+        </CloseButton>
+        {children}
+      </Body>
     </ExpanderStyled>
   )
 }
+
 export default Expander
