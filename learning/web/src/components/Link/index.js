@@ -1,23 +1,33 @@
 import React from "react"
 import { Link as GatsbyLink } from "gatsby"
 import styled from "styled-components"
-import { anchorColour, mhraBlue } from "../../utils/colors"
+import { anchorColour, mhra } from "../../utils/colors"
+import { FiExternalLink } from "react-icons/fi"
 
 const GatsbyLinkStyled = styled(GatsbyLink)`
   color: ${anchorColour};
-  text-decoration: none;
   &:hover,
   &:active {
-    color: ${mhraBlue};
-    text-decoration: underline;
+    color: ${mhra};
   }
 `
 const Footnote = styled.a`
   color: ${anchorColour};
   &:hover,
   &:active {
-    color: ${mhraBlue};
-    text-decoration: underline;
+    color: ${mhra};
+  }
+`
+
+const ExternalLink = styled.a`
+  color: ${anchorColour};
+  &:hover,
+  &:active {
+    color: ${mhra};
+  }
+  span {
+    display: inline-block;
+    padding-left: 0.3em;
   }
 `
 
@@ -47,9 +57,12 @@ const Link = ({ children, to, activeClassName, partiallyActive, ...other }) => {
     )
   }
   return (
-    <a href={to} {...other}>
+    <ExternalLink href={to} target="_blank" {...other}>
       {children}
-    </a>
+      <span>
+        <FiExternalLink />
+      </span>
+    </ExternalLink>
   )
 }
 
