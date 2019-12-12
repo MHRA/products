@@ -1,3 +1,4 @@
+import getConfig from 'next/config';
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
@@ -61,7 +62,12 @@ const Footer: React.FC = () => (
         <ul>
           <li>
             <p>
-              <Link href="/cookies">
+              <Link
+                href={{
+                  pathname:
+                    getConfig().publicRuntimeConfig.baseUrl + '/cookies',
+                }}
+              >
                 <a>Cookie Policy</a>
               </Link>
             </p>

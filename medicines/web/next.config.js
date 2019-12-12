@@ -30,4 +30,11 @@ module.exports = {
       ? ''
       : `/${process.env.ASSET_PREFIX}`,
   exportTrailingSlash: true,
+  publicRuntimeConfig: {
+    baseUrl:
+      process.env.ASSET_PREFIX === 'master' ||
+      process.env.ASSET_PREFIX === undefined
+        ? ''
+        : `/${process.env.ASSET_PREFIX}`,
+  },
 };
