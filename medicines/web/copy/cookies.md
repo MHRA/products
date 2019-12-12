@@ -2,7 +2,7 @@ Cookies are files saved on your phone, tablet or computer when you visit a websi
 
 We use cookies to store information about how you use the MHRA Products website, such as the pages you visit.
 
-You can find out more about [how to manage cookies][ico] on the Information Commissioner’s Office (ICO) website.
+You can find out more about [how to manage cookies][ico] on the Information Commissioner’s Office (ICO) website.
 
 ## Necessary cookies
 
@@ -16,7 +16,7 @@ We do this to find out such things as the number of visitors to the various part
 
 This information is only processed in a way that does not identify anyone.
 We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website.
-Please go visit Google’s [overview of privacy and safeguarding data][google privacy] to know more about their policies.
+Please visit Google’s  [overview of privacy and safeguarding data][google privacy] to know more about their policies.
 
 Google Analytics cookies we use are:
 
@@ -25,6 +25,9 @@ Google Analytics cookies we use are:
 | `_ga`  | 2 years    | Used to distinguish users.     |
 | `_gid` | 24 hours   | Used to distinguish users.     |
 | `_gat` | 1 minute   | Used to throttle request rate. |
+
+We do not currently have the functionality to allow you to disable Google Analytics, so please note that if you continue to use this site, all cookies are enabled.
+We will rectify this shortly.
 
 [ico]: https://ico.org.uk/for-the-public/online/cookies/
 [google privacy]: https://support.google.com/analytics/answer/6004245
