@@ -172,11 +172,25 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         """Convert a table."""
         table_tag.attrs = {}
 
+        # Collect footnotes from text.
+        footnotes = []
+        for match in re.finditer(r"\[\^(\d+)\]", text):
+            footnotes.append(match[0])
+
+        # Replace footnotes with links.
+        text = re.sub(
+            r"\[\^(\d+)\]",
+            r"<sup><a href='#fn-\1' class='footnote-ref'>\1</a></sup>",
+            text,
+        )
+
         self.markdown_to_html(table_tag, text)
 
-        return "\n\n" + table_tag.prettify() + "\n\n"
+        return "\n\n" + table_tag.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
 
-    def convert_sub(self, sub_tag, text):
+    def convert_sub(
+        self, sub_tag, text
+    ):  # pylint: disable=unused-argument, no-self-use
         """Convert subscript text."""
         return str(sub_tag)
 
