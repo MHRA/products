@@ -76,7 +76,7 @@ const StyledYellowCard = styled.section`
 
 const title = 'Yellow Card';
 const content = 'Report a side effect with a medicine or medical device';
-const linkText = 'Start\u00a0now';
+const linkText = 'Make\u00a0a\u00a0report';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
