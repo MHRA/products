@@ -15,10 +15,6 @@ const StyledMain = styled.main`
   a {
     color: ${mhra70};
   }
-
-  ul li {
-    list-style: none;
-  }
 `;
 
 const App: React.FC = () => {
