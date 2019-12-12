@@ -65,8 +65,12 @@ const StyledSearch = styled.section`
   @media ${mobileBreakpoint} {
     margin-bottom: 0;
 
+    .search {
+      padding: 1.25rem;
+    }
+
     form {
-      padding: ${baseSpace};
+      padding: ${baseSpace} 0;
     }
   }
 `;

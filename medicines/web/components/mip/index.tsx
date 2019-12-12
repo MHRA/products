@@ -6,14 +6,14 @@ import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
-import { baseSpace } from '../../styles/dimensions';
+import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
 import SearchResults, { IDocument } from '../search-results';
 import YellowCard from '../yellow-card';
 
-const StyledMip = styled.section`
+const StyledMip = styled.div`
   width: 100%;
   padding: 1.25rem 0.625rem 0 1.25rem;
   .search {
@@ -22,8 +22,12 @@ const StyledMip = styled.section`
     padding: ${baseSpace} calc(${baseSpace} / 2);
   }
 
-  .yellow-card-wrapper {
-    margin-bottom: ${baseSpace};
+  @media ${mobileBreakpoint} {
+    padding: 1.25rem;
+
+    .search {
+      padding: 1.25rem;
+    }
   }
 `;
 
@@ -146,7 +150,7 @@ const Mip: React.FC = () => {
 
   return (
     <StyledMip>
-      <div className="search">
+      <section className="search">
         <Search
           search={search}
           onSearchChange={handleSearchChange}
@@ -157,33 +161,29 @@ const Mip: React.FC = () => {
           items={index}
           horizontal
         />
-      </div>
-      <div className="yellow-card-wrapper">
-        <YellowCard />
-      </div>
-      <div>
-        {showingResultsForTerm.length === 0 ? (
-          <>
-            {hasIntro && <MipText />}
-            {products == null ? (
-              <></>
-            ) : products.length > 0 ? (
-              <DrugIndex title={`${substance || '...'}`} items={products} />
-            ) : (
-              <p>Nothing found for "{substance}"</p>
-            )}
-          </>
-        ) : (
-          <SearchResults
-            drugs={results}
-            showingResultsForTerm={showingResultsForTerm}
-            resultCount={resultCount}
-            page={pageNumber}
-            pageSize={pageSize}
-            searchTerm={search}
-          />
-        )}
-      </div>{' '}
+      </section>
+      <YellowCard />
+      {showingResultsForTerm.length === 0 ? (
+        <>
+          {hasIntro && <MipText />}
+          {products == null ? (
+            <></>
+          ) : products.length > 0 ? (
+            <DrugIndex title={`${substance || '...'}`} items={products} />
+          ) : (
+            <p>Nothing found for "{substance}"</p>
+          )}
+        </>
+      ) : (
+        <SearchResults
+          drugs={results}
+          showingResultsForTerm={showingResultsForTerm}
+          resultCount={resultCount}
+          page={pageNumber}
+          pageSize={pageSize}
+          searchTerm={search}
+        />
+      )}
     </StyledMip>
   );
 };
