@@ -73,9 +73,7 @@ const CookieBanner = () => {
           use non-essential cookies to help us improve our services. Any data
           collected is anonymised. To know more about our policies, please go to
           our&nbsp;
-          <Link to="/cookies">
-            <a>cookie policy page</a>
-          </Link>
+          <Link to="/cookies">cookie policy page</Link>
           .&nbsp;By continuing to use this site, you agree to our use of
           cookies.
         </p>
