@@ -5,13 +5,13 @@ import { mhra, mhra10, mhraGray10 } from "../../utils/colors"
 import { media } from "../../utils/theme"
 
 const StyledCookieBanner = styled.aside`
-  padding: 0 10px 20px;
+  padding: 0 0.625rem 1.25rem;
   color: ${mhra};
   background-color: ${mhraGray10};
 
   div {
     margin: auto;
-    max-width: 860px;
+    max-width: 53.75rem;
   }
 
   p {
@@ -41,7 +41,7 @@ const StyledCookieBanner = styled.aside`
   ${media.desktop`
     p {
       font-size: 1.1875rem;
-      line-height: 28px;
+      line-height: 1.75rem;
     }
 
     button {
