@@ -1,15 +1,16 @@
 import React from "react"
 import { Link, graphql } from "gatsby"
 
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import Layout from "../components/Layout"
+import SEO from "../components/SEO"
 import { rhythm } from "../utils/typography"
 import styled from "styled-components"
-import { mhraBlue10, mhraBlue90, black } from "../utils/colors"
+import { mhraBlue10, anchorColour, mhraBlue } from "../utils/colors"
 import { GoChevronRight } from "react-icons/go"
 
 const HomepageLink = styled.div`
   a {
+    color: ${anchorColour};
     background-color: ${mhraBlue10};
     display: flex;
     align-items: center;
@@ -17,11 +18,11 @@ const HomepageLink = styled.div`
     justify-content: left;
     padding: 0 ${rhythm(1.4)};
     text-decoration: none;
-    color: ${black};
     font-size: 1.2em;
     &:hover {
       padding-top: 0.25rem;
-      border-bottom: 0.25rem solid ${mhraBlue90};
+      color: ${mhraBlue};
+      border-bottom: 0.25rem solid ${mhraBlue};
     }
   }
   margin-bottom: ${rhythm(1)};
@@ -51,13 +52,13 @@ class ModulesIndex extends React.Component {
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-        {modules.map(({ name: title, link }) => {
+        {modules.map(({ name: title, link, id }) => {
           return (
-            <HomepageLink>
-              <Link key={link} to={link}>
+            <HomepageLink key={id}>
+              <Link to={link}>
                 {title}
                 <Icon>
-                  <GoChevronRight size={"1.2em"} />
+                  <GoChevronRight size={"1.5em"} />
                 </Icon>
               </Link>
             </HomepageLink>
