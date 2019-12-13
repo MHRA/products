@@ -51,15 +51,18 @@ stages:
         dependsOn: []
         pool:
           vmImage: ubuntu-latest
+        variables:
+          GOOGLE_ANALYTICS_TACKING_ID: UA-6838115-14
+          GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
         steps:
           - script: |
               yarn && yarn build
-            displayName: Build learning web
+            displayName: Build learning web (master)
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
           - script: |
               export PATH_PREFIX=$(Build.SourceBranchName) && yarn && yarn build
-            displayName: Build learning web
+            displayName: Build learning web (branch)
             condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
           # - script: |
