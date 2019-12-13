@@ -7,6 +7,7 @@ import SvgAgencyDigitalLogo from "./Logos/agency-digital-logo"
 import styled from "styled-components"
 import { media, visuallyHidden } from "../utils/theme"
 import Sidebar from "./Sidebar"
+import CookieBanner from "./CookieBanner"
 
 const maxWidth = `${1024 / 16}em`
 const paddingTopBottom = rhythm(1.5)
@@ -130,6 +131,7 @@ class Layout extends React.Component {
 
     return (
       <LayoutStyled>
+        <CookieBanner />
         <Header>
           <Wrapper>
             <HeaderLogoLink />
