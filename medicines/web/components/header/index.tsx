@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
@@ -8,6 +7,7 @@ import {
   halfBaseSpace,
   mobileBreakpoint,
 } from '../../styles/dimensions';
+import Link from '../link';
 import SvgMhraLogo from '../logos/mhra-logo';
 
 const Header = styled.header`
