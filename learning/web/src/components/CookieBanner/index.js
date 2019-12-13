@@ -17,6 +17,7 @@ const StyledCookieBanner = styled.aside`
   p {
     font-size: 1rem;
     line-height: 24px;
+    padding-top: 1rem;
   }
 
   button {
@@ -26,7 +27,7 @@ const StyledCookieBanner = styled.aside`
     border: 1px solid ${mhra};
     color: ${mhra};
     display: block;
-    padding: 10px 20px;
+    padding: 0.5rem 1rem;
     font-size: 0.75rem;
   }
 
