@@ -63,5 +63,11 @@ module.exports = {
         ],
       },
     },
+    {
+      resolve: `gatsby-plugin-csp`,
+      options: {
+        disableOnDev: true,
+      },
+    },
   ],
 }
