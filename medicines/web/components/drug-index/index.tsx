@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import Link from '../link';
 
 const StyledDrugIndex = styled.nav`
   h2 {

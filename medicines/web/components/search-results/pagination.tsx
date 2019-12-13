@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { mhra70, mhraBlue, mhraWhite, primaryColor } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import Link from '../link';
 import { getPaginationGroups } from './pagination-groups';
 
 const StyledPagination = styled.nav`
