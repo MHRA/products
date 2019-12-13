@@ -1,10 +1,11 @@
 require('dotenv').config();
 
-const baseUrl =
+const isMasterEnvironment =
   process.env.ASSET_PREFIX === 'master' ||
-  process.env.ASSET_PREFIX === undefined
-    ? ''
-    : `/${process.env.ASSET_PREFIX}`;
+  process.env.ASSET_PREFIX === undefined;
+
+const baseUrl = isMasterEnvironment ? '' : `/${process.env.ASSET_PREFIX}`;
+const appendix = isMasterEnvironment ? '' : '/index.html';
 
 module.exports = {
   env: {
@@ -34,5 +35,6 @@ module.exports = {
   assetPrefix: baseUrl,
   publicRuntimeConfig: {
     baseUrl,
+    appendix,
   },
 };

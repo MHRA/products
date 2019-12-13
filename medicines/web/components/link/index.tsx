@@ -4,13 +4,14 @@ import { UrlObject } from 'url';
 
 type Url = string | UrlObject;
 const MhraLink: React.FC<LinkProps> = props => {
+  const { baseUrl, appendix } = getConfig().publicRuntimeConfig;
   let href: Url;
   if (typeof props.href === 'string') {
-    href = getConfig().publicRuntimeConfig.baseUrl + props.href;
+    href = `${baseUrl}${props.href}${appendix}`;
   } else {
     href = {
       ...props.href,
-      pathname: getConfig().publicRuntimeConfig.baseUrl + props.href.pathname,
+      pathname: `${baseUrl}${props.href.pathname}${appendix}`,
     };
   }
 
