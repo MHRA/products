@@ -24,7 +24,7 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 #### Provision infrastructure
 
 1. Change to the relevant directory
-1. Initialize terraform (ensure providers are installed and backend is initialized)
+1. Initialize terraform (ensure providers/modules are installed and backend is initialized)
 1. Create a plan, or apply the infrastructure
 
    ```bash
