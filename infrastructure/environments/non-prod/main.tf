@@ -12,7 +12,7 @@ terraform {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.RESOURCE_GROUP
+  name     = var.RESOURCE_GROUP_PRODUCTS
   location = var.REGION
 }
 

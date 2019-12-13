@@ -12,7 +12,7 @@ variable "REGION" {
   description = "Azure region"
   default     = "uksouth"
 }
-variable "RESOURCE_GROUP" {
-  description = "Resource group name"
-  default     = "nonprod"
+variable "RESOURCE_GROUP_PRODUCTS" {
+  description = "Products resource group name"
+  default     = "products"
 }

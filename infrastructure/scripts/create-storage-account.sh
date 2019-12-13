@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 RESOURCE_GROUP_NAME=tfstate
 STORAGE_ACCOUNT_NAME=tfstate$RANDOM
 CONTAINER_NAME=tfstate

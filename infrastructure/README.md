@@ -14,7 +14,12 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    az account set --subscription="SUBSCRIPTION_ID"
    ```
 
-1. If you don't already have a storage account for the Terraform state, create one now
+1. If you don't already have a storage account for the Terraform state, create one now:
+
+   ```bash
+   # copy and paste the final output from this script to export ENV vars for the steps below
+   ./scripts/create-storage-account.sh
+   ```
 
 #### Provision infrastructure
 
