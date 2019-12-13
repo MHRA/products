@@ -1,17 +1,10 @@
 import React from "react"
 import { Link as GatsbyLink } from "gatsby"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import { anchorColour, mhra } from "../../utils/colors"
 import { FiExternalLink } from "react-icons/fi"
 
-const GatsbyLinkStyled = styled(GatsbyLink)`
-  color: ${anchorColour};
-  &:hover,
-  &:active {
-    color: ${mhra};
-  }
-`
-const Footnote = styled.a`
+const linkStyle = css`
   color: ${anchorColour};
   &:hover,
   &:active {
@@ -19,12 +12,15 @@ const Footnote = styled.a`
   }
 `
 
-const ExternalLink = styled.a`
-  color: ${anchorColour};
-  &:hover,
-  &:active {
-    color: ${mhra};
-  }
+const GatsbyLinkStyled = styled(GatsbyLink)`
+  ${linkStyle}
+`
+
+const StyledLink = styled.a`
+  ${linkStyle}
+`
+
+const ExternalLink = styled(StyledLink)`
   span {
     display: inline-block;
     padding-left: 0.3em;
@@ -32,13 +28,11 @@ const ExternalLink = styled.a`
 `
 
 const Link = ({ children, to, activeClassName, partiallyActive, ...other }) => {
-  // Tailor the following test to your environment.
-  // This example assumes that any internal link (intended for Gatsby)
-  // will start with exactly one slash, and that anything else is external.
   const internal = /^\/(?!\/)/.test(to)
-  const footnote = /^#(?!\/)/.test(to)
-  // Use Gatsby Link for internal links, and <a> for others
-  if (internal) {
+  const hash = /^#(?!\/)/.test(to)
+  const file = /^.*\.(jpg|JPG|gif|GIF|doc|DOC|pdf|PDF)$/.test(to)
+
+  if (internal && !file) {
     return (
       <GatsbyLinkStyled
         to={to}
@@ -49,13 +43,24 @@ const Link = ({ children, to, activeClassName, partiallyActive, ...other }) => {
         {children}
       </GatsbyLinkStyled>
     )
-  } else if (footnote) {
+  }
+
+  if (hash) {
     return (
-      <Footnote href={to} {...other}>
+      <StyledLink href={to} {...other}>
         {children}
-      </Footnote>
+      </StyledLink>
     )
   }
+
+  if (file) {
+    return (
+      <StyledLink href={to} {...other}>
+        {children}
+      </StyledLink>
+    )
+  }
+
   return (
     <ExternalLink href={to} target="_blank" {...other}>
       {children}
