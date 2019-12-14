@@ -11,18 +11,26 @@ terraform {
   }
 }
 
-resource "azurerm_resource_group" "rg" {
+resource "azurerm_resource_group" "products" {
   name     = var.RESOURCE_GROUP_PRODUCTS
   location = var.REGION
+
+  tags = {
+    environment = "non-prod"
+  }
 }
 
 resource "azurerm_storage_account" "products" {
   name                     = "mhraproductsnonprod"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.products.name
+  location                 = azurerm_resource_group.products.location
   account_kind             = "StorageV2"
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
+
+  tags = {
+    environment = "non-prod"
+  }
 }
 
 resource "azurerm_storage_container" "website" {
@@ -44,3 +52,13 @@ module "staticweb" {
   storage_account_name = azurerm_storage_account.products.name
 }
 
+resource "azurerm_search_service" "search" {
+  name                = "mhraproductsnonprod"
+  resource_group_name = azurerm_resource_group.products.name
+  location            = azurerm_resource_group.products.location
+  sku                 = "basic"
+
+  tags = {
+    environment = "non-prod"
+  }
+}
