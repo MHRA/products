@@ -52,7 +52,7 @@ stages:
         pool:
           vmImage: ubuntu-latest
         variables:
-          GOOGLE_ANALYTICS_TACKING_ID: UA-6838115-14
+          GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
           GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
         steps:
           - script: |
