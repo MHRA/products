@@ -164,18 +164,12 @@ class Layout extends React.Component {
                 </li>
                 <li>
                   <p>
-                    <Link to="/privacy">Privacy Policy</Link>
+                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank">Privacy Policy</a>
                   </p>
                 </li>
                 <li>
                   <p>
                     <Link to="/accessibility">Accessibility Statement</Link>
-                  </p>
-                </li>
-                <li>
-                  <p>
-                    Built by the Medicines &amp; Healthcare products Regulatory
-                    Agency © {new Date().getFullYear()}
                   </p>
                 </li>
               </ul>
