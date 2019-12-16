@@ -33,7 +33,18 @@ module.exports = {
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        //trackingId: `ADD YOUR TRACKING ID HERE`,
+        ...(process.env.GOOGLE_ANALYTICS_TRACKING_ID && {
+          trackingId: process.env.GOOGLE_ANALYTICS_TRACKING_ID,
+        }),
+        head: true,
+      },
+    },
+    {
+      resolve: "gatsby-plugin-google-tagmanager",
+      options: {
+        ...(process.env.GOOGLE_TAG_MANAGER_ID && {
+          id: process.env.GOOGLE_TAG_MANAGER_ID,
+        }),
       },
     },
     `gatsby-plugin-offline`,
