@@ -15,7 +15,7 @@ const HomepageLink = styled.div`
     background-color: ${mhraBlue10};
     display: flex;
     align-items: center;
-    min-height: ${rhythm(4)};
+    height: ${rhythm(4)};
     justify-content: left;
     padding: 0 ${rhythm(1.4)};
     text-decoration: none;
