@@ -18,6 +18,7 @@ pub fn get_from_env(environment_variable: &str) -> String {
 
 #[cfg(test)]
 mod test {
+    use self::rand::Rng;
     use super::*;
     #[test]
     fn test_get_env_var() {
