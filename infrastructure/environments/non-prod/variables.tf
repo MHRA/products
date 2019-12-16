@@ -19,8 +19,3 @@ variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
   default     = "products"
 }
-
-variable "RESOURCE_GROUP_CPD" {
-  description = "Continuous Professional Development resource group name"
-  default     = "cpd"
-}
