@@ -17,13 +17,15 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 1. If you don't already have a storage account for the Terraform state, create one now:
 
    ```bash
+   cd infrastructure
+
    # copy and paste the final output from this script to export ENV vars for the steps below
    ./scripts/create-storage-account.sh
    ```
 
 #### Provision infrastructure
 
-1. Change to the relevant directory
+1. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
 1. Initialize terraform (ensure providers/modules are installed and backend is initialized)
 1. Create a plan, or apply the infrastructure
 

@@ -33,7 +33,7 @@ resource "azurerm_storage_account" "products" {
   }
 }
 
-resource "azurerm_storage_container" "website" {
+resource "azurerm_storage_container" "products_website" {
   name                  = "$web"
   storage_account_name  = azurerm_storage_account.products.name
   container_access_type = "container"
@@ -47,7 +47,7 @@ resource "azurerm_storage_container" "docs" {
 
 # waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
 # (which is imminent), but in the meantime ...
-module "staticweb" {
+module "products_staticweb" {
   source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
   storage_account_name = azurerm_storage_account.products.name
 }
@@ -63,19 +63,10 @@ resource "azurerm_search_service" "search" {
   }
 }
 
-resource "azurerm_resource_group" "cpd" {
-  name     = var.RESOURCE_GROUP_CPD
-  location = var.REGION
-
-  tags = {
-    environment = "non-prod"
-  }
-}
-
 resource "azurerm_storage_account" "cpd" {
   name                     = "mhracpdnonprod"
-  resource_group_name      = azurerm_resource_group.cpd.name
-  location                 = azurerm_resource_group.cpd.location
+  resource_group_name      = azurerm_resource_group.products.name
+  location                 = azurerm_resource_group.products.location
   account_kind             = "StorageV2"
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
@@ -85,7 +76,7 @@ resource "azurerm_storage_account" "cpd" {
   }
 }
 
-resource "azurerm_storage_container" "website" {
+resource "azurerm_storage_container" "cpd_website" {
   name                  = "$web"
   storage_account_name  = azurerm_storage_account.cpd.name
   container_access_type = "container"
@@ -93,7 +84,7 @@ resource "azurerm_storage_container" "website" {
 
 # waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
 # (which is imminent), but in the meantime ...
-module "staticweb" {
+module "cpd_staticweb" {
   source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
   storage_account_name = azurerm_storage_account.cpd.name
 }

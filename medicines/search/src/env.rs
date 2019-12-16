@@ -1,6 +1,5 @@
 extern crate rand;
 
-use self::rand::Rng;
 use std::env;
 
 pub const API_ADMIN_KEY: &str = "API_ADMIN_KEY";
