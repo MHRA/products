@@ -173,12 +173,6 @@ class Layout extends React.Component {
                     <Link to="/accessibility">Accessibility Statement</Link>
                   </p>
                 </li>
-                <li>
-                  <p>
-                    Built by the Medicines &amp; Healthcare products Regulatory
-                    Agency © {new Date().getFullYear()}
-                  </p>
-                </li>
               </ul>
             </FooterNav>
           </Wrapper>
