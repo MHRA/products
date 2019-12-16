@@ -1,13 +1,17 @@
+import { MDXProvider } from "@mdx-js/react"
 import Layout from "../components/Layout"
 import SEO from "../components/SEO"
+import { components } from "../utils/mdx-components"
 
 export default ({ children }) => {
   const title = `Accessibility statement`
   return (
-    <Layout title={title}>
-      <SEO title={title} />
-      {children}
-    </Layout>
+    <MDXProvider components={components}>
+      <Layout title={title}>
+        <SEO title={title} />
+        {children}
+      </Layout>
+    </MDXProvider>
   )
 }
 
