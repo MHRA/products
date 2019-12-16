@@ -164,7 +164,7 @@ class Layout extends React.Component {
                 </li>
                 <li>
                   <p>
-                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank">Privacy Policy</a>
+                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
                   </p>
                 </li>
                 <li>

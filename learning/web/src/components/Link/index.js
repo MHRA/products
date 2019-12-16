@@ -61,8 +61,9 @@ const Link = ({ children, to, activeClassName, partiallyActive, ...other }) => {
     )
   }
 
+  // rel attribute addresses warning about security risk explained at https://mathiasbynens.github.io/rel-noopener/
   return (
-    <ExternalLink href={to} target="_blank" {...other}>
+    <ExternalLink href={to} target="_blank" rel="noopener noreferrer" {...other}>
       {children}
       <span>
         <FiExternalLink />
