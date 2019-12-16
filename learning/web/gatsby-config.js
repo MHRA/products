@@ -1,7 +1,7 @@
 module.exports = {
   pathPrefix: process.env.PATH_PREFIX || "/",
   siteMetadata: {
-    title: `Continuous Professional Development`,
+    title: `Learning Modules for Continuous Professional Development`,
     author: `MHRA`,
     description: `Medicines and Healthcare products Regulatory Agency Continuous Professional Development`,
   },
