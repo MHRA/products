@@ -40,3 +40,15 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    terraform plan # optional
    terraform apply
    ```
+
+1. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
+
+   ```
+   Outputs:
+
+   cpd-primary-access-key = APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
+   cpd-static-web-url = https://mhracpdnonprod.z33.web.core.windows.net/
+   products-primary-access-key = ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
+   products-static-web-url = https://mhraproductsnonprod.z33.web.core.windows.net/
+   search_admin_key = CB28B1A47E29FF4620184BD27B89945E
+   ```
