@@ -8,6 +8,7 @@ import styled from "styled-components"
 import { media, visuallyHidden } from "../../utils/theme"
 import Sidebar from "../Sidebar"
 import CookieBanner from "../CookieBanner"
+import { ExternalLink } from "../Link"
 
 const maxWidth = `${1024 / 16}em`
 const paddingTopBottom = rhythm(1.5)
@@ -164,7 +165,7 @@ class Layout extends React.Component {
                 </li>
                 <li>
                   <p>
-                    <Link to="/privacy">Privacy Policy</Link>
+                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank">Privacy Policy</a>
                   </p>
                 </li>
                 <li>
