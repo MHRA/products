@@ -95,13 +95,20 @@ const Mip: React.FC = () => {
     '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
     'ig',
   );
+  const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
 
   const prepareSearchTerm = (q: string): string => {
-    return q.trim().replace(extractProductLicenseRegExp, 'PL$3$5');
+    return q
+      .replace(extractProductLicenseRegExp, ' PL$3$5')
+      .replace(whitespaceRegExp, ' ')
+      .trim();
   };
 
   const formatSearchTerm = (s: string): string => {
-    return s.replace(extractProductLicenseRegExp, 'PL $3/$5');
+    return s
+      .replace(extractProductLicenseRegExp, ' PL $3/$5')
+      .replace(whitespaceRegExp, ' ')
+      .trim();
   };
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
