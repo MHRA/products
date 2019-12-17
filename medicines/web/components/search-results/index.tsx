@@ -236,7 +236,7 @@ const SearchResults = (props: {
           </p>
           <p>
             The information about a medicine will be updated when new evidence
-            become available. This may mean that there are differences between
+            becomes available. This may mean that there are differences between
             the information in the pack and the information here. The most
             up-to-date information will be available on this site.
           </p>

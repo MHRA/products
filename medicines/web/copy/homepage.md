@@ -2,7 +2,7 @@ The MHRA products website allows you to find:
 
 - The leaflets which are provided with medicines
 - The description of the medicinal product’s properties and how it can be used
-- Scientific reports about new marketing authorisations for medicines
+- Scientific reports about marketing authorisations for medicines
 
 You can look for any word, phrase or Product Licence number (PL) using the search tool.
 
