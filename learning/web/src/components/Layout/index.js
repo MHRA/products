@@ -1,13 +1,13 @@
 import React from "react"
 import { Link } from "gatsby"
 
-import { rhythm } from "../utils/typography"
-import SvgMhraLogo from "./Logos/mhra-logo"
-import SvgAgencyDigitalLogo from "./Logos/agency-digital-logo"
+import { rhythm } from "../../utils/typography"
+import SvgMhraLogo from "../Logos/mhra-logo"
+import SvgAgencyDigitalLogo from "../Logos/agency-digital-logo"
 import styled from "styled-components"
-import { media, visuallyHidden } from "../utils/theme"
-import Sidebar from "./Sidebar"
-import CookieBanner from "./CookieBanner"
+import { media, visuallyHidden } from "../../utils/theme"
+import Sidebar from "../Sidebar"
+import CookieBanner from "../CookieBanner"
 
 const maxWidth = `${1024 / 16}em`
 const paddingTopBottom = rhythm(1.5)
@@ -20,7 +20,7 @@ const Header = styled.header`
   h1 {
     margin-bottom: 0;
     margin-top: ${paddingTopBottom};
-    padding: 0 ${paddingLeftRight} 0.5rem;
+    padding: 0 ${paddingLeftRight} 1.5rem;
   }
 
   a {
@@ -57,10 +57,12 @@ const Main = styled.main`
 
 const Content = styled.div`
   flex: 2;
+  margin-top: ${rhythm(2)};
   padding: 0 ${paddingLeftRight};
 
   ${media.desktop`
-    padding: 0 1.25rem 0 0;
+    margin-top: 0;
+    padding: 0;
   `};
 `
 
@@ -162,18 +164,12 @@ class Layout extends React.Component {
                 </li>
                 <li>
                   <p>
-                    <Link to="/privacy">Privacy Policy</Link>
+                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
                   </p>
                 </li>
                 <li>
                   <p>
                     <Link to="/accessibility">Accessibility Statement</Link>
-                  </p>
-                </li>
-                <li>
-                  <p>
-                    Built by the Medicines &amp; Healthcare products Regulatory
-                    Agency © {new Date().getFullYear()}
                   </p>
                 </li>
               </ul>

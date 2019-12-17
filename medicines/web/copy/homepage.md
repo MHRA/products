@@ -16,7 +16,7 @@ PILs are based on the Summaries of Product Characteristics (SPCs) which are a de
 
 You can use the A-Z list to find an active substance, or search for a medicine.
 
-## Publish Assessment Resports (PARs)
+## Publish Assessment Reports (PARs)
 
 We publish scientific assessment reports called a Public Assessment Report (PAR) available for new marketing authorisations granted after 30 October 2005.
 

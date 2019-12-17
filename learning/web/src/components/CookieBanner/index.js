@@ -63,7 +63,7 @@ const CookieBanner = () => {
   useEffect(() => {
     const showBanner = window.localStorage.getItem(banner)
     showBanner === "false" ? setCookieBanner(false) : setCookieBanner(true)
-  })
+  }, [])
 
   return cookieBanner ? (
     <StyledCookieBanner>
