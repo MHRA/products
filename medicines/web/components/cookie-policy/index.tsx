@@ -69,15 +69,14 @@ const CookieBanner: React.FC = () => {
     <StyledCookieBanner>
       <div>
         <p>
-          MHRA uses cookies which are essential for the site to work. We also
-          use non-essential cookies to help us improve our services. Any data
-          collected is anonymised. To know more about our policies, please go to
-          our&nbsp;
+          MHRA uses cookies which are essential for the site to work.
+          We also use Google Analytics  cookies to help us improve our services.
+          We do not collect any data that would identify you directly.
+          To know more about our policies, please go to our&nbsp;
           <Link href="cookies">
             <a>cookie policy page</a>
           </Link>
-          .&nbsp;By continuing to use this site, you agree to our use of
-          cookies.
+          .
         </p>
         <button onClick={handleOnClick}>Accept cookies</button>
       </div>
