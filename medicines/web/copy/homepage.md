@@ -2,7 +2,7 @@ The MHRA products website allows you to find:
 
 - The leaflets which are provided with medicines
 - The description of the medicinal product’s properties and how it can be used
-- Scientific reports about new marketing authorisations for medicines
+- Scientific reports about marketing authorisations for medicines
 
 You can look for any word, phrase or Product Licence number (PL) using the search tool.
 
@@ -16,7 +16,7 @@ PILs are based on the Summaries of Product Characteristics (SPCs) which are a de
 
 You can use the A-Z list to find an active substance, or search for a medicine.
 
-## Publish Assessment Resports (PARs)
+## Publish Assessment Reports (PARs)
 
 We publish scientific assessment reports called a Public Assessment Report (PAR) available for new marketing authorisations granted after 30 October 2005.
 

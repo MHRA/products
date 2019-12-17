@@ -59,7 +59,7 @@ const StyledDrugList = styled.div`
   }
 
   dt.left {
-    flex: 0;
+    flex: 1;
   }
 
   dt.left .icon {
@@ -73,7 +73,7 @@ const StyledDrugList = styled.div`
   }
 
   dd.right {
-    flex: 1;
+    flex: 12;
     margin-left: 0;
     min-width: 1%;
     padding: 0 ${baseFontSize};
@@ -221,8 +221,8 @@ const SearchResults = (props: {
           )}
           <p className="ema-message">
             If the product information you are seeking does not appear below, it
-            is possible that the product holds a European license and
-            its information may be available at the {emaWebsiteLink()} website.
+            is possible that the product holds a European licence and its
+            information may be available at the {emaWebsiteLink()} website.
           </p>
           <p>
             Before a medicine can be sold in the UK, a number of licenses are
