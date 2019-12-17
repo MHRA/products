@@ -187,11 +187,24 @@ const SearchResults = (props: {
   resultCount: number;
   searchTerm: string;
   showingResultsForTerm: string;
+  disclaimerAgree: boolean;
 }) => {
   const [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
     'showDisclaimer',
     true,
   );
+
+  const {
+    disclaimerAgree,
+    drugs,
+    page,
+    pageSize,
+    resultCount,
+    searchTerm,
+    showingResultsForTerm,
+  } = props;
+
+  const hasDrugs = drugs.length > 0;
 
   const handleOnDisclaimerAgree = (
     event: MouseEvent<HTMLButtonElement>,
@@ -205,18 +218,15 @@ const SearchResults = (props: {
       <StyledDrugList>
         <div>
           <h1 className="title">
-            {searchResultsTitle(
-              props.showingResultsForTerm,
-              props.drugs.length,
-            )}
+            {searchResultsTitle(showingResultsForTerm, drugs.length)}
           </h1>
-          {props.drugs.length > 0 && (
+          {hasDrugs && (
             <p className="no-of-results">
               {searchResultsNumberingInformation({
-                page: props.page,
-                pageSize: props.pageSize,
-                shownResultCount: props.drugs.length,
-                totalResultCount: props.resultCount,
+                page,
+                pageSize,
+                shownResultCount: drugs.length,
+                totalResultCount: resultCount,
               })}
             </p>
           )}
@@ -236,15 +246,15 @@ const SearchResults = (props: {
             You can identify the product in the list below using the PL number.
           </p>
         </div>
-        {showDisclaimerWarning && props.drugs.length > 0 ? (
+        {showDisclaimerWarning && hasDrugs && !disclaimerAgree ? (
           <Disclaimer
             onDisclaimerAgree={handleOnDisclaimerAgree}
-            searchTerm={props.searchTerm}
+            searchTerm={searchTerm}
           />
         ) : (
           <dl>
-            {props.drugs.length > 0 &&
-              props.drugs.map((drug, i) => (
+            {hasDrugs &&
+              drugs.map((drug, i) => (
                 <article key={i}>
                   <dt className="left">
                     <p className="icon">{drug.docType.toUpperCase()}</p>
@@ -283,12 +293,12 @@ const SearchResults = (props: {
         )}
       </StyledDrugList>
 
-      {props.resultCount > props.pageSize && !showDisclaimerWarning ? (
+      {resultCount > pageSize && (!showDisclaimerWarning || disclaimerAgree) ? (
         <Pagination
-          currentPage={props.page}
-          pageSize={props.pageSize}
-          resultCount={props.resultCount}
-          searchTerm={props.searchTerm}
+          currentPage={page}
+          pageSize={pageSize}
+          resultCount={resultCount}
+          searchTerm={searchTerm}
         />
       ) : (
         ''

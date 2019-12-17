@@ -105,8 +105,7 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => {
   };
 
   return (
-    // id (#disclaimer) is used here for pa11y checks.
-    <StyledDisclaimer id="disclaimer">
+    <StyledDisclaimer>
       <p>
         Please read the following information and tick the box to proceed to
         view the product information in pdf format.
@@ -155,7 +154,6 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => {
           <input
             type="checkbox"
             name="agree"
-            // id (#agree-checkbox) is used here for pa11y checks.
             id="agree-checkbox"
             onChange={handleOnCheck}
           />
@@ -165,8 +163,6 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => {
         </div>
         <button
           type="submit"
-          // id (#agree) is used here for pa11y checks.
-          id="agree"
           disabled={!agreed}
           onClick={props.onDisclaimerAgree}
         >

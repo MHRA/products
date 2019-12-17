@@ -52,11 +52,12 @@ const Mip: React.FC = () => {
   const [search, setSearch] = React.useState('');
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [products, setProducts] = React.useState<IProduct[] | null>(null);
+  const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
 
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance },
+    query: { search: searchTerm, page, substance, disclaimer },
   } = router;
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
@@ -119,6 +120,7 @@ const Mip: React.FC = () => {
             parsedPage = 1;
           }
           setPageNumber(parsedPage);
+          if (disclaimer === 'agree') setDisclaimerAgree(true);
           await fetchSearchResults(trimmedTerm, parsedPage);
         })();
       }
@@ -136,6 +138,7 @@ const Mip: React.FC = () => {
           } else {
             setProducts(ss);
           }
+          if (disclaimer === 'agree') setDisclaimerAgree(true);
         })();
       }
     } else {
@@ -144,9 +147,10 @@ const Mip: React.FC = () => {
       setSearch('');
       setShowingResultsForTerm('');
       setProducts(null);
+      setDisclaimerAgree(false);
     }
     window.scrollTo(0, 0);
-  }, [page, searchTerm, substance]);
+  }, [page, searchTerm, substance, disclaimerAgree]);
 
   return (
     <StyledMip>
@@ -182,6 +186,7 @@ const Mip: React.FC = () => {
           page={pageNumber}
           pageSize={pageSize}
           searchTerm={search}
+          disclaimerAgree={disclaimerAgree}
         />
       )}
     </StyledMip>

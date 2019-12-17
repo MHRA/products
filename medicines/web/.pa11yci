@@ -5,15 +5,8 @@
     "http://localhost:3000/accessibility",
     "http://localhost:3000/cookies",
     "http://localhost:3000/?search=eyes&page=1",
-    {
-      "url": "http://localhost:3000/?search=eyes&page=1",
-      "wait": 2000,
-      "actions": [
-        "click element #agree-checkbox",
-        "click element #agree",
-        "wait for element #disclaimer to be removed"
-      ]
-    },
-    "http://localhost:3000/?substance=A&index=true"
+    "http://localhost:3000/?search=eyes&page=1&disclaimer=agree",
+    "http://localhost:3000/?substance=A&index=true",
+    "http://localhost:3000/?&product=true&page=1&search=OLBAS%20OIL&disclaimer=agree"
   ]
 }
