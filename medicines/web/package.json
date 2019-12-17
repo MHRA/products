@@ -28,7 +28,7 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.3",
     "markdown-loader": "^5.1.0",
-    "pa11y": "^5.3",
+    "pa11y-ci": "^2.3.0",
     "prettier": "^1.19.1",
     "ts-node": "^8.5.0",
     "tslint": "^5.20.1",
@@ -56,12 +56,12 @@
   "name": "mhra-mip-website",
   "private": false,
   "scripts": {
-    "a11y": "yarn run pa11y file://$PWD/dist/index.html",
-    "build": "next build && yarn sitemap",
+    "a11y": "yarn start & sleep 5 && yarn run pa11y-ci && kill $!",
+    "build": "next build",
     "dev": "next",
     "lint": "yarn tslint",
     "start": "next start",
-    "export": "next export -o dist",
+    "export": "next export -o dist && yarn sitemap",
     "sitemap": "node ./tools/sitemap-generator.js"
   },
   "version": "1.0.0"
