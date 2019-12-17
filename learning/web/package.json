@@ -44,7 +44,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
-    "pa11y": "^5.3.0",
+    "pa11y-ci": "^2.3.0",
     "prettier": "^1.19.1"
   },
   "homepage": "https://github.com/MHRA/products#readme",
@@ -57,7 +57,7 @@
     "url": "git+https://github.com/MHRA/products.git"
   },
   "scripts": {
-    "a11y": "yarn run pa11y file://$PWD/public/index.html",
+    "a11y": "yarn serve & sleep 5 && yarn run pa11y-ci && kill $!",
     "build": "gatsby build --prefix-paths",
     "dev": "gatsby develop",
     "pretty": "prettier --write \"**/*.{js,jsx,json,md}\"",

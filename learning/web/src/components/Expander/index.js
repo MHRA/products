@@ -65,9 +65,11 @@ const Expander = ({ title, children }) => {
   }
   return (
     <ExpanderStyled>
-      <Button onClick={toggleOpen}>{title}</Button>
+      <Button onClick={toggleOpen} title="expand">
+        {title}
+      </Button>
       <Body className={open ? undefined : "hidden"}>
-        <CloseButton onClick={toggleOpen}>
+        <CloseButton onClick={toggleOpen} title="close">
           <MdClose />
         </CloseButton>
         {children}
