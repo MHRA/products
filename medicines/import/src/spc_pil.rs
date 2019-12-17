@@ -1,12 +1,17 @@
-use crate::{csv, metadata, model, pdf, storage};
+use crate::{csv, hash::hash, metadata, model, pdf, report::Report, storage};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
+use indicatif::{HumanDuration, ProgressBar};
 use std::{collections::HashMap, fs, path::Path, str, time::Instant};
 use tokio_core::reactor::Core;
-use crate::{hash::hash, report::Report};
-use indicatif::{HumanDuration, ProgressBar};
 
-pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8, dryrun: bool) -> Result<(), AzureError> {
+pub fn import(
+    dir: &Path,
+    client: Client,
+    mut core: Core,
+    verbosity: i8,
+    dryrun: bool,
+) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(dir) {
         if dryrun {
             println!("This is a dry run, nothing will be uploaded!");
@@ -14,7 +19,7 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8, dry
         let started = Instant::now();
         let mut report = Report::new(verbosity);
         let pdfs = pdf::get_pdfs(dir).expect("Could not load any PDFs.");
-        let bar = ProgressBar::new(pdfs.len() as u64);
+        let progress_bar = ProgressBar::new(pdfs.len() as u64);
         for path in pdfs {
             let key = path
                 .file_stem()
@@ -48,6 +53,9 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8, dry
                 let title = metadata::sanitize(&record.title);
                 metadata.insert("title", &title);
 
+                let pl_number = metadata::extract_product_license(&title);
+                metadata.insert("pl_number", &pl_number);
+
                 let rev_label = metadata::sanitize(&record.rev_label);
                 metadata.insert("rev_label", &rev_label);
 
@@ -75,7 +83,7 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8, dry
                     continue;
                 }
 
-                if false == dryrun {
+                if !dryrun {
                     storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
                 }
                 report.add_uploaded(&file_name, &hash);
@@ -83,11 +91,14 @@ pub fn import<'a>(dir: &Path, client: Client, mut core: Core, verbosity: i8, dry
                 report.add_skipped_incomplete(key);
             }
             if verbosity == 0 {
-                bar.inc(1);
+                progress_bar.inc(1);
             }
         }
-        bar.finish();
-        println!("Importing SPCs & PILs finished in {}", HumanDuration(started.elapsed()));
+        progress_bar.finish();
+        println!(
+            "Importing SPCs & PILs finished in {}",
+            HumanDuration(started.elapsed())
+        );
         report.print_report();
     }
     Ok(())
