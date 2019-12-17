@@ -78,6 +78,7 @@ const StyledSearch = styled.section`
 const labelString = 'Enter a product, active substance, or PL number:';
 
 interface ISearchProps {
+  onSearchBlur: (e: FormEvent<HTMLInputElement>) => void;
   onSearchChange: (e: FormEvent<HTMLInputElement>) => void;
   onSearchSubmit: (e: FormEvent<HTMLFormElement>) => void;
   search: string;
@@ -97,6 +98,7 @@ const Search: React.FC<ISearchProps> = props => (
           id="search"
           value={props.search}
           onChange={props.onSearchChange}
+          onBlur={props.onSearchBlur}
         />
         <input type="submit" value="Search" />
       </div>
