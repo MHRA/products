@@ -1,7 +1,7 @@
-import React, { ChangeEvent } from 'react';
+import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useSessionStorage } from '../../hooks';
-import { mhraBlue10, mhraBlue80, mhraGray10, white } from '../../styles/colors';
+import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -193,10 +193,11 @@ const SearchResults = (props: {
     true,
   );
 
-  const handleOnCheck = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (event.target.checked) {
-      setTimeout(() => setShowDisclaimerWarning(false), 1000);
-    }
+  const handleOnDisclaimerAgree = (
+    event: MouseEvent<HTMLButtonElement>,
+  ): void => {
+    event.preventDefault();
+    setTimeout(() => setShowDisclaimerWarning(false), 1000);
   };
 
   return (
@@ -237,7 +238,7 @@ const SearchResults = (props: {
         </div>
         {showDisclaimerWarning && props.drugs.length > 0 ? (
           <Disclaimer
-            onDisclaimerCheck={handleOnCheck}
+            onDisclaimerAgree={handleOnDisclaimerAgree}
             searchTerm={props.searchTerm}
           />
         ) : (

@@ -1,17 +1,32 @@
 import Link from 'next/link';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, MouseEvent, useState } from 'react';
 import styled from 'styled-components';
-import { anchorColour, black, mhra } from '../../styles/colors';
+import {
+  anchorColour,
+  black,
+  mhra,
+  mhra70,
+  mhraGray,
+  mhraWhite,
+  primaryColor,
+} from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';
 
 interface IDisclaimerProps {
-  onDisclaimerCheck: (event: ChangeEvent<HTMLInputElement>) => void;
+  onDisclaimerAgree: (event: MouseEvent<HTMLButtonElement>) => void;
   searchTerm: string;
 }
 
+const DisclaimerWrapper = styled.div`
+  border-radius: 10px;
+  background-color: rgba(254, 212, 50, 0.5);
+  padding: ${baseSpace};
+  margin-bottom: 30px;
+`;
 const StyledDisclaimer = styled.section`
   margin-top: 50px;
   margin-bottom: 50px;
+
   h3 {
     margin-top: 0;
     margin-bottom: 2.2rem;
@@ -31,7 +46,7 @@ const StyledDisclaimer = styled.section`
     color: ${mhra};
   }
 
-  form {
+  form div {
     display: flex;
     margin-top: 3.24rem;
   }
@@ -52,62 +67,114 @@ const StyledDisclaimer = styled.section`
     background-repeat: no-repeat;
   }
 
+  button[type='submit'] {
+    display: block;
+    cursor: pointer;
+    color: ${mhraWhite};
+    background-color: ${primaryColor};
+    align-self: flex-end;
+    max-width: 50%;
+    border-radius: 6px;
+    text-decoration: none;
+    -webkit-appearance: none;
+    border: solid 1px ${mhra70};
+    padding: 0.5em 1em;
+    margin-top: 1em;
+
+    &:disabled {
+      background-color: ${mhraGray};
+      border: solid 1px ${mhraGray};
+      cursor: not-allowed;
+    }
+
+    &:hover:enabled {
+      background-color: ${mhra70};
+    }
+  }
+
   label {
     font-size: 1.125rem;
   }
 `;
 
-const Disclaimer: React.FC<IDisclaimerProps> = props => (
-  <StyledDisclaimer>
-    <p>
-      Please read the following information and tick the box to proceed to view
-      the product information in pdf format.
-    </p>
-    <div>
-      <h3>Disclaimer:</h3>
+const Disclaimer: React.FC<IDisclaimerProps> = props => {
+  const [agreed, setAgreed] = useState(false);
+
+  const handleOnCheck = (event: ChangeEvent<HTMLInputElement>): void => {
+    setAgreed(!agreed);
+  };
+
+  return (
+    // id (#disclaimer) is used here for pa11y checks.
+    <StyledDisclaimer id="disclaimer">
       <p>
-        I understand that this information is a copy of the Summary of Product
-        Characteristics and patient information leaflet for a medicine, which
-        outline the conditions under which the medicine should be used and
-        information on its known safety.
+        Please read the following information and tick the box to proceed to
+        view the product information in pdf format.
       </p>
+      <DisclaimerWrapper>
+        <h3>Disclaimer:</h3>
+        <p>
+          I understand that this information is a copy of the Summary of Product
+          Characteristics and patient information leaflet for a medicine, which
+          outline the conditions under which the medicine should be used and
+          information on its known safety.
+        </p>
+        <p>
+          I understand that this information may be updated several times during
+          the product’s lifecycle, and that there could be differences between
+          the of the information shown here and other information in the public
+          domain.
+        </p>
+        <p>
+          I understand that the MHRA is unable to offer medical advice and that
+          if a patient has any questions about a medicine they are taking they
+          should contact their doctor or pharmacist. Patients should not stop
+          taking any prescribed medicines without first speaking to a healthcare
+          professional. Suspected adverse reactions to a medicine can be
+          reported to us on a{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://yellowcard.mhra.gov.uk/"
+          >
+            Yellow Card.
+          </a>
+        </p>
+        <p>
+          I understand that the MHRA has used its best endeavours in publishing
+          this information, but accept that the information may not be the most
+          up to date version for this product.
+        </p>
+      </DisclaimerWrapper>
       <p>
-        I understand that this information may be updated several times during the product’s lifecycle, and that there could be differences between the of the information shown here and other information in the public domain.
+        To view details for <em>{props.searchTerm}</em>, please read and accept
+        the disclaimer.
       </p>
-      <p>
-        I understand that the MHRA is unable to offer medical advice and that if a
-        patient has any questions about a medicine they are taking they should
-        contact their doctor or pharmacist. Patients should not stop taking any
-        prescribed medicines without first speaking to a healthcare professional.
-        Suspected adverse reactions to a medicine can be reported to us on a{' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://yellowcard.mhra.gov.uk/"
+      <form>
+        <div>
+          <input
+            type="checkbox"
+            name="agree"
+            // id (#agree-checkbox) is used here for pa11y checks.
+            id="agree-checkbox"
+            onChange={handleOnCheck}
+          />
+          <label htmlFor="agree-checkbox">
+            I have read and understand the disclaimer.
+          </label>
+        </div>
+        <button
+          type="submit"
+          // id (#agree) is used here for pa11y checks.
+          id="agree"
+          disabled={!agreed}
+          onClick={props.onDisclaimerAgree}
         >
-          Yellow Card.
-        </a>
-      </p>
-      <p>
-        I understand that the MHRA has used its best endeavours in publishing
-        this information, but accept that the information may not be the most
-        up to date version for this product.
-      </p>
-    </div>
-    <p>
-      To view details for <em>{props.searchTerm}</em>, please read and accept
-      the disclaimer.
-    </p>
-    <form>
-      <input
-        type="checkbox"
-        name="agree"
-        id="agree"
-        onChange={props.onDisclaimerCheck}
-      />
-      <label htmlFor="agree">I have read and understand the disclaimer.</label>
-    </form>
-  </StyledDisclaimer>
-);
+          Agree
+        </button>
+      </form>
+    </StyledDisclaimer>
+  );
+};
 
 export default Disclaimer;
