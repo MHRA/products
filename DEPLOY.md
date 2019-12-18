@@ -41,10 +41,26 @@ For more info check out the readme [here](infrastructure/README.md), but remembe
 ## Data Import
 
 PARs, SPCs and PILs:
+products-primary-access-key === STORAGE_MASTER_KEY
+search_admin_key === API_ADMIN_KEY
+cpd-primary-access-key === CPD_STORAGE_KEY
+
+```bash
+export PRODUCTS_APPLICATION_NAME=mhraproductsnonprod
+export CPD_APPLICATION_NAME=mhracpdnonprod
+export STORAGE_ACCOUNT=$PRODUCTS_APPLICATION_NAME
+export STORAGE_MASTER_KEY=ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
+export STORAGE_CONTAINER=docs
+export SEARCH_SERVICE=$PRODUCTS_APPLICATION_NAME
+export API_ADMIN_KEY=CB28B1A47E29FF4620184BD27B89945E
+export DATASOURCE_NAME=products-datasource
+export INDEX_NAME=products-index
+export INDEXER_NAME=products-index
+export CPD_STORAGE_KEY=APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
+```
 
 ```bash
 cd ../import
-export STORAGE_ACCOUNT=mhraproductsnonprod STORAGE_MASTER_KEY=ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ== STORAGE_CONTAINER=docs
 cargo run --bin import par -d ~/mhra-docs/par
 cargo run --bin import spcpil -d ~/mhra-docs/spc-pil
 ```
@@ -53,16 +69,17 @@ Set up search index:
 
 ```bash
 cd ../search
-export SEARCH_SERVICE=mhraproductsnonprod API_ADMIN_KEY=CB28B1A47E29FF4620184BD27B89945E DATASOURCE_NAME=products-datasource STORAGE_ACCOUNT=mhraproductsnonprod STORAGE_CONTAINER=docs STORAGE_MASTER_KEY=ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ== INDEX_NAME=products-index INDEXER_NAME=products-index
 cargo run create_datasource
 cargo run create_index
 cargo run create_indexer
-az search query-key create --resource-group=products --service-name=mhraproductsnonprod -n query
+az search query-key list --resource-group=products --service-name=$PRODUCTS_APPLICATION_NAME --output table
 ```
 
 ## Deploy Web
 
 Deploy products Web:
+
+_Note: `AZURE_SEARCH_KEY` comes from previous steps output._
 
 ```bash
 cd ../web
@@ -72,7 +89,7 @@ export AZURE_SEARCH_EXACTNESS_BOOST=4
 export AZURE_SEARCH_INDEX=products-index
 export AZURE_SEARCH_KEY=D564774FD5DF33C1A8C6A9C98985C21B
 export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
-export AZURE_SEARCH_SERVICE=mhraproductsnonprod
+export AZURE_SEARCH_SERVICE=$PRODUCTS_APPLICATION_NAME
 export AZURE_SEARCH_WORD_FUZZINESS=1
 export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
 export GOOGLE_TRACKING_ID=UA-6838115-11
@@ -80,14 +97,16 @@ yarn
 yarn build
 yarn export
 cd dist
-az storage blob upload-batch -d \$web -s . --account-name=mhraproductsnonprod --account-key=ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
+az storage blob upload-batch -d \$web -s . --account-name=$PRODUCTS_APPLICATION_NAME --account-key=$STORAGE_MASTER_KEY
 ```
 
 Deploy learning web:
 
 ```bash
-../../../learning/web
+cd ../../../learning/web
+export GOOGLE_ANALYTICS_TRACKING_ID=UA-6838115-14
+export GOOGLE_TAG_MANAGER_ID=GTM-WJ5TW34
 yarn && yarn build
 cd public
-az storage blob upload-batch -d \$web -s . --account-name=mhracpdnonprod --account-key=APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
+az storage blob upload-batch -d \$web -s . --account-name=$CPD_APPLICATION_NAME --account-key=$CPD_STORAGE_KEY
 ```
