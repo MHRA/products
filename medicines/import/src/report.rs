@@ -1,7 +1,7 @@
 struct Uploaded {
     file_name: String,
     hash: String,
-    pl_numbers: u8
+    pl_numbers: u8,
 }
 
 struct SkippedDuplicate {
@@ -44,7 +44,7 @@ impl Report {
         self.uploaded.push(Uploaded {
             file_name: file_name.to_string(),
             hash: hash.to_string(),
-            pl_numbers: pl_numbers_count
+            pl_numbers: pl_numbers_count,
         });
 
         if self.verbosity >= 2 {
@@ -108,13 +108,11 @@ impl Report {
         );
 
         println!("---------------");
-        println!("Files with no product license numbers:");
-        self.uploaded.iter().filter(|f| f.pl_numbers == 0).for_each(|f| {
-            println!(
-                "- File {} has no product license numbers.",
-                f.file_name
-            )
-        });
+        println!("Files with no product licence numbers:");
+        self.uploaded
+            .iter()
+            .filter(|f| f.pl_numbers == 0)
+            .for_each(|f| println!("- File {} has no product licence numbers.", f.file_name));
 
         println!("---------------");
         println!("Unreleased files ({}):", self.skipped_unreleaseds.len());

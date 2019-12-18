@@ -53,7 +53,7 @@ pub fn import(
                 let title = metadata::sanitize(&record.title);
                 metadata.insert("title", &title);
 
-                let pl_numbers = metadata::extract_product_licenses(&title);
+                let pl_numbers = metadata::extract_product_licences(&title);
                 metadata.insert("pl_number", &pl_numbers);
 
                 let rev_label = metadata::sanitize(&record.rev_label);

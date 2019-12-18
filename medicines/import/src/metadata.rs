@@ -69,15 +69,19 @@ pub fn create_facets_by_active_substance(
     facets
 }
 
-pub fn extract_product_licenses(input: &str) -> String {
+pub fn extract_product_licences(input: &str) -> String {
     lazy_static! {
         static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+|/|_|-)").expect("cannot compile regex");
         static ref RE_PL: Regex = Regex::new(r"(?i:\b|PL)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
             .expect("cannot compile regex");
     }
-    let product_licenses: Vec<String> = RE_PL
+    let product_licences: Vec<String> = RE_PL
         .find_iter(input)
-        .map(|m| RE_WHITESPACE.replace_all(m.as_str(), "").to_ascii_uppercase().to_string())
+        .map(|m| {
+            RE_WHITESPACE
+                .replace_all(m.as_str(), "")
+                .to_ascii_uppercase()
+        })
         .map(|s| {
             if s.starts_with("PL") {
                 s
@@ -87,7 +91,7 @@ pub fn extract_product_licenses(input: &str) -> String {
         })
         .collect();
 
-    to_json(product_licenses)
+    to_json(product_licences)
 }
 
 #[cfg(test)]
@@ -207,17 +211,17 @@ mod test {
         let output = "[\"PL123451234\"]";
         input
             .iter()
-            .for_each(|i| assert_eq!(extract_product_licenses(i), output));
+            .for_each(|i| assert_eq!(extract_product_licences(i), output));
     }
     #[test]
-    fn extract_multiple_product_licenses() {
+    fn extract_multiple_product_licences() {
         let input = "00 PL123451234 01 pl123451235__ 02 123451236-03 PL 12345 1237";
         let output = "[\"PL123451234\",\"PL123451235\",\"PL123451236\",\"PL123451237\"]";
 
-        assert_eq!(extract_product_licenses(input), output);
+        assert_eq!(extract_product_licences(input), output);
     }
     #[test]
     fn extract_product_license_test_not_found() {
-        assert_eq!(extract_product_licenses("no pl number here"), "[]");
+        assert_eq!(extract_product_licences("no pl number here"), "[]");
     }
 }
