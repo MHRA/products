@@ -25,6 +25,9 @@ const StyledYellowCard = styled.section`
   header {
     padding: 1rem;
     background-color: ${mhraYellow};
+    svg {
+      height: 31px;
+    }
   }
 
   div.action-bar {
