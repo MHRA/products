@@ -12,19 +12,15 @@ interface IDisclaimerProps {
 const StyledDisclaimer = styled.section`
   margin-top: 50px;
   margin-bottom: 50px;
-  div {
-    border-radius: 10px;
-    background-color: rgba(254, 212, 50, 0.5);
-    padding: ${baseSpace};
-    margin-bottom: 30px;
-  }
-
   h3 {
     margin-top: 0;
+    margin-bottom: 2.2rem;
+    margin-top: 2rem;
   }
 
   p {
-    font-size: 0.875rem;
+    font-size: 1.188rem;
+    line-height: 1.981rem;
   }
 
   div p:last-of-type {
@@ -37,6 +33,7 @@ const StyledDisclaimer = styled.section`
 
   form {
     display: flex;
+    margin-top: 3.24rem;
   }
 
   input[type='checkbox'] {
