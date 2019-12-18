@@ -72,10 +72,7 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         information on its known safety.
       </p>
       <p>
-        The information about a medicine will be updated when new evidence become
-        available. This may mean that there are differences between the information
-        in the pack and the information here. The most up-to-date information
-        will be available on this site.
+        I understand that this information may be updated several times during the product’s lifecycle, and that there could be differences between the of the information shown here and other information in the public domain.
       </p>
       <p>
         I understand that the MHRA is unable to offer medical advice and that if a
