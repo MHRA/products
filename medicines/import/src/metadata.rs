@@ -1,3 +1,4 @@
+use lazy_static;
 use regex::Regex;
 use std::str;
 use tantivy::tokenizer::*;
@@ -30,11 +31,14 @@ pub fn tokenize(s: &str) -> String {
 }
 
 pub fn to_array(s: &str) -> Vec<String> {
-    let re = Regex::new(r"(,|\s+AND\s+)").unwrap();
-    let pattern_spaces = Regex::new(r"(\s+)").unwrap();
-    re.split(s)
+    lazy_static! {
+        static ref RE_SPLIT: Regex = Regex::new(r"(,|\s+AND\s+)").unwrap();
+        static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+)").unwrap();
+    }
+    RE_SPLIT
+        .split(s)
         .map(|s| s.trim())
-        .map(|s| pattern_spaces.replace_all(s, " "))
+        .map(|s| RE_WHITESPACE.replace_all(s, " "))
         .map(|s| s.replace("\n", " "))
         .map(|s| s.replace(|c: char| !c.is_ascii(), ""))
         .collect()
@@ -63,6 +67,31 @@ pub fn create_facets_by_active_substance(
     facets.sort();
     facets.dedup();
     facets
+}
+
+pub fn extract_product_licences(input: &str) -> String {
+    lazy_static! {
+        static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+|/|_|-)").expect("cannot compile regex");
+        static ref RE_PL: Regex = Regex::new(r"(?i:\b|PL)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
+            .expect("cannot compile regex");
+    }
+    let product_licences: Vec<String> = RE_PL
+        .find_iter(input)
+        .map(|m| {
+            RE_WHITESPACE
+                .replace_all(m.as_str(), "")
+                .to_ascii_uppercase()
+        })
+        .map(|s| {
+            if s.starts_with("PL") {
+                s
+            } else {
+                String::from("PL") + s.as_str()
+            }
+        })
+        .collect();
+
+    to_json(product_licences)
 }
 
 #[cfg(test)]
@@ -148,5 +177,51 @@ mod test {
             create_facets_by_active_substance(product, active_substances),
             expected
         );
+    }
+
+    #[test]
+    fn extract_product_license_test() {
+        let input = vec![
+            "00 PL123451234",
+            "01 pl123451234",
+            "02 123451234",
+            "03 PL 12345 1234",
+            "04 PL  12345 1234",
+            "05 test pl 12345   1234",
+            "06 pl  12345   1234 test",
+            "07 12345 1234",
+            "08 PL 12345/1234",
+            "09 PL/12345/1234",
+            "10 pl 12345/1234",
+            "11 pl/12345/1234",
+            "12 12345/1234",
+            "13 PL 12345_1234",
+            "14 PL_12345_1234",
+            "15 pl 12345_1234",
+            "16 pl_12345_1234",
+            "17 12345_1234",
+            "18 PL 12345-1234",
+            "19 PL-12345-1234",
+            "20 pl 12345-1234",
+            "21 pl-12345-1234",
+            "22 12345-1234",
+            "23 12345-1234GG",
+            "leaflet MAH GENERIC_PL 12345-1234R.pdf",
+        ];
+        let output = "[\"PL123451234\"]";
+        input
+            .iter()
+            .for_each(|i| assert_eq!(extract_product_licences(i), output));
+    }
+    #[test]
+    fn extract_multiple_product_licences() {
+        let input = "00 PL123451234 01 pl123451235__ 02 123451236-03 PL 12345 1237";
+        let output = "[\"PL123451234\",\"PL123451235\",\"PL123451236\",\"PL123451237\"]";
+
+        assert_eq!(extract_product_licences(input), output);
+    }
+    #[test]
+    fn extract_product_license_test_not_found() {
+        assert_eq!(extract_product_licences("no pl number here"), "[]");
     }
 }

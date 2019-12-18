@@ -13,7 +13,7 @@ pub const STORAGE_MASTER_KEY: &str = "STORAGE_MASTER_KEY";
 
 pub fn get_from_env(environment_variable: &str) -> String {
     env::var(environment_variable)
-        .expect(format!("Set env variable {} first!", environment_variable).as_ref())
+        .unwrap_or_else(|e| format!("Set env variable {} first!, {:?}", environment_variable, e))
 }
 
 #[cfg(test)]

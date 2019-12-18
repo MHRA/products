@@ -152,6 +152,21 @@
       "fields": []
     },
     {
+      "name": "pl_number",
+      "type": "Collection(Edm.String)",
+      "facetable": true,
+      "filterable": true,
+      "key": false,
+      "retrievable": false,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "file_name",
       "type": "Edm.String",
       "facetable": false,
@@ -293,11 +308,6 @@
     }
   ],
   "suggesters": [
-    {
-      "name": "azure-suggester",
-      "searchMode": "analyzingInfixMatching",
-      "sourceFields": ["suggestions", "title", "substance_name", "product_name"]
-    }
   ],
   "scoringProfiles": [
     {
@@ -305,6 +315,7 @@
       "text": {
         "weights": {
           "keywords": 3,
+          "pl_number": 10,
           "product_name": 3
         }
       }

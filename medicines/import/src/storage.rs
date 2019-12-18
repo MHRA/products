@@ -14,10 +14,10 @@ pub fn upload(
     core: &mut Core,
     data: &[u8],
     metadata: &HashMap<&str, &str>,
-    verbosity: i8
+    verbosity: i8,
 ) -> Result<(), AzureError> {
-    let container_name = std::env::var("STORAGE_CONTAINER")
-        .expect("Set env variable STORAGE_CONTAINER first!");
+    let container_name =
+        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
 
     if verbosity >= 2 {
         println!("---------------");

@@ -60,6 +60,10 @@ const Mip: React.FC = () => {
     query: { search: searchTerm, page, substance, disclaimer },
   } = router;
 
+  const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
+    setSearch(formatSearchTerm(e.currentTarget.value));
+  };
+
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
@@ -88,8 +92,22 @@ const Mip: React.FC = () => {
     setProducts([]);
   };
 
+  const extractProductLicenseRegExp: RegExp = new RegExp(
+    '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
+    'ig',
+  );
+  const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
+
+  const formatSearchTerm = (s: string): string => {
+    return s
+      .replace(extractProductLicenseRegExp, ' PL $3/$5')
+      .replace(whitespaceRegExp, ' ')
+      .trim();
+  };
+
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSearch(formatSearchTerm(search));
 
     if (search.length > 0) {
       rerouteSearchResults(1);
@@ -104,7 +122,7 @@ const Mip: React.FC = () => {
   const rerouteSearchResults = (pageNo: number) => {
     router.push({
       pathname: router.route,
-      query: { search: search.trim(), page: pageNo },
+      query: { search, page: pageNo },
     });
   };
 
@@ -113,15 +131,14 @@ const Mip: React.FC = () => {
       if (typeof searchTerm === 'string') {
         (async () => {
           setHasIntro(false);
-          const trimmedTerm = searchTerm.trim();
-          setSearch(trimmedTerm);
+          setSearch(formatSearchTerm(searchTerm));
           let parsedPage = Number(page);
           if (!parsedPage || parsedPage < 1) {
             parsedPage = 1;
           }
           setPageNumber(parsedPage);
           if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(trimmedTerm, parsedPage);
+          await fetchSearchResults(searchTerm, parsedPage);
         })();
       }
     } else if (substance) {
@@ -158,6 +175,7 @@ const Mip: React.FC = () => {
         <Search
           search={search}
           onSearchChange={handleSearchChange}
+          onSearchBlur={handleSearchBlur}
           onSearchSubmit={handleSearchSubmit}
         />
         <DrugIndex
@@ -181,7 +199,7 @@ const Mip: React.FC = () => {
       ) : (
         <SearchResults
           drugs={results}
-          showingResultsForTerm={showingResultsForTerm}
+          showingResultsForTerm={formatSearchTerm(showingResultsForTerm)}
           resultCount={resultCount}
           page={pageNumber}
           pageSize={pageSize}

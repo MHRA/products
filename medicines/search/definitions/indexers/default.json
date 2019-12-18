@@ -7,15 +7,19 @@
   },
   "fieldMappings": [
     {
+      "sourceFieldName": "facets",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "pl_number",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
       "sourceFieldName": "suggestions",
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
     },
     {
       "sourceFieldName": "substance_name",
-      "mappingFunction": { "name": "jsonArrayToStringCollection" }
-    },
-    {
-      "sourceFieldName": "facets",
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
     }
   ]
