@@ -30,24 +30,32 @@ pub fn import(
                 let mut metadata: HashMap<&str, &str> = HashMap::new();
                 let file_name = metadata::sanitize(&record.filename);
                 metadata.insert("file_name", &file_name);
+
                 let release_state = metadata::sanitize(&record.release_state);
                 metadata.insert("release_state", &release_state);
-                let doc_type = format!("{:?}", model::DocType::Par);
-
                 if release_state != "Y" {
                     report.add_skipped_unreleased(&file_name, &release_state);
                     continue;
                 }
 
+                let doc_type = format!("{:?}", model::DocType::Par);
                 metadata.insert("doc_type", &doc_type);
+
                 let title = metadata::sanitize(&record.title);
                 metadata.insert("title", &title);
+
+                let pl_number = metadata::extract_product_license(&title);
+                metadata.insert("pl_number", &pl_number);
+
                 let keywords = metadata::tokenize(&record.keywords);
                 metadata.insert("keywords", &keywords);
+
                 let suggestions = metadata::to_json(metadata::to_array(&record.keywords));
                 metadata.insert("suggestions", &suggestions);
+
                 let created = record.created.to_rfc3339();
                 metadata.insert("created", &created);
+
                 let author = metadata::sanitize(&record.author);
                 metadata.insert("author", &author);
 
