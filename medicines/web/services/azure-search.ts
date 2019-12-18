@@ -35,14 +35,28 @@ export interface ISearchResults {
   results: ISearchResult[];
 }
 
+const extractProductLicenseRegExp: RegExp = new RegExp(
+  '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
+  'ig',
+);
+
 const escapeSpecialCharacters = (word: string): string =>
   word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
 
+const addNormalizedProductLicenses = (q: string): string => {
+  const normalizedProductLicences = q
+    .match(extractProductLicenseRegExp)
+    ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'))
+    .join(' ');
+
+  return `${q} ${normalizedProductLicences as string}`;
+};
+
 const buildFuzzyQuery = (query: string): string => {
-  return query
+  return addNormalizedProductLicenses(query)
     .split(' ')
     .map(word => escapeSpecialCharacters(word))
     .map(word => preferExactMatchButSupportFuzzyMatch(word))
