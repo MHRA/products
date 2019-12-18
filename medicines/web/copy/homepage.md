@@ -8,15 +8,17 @@ You can look for any word, phrase or Product Licence number (PL) using the searc
 
 You can also use the A-Z list to find the active substance.
 
-## Summary of products characteristics (SPCs) and Patient Information Leaflet (PILs)
+## Summaries of Product Characteristics (SPCs) and Patient Information Leaflet (PILs)
 
 Every medicine pack includes a patient information leaflet (PIL), which provides information on using the medicine safely.
 
 PILs are based on the Summaries of Product Characteristics (SPCs) which are a description of a medicinal product’s properties and the conditions attached to its use.
 
+We publish the most up-to-date information for a medicine according to its licence history.
+
 You can use the A-Z list to find an active substance, or search for a medicine.
 
-## Publish Assessment Reports (PARs)
+## Public Assessment Reports (PARs)
 
 We publish scientific assessment reports called a Public Assessment Report (PAR) available for new marketing authorisations granted after 30 October 2005.
 

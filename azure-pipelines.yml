@@ -65,10 +65,10 @@ stages:
             displayName: Build learning web (branch)
             condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
-          # - script: |
-          #     yarn a11y
-          #   displayName: Check accessibility
-          #   workingDirectory: $(Build.SourcesDirectory)/learning/web
+          - script: |
+              yarn a11y
+            displayName: Check accessibility
+            workingDirectory: $(Build.SourcesDirectory)/learning/web
           - task: CopyFiles@2
             displayName: Copy Files
             inputs:
