@@ -114,8 +114,7 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => {
       <p>
         I understand that this information may be updated several times during
         the product’s lifecycle, and that there could be differences between the
-        of the information shown here and other information in the public
-        domain.
+        information shown here and other information in the public domain.
       </p>
       <p>
         I understand that the MHRA is unable to offer medical advice and that if
