@@ -71,7 +71,7 @@ We will be ensuring that PDFs published in the future do meet the accessibility 
 
 ## How we tested this website
 
-This website was last tested on <span style='color: red'>date</span>. The test was carried out by the testing team at the Medicines and Healthcare products Regulatory Agency.
+This website was last tested on 16 December 2019. The test was carried out by the testing team at the Medicines and Healthcare products Regulatory Agency.
 
 We used below approach when testing.
 
