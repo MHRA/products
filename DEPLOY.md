@@ -2,7 +2,7 @@
 
 _Note: all secrets in this doc are for demo purposes only and need replacing with the real ones as you go!_
 
-Make sure you run the setup steps [here](infrastructure/README.md) to login and set the Azure subscription ID correctly.
+Make sure you run the setup steps [here](infrastructure/README.md) to login and set the Azure subscription ID correctly. You can use `az account list` to find the correct Azure subscription ID.
 
 ## Set up a new environment
 
