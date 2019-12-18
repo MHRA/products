@@ -1,8 +1,6 @@
-import Link from 'next/link';
-import React, { ChangeEvent, MouseEvent, useState } from 'react';
+import React, { MouseEvent, useState } from 'react';
 import styled from 'styled-components';
 import {
-  anchorColour,
   black,
   mhra,
   mhra70,
@@ -17,12 +15,6 @@ interface IDisclaimerProps {
   searchTerm: string;
 }
 
-const DisclaimerWrapper = styled.div`
-  border-radius: 0.625rem;
-  background-color: rgba(254, 212, 50, 0.5);
-  padding: ${baseSpace};
-  margin-bottom: 1.875rem;
-`;
 const StyledDisclaimer = styled.section`
   margin-top: 3.125rem;
   margin-bottom: 3.125rem;
@@ -42,13 +34,14 @@ const StyledDisclaimer = styled.section`
     margin-bottom: 0;
   }
 
-  a {
-    color: ${mhra};
-  }
-
   form div {
     display: flex;
     margin-top: 3.24rem;
+  }
+
+  form input,
+  form label {
+    cursor: pointer;
   }
 
   input[type='checkbox'] {
@@ -100,7 +93,7 @@ const StyledDisclaimer = styled.section`
 const Disclaimer: React.FC<IDisclaimerProps> = props => {
   const [agreed, setAgreed] = useState(false);
 
-  const handleOnCheck = (event: ChangeEvent<HTMLInputElement>): void => {
+  const handleOnCheck = (): void => {
     setAgreed(!agreed);
   };
 
@@ -110,41 +103,41 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => {
         Please read the following information and tick the box to proceed to
         view the product information in pdf format.
       </p>
-      <DisclaimerWrapper>
-        <h3>Disclaimer:</h3>
-        <p>
-          I understand that this information is a copy of the Summary of Product
-          Characteristics and patient information leaflet for a medicine, which
-          outline the conditions under which the medicine should be used and
-          information on its known safety.
-        </p>
-        <p>
-          I understand that this information may be updated several times during
-          the product’s lifecycle, and that there could be differences between
-          the of the information shown here and other information in the public
-          domain.
-        </p>
-        <p>
-          I understand that the MHRA is unable to offer medical advice and that
-          if a patient has any questions about a medicine they are taking they
-          should contact their doctor or pharmacist. Patients should not stop
-          taking any prescribed medicines without first speaking to a healthcare
-          professional. Suspected adverse reactions to a medicine can be
-          reported to us on a{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://yellowcard.mhra.gov.uk/"
-          >
-            Yellow Card.
-          </a>
-        </p>
-        <p>
-          I understand that the MHRA has used its best endeavours in publishing
-          this information, but accept that the information may not be the most
-          up to date version for this product.
-        </p>
-      </DisclaimerWrapper>
+
+      <h3>Disclaimer:</h3>
+      <p>
+        I understand that this information is a copy of the Summary of Product
+        Characteristics and patient information leaflet for a medicine, which
+        outline the conditions under which the medicine should be used and
+        information on its known safety.
+      </p>
+      <p>
+        I understand that this information may be updated several times during
+        the product’s lifecycle, and that there could be differences between the
+        of the information shown here and other information in the public
+        domain.
+      </p>
+      <p>
+        I understand that the MHRA is unable to offer medical advice and that if
+        a patient has any questions about a medicine they are taking they should
+        contact their doctor or pharmacist. Patients should not stop taking any
+        prescribed medicines without first speaking to a healthcare
+        professional. Suspected adverse reactions to a medicine can be reported
+        to us on a{' '}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://yellowcard.mhra.gov.uk/"
+        >
+          Yellow Card.
+        </a>
+      </p>
+      <p>
+        I understand that the MHRA has used its best endeavours in publishing
+        this information, but accept that the information may not be the most up
+        to date version for this product.
+      </p>
+
       <p>
         To view details for <em>{props.searchTerm}</em>, please read and accept
         the disclaimer.
