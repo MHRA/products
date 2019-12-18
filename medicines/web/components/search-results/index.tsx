@@ -245,6 +245,9 @@ const SearchResults = (props: {
           <p>
             You can identify the product in the list below using the PL number.
           </p>
+          <p>
+          The information about a medicine will be updated when new evidence become available.  This may mean that there are differences between the information in the pack and the information here.  The most up-to-date information will be available on this site.
+          </p>
         </div>
         {showDisclaimerWarning && hasDrugs && !disclaimerAgree ? (
           <Disclaimer
