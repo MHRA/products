@@ -225,7 +225,7 @@ const SearchResults = (props: {
             information may be available at the {emaWebsiteLink()} website.
           </p>
           <p>
-            Before a medicine can be sold in the UK, a number of licenses are
+            Before a medicine can be sold in the UK, a number of licences are
             essential. Products with a UK marketing authorisation have a licence
             number in the format ‘PL 12345/0001’. The first 2 characters are
             always the letters ‘PL’, and this can be found on the packaging of
