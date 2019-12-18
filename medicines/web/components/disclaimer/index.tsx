@@ -12,19 +12,15 @@ interface IDisclaimerProps {
 const StyledDisclaimer = styled.section`
   margin-top: 50px;
   margin-bottom: 50px;
-  div {
-    border-radius: 10px;
-    background-color: rgba(254, 212, 50, 0.5);
-    padding: ${baseSpace};
-    margin-bottom: 30px;
-  }
-
   h3 {
     margin-top: 0;
+    margin-bottom: 2.2rem;
+    margin-top: 2rem;
   }
 
   p {
-    font-size: 0.875rem;
+    font-size: 1.188rem;
+    line-height: 1.981rem;
   }
 
   div p:last-of-type {
@@ -32,14 +28,12 @@ const StyledDisclaimer = styled.section`
   }
 
   a {
-    color: ${anchorColour};
-    &:hover {
-      color: ${mhra};
-    }
+    color: ${mhra};
   }
 
   form {
     display: flex;
+    margin-top: 3.24rem;
   }
 
   input[type='checkbox'] {
@@ -78,18 +72,17 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
         information on its known safety.
       </p>
       <p>
-        I understand that this information may be updated several times during
-        the product’s lifecycle, and that there could be differences between the
-        of the information shown here and other information in the public
-        domain.
+        The information about a medicine will be updated when new evidence become
+        available. This may mean that there are differences between the information
+        in the pack and the information here. The most up-to-date information
+        will be available on this site.
       </p>
       <p>
-        I understand that the MHRA is unable to offer medical advice and that if
-        a patient has any questions about a medicine they are taking they should
+        I understand that the MHRA is unable to offer medical advice and that if a
+        patient has any questions about a medicine they are taking they should
         contact their doctor or pharmacist. Patients should not stop taking any
-        prescribed medicines without first speaking to a healthcare
-        professional. Suspected adverse reactions to a medicine can be reported
-        to us on a{' '}
+        prescribed medicines without first speaking to a healthcare professional.
+        Suspected adverse reactions to a medicine can be reported to us on a{' '}
         <a
           target="_blank"
           rel="noopener noreferrer"
@@ -100,8 +93,8 @@ const Disclaimer: React.FC<IDisclaimerProps> = props => (
       </p>
       <p>
         I understand that the MHRA has used its best endeavours in publishing
-        this information, but accept that the information may not be the most up
-        to date version for this product.
+        this information, but accept that the information may not be the most
+        up to date version for this product.
       </p>
     </div>
     <p>
