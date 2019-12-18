@@ -210,7 +210,7 @@ const SearchResults = (props: {
     event: MouseEvent<HTMLButtonElement>,
   ): void => {
     event.preventDefault();
-    setTimeout(() => setShowDisclaimerWarning(false), 1000);
+    setShowDisclaimerWarning(false);
   };
 
   return (

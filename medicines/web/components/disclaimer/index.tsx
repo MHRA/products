@@ -18,14 +18,14 @@ interface IDisclaimerProps {
 }
 
 const DisclaimerWrapper = styled.div`
-  border-radius: 10px;
+  border-radius: 0.625rem;
   background-color: rgba(254, 212, 50, 0.5);
   padding: ${baseSpace};
-  margin-bottom: 30px;
+  margin-bottom: 1.875rem;
 `;
 const StyledDisclaimer = styled.section`
-  margin-top: 50px;
-  margin-bottom: 50px;
+  margin-top: 3.125rem;
+  margin-bottom: 3.125rem;
 
   h3 {
     margin-top: 0;
@@ -55,9 +55,9 @@ const StyledDisclaimer = styled.section`
     appearance: none;
     border: 1px solid ${black};
     display: block;
-    height: 20px;
-    margin-right: 20px;
-    width: 20px;
+    height: 1.25rem;
+    margin-right: 1.25rem;
+    width: 1.25rem;
   }
 
   input[type='checkbox']:checked {
@@ -74,7 +74,7 @@ const StyledDisclaimer = styled.section`
     background-color: ${primaryColor};
     align-self: flex-end;
     max-width: 50%;
-    border-radius: 6px;
+    border-radius: 0.375rem;
     text-decoration: none;
     -webkit-appearance: none;
     border: solid 1px ${mhra70};
