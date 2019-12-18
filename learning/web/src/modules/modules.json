@@ -2,11 +2,11 @@
   {
     "name": "Antipsychotics",
     "module": "antipsychotics",
-    "link": "/antipsychotics/CON155606_1",
+    "link": "/antipsychotics/about",
     "items": [
       {
         "name": "About this learning module",
-        "link": "/antipsychotics/CON155606_1"
+        "link": "/antipsychotics/about"
       },
       {
         "name": "1. Introduction",
@@ -189,11 +189,11 @@
   {
     "name": "Benzodiazepines",
     "module": "benzodiazepines",
-    "link": "/benzodiazepines/CON234573_1",
+    "link": "/benzodiazepines/about",
     "items": [
       {
         "name": "About this learning module",
-        "link": "/benzodiazepines/CON234573_1"
+        "link": "/benzodiazepines/about"
       },
       {
         "name": "1. Introduction",
@@ -288,11 +288,11 @@
   {
     "name": "Opioids",
     "module": "opioids",
-    "link": "/opioids/CON143740_1",
+    "link": "/opioids/about",
     "items": [
       {
         "name": "About this learning module",
-        "link": "/opioids/CON143740_1"
+        "link": "/opioids/about"
       },
       {
         "name": "1. Introduction",
@@ -365,13 +365,13 @@
     ]
   },
   {
-    "name": "SSRI",
+    "name": "Selective Serotonin Reuptake Inhibitors (SSRI)",
     "module": "ssri",
-    "link": "/ssri/CON146583_1",
+    "link": "/ssri/about",
     "items": [
       {
         "name": "About this learning module",
-        "link": "/ssri/CON146583_1"
+        "link": "/ssri/about"
       },
       {
         "name": "1. Introduction",

@@ -11,7 +11,7 @@ import uuid from "uuid/v4"
 
 const Aside = styled.aside`
   flex: 0 0 ${rhythm(14)};
-  margin: 0 0 ${rhythm(2)};
+  margin: 0;
   background-color: ${mhraGray10};
   ${media.desktop`
     background: none;
