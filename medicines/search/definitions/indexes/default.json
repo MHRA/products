@@ -153,7 +153,7 @@
     },
     {
       "name": "pl_number",
-      "type": "Edm.String",
+      "type": "Collection(Edm.String)",
       "facetable": true,
       "filterable": true,
       "key": false,
@@ -308,11 +308,6 @@
     }
   ],
   "suggesters": [
-    {
-      "name": "azure-suggester",
-      "searchMode": "analyzingInfixMatching",
-      "sourceFields": ["suggestions", "title", "substance_name", "product_name"]
-    }
   ],
   "scoringProfiles": [
     {

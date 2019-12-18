@@ -53,8 +53,8 @@ pub fn import(
                 let title = metadata::sanitize(&record.title);
                 metadata.insert("title", &title);
 
-                let pl_number = metadata::extract_product_license(&title);
-                metadata.insert("pl_number", &pl_number);
+                let pl_numbers = metadata::extract_product_licenses(&title);
+                metadata.insert("pl_number", &pl_numbers);
 
                 let rev_label = metadata::sanitize(&record.rev_label);
                 metadata.insert("rev_label", &rev_label);
@@ -86,7 +86,7 @@ pub fn import(
                 if !dryrun {
                     storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
                 }
-                report.add_uploaded(&file_name, &hash);
+                report.add_uploaded(&file_name, &hash, &pl_numbers);
             } else {
                 report.add_skipped_incomplete(key);
             }

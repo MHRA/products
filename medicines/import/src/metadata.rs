@@ -69,25 +69,25 @@ pub fn create_facets_by_active_substance(
     facets
 }
 
-pub fn extract_product_license(input: &str) -> String {
+pub fn extract_product_licenses(input: &str) -> String {
     lazy_static! {
         static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+|/|_|-)").expect("cannot compile regex");
         static ref RE_PL: Regex = Regex::new(r"(?i:\b|PL)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
             .expect("cannot compile regex");
     }
-    match RE_PL.find(input) {
-        Some(m) => {
-            let s: String = RE_WHITESPACE
-                .replace_all(m.as_str(), "")
-                .to_ascii_uppercase();
+    let product_licenses: Vec<String> = RE_PL
+        .find_iter(input)
+        .map(|m| RE_WHITESPACE.replace_all(m.as_str(), "").to_ascii_uppercase().to_string())
+        .map(|s| {
             if s.starts_with("PL") {
                 s
             } else {
                 String::from("PL") + s.as_str()
             }
-        }
-        None => String::from(""),
-    }
+        })
+        .collect();
+
+    to_json(product_licenses)
 }
 
 #[cfg(test)]
@@ -204,13 +204,20 @@ mod test {
             "23 12345-1234GG",
             "leaflet MAH GENERIC_PL 12345-1234R.pdf",
         ];
-        let output = "PL123451234";
+        let output = "[\"PL123451234\"]";
         input
             .iter()
-            .for_each(|i| assert_eq!(output, extract_product_license(i)));
+            .for_each(|i| assert_eq!(extract_product_licenses(i), output));
+    }
+    #[test]
+    fn extract_multiple_product_licenses() {
+        let input = "00 PL123451234 01 pl123451235__ 02 123451236-03 PL 12345 1237";
+        let output = "[\"PL123451234\",\"PL123451235\",\"PL123451236\",\"PL123451237\"]";
+
+        assert_eq!(extract_product_licenses(input), output);
     }
     #[test]
     fn extract_product_license_test_not_found() {
-        assert_eq!("", extract_product_license("no pl number here"));
+        assert_eq!(extract_product_licenses("no pl number here"), "[]");
     }
 }

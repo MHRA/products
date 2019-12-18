@@ -1,5 +1,7 @@
 struct Uploaded {
+    file_name: String,
     hash: String,
+    pl_numbers: u8
 }
 
 struct SkippedDuplicate {
@@ -35,9 +37,14 @@ impl Report {
         }
     }
 
-    pub(crate) fn add_uploaded(&mut self, file_name: &str, hash: &str) {
+    pub(crate) fn add_uploaded(&mut self, file_name: &str, hash: &str, pls: &str) {
+        let pl_numbers: Vec<&str> = serde_json::from_str(pls).unwrap();
+        let pl_numbers_count: u8 = pl_numbers.len() as u8;
+
         self.uploaded.push(Uploaded {
+            file_name: file_name.to_string(),
             hash: hash.to_string(),
+            pl_numbers: pl_numbers_count
         });
 
         if self.verbosity >= 2 {
@@ -99,6 +106,15 @@ impl Report {
                 + self.skipped_incompletes.len()
                 + self.skipped_duplicates.len()
         );
+
+        println!("---------------");
+        println!("Files with no product license numbers:");
+        self.uploaded.iter().filter(|f| f.pl_numbers == 0).for_each(|f| {
+            println!(
+                "- File {} has no product license numbers.",
+                f.file_name
+            )
+        });
 
         println!("---------------");
         println!("Unreleased files ({}):", self.skipped_unreleaseds.len());
