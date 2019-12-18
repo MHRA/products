@@ -98,13 +98,6 @@ const Mip: React.FC = () => {
   );
   const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
 
-  const prepareSearchTerm = (q: string): string => {
-    return q
-      .replace(extractProductLicenseRegExp, ' PL$3$5')
-      .replace(whitespaceRegExp, ' ')
-      .trim();
-  };
-
   const formatSearchTerm = (s: string): string => {
     return s
       .replace(extractProductLicenseRegExp, ' PL $3/$5')
@@ -129,7 +122,7 @@ const Mip: React.FC = () => {
   const rerouteSearchResults = (pageNo: number) => {
     router.push({
       pathname: router.route,
-      query: { search: prepareSearchTerm(search), page: pageNo },
+      query: { search, page: pageNo },
     });
   };
 
@@ -145,7 +138,7 @@ const Mip: React.FC = () => {
           }
           setPageNumber(parsedPage);
           if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(prepareSearchTerm(searchTerm), parsedPage);
+          await fetchSearchResults(searchTerm, parsedPage);
         })();
       }
     } else if (substance) {
