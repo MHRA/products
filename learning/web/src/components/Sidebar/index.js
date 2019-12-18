@@ -86,9 +86,9 @@ const MobileNavButton = styled.button`
     margin-right: 0.5rem;
   }
 
-  &.hidden {
+  ${media.desktop`
     display: none;
-  }
+  `}
 `
 
 class Sidebar extends Component {
@@ -97,7 +97,6 @@ class Sidebar extends Component {
     this.state = {
       open: false,
       width: typeof window !== `undefined` ? window.innerWidth : null,
-      desktop: false,
     }
     this.handleResize = this.handleResize.bind(this)
   }
@@ -127,7 +126,7 @@ class Sidebar extends Component {
 
   render() {
     const { location } = this.props
-    const { open, width } = this.state
+    const { open } = this.state
 
     return (
       <StaticQuery
@@ -181,10 +180,7 @@ class Sidebar extends Component {
           return (
             <Aside>
               <MobileNav>
-                <MobileNavButton
-                  className={width < sizes.desktop ? undefined : "hidden"}
-                  onClick={this.toggleOpen}
-                >
+                <MobileNavButton onClick={this.toggleOpen}>
                   <span>Contents</span>
                   {open ? (
                     <MdArrowDropUp size={"2em"}></MdArrowDropUp>
