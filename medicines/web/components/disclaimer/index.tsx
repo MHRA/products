@@ -32,10 +32,7 @@ const StyledDisclaimer = styled.section`
   }
 
   a {
-    color: ${anchorColour};
-    &:hover {
-      color: ${mhra};
-    }
+    color: ${mhra};
   }
 
   form {
