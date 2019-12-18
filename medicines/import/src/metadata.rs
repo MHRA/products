@@ -86,7 +86,7 @@ pub fn extract_product_license(input: &str) -> String {
                 String::from("PL") + s.as_str()
             }
         }
-        None => String::from(input),
+        None => String::from(""),
     }
 }
 
@@ -208,5 +208,9 @@ mod test {
         input
             .iter()
             .for_each(|i| assert_eq!(output, extract_product_license(i)));
+    }
+    #[test]
+    fn extract_product_license_test_not_found() {
+        assert_eq!("", extract_product_license("no pl number here"));
     }
 }
