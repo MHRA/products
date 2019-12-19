@@ -17,3 +17,11 @@ output "cpd-static-web-url" {
 output "search_admin_key" {
   value = azurerm_search_service.search.primary_key
 }
+
+output "products-hostname-cdn" {
+  value = azurerm_cdn_endpoint.products.host_name
+}
+
+output "cpd-hostname-cdn" {
+  value = azurerm_cdn_endpoint.cpd.host_name
+}
