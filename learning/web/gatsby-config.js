@@ -72,5 +72,12 @@ module.exports = {
         ],
       },
     },
+    {
+      resolve: `gatsby-plugin-csp`,
+      options: {
+        disableOnDev: false,
+        reportOnly: true
+      },
+    },
   ],
 }
