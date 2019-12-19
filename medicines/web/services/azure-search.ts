@@ -49,10 +49,16 @@ const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
 const addNormalizedProductLicenses = (q: string): string => {
   const normalizedProductLicences = q
     .match(extractProductLicenseRegExp)
-    ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'))
-    .join(' ');
+    ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'));
 
-  return `${q} ${normalizedProductLicences as string}`;
+  if (normalizedProductLicences && normalizedProductLicences.length) {
+    const normalizedProductLicencesString: string = normalizedProductLicences.join(
+      ' ',
+    );
+    return `${q} ${normalizedProductLicencesString}`;
+  }
+
+  return `${q}`;
 };
 
 const buildFuzzyQuery = (query: string): string => {
