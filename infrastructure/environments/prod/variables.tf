@@ -12,10 +12,10 @@ variable "ACCESS_KEY" {
 
 variable "REGION" {
   description = "Azure region"
-  default     = "uksouth"
+  default     = "westeurope"
 }
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products"
+  default     = "mpazr-rg-1023"
 }
