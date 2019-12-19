@@ -88,3 +88,35 @@ module "cpd_staticweb" {
   source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
   storage_account_name = azurerm_storage_account.cpd.name
 }
+
+
+resource "azurerm_cdn_profile" "products" {
+  name                = "mhraproductsnonprod"
+  location            = "westeurope"
+  resource_group_name = "${azurerm_resource_group.products.name}"
+  sku                 = "Standard_Microsoft"
+}
+
+resource "azurerm_cdn_endpoint" "products" {
+  name                = "mhraproductsnonprod"
+  profile_name        = "${azurerm_cdn_profile.products.name}"
+  location            = "${azurerm_cdn_profile.products.location}"
+  resource_group_name = "${azurerm_resource_group.products.name}"
+  origin_host_header  = "${azurerm_storage_account.products.primary_web_host}"
+  origin {
+    name      = "mhraproductsnonprod"
+    host_name = "${azurerm_storage_account.products.primary_web_host}"
+  }
+}
+
+resource "azurerm_cdn_endpoint" "cpd" {
+  name                = "mhracpdnonprod"
+  profile_name        = "${azurerm_cdn_profile.products.name}"
+  location            = "${azurerm_cdn_profile.products.location}"
+  resource_group_name = "${azurerm_resource_group.products.name}"
+  origin_host_header  = "${azurerm_storage_account.cpd.primary_web_host}"
+  origin {
+    name      = "mhracpdnonprod"
+    host_name = "${azurerm_storage_account.cpd.primary_web_host}"
+  }
+}
