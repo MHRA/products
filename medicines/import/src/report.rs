@@ -90,10 +90,7 @@ impl Report {
         });
 
         if self.verbosity >= 1 {
-            println!(
-                "Deleting {} from blob storage.",
-                file_name
-            );
+            println!("Deleting {} from blob storage.", file_name);
         }
     }
 
@@ -103,10 +100,7 @@ impl Report {
         });
 
         if self.verbosity >= 1 {
-            println!(
-                "Replacing {} in blob storage.",
-                file_name
-            );
+            println!("Replacing {} in blob storage.", file_name);
         }
     }
 
@@ -116,10 +110,7 @@ impl Report {
         });
 
         if self.verbosity >= 1 {
-            println!(
-                "Skipping {} because it has not changed.",
-                file_name
-            );
+            println!("Skipping {} because it has not changed.", file_name);
         }
     }
 
@@ -171,7 +162,7 @@ impl Report {
             .filter(|f| f.pl_numbers == 0)
             .for_each(|f| println!("- File {} has no product licence numbers.", f.file_name));
 
-        if self.skipped_unchangeds.len() > 0 {
+        if !self.skipped_unchangeds.is_empty() {
             println!("---------------");
             println!("Unchanged files ({}):", self.skipped_unchangeds.len());
             self.skipped_unchangeds.iter().for_each(|f| {

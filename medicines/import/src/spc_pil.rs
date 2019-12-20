@@ -8,8 +8,7 @@ use tokio_core::reactor::Core;
 enum Action {
     Upload,
     Replace,
-    Delete,
-    Skip
+    Skip,
 }
 
 pub fn import(
@@ -41,7 +40,7 @@ pub fn import(
                 .unwrap();
             if let Some(record) = records.get(&key.to_lowercase()) {
                 let mut action: Action = Action::Upload;
-                let mut metadata = generate_metadata(record);
+                let metadata = generate_metadata(record);
 
                 if let Some(old_record) = old_records.get(&key.to_lowercase()) {
                     let old_metadata = generate_metadata(old_record);
@@ -54,13 +53,16 @@ pub fn import(
                     }
                 }
 
-                match metadata.get("release_state") {
-                    Some(&"Y") => (),
+                match metadata.get("release_state").map(String::as_str) {
+                    Some("Y") => (),
                     None => panic!("Release state should never be empty"),
                     _ => {
-                        report.add_skipped_unreleased(metadata.get("file_name").unwrap(), metadata.get("release_state").unwrap());
+                        report.add_skipped_unreleased(
+                            metadata.get("file_name").unwrap(),
+                            metadata.get("release_state").unwrap(),
+                        );
                         action = Action::Skip;
-                    },
+                    }
                 }
 
                 let file_data = fs::read(path)?;
@@ -74,28 +76,39 @@ pub fn import(
                 match action {
                     Action::Upload => {
                         if !dryrun {
-                            storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                            storage::upload(
+                                &hash, &client, &mut core, &file_data, &metadata, verbosity,
+                            )?;
                         }
 
-                        report.add_uploaded(metadata.get("file_name").unwrap(), &hash, metadata.get("pl_number").unwrap());
+                        report.add_uploaded(
+                            metadata.get("file_name").unwrap(),
+                            &hash,
+                            metadata.get("pl_number").unwrap(),
+                        );
                     }
                     Action::Replace => {
                         if !dryrun {
-                            storage::delete(metadata.get("file_name").unwrap());
-                        }
-
-                        if !dryrun {
-                            storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                            // TODO find old hash
+                            let old_hash = "";
+                            storage::delete(&old_hash, &client, &mut core, verbosity)?;
+                            storage::upload(
+                                &hash, &client, &mut core, &file_data, &metadata, verbosity,
+                            )?;
                         }
 
                         report.add_replaced(metadata.get("file_name").unwrap());
-                    },
+                    }
                     _ => (),
                 }
             } else if let Some(old_record) = old_records.get(&key.to_lowercase()) {
                 if !dryrun {
-                    storage::delete(&old_record.filename);
+                    // TODO find old hash
+                    let old_hash = "";
+                    storage::delete(&old_hash, &client, &mut core, verbosity)?;
                 }
+
+                report.add_deleted(&old_record.filename);
             } else {
                 report.add_skipped_incomplete(key);
             }
@@ -113,29 +126,40 @@ pub fn import(
     Ok(())
 }
 
-fn generate_metadata(record: &Record) -> HashMap<&str, &str> {
-    let mut metadata: HashMap<&str, &str> = HashMap::new();
+fn generate_metadata(record: &Record) -> HashMap<&str, String> {
+    let mut metadata: HashMap<&str, String> = HashMap::new();
 
-    metadata.insert("file_name", &metadata::sanitize(&record.filename));
-    metadata.insert("release_state", &metadata::sanitize(&record.release_state));
-    metadata.insert("doc_type", &format!(
-        "{:?}",
-        match record.second_level.as_ref() {
-            "PIL" => model::DocType::Pil,
-            "SPC" => model::DocType::Spc,
-            _ => panic!("unexpected doc type"),
-        }
-    ));
-    metadata.insert("title", &metadata::sanitize(&record.title));
-    metadata.insert("pl_number", &metadata::extract_product_licences(&metadata::sanitize(&record.title)));
-    metadata.insert("rev_label", &metadata::sanitize(&record.rev_label));
-    metadata.insert("created", &record.created.to_rfc3339());
-    metadata.insert("product_name", &metadata::sanitize(&record.product_name));
-    metadata.insert("substance_name", &metadata::to_json(metadata::to_array(&record.substance_name)));
-    metadata.insert("facets", &metadata::to_json(metadata::create_facets_by_active_substance(
-        &metadata::sanitize(&record.product_name),
-        metadata::to_array(&record.substance_name),
-    )));
-
+    metadata.insert("file_name", metadata::sanitize(&record.filename));
+    metadata.insert("release_state", metadata::sanitize(&record.release_state));
+    metadata.insert(
+        "doc_type",
+        format!(
+            "{:?}",
+            match record.second_level.as_ref() {
+                "PIL" => model::DocType::Pil,
+                "SPC" => model::DocType::Spc,
+                _ => panic!("unexpected doc type"),
+            }
+        ),
+    );
+    metadata.insert("title", metadata::sanitize(&record.title));
+    metadata.insert(
+        "pl_number",
+        metadata::extract_product_licences(&metadata::sanitize(&record.title)),
+    );
+    metadata.insert("rev_label", metadata::sanitize(&record.rev_label));
+    metadata.insert("created", record.created.to_rfc3339());
+    metadata.insert("product_name", metadata::sanitize(&record.product_name));
+    metadata.insert(
+        "substance_name",
+        metadata::to_json(metadata::to_array(&record.substance_name)),
+    );
+    metadata.insert(
+        "facets",
+        metadata::to_json(metadata::create_facets_by_active_substance(
+            &metadata::sanitize(&record.product_name),
+            metadata::to_array(&record.substance_name),
+        )),
+    );
     metadata
 }

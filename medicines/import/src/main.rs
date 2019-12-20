@@ -4,7 +4,7 @@ extern crate clap;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
-use import::{par, spc_pil};
+use import::{csv, par, spc_pil};
 use std::{fs::File, path::Path};
 use tokio_core::reactor::Core;
 
@@ -47,14 +47,14 @@ fn main() -> Result<(), AzureError> {
 fn open_file(path: Option<&str>, dir: &Path) -> File {
     match path {
         Some(csv) => File::open(csv).expect("CSV could not be opened."),
-        None => find_csv(dir).expect("CSV could not be opened.")
+        None => csv::find_csv(dir).expect("CSV could not be opened."),
     }
 }
 
 fn open_file_optional(path: Option<&str>) -> Option<File> {
     match path {
         Some(csv) => Some(File::open(csv).expect("CSV could not be opened.")),
-        None => None
+        None => None,
     }
 }
 

@@ -5,7 +5,7 @@ extern crate log;
 #[macro_use]
 extern crate serde_derive;
 
-mod csv;
+pub mod csv;
 mod date_de;
 pub mod hash;
 mod metadata;
