@@ -9,6 +9,7 @@ import {
   mhraWhite,
   primaryColor,
 } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
 
 interface IDisclaimerProps {
   onDisclaimerAgree: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -20,6 +21,11 @@ const DisclaimerWrapper = styled.div`
   border: 1px solid ${mhraGray90};
   background-color: ${mhraGray10};
   padding: 4rem 5rem;
+
+  @media ${mobileBreakpoint} {
+    border-radius: 0.5rem;
+    padding: 0 1rem 1rem;
+  }
 `;
 
 const StyledDisclaimer = styled.section`
@@ -58,6 +64,7 @@ const StyledDisclaimer = styled.section`
     height: 1.25rem;
     margin-right: 1.25rem;
     width: 1.25rem;
+    min-width: 1.25rem;
   }
 
   input[type='checkbox']:checked {

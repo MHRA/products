@@ -43,7 +43,7 @@ const WithStyles = styled.div`
 
 const Wrapper = styled.main`
   flex-grow: 1;
-  margin: 0 auto;
+  margin: 0 auto 4rem;
   max-width: ${desktopMaxWidth};
   width: 100%;
 `;
