@@ -4,6 +4,7 @@ module.exports = {
     title: `Learning Modules for Continuous Professional Development`,
     author: `MHRA`,
     description: `Medicines and Healthcare products Regulatory Agency Continuous Professional Development`,
+    siteUrl: `https://cpd.mhra.gov.uk`,
   },
   plugins: [
     {
@@ -76,8 +77,9 @@ module.exports = {
       resolve: `gatsby-plugin-csp`,
       options: {
         disableOnDev: false,
-        reportOnly: true
+        reportOnly: true,
       },
     },
+    `gatsby-plugin-sitemap`,
   ],
 }
