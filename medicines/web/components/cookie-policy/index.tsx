@@ -73,7 +73,7 @@ const CookieBanner: React.FC = () => {
           use Google Analytics cookies to help us improve our services. We do
           not collect any data that would identify you directly. To know more
           about our policies, please go to our&nbsp;
-          <Link href="cookies">
+          <Link href="/cookies">
             <a>cookie policy page</a>
           </Link>
           .&nbsp;By continuing to use this site, you agree to our use of
