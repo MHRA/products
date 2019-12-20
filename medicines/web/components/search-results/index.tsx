@@ -267,7 +267,10 @@ const SearchResults = (props: {
                   </dt>
                   <dd className="right">
                     {drug.product != null ? (
-                      <a href={drug.url}>
+                      <a
+                        href={drug.url}
+                        className={'doc-type-' + drug.docType.toLowerCase()}
+                      >
                         <p className="title">{drug.product}</p>
                         <p className="subtitle">{drug.name}</p>
                       </a>
