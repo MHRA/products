@@ -26,6 +26,16 @@ subcommands:
             required: true
             takes_value: true
             help: directory to import
+        - old:
+            short: o
+            required: false
+            takes_value: true
+            help: old csv to compare to
+        - csv:
+            short: c
+            required: false
+            takes_value: true
+            help: csv to read from
   - par:
       about: import PARs from local directory
       args:
@@ -34,3 +44,13 @@ subcommands:
             required: true
             takes_value: true
             help: directory to import
+        - old:
+            short: o
+            required: false
+            takes_value: true
+            help: old csv to compare to
+        - csv:
+            short: c
+            required: false
+            takes_value: true
+            help: csv to read from

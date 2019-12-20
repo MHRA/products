@@ -1,9 +1,16 @@
-use crate::{csv, hash::hash, metadata, model, pdf, report::Report, storage};
+use crate::{csv, hash::hash, metadata, model, model::Record, pdf, report::Report, storage};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use indicatif::{HumanDuration, ProgressBar};
-use std::{collections::HashMap, fs, path::Path, str, time::Instant};
+use std::{collections::HashMap, fs, fs::File, path::Path, str, time::Instant};
 use tokio_core::reactor::Core;
+
+enum Action {
+    Upload,
+    Replace,
+    Delete,
+    Skip
+}
 
 pub fn import(
     dir: &Path,
@@ -11,8 +18,14 @@ pub fn import(
     mut core: Core,
     verbosity: i8,
     dryrun: bool,
+    csv: File,
+    old: Option<File>,
 ) -> Result<(), AzureError> {
-    if let Ok(records) = csv::load_csv(dir) {
+    if let Ok(records) = csv::load_csv(csv) {
+        let old_records: HashMap<String, Record> = match old {
+            Some(old_csv) => csv::load_csv(old_csv).expect("Couldn't load old CSV."),
+            None => HashMap::new(),
+        };
         if dryrun {
             println!("This is a dry run, nothing will be uploaded!");
         }
@@ -27,66 +40,62 @@ pub fn import(
                 .to_str()
                 .unwrap();
             if let Some(record) = records.get(&key.to_lowercase()) {
-                let mut metadata: HashMap<&str, &str> = HashMap::new();
+                let mut action: Action = Action::Upload;
+                let mut metadata = generate_metadata(record);
 
-                let file_name = metadata::sanitize(&record.filename);
-                metadata.insert("file_name", &file_name);
+                if let Some(old_record) = old_records.get(&key.to_lowercase()) {
+                    let old_metadata = generate_metadata(old_record);
 
-                let release_state = metadata::sanitize(&record.release_state);
-                metadata.insert("release_state", &release_state);
-
-                if release_state != "Y" {
-                    report.add_skipped_unreleased(&file_name, &release_state);
-                    continue;
+                    if metadata == old_metadata {
+                        report.add_skipped_unchanged(metadata.get("file_name").unwrap());
+                        action = Action::Skip;
+                    } else {
+                        action = Action::Replace;
+                    }
                 }
 
-                let doc_type = format!(
-                    "{:?}",
-                    match record.second_level.as_ref() {
-                        "PIL" => model::DocType::Pil,
-                        "SPC" => model::DocType::Spc,
-                        _ => panic!("unexpected doc type"),
-                    }
-                );
-                metadata.insert("doc_type", &doc_type);
-
-                let title = metadata::sanitize(&record.title);
-                metadata.insert("title", &title);
-
-                let pl_numbers = metadata::extract_product_licences(&title);
-                metadata.insert("pl_number", &pl_numbers);
-
-                let rev_label = metadata::sanitize(&record.rev_label);
-                metadata.insert("rev_label", &rev_label);
-
-                let created = record.created.to_rfc3339();
-                metadata.insert("created", &created);
-
-                let product_name = metadata::sanitize(&record.product_name);
-                metadata.insert("product_name", &product_name);
-
-                let active_substances = metadata::to_array(&record.substance_name);
-                let substance_name = metadata::to_json(active_substances.clone());
-                metadata.insert("substance_name", &substance_name);
-
-                let facets = metadata::to_json(metadata::create_facets_by_active_substance(
-                    &product_name,
-                    active_substances,
-                ));
-                metadata.insert("facets", &facets);
+                match metadata.get("release_state") {
+                    Some(&"Y") => (),
+                    None => panic!("Release state should never be empty"),
+                    _ => {
+                        report.add_skipped_unreleased(metadata.get("file_name").unwrap(), metadata.get("release_state").unwrap());
+                        action = Action::Skip;
+                    },
+                }
 
                 let file_data = fs::read(path)?;
                 let hash = hash(&file_data);
 
                 if (report).already_uploaded_file_with_hash(&hash) {
-                    report.add_skipped_duplicate(&file_name, &hash);
-                    continue;
+                    report.add_skipped_duplicate(metadata.get("file_name").unwrap(), &hash);
+                    action = Action::Skip;
                 }
 
-                if !dryrun {
-                    storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                match action {
+                    Action::Upload => {
+                        if !dryrun {
+                            storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                        }
+
+                        report.add_uploaded(metadata.get("file_name").unwrap(), &hash, metadata.get("pl_number").unwrap());
+                    }
+                    Action::Replace => {
+                        if !dryrun {
+                            storage::delete(metadata.get("file_name").unwrap());
+                        }
+
+                        if !dryrun {
+                            storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                        }
+
+                        report.add_replaced(metadata.get("file_name").unwrap());
+                    },
+                    _ => (),
                 }
-                report.add_uploaded(&file_name, &hash, &pl_numbers);
+            } else if let Some(old_record) = old_records.get(&key.to_lowercase()) {
+                if !dryrun {
+                    storage::delete(&old_record.filename);
+                }
             } else {
                 report.add_skipped_incomplete(key);
             }
@@ -102,4 +111,31 @@ pub fn import(
         report.print_report();
     }
     Ok(())
+}
+
+fn generate_metadata(record: &Record) -> HashMap<&str, &str> {
+    let mut metadata: HashMap<&str, &str> = HashMap::new();
+
+    metadata.insert("file_name", &metadata::sanitize(&record.filename));
+    metadata.insert("release_state", &metadata::sanitize(&record.release_state));
+    metadata.insert("doc_type", &format!(
+        "{:?}",
+        match record.second_level.as_ref() {
+            "PIL" => model::DocType::Pil,
+            "SPC" => model::DocType::Spc,
+            _ => panic!("unexpected doc type"),
+        }
+    ));
+    metadata.insert("title", &metadata::sanitize(&record.title));
+    metadata.insert("pl_number", &metadata::extract_product_licences(&metadata::sanitize(&record.title)));
+    metadata.insert("rev_label", &metadata::sanitize(&record.rev_label));
+    metadata.insert("created", &record.created.to_rfc3339());
+    metadata.insert("product_name", &metadata::sanitize(&record.product_name));
+    metadata.insert("substance_name", &metadata::to_json(metadata::to_array(&record.substance_name)));
+    metadata.insert("facets", &metadata::to_json(metadata::create_facets_by_active_substance(
+        &metadata::sanitize(&record.product_name),
+        metadata::to_array(&record.substance_name),
+    )));
+
+    metadata
 }

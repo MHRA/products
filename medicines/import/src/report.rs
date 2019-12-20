@@ -4,6 +4,14 @@ struct Uploaded {
     pl_numbers: u8,
 }
 
+struct Deleted {
+    file_name: String,
+}
+
+struct Replaced {
+    file_name: String,
+}
+
 struct SkippedDuplicate {
     file_name: String,
     hash: String,
@@ -13,6 +21,10 @@ struct SkippedIncomplete {
     file_path: String,
 }
 
+struct SkippedUnchanged {
+    file_name: String,
+}
+
 struct SkippedUnreleased {
     file_name: String,
     release_state: String,
@@ -20,8 +32,11 @@ struct SkippedUnreleased {
 
 pub(crate) struct Report {
     uploaded: Vec<Uploaded>,
+    deleted: Vec<Deleted>,
+    replaced: Vec<Replaced>,
     skipped_duplicates: Vec<SkippedDuplicate>,
     skipped_incompletes: Vec<SkippedIncomplete>,
+    skipped_unchangeds: Vec<SkippedUnchanged>,
     skipped_unreleaseds: Vec<SkippedUnreleased>,
     verbosity: i8,
 }
@@ -30,8 +45,11 @@ impl Report {
     pub(crate) fn new(verbosity: i8) -> Report {
         Report {
             uploaded: Vec::new(),
+            deleted: Vec::new(),
+            replaced: Vec::new(),
             skipped_duplicates: Vec::new(),
             skipped_incompletes: Vec::new(),
+            skipped_unchangeds: Vec::new(),
             skipped_unreleaseds: Vec::new(),
             verbosity,
         }
@@ -62,6 +80,45 @@ impl Report {
             println!(
                 "Skipping {} with sha1 hash '{}' as a duplicate of an already-uploaded file.",
                 file_name, hash
+            );
+        }
+    }
+
+    pub(crate) fn add_deleted(&mut self, file_name: &str) {
+        self.deleted.push(Deleted {
+            file_name: file_name.to_string(),
+        });
+
+        if self.verbosity >= 1 {
+            println!(
+                "Deleting {} from blob storage.",
+                file_name
+            );
+        }
+    }
+
+    pub(crate) fn add_replaced(&mut self, file_name: &str) {
+        self.replaced.push(Replaced {
+            file_name: file_name.to_string(),
+        });
+
+        if self.verbosity >= 1 {
+            println!(
+                "Replacing {} in blob storage.",
+                file_name
+            );
+        }
+    }
+
+    pub(crate) fn add_skipped_unchanged(&mut self, file_name: &str) {
+        self.skipped_unchangeds.push(SkippedUnchanged {
+            file_name: file_name.to_string(),
+        });
+
+        if self.verbosity >= 1 {
+            println!(
+                "Skipping {} because it has not changed.",
+                file_name
             );
         }
     }
@@ -113,6 +170,17 @@ impl Report {
             .iter()
             .filter(|f| f.pl_numbers == 0)
             .for_each(|f| println!("- File {} has no product licence numbers.", f.file_name));
+
+        if self.skipped_unchangeds.len() > 0 {
+            println!("---------------");
+            println!("Unchanged files ({}):", self.skipped_unchangeds.len());
+            self.skipped_unchangeds.iter().for_each(|f| {
+                println!(
+                    "- File {} has not changed since the last batch.",
+                    f.file_name
+                )
+            });
+        }
 
         println!("---------------");
         println!("Unreleased files ({}):", self.skipped_unreleaseds.len());

@@ -60,3 +60,8 @@ pub fn upload(
     trace!("created {:?}", blob_name);
     Ok(())
 }
+
+pub fn delete(hash: &str) -> Result<(), AzureError> {
+    // Implement me.
+    Ok(())
+}

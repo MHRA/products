@@ -5,7 +5,7 @@ use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
 use import::{par, spc_pil};
-use std::path::Path;
+use std::{fs::File, path::Path};
 use tokio_core::reactor::Core;
 
 fn main() -> Result<(), AzureError> {
@@ -25,7 +25,9 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            spc_pil::import(dir, client, core, verbosity, dryrun)?
+            let csv = open_file(m.value_of("csv"), dir);
+            let old = open_file_optional(m.value_of("old"));
+            spc_pil::import(dir, client, core, verbosity, dryrun, csv, old)?
         }
         ("par", Some(m)) => {
             let path = m
@@ -33,11 +35,27 @@ fn main() -> Result<(), AzureError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let (client, core) = initialize()?;
             let dir = Path::new(&path);
-            par::import(dir, client, core, verbosity, dryrun)?
+            let csv = open_file(m.value_of("csv"), dir);
+            let old = open_file_optional(m.value_of("old"));
+            par::import(dir, client, core, verbosity, dryrun, csv, old)?
         }
         _ => println!("yaml is incorrect: pdf is currently the only subcommand"),
     }
     Ok(())
+}
+
+fn open_file(path: Option<&str>, dir: &Path) -> File {
+    match path {
+        Some(csv) => File::open(csv).expect("CSV could not be opened."),
+        None => find_csv(dir).expect("CSV could not be opened.")
+    }
+}
+
+fn open_file_optional(path: Option<&str>) -> Option<File> {
+    match path {
+        Some(csv) => Some(File::open(csv).expect("CSV could not be opened.")),
+        None => None
+    }
 }
 
 fn initialize() -> Result<(Client, Core), AzureError> {
