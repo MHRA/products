@@ -4,13 +4,15 @@ import hashlib
 
 p = Path('.')
 
+
 def get_sha(file):
     file_contents = file.read_bytes()
     return hashlib.sha1(file_contents).hexdigest()
 
+
 sha_dict = {}
 
-for pdf in p.glob('**/*.pdf'):
+for pdf in p.glob('*.pdf'):
     sha = get_sha(pdf)
     if pdf.stem not in sha_dict:
         sha_dict[pdf.stem] = []
