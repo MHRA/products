@@ -45,6 +45,9 @@ pub fn import(
                 .file_stem()
                 .expect("file has no stem")
                 .to_str()
+                .unwrap()
+                .split("-")
+                .next()
                 .unwrap();
             if let Some(record) = records.get(&key.to_lowercase()) {
                 let mut action: Action = Action::Upload;
