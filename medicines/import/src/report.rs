@@ -6,10 +6,12 @@ struct Uploaded {
 
 struct Deleted {
     file_name: String,
+    hashes: Vec<String>,
 }
 
 struct Replaced {
     file_name: String,
+    hashes: Vec<String>,
 }
 
 struct SkippedDuplicate {
@@ -84,23 +86,33 @@ impl Report {
         }
     }
 
-    pub(crate) fn add_deleted(&mut self, file_name: &str) {
+    pub(crate) fn add_deleted(&mut self, file_name: &str, hashes: Vec<String>) {
         self.deleted.push(Deleted {
             file_name: file_name.to_string(),
+            hashes: hashes.clone()
         });
 
         if self.verbosity >= 1 {
-            println!("Deleting {} from blob storage.", file_name);
+            println!(
+                "Deleting {} from blob storage (deleted hashes: {}).",
+                file_name,
+                hashes.join(", ")
+            );
         }
     }
 
-    pub(crate) fn add_replaced(&mut self, file_name: &str) {
+    pub(crate) fn add_replaced(&mut self, file_name: &str, hashes: Vec<String>) {
         self.replaced.push(Replaced {
             file_name: file_name.to_string(),
+            hashes: hashes.clone()
         });
 
         if self.verbosity >= 1 {
-            println!("Replacing {} in blob storage.", file_name);
+            println!(
+                "Replacing {} in blob storage (deleted hashes: {}).",
+                file_name,
+                hashes.join(", ")
+            );
         }
     }
 
@@ -148,6 +160,8 @@ impl Report {
     pub(crate) fn print_report(&self) {
         println!("---------------");
         println!("Number of uploaded files: {}", self.uploaded.len());
+        println!("Number of replaced files: {}", self.replaced.len());
+        println!("Number of deleted files: {}", self.deleted.len());
         println!(
             "Number of skipped files: {}",
             self.skipped_unreleaseds.len()
@@ -156,11 +170,40 @@ impl Report {
         );
 
         println!("---------------");
-        println!("Files with no product licence numbers:");
+        println!("List of uploaded files ({}):", self.uploaded.len());
         self.uploaded
             .iter()
-            .filter(|f| f.pl_numbers == 0)
-            .for_each(|f| println!("- File {} has no product licence numbers.", f.file_name));
+            .for_each(|f| {
+                println!(
+                    "File {} was uploaded with {} PL numbers associated.",
+                    f.file_name,
+                    f.pl_numbers
+                )
+            });
+
+        println!("---------------");
+        println!("List of replaced files ({}):", self.replaced.len());
+        self.replaced
+            .iter()
+            .for_each(|f| {
+                println!(
+                    "File {} replaced the following old file hashes: {}.",
+                    f.file_name,
+                    f.hashes.join(", ")
+                )
+            });
+
+        println!("---------------");
+        println!("List of deleted files ({}):", self.deleted.len());
+        self.deleted
+            .iter()
+            .for_each(|f| {
+                println!(
+                    "File {} was deleted, with the following old file hashes: {}.",
+                    f.file_name,
+                    f.hashes.join(", ")
+                )
+            });
 
         if !self.skipped_unchangeds.is_empty() {
             println!("---------------");

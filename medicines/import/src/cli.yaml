@@ -36,6 +36,11 @@ subcommands:
             required: false
             takes_value: true
             help: csv to read from
+        - hashfile:
+            short: h
+            required: false
+            takes_value: true
+            help: json file containing hashes of old PDFs
   - par:
       about: import PARs from local directory
       args:
@@ -54,3 +59,8 @@ subcommands:
             required: false
             takes_value: true
             help: csv to read from
+        - hashfile:
+            short: h
+            required: false
+            takes_value: true
+            help: json file containing hashes of old PDFs

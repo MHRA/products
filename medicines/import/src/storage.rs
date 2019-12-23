@@ -67,6 +67,6 @@ pub fn delete(
 
     core.run(future)?;
 
-    trace!("created {:?}", blob_name);
+    trace!("deleted {:?}", blob_name);
     Ok(())
 }

@@ -1,4 +1,4 @@
-use crate::{csv, hash::hash, metadata, model, model::Record, pdf, report::Report, storage};
+use crate::{csv, hash::hash, hashfile::read_hashfile, metadata, model, model::Record, pdf, report::Report, storage};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use indicatif::{HumanDuration, ProgressBar};
@@ -19,11 +19,16 @@ pub fn import(
     dryrun: bool,
     csv: File,
     old: Option<File>,
+    hashfile: Option<File>,
 ) -> Result<(), AzureError> {
     if let Ok(records) = csv::load_csv(csv) {
         let old_records: HashMap<String, Record> = match old {
             Some(old_csv) => csv::load_csv(old_csv).expect("Couldn't load old CSV."),
             None => HashMap::new(),
+        };
+        let mut old_hashes: HashMap<String, Vec<String>> = match hashfile {
+            Some(json) => read_hashfile(json).expect("Couldn't parse old hashfile"),
+            None => HashMap::new()
         };
         if dryrun {
             println!("This is a dry run, nothing will be uploaded!");
@@ -65,7 +70,7 @@ pub fn import(
                     }
                 }
 
-                let file_data = fs::read(path)?;
+                let file_data = fs::read(path.clone())?;
                 let hash = hash(&file_data);
 
                 if (report).already_uploaded_file_with_hash(&hash) {
@@ -88,27 +93,48 @@ pub fn import(
                         );
                     }
                     Action::Replace => {
+                        let hashes_to_delete = old_hashes.entry(key.to_string()).or_insert(Vec::new());
+
                         if !dryrun {
-                            // TODO find old hash
-                            let old_hash = "";
-                            storage::delete(&old_hash, &client, &mut core, verbosity)?;
+                            hashes_to_delete.iter().for_each(|old_hash| {
+                                match storage::delete(old_hash, &client, &mut core, verbosity) {
+                                    Ok(_) => (),
+                                    Err(_) => {
+                                        if verbosity >= 1 {
+                                            println!("Encountered an error when deleting {}.", old_hash);
+                                        }
+                                        ()
+                                    },
+                                }
+                            });
+
                             storage::upload(
                                 &hash, &client, &mut core, &file_data, &metadata, verbosity,
                             )?;
                         }
 
-                        report.add_replaced(metadata.get("file_name").unwrap());
+                        report.add_replaced(metadata.get("file_name").unwrap(), hashes_to_delete.to_vec());
                     }
                     _ => (),
                 }
             } else if let Some(old_record) = old_records.get(&key.to_lowercase()) {
-                if !dryrun {
-                    // TODO find old hash
-                    let old_hash = "";
-                    storage::delete(&old_hash, &client, &mut core, verbosity)?;
-                }
+                let hashes_to_delete = old_hashes.entry(key.to_string()).or_insert(Vec::new());
 
-                report.add_deleted(&old_record.filename);
+                hashes_to_delete.iter().for_each(|old_hash| {
+                    if !dryrun {
+                        match storage::delete(old_hash, &client, &mut core, verbosity) {
+                            Ok(_) => (),
+                            Err(_) => {
+                                if verbosity >= 1 {
+                                    println!("Encountered an error when deleting {}.", old_hash);
+                                }
+                                ()
+                            },
+                        }
+                    }
+
+                    report.add_deleted(&old_record.filename, hashes_to_delete.to_vec());
+                });
             } else {
                 report.add_skipped_incomplete(key);
             }

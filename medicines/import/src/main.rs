@@ -27,7 +27,8 @@ fn main() -> Result<(), AzureError> {
             let dir = Path::new(&path);
             let csv = open_file(m.value_of("csv"), dir);
             let old = open_file_optional(m.value_of("old"));
-            spc_pil::import(dir, client, core, verbosity, dryrun, csv, old)?
+            let hashfile = open_file_optional(m.value_of("hashfile"));
+            spc_pil::import(dir, client, core, verbosity, dryrun, csv, old, hashfile)?
         }
         ("par", Some(m)) => {
             let path = m
@@ -37,7 +38,8 @@ fn main() -> Result<(), AzureError> {
             let dir = Path::new(&path);
             let csv = open_file(m.value_of("csv"), dir);
             let old = open_file_optional(m.value_of("old"));
-            par::import(dir, client, core, verbosity, dryrun, csv, old)?
+            let hashfile = open_file_optional(m.value_of("hashfile"));
+            par::import(dir, client, core, verbosity, dryrun, csv, old, hashfile)?
         }
         _ => println!("yaml is incorrect: pdf is currently the only subcommand"),
     }
@@ -53,7 +55,7 @@ fn open_file(path: Option<&str>, dir: &Path) -> File {
 
 fn open_file_optional(path: Option<&str>) -> Option<File> {
     match path {
-        Some(csv) => Some(File::open(csv).expect("CSV could not be opened.")),
+        Some(csv) => Some(File::open(csv).expect("File could not be opened.")),
         None => None,
     }
 }
