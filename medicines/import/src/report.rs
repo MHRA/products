@@ -167,6 +167,7 @@ impl Report {
             self.skipped_unreleaseds.len()
                 + self.skipped_incompletes.len()
                 + self.skipped_duplicates.len()
+                + self.skipped_unchangeds.len()
         );
 
         println!("---------------");
