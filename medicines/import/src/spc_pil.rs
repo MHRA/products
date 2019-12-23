@@ -1,4 +1,7 @@
-use crate::{csv, hash::hash, hashfile::read_hashfile, metadata, model, model::Record, pdf, report::Report, storage};
+use crate::{
+    csv, hash::hash, hashfile::read_hashfile, metadata, model, model::Record, pdf, report::Report,
+    storage,
+};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use indicatif::{HumanDuration, ProgressBar};
@@ -28,7 +31,7 @@ pub fn import(
         };
         let mut old_hashes: HashMap<String, Vec<String>> = match hashfile {
             Some(json) => read_hashfile(json).expect("Couldn't parse old hashfile"),
-            None => HashMap::new()
+            None => HashMap::new(),
         };
         if dryrun {
             println!("This is a dry run, nothing will be uploaded!");
@@ -93,7 +96,8 @@ pub fn import(
                         );
                     }
                     Action::Replace => {
-                        let hashes_to_delete = old_hashes.entry(key.to_string()).or_insert(Vec::new());
+                        let hashes_to_delete =
+                            old_hashes.entry(key.to_string()).or_insert_with(Vec::new);
 
                         if !dryrun {
                             hashes_to_delete.iter().for_each(|old_hash| {
@@ -101,10 +105,12 @@ pub fn import(
                                     Ok(_) => (),
                                     Err(_) => {
                                         if verbosity >= 1 {
-                                            println!("Encountered an error when deleting {}.", old_hash);
+                                            println!(
+                                                "Encountered an error when deleting {}.",
+                                                old_hash
+                                            );
                                         }
-                                        ()
-                                    },
+                                    }
                                 }
                             });
 
@@ -113,12 +119,15 @@ pub fn import(
                             )?;
                         }
 
-                        report.add_replaced(metadata.get("file_name").unwrap(), hashes_to_delete.to_vec());
+                        report.add_replaced(
+                            metadata.get("file_name").unwrap(),
+                            hashes_to_delete.to_vec(),
+                        );
                     }
                     _ => (),
                 }
             } else if let Some(old_record) = old_records.get(&key.to_lowercase()) {
-                let hashes_to_delete = old_hashes.entry(key.to_string()).or_insert(Vec::new());
+                let hashes_to_delete = old_hashes.entry(key.to_string()).or_insert_with(Vec::new);
 
                 hashes_to_delete.iter().for_each(|old_hash| {
                     if !dryrun {
@@ -128,8 +137,7 @@ pub fn import(
                                 if verbosity >= 1 {
                                     println!("Encountered an error when deleting {}.", old_hash);
                                 }
-                                ()
-                            },
+                            }
                         }
                     }
 
