@@ -92,7 +92,7 @@ module "cpd_staticweb" {
 
 resource "azurerm_cdn_profile" "products" {
   name                = "mhraproductsnonprod"
-  location            = "westeurope"
+  location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
   sku                 = "Standard_Microsoft"
 }
