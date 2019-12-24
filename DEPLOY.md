@@ -55,7 +55,7 @@ export SEARCH_SERVICE=$PRODUCTS_APPLICATION_NAME
 export API_ADMIN_KEY=CB28B1A47E29FF4620184BD27B89945E
 export DATASOURCE_NAME=products-datasource
 export INDEX_NAME=products-index
-export INDEXER_NAME=products-index
+export INDEXER_NAME=products-indexer
 export CPD_STORAGE_KEY=APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
 ```
 
