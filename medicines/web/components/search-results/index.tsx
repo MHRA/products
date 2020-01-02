@@ -266,19 +266,19 @@ const SearchResults = (props: {
                     <p className="icon">{drug.docType.toUpperCase()}</p>
                   </dt>
                   <dd className="right">
-                    {drug.product != null ? (
-                      <a
-                        href={drug.url}
-                        className={'doc-type-' + drug.docType.toLowerCase()}
-                      >
-                        <p className="title">{drug.product}</p>
-                        <p className="subtitle">{drug.name}</p>
-                      </a>
-                    ) : (
-                      <a href={drug.url}>
+                    <a
+                      href={drug.url}
+                      className={'doc-type-' + drug.docType.toLowerCase()}
+                    >
+                      {drug.product != null ? (
+                        <>
+                          <p className="title">{drug.product}</p>
+                          <p className="subtitle">{drug.name}</p>
+                        </>
+                      ) : (
                         <p className="title">{drug.name}</p>
-                      </a>
-                    )}
+                      )}
+                    </a>
                     <p className="metadata">File size: {drug.fileSize} KB</p>
                     {drug.activeSubstances != null &&
                       drug.activeSubstances.length > 0 && (
