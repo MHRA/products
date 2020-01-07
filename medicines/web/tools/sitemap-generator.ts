@@ -74,4 +74,4 @@ if (!module.parent) {
   );
 }
 
-module.exports = start;
+export default start;
