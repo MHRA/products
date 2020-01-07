@@ -81,7 +81,7 @@ const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
-  docType?: DocType,
+  filters: ISearchFilters,
 ): string => {
   const url = new URL(
     `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
@@ -100,8 +100,9 @@ const buildSearchUrl = (
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
   url.searchParams.append('searchMode', 'all');
-  if (docType) {
-    url.searchParams.append('$filter', `doc_type eq '${docType}'`);
+  const f = createFilter(filters);
+  if (f.length > 0) {
+    url.searchParams.append('$filter', f);
   }
 
   return url.toString();
@@ -139,14 +140,28 @@ const getJson = async (url: string): Promise<any> => {
   }
 };
 
+export interface ISearchFilters {
+  docType?: DocType;
+  substanceName?: string;
+}
+
+interface ISearchQuery {
+  query: string;
+  page: number;
+  pageSize: number;
+  filters: ISearchFilters;
+}
+
 export const docSearch = async (
-  query: string,
-  page: number,
-  pageSize: number,
-  docType?: DocType,
+  query: ISearchQuery,
 ): Promise<ISearchResults> => {
   const body = await getJson(
-    buildSearchUrl(buildFuzzyQuery(query), page, pageSize, docType),
+    buildSearchUrl(
+      buildFuzzyQuery(query.query),
+      query.page,
+      query.pageSize,
+      query.filters,
+    ),
   );
   return {
     resultCount: body['@odata.count'],
@@ -160,4 +175,17 @@ export const facetSearch = async (
   const body = await getJson(buildFacetUrl(query));
 
   return [query, body['@search.facets']];
+};
+
+const createFilter = (filters: ISearchFilters) => {
+  const filterParams: string[] = [];
+  if (filters.docType) {
+    filterParams.push(`doc_type eq '${filters.docType}'`);
+  }
+  if (filters.substanceName) {
+    filterParams.push(
+      `substance_name/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
+    );
+  }
+  return filterParams.join(' and ');
 };

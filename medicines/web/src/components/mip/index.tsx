@@ -4,7 +4,12 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { docSearch, DocType, ISearchResult } from '../../services/azure-search';
+import {
+  docSearch,
+  DocType,
+  ISearchFilters,
+  ISearchResult,
+} from '../../services/azure-search';
 import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
@@ -61,9 +66,12 @@ const Mip: React.FC = () => {
     query: { search: searchTerm, page, substance, disclaimer, doc },
   } = router;
 
-  let docType: DocType;
+  const filters: ISearchFilters = {};
   if (typeof doc === 'string') {
-    docType = DocType[doc as keyof typeof DocType];
+    filters.docType = DocType[doc as keyof typeof DocType];
+  }
+  if (typeof substance === 'string') {
+    filters.substanceName = substance;
   }
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
@@ -74,12 +82,13 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const fetchSearchResults = async (
-    searchTerm: string,
-    page: number,
-    docType?: DocType,
-  ) => {
-    const searchResults = await docSearch(searchTerm, page, pageSize, docType);
+  const fetchSearchResults = async (searchTerm: string, page: number) => {
+    const searchResults = await docSearch({
+      query: searchTerm,
+      page,
+      pageSize,
+      filters,
+    });
     const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
@@ -149,7 +158,7 @@ const Mip: React.FC = () => {
       setSearch(formatSearchTerm(searchTerm));
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      await fetchSearchResults(searchTerm, parsedPage, DocType[docType]);
+      await fetchSearchResults(searchTerm, parsedPage);
       Events.searchForProductsMatchingKeywords(search, parsedPage);
     }
   };
