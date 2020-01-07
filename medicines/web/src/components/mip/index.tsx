@@ -4,7 +4,7 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { docSearch, ISearchResult } from '../../services/azure-search';
+import { docSearch, DocType, ISearchResult } from '../../services/azure-search';
 import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
@@ -58,8 +58,13 @@ const Mip: React.FC = () => {
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance, disclaimer },
+    query: { search: searchTerm, page, substance, disclaimer, doc },
   } = router;
+
+  let docType: DocType;
+  if (typeof doc === 'string') {
+    docType = DocType[doc as keyof typeof DocType];
+  }
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
     setSearch(formatSearchTerm(e.currentTarget.value));
@@ -69,8 +74,12 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const fetchSearchResults = async (searchTerm: string, page: number) => {
-    const searchResults = await docSearch(searchTerm, page, pageSize);
+  const fetchSearchResults = async (
+    searchTerm: string,
+    page: number,
+    docType?: DocType,
+  ) => {
+    const searchResults = await docSearch(searchTerm, page, pageSize, docType);
     const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
@@ -140,7 +149,7 @@ const Mip: React.FC = () => {
       setSearch(formatSearchTerm(searchTerm));
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      await fetchSearchResults(searchTerm, parsedPage);
+      await fetchSearchResults(searchTerm, parsedPage, DocType[docType]);
       Events.searchForProductsMatchingKeywords(search, parsedPage);
     }
   };

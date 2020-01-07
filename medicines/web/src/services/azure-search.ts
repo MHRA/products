@@ -8,10 +8,10 @@ const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
 const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
-enum DocType {
-  Par,
-  Pil,
-  Spc,
+export enum DocType {
+  Par = 'Par',
+  Pil = 'Pil',
+  Spc = 'Spc',
 }
 
 export interface ISearchResult {
@@ -81,6 +81,7 @@ const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
+  docType?: DocType,
 ): string => {
   const url = new URL(
     `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
@@ -99,6 +100,9 @@ const buildSearchUrl = (
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
   url.searchParams.append('searchMode', 'all');
+  if (docType) {
+    url.searchParams.append('$filter', `doc_type eq '${docType}'`);
+  }
 
   return url.toString();
 };
@@ -139,9 +143,10 @@ export const docSearch = async (
   query: string,
   page: number,
   pageSize: number,
+  docType?: DocType,
 ): Promise<ISearchResults> => {
   const body = await getJson(
-    buildSearchUrl(buildFuzzyQuery(query), page, pageSize),
+    buildSearchUrl(buildFuzzyQuery(query), page, pageSize, docType),
   );
   return {
     resultCount: body['@odata.count'],
