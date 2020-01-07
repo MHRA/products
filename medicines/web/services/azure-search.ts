@@ -1,3 +1,5 @@
+import fetch, { Response } from 'node-fetch';
+
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const searchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const searchIndex = process.env.AZURE_SEARCH_INDEX;

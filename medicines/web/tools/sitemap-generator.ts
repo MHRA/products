@@ -1,6 +1,7 @@
 import fs, { promises, readdirSync } from 'fs';
 import moment from 'moment';
 import path from 'path';
+import { facetSearch } from '../services/azure-search';
 
 const pagesDir = path.resolve('./dist');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
@@ -10,7 +11,7 @@ const BASE_URL = 'https://products.mhra.gov.uk';
 const YYY_MM_DD = 'YYYY-MM-DD';
 const CHANGE_FREQUENCY = 'daily';
 
-const createPathsObj = async (): Promise<{ [index: string]: any }> => {
+const createFilePathsObj = async (): Promise<{ [index: string]: any }> => {
   const pages = readdirSync(pagesDir, {
     withFileTypes: true,
   })
@@ -31,8 +32,48 @@ const createPathsObj = async (): Promise<{ [index: string]: any }> => {
   );
 };
 
+const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
+  // Get substance and product page URLs by mimicing the behavour of the A–Z, 0–9 list
+  // on the web site.
+  const searchPathsObj: { [index: string]: any } = {};
+
+  for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+    const facetResult = await facetSearch(letter);
+
+    for (const facet of facetResult[1].facets) {
+      // Value is in the format "letter, substance, product". Substance and product may
+      // not be present.
+      const stringParts = facet.value.split(', ');
+      const substance = stringParts[1];
+      const product = stringParts[2];
+
+      if (product) {
+        // If a product is present, output a product URL.
+        const route = `/?product=true&page=1&search=${encodeURIComponent(
+          product,
+        )}`;
+        searchPathsObj[route] = {
+          page: route,
+          lastModified: new Date().toISOString(),
+        };
+      } else if (substance) {
+        // If product is undefined and a substance is present, include a substance URL.
+        const route = `/?substance=${encodeURIComponent(substance)}`;
+        searchPathsObj[route] = {
+          page: route,
+          lastModified: new Date().toISOString(),
+        };
+      }
+    }
+  }
+
+  return searchPathsObj;
+};
+
 const createSiteMapString = async () => {
-  const pathsObj = await createPathsObj();
+  const filePathsObj = await createFilePathsObj();
+  const searchPathsObj = await createSearchPathsObj();
+  const pathsObj = { ...filePathsObj, ...searchPathsObj };
 
   const urls = `${Object.keys(pathsObj)
     .map(
