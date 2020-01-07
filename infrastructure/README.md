@@ -5,7 +5,8 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 #### Setup
 
 1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-1. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
+2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+3. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
 
    ```bash
    az login
@@ -14,7 +15,7 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    az account set --subscription="SUBSCRIPTION_ID"
    ```
 
-1. If you don't already have a storage account for the Terraform state, create one now:
+4. If you don't already have a storage account for the Terraform state, create one now:
 
    ```bash
    cd infrastructure
@@ -26,8 +27,8 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 #### Provision infrastructure
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-1. Initialize terraform (ensure providers/modules are installed and backend is initialized)
-1. Create a plan, or apply the infrastructure
+2. Initialize terraform (ensure providers/modules are installed and backend is initialized)
+3. Create a plan, or apply the infrastructure
 
    ```bash
    cd environments/non-prod
@@ -41,7 +42,7 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    terraform apply
    ```
 
-1. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
+4. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
 
    ```
    Outputs:

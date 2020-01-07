@@ -1,13 +1,16 @@
 provider "azurerm" {
-  version = "=1.38.0"
+  version         = "~> 1.38.0"
+  subscription_id = "b2f4966f-71ea-415b-9ec6-bf96d597d596"
 }
 
 terraform {
   required_version = "0.12.18"
 
   backend "azurerm" {
-    resource_group_name = "tfstate"
-    key                 = "non-prod.terraform.tfstate"
+    resource_group_name  = "tfstate"
+    container_name       = "tfstate"
+    storage_account_name = "tfstate4338"
+    key                  = "non-prod.terraform.tfstate"
   }
 }
 
