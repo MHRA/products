@@ -1,7 +1,6 @@
-const fs = require('fs').promises;
-const { readdirSync } = require('fs');
-const path = require('path');
-const moment = require('moment');
+import fs, { promises, readdirSync } from 'fs';
+import moment from 'moment';
+import path from 'path';
 
 const pagesDir = path.resolve('./dist');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
@@ -11,7 +10,7 @@ const BASE_URL = 'https://products.mhra.gov.uk';
 const YYY_MM_DD = 'YYYY-MM-DD';
 const CHANGE_FREQUENCY = 'daily';
 
-const createPathsObj = async () => {
+const createPathsObj = async (): Promise<{ [index: string]: any }> => {
   const pages = readdirSync(pagesDir, {
     withFileTypes: true,
   })
@@ -21,13 +20,13 @@ const createPathsObj = async () => {
     .map(dir => (dir === 'index' ? '/' : `/${dir}`));
 
   return pages.reduce(
-    (acc, pageRoute) =>
-      Object.assign(acc, {
-        [`${pageRoute}`]: {
-          page: pageRoute,
-          lastModified: new Date().toISOString(),
-        },
-      }),
+    (acc, pageRoute) => ({
+      ...acc,
+      [`${pageRoute}`]: {
+        page: pageRoute,
+        lastModified: new Date().toISOString(),
+      },
+    }),
     {},
   );
 };
@@ -65,12 +64,14 @@ Sitemap: ${BASE_URL}/sitemap.xml
 
 const start = async () => {
   const sitemapXml = await createSiteMapString();
-  await fs.writeFile(sitemapFile, sitemapXml);
-  await fs.writeFile(robotsFile, robotString);
+  await fs.writeFileSync(sitemapFile, sitemapXml);
+  await fs.writeFileSync(robotsFile, robotString);
 };
 
 if (!module.parent) {
-  start().then(() => console.log('Created sitemap.xml 🗺  & robots.txt 🤖'));
+  start().then(() =>
+    process.stdout.write('Created sitemap.xml 🗺  & robots.txt 🤖\n'),
+  );
 }
 
 module.exports = start;
