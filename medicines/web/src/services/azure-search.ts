@@ -143,6 +143,7 @@ const getJson = async (url: string): Promise<any> => {
 export interface ISearchFilters {
   docType?: DocType;
   substanceName?: string;
+  productName?: string;
 }
 
 interface ISearchQuery {
@@ -186,6 +187,9 @@ const createFilter = (filters: ISearchFilters) => {
     filterParams.push(
       `substance_name/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
     );
+  }
+  if (filters.productName) {
+    filterParams.push(`product_name eq '${filters.productName.toUpperCase()}'`);
   }
   return filterParams.join(' and ');
 };

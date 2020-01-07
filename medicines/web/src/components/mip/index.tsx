@@ -63,7 +63,14 @@ const Mip: React.FC = () => {
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance, disclaimer, doc },
+    query: {
+      search: searchTerm,
+      page,
+      substance,
+      disclaimer,
+      doc,
+      productName,
+    },
   } = router;
 
   const filters: ISearchFilters = {};
@@ -72,6 +79,9 @@ const Mip: React.FC = () => {
   }
   if (typeof substance === 'string') {
     filters.substanceName = substance;
+  }
+  if (typeof productName === 'string') {
+    filters.productName = productName;
   }
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
