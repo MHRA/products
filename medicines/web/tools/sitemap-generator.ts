@@ -78,21 +78,20 @@ const createSiteMapString = async () => {
   const urls = `${Object.keys(pathsObj)
     .map(
       path =>
-        `<url>
-          <loc>${BASE_URL}${path}</loc>
-          <lastmod>${moment(pathsObj[path].lastModified).format(
-            YYY_MM_DD,
-          )}</lastmod>
-          <changefreq>${CHANGE_FREQUENCY}</changefreq>
-        </url>
-        `,
+        `<url>` +
+        `<loc>${BASE_URL}${path}</loc>` +
+        `<lastmod>${moment(pathsObj[path].lastModified).format(
+          YYY_MM_DD,
+        )}</lastmod>` +
+        `<changefreq>${CHANGE_FREQUENCY}</changefreq>` +
+        `</url>`,
     )
-    .join('')}`;
+    .join('\n')}`;
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
-      ${urls}
-    </urlset>`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
 
   return sitemapXml;
 };
