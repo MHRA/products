@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "products" {
   location = var.REGION
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -32,7 +32,7 @@ resource "azurerm_storage_account" "products" {
   account_replication_type = "RAGRS"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -62,7 +62,7 @@ resource "azurerm_search_service" "search" {
   sku                 = "basic"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -75,7 +75,7 @@ resource "azurerm_storage_account" "cpd" {
   account_replication_type = "RAGRS"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -120,11 +120,14 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     vm_size    = "Standard_D2_v2"
   }
 
-
+  service_principal {
+    client_id     = var.CLIENT_ID
+    client_secret = var.CLIENT_SECRET
+  }
 
 
   tags = {
-    Environment = "non-prod"
+    Environment = var.ENVIROMENT
   }
 
 }
