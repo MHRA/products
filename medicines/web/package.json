@@ -50,6 +50,9 @@
     ],
     "*.{ts,tsx}": [
       "yarn lint"
+    ],
+    "*.{tf,tfvars}": [
+      "bash -c 'terraform fmt -check'"
     ]
   },
   "main": "index.js",
