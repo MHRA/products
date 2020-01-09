@@ -1,6 +1,7 @@
 import fs, { promises, readdirSync } from 'fs';
 import moment from 'moment';
 import path from 'path';
+import { stringify } from 'querystring';
 import { facetSearch } from '../services/azure-search';
 
 const pagesDir = path.resolve('./dist');
@@ -49,16 +50,26 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
 
       if (product) {
         // If a product is present, output a product URL.
-        const route = `/?product=true&page=1&search=${encodeURIComponent(
-          product,
-        )}`;
+        const route =
+          '/?' +
+          stringify({
+            product: true,
+            page: 1,
+            search: product,
+          });
+
         searchPathsObj[route] = {
           page: route,
           lastModified: new Date().toISOString(),
         };
       } else if (substance) {
         // If product is undefined and a substance is present, include a substance URL.
-        const route = `/?substance=${encodeURIComponent(substance)}`;
+        const route =
+          '/?' +
+          stringify({
+            substance,
+          });
+
         searchPathsObj[route] = {
           page: route,
           lastModified: new Date().toISOString(),
