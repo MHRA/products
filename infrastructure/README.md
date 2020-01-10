@@ -74,6 +74,7 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 2. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication
 
    ```shell
+   # Replace <ServicePrincipalName> with the name of the account you want to use
     az ad sp create-for-rbac --name <ServicePrincipalName>
    ```
 
