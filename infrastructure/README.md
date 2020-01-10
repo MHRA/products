@@ -1,12 +1,13 @@
 # MHRA Infrastructure Automation
 
-This folder contains all the Terraform files for provisioning infrastructure in Azure.
+This folder contains all the files for provisioning infrastructure in Azure.
 
 The following instructions are divided in:
 
 - [Provisioning a new environment](provisioning-in-a-new-environment)
 - [Provisioning infrastructure in an existing environment](provisioning-infrastructure-in-an-existing-environment)
 - [Connecting to a Kubernetes cluster](connecting-to-a-kubernetes-cluster) using `kubectl`
+- [Installing Istio](installing-istio)
 
 ## Provisioning a new environment
 
@@ -104,3 +105,86 @@ Now you can run `kubectl` commands, e.g.
 ```sh
 kubectl get nodes
 ```
+
+## Installing Istio
+
+1. Change to the root directory
+
+   ```sh
+   cd ~
+   ```
+
+2. Specify the [Istio version](https://github.com/istio/istio/releases/)
+
+   ```sh
+   ISTIO_VERSION=1.4.0
+   ```
+
+3. Download and install
+
+   ```sh
+     curl -L https://istio.io/downloadIstio | sh -
+   ```
+
+4. To configure the `istioctl` client tool
+
+   ```sh
+   export PATH="\$PATH:/Users/pataruco/istio-1.4.3/bin"
+   ```
+
+5. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
+6. Source the environment variables
+
+   ```sh
+     source .env
+   ```
+
+7. Create a kubernetes namespace called `istio-system`
+
+   ```sh
+   kubectl create namespace istio-system --save-config
+   ```
+
+8. Create a file called `istio.aks.yaml`
+
+   ```sh
+   touch istio.aks.yaml
+   ```
+
+9. Populate with a [config profile](https://istio.io/docs/setup/additional-setup/config-profiles/), e.g:
+
+   ```yml
+   apiVersion: install.istio.io/v1alpha2
+   kind: IstioControlPlane
+   spec:
+     # Use the default profile as the base
+     # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
+     profile: default
+     values:
+       global:
+         # Ensure that the Istio pods are only scheduled to run on Linux nodes
+         defaultNodeSelector:
+           beta.kubernetes.io/os: linux
+         # Enable mutual TLS for the control plane
+         controlPlaneSecurityEnabled: true
+         mtls:
+           # Require all service to service communication to have mtls
+           enabled: false
+   ```
+
+10. Apply manifest to the cluster
+
+    ```sh
+    istioctl manifest apply -f istio.aks.yaml --logtostderr
+    ```
+
+11. Validate the Istio installation
+
+    ```sh
+    kubectl get svc --namespace istio-system --output wide
+    ```
+
+12. Confirm that the required pods have been created
+    ```sh
+    kubectl get pods --namespace istio-system
+    ```
