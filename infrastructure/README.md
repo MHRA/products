@@ -4,13 +4,13 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 
 The following instructions are divided in:
 
-- [Provisioning a new enviroment](provisioning-in-a-new-enviroment)
-- [Provisioning infrastructure in an existing enviroment](provisioning-infrastructure-in-an-existing-enviroment)
+- [Provisioning a new environment](provisioning-in-a-new-environment)
+- [Provisioning infrastructure in an existing environment](provisioning-infrastructure-in-an-existing-environment)
 - [Connecting to a Kubernetes cluster](connecting-to-a-kubernetes-cluster) using `kubectl`
 
-## Provisioning a new enviroment
+## Provisioning a new environment
 
-This step is limited to developers who have `owner` rights on Azure, if is not your case ask to a collegue with proper priviligies or contact **MHRA IT Desk**
+This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
 
 ### Setup
 
@@ -47,11 +47,11 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 
 10. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
 
-## Provisioning infrastructure in an existing enviroment
+## Provisioning infrastructure in an existing environment
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values ask to a collegue_
-3. Source the enviroment variables
+2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values, ask a colleague._
+3. Source the environment variables
 
    ```sh
      source .env
@@ -84,10 +84,10 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 
 ## Connecting to a Kubernetes cluster
 
-To be able to connect to the cluster we need to set the Kubernetes credentials file path to `KUBECONFIG` enviromental variable
+To be able to connect to the cluster, we need to set the Kubernetes credentials file path as the `KUBECONFIG` environment variable.
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-2. Source the enviroment variables
+2. Source the environment variables
 
    ```sh
      source .env
