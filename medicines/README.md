@@ -30,4 +30,4 @@ This has several benefits:
 - Overall security is significantly improved as no external access or login capability required
 - A more consistent user experience
 - No duplication of the surrounding website content
-- A single search index and user experience for all docs (SPC/PIL/PAR)
+- A single search index and user experience for all docs (SPC/PIL/PAR) 
