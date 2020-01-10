@@ -1,6 +1,5 @@
 provider "azurerm" {
   version = "~> 1.38.0"
-  # subscription_id = "b2f4966f-71ea-415b-9ec6-bf96d597d596"
 }
 
 terraform {
