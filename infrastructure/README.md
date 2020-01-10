@@ -2,7 +2,17 @@
 
 This folder contains all the Terraform files for provisioning infrastructure in Azure.
 
-## Setup
+The following instructions are divided in:
+
+- [Provisioning a new enviroment](provisioning-in-a-new-enviroment)
+- [Provisioning infrastructure in an existing enviroment](provisioning-infrastructure-in-an-existing-enviroment)
+- [Connecting to a Kubernetes cluster](connecting-to-a-kubernetes-cluster) using `kubectl`
+
+## Provisioning a new enviroment
+
+This step is limited to developers who have `owner` rights on Azure, if is not your case ask to a collegue with proper priviligies or contact **MHRA IT Desk**
+
+### Setup
 
 1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
 2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
@@ -10,25 +20,37 @@ This folder contains all the Terraform files for provisioning infrastructure in 
 
    ```shell
    az login
+   ```
 
-   # SUBSCRIPTION_ID can be found in output from previous command
+4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
+
+   ```shell
    az account set --subscription="SUBSCRIPTION_ID"
    ```
 
-4. If you don't already have a storage account for the Terraform state, create one now:
+5. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
+6. Create an `.env` file following the example from `.env.example`
+
+7. Create a new storage account for the Terraform state,
 
    ```shell
-   cd infrastructure
-
-   # copy and paste the final output from this script to export ENV vars for the steps below
-   ./scripts/create-storage-account.sh
+   ../../scripts/create-storage-account.sh
    ```
 
-## Provision infrastructure
+8. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
 
-1. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values
-   - If you don't have the values ask to a collegue or follow these [instructions](#setup-a-service-principal-account) to create a service principal account and retrive the values from there
+9. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication replacing `<ServicePrincipalName>` with the name of the account you want to use
+
+   ```shell
+   az ad sp create-for-rbac --name <ServicePrincipalName>
+   ```
+
+10. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
+
+## Provisioning infrastructure in an existing enviroment
+
+1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
+2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values ask to a collegue_
 3. Source the enviroment variables
 
    ```shell
@@ -60,30 +82,12 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    search_admin_key = CB28B1A47E29FF4620184BD27B89945E
    ```
 
-## Setup a service principal account
-
-1. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
-
-   ```shell
-   az login
-
-   # SUBSCRIPTION_ID can be found in output from previous command
-   az account set --subscription="SUBSCRIPTION_ID"
-   ```
-
-2. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication
-
-   ```shell
-   # Replace <ServicePrincipalName> with the name of the account you want to use
-    az ad sp create-for-rbac --name <ServicePrincipalName>
-   ```
-
-## Cluster credentials
+## Connecting to a Kubernetes cluster
 
 To be able to connect to the cluster we need to set the credentials file path to `KUBECONFIG` enviromental variable, we create a shell script for that
 
 ```shell
- cd infrastructure
+cd infrastructure
 
- ./scripts/create-kubernetes-config.sh
+./scripts/create-kubernetes-config.sh
 ```
