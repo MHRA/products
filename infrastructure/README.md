@@ -18,22 +18,22 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 3. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
 
-   ```shell
+   ```sh
    az login
    ```
 
 4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
 
-   ```shell
+   ```sh
    az account set --subscription="SUBSCRIPTION_ID"
    ```
 
 5. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-6. Create an `.env` file following the example from `.env.example`
+6. Create an `.env` file following the example from `.env.example`, values to populate these fields are on step 8 and 10. (_Note: Some values are the same for different keys it, e.g. `ARM_CLIENT_ID` & `TF_VAR_CLIENT_ID`, this is because one is for Azure CLI and the other one is to inject the sensible value into a Terraform block_)
 
 7. Create a new storage account for the Terraform state,
 
-   ```shell
+   ```sh
    ../../scripts/create-storage-account.sh
    ```
 
@@ -41,7 +41,7 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 
 9. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication replacing `<ServicePrincipalName>` with the name of the account you want to use
 
-   ```shell
+   ```sh
    az ad sp create-for-rbac --name <ServicePrincipalName>
    ```
 
@@ -53,19 +53,19 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values ask to a collegue_
 3. Source the enviroment variables
 
-   ```shell
+   ```sh
      source .env
    ```
 
 4. Initialize terraform (ensure providers/modules are installed and backend is initialized)
 
-   ```shell
+   ```sh
      terraform init
    ```
 
 5. Create a plan, or apply the infrastructure
 
-   ```shell
+   ```sh
    terraform plan # optional
    terraform apply
    ```
@@ -84,10 +84,23 @@ This step is limited to developers who have `owner` rights on Azure, if is not y
 
 ## Connecting to a Kubernetes cluster
 
-To be able to connect to the cluster we need to set the credentials file path to `KUBECONFIG` enviromental variable, we create a shell script for that
+To be able to connect to the cluster we need to set the Kubernetes credentials file path to `KUBECONFIG` enviromental variable
 
-```shell
-cd infrastructure
+1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
+2. Source the enviroment variables
 
-./scripts/create-kubernetes-config.sh
+   ```sh
+     source .env
+   ```
+
+3. Create the credentials file running this script
+
+   ```sh
+   ../../scripts/create-kubernetes-config.sh
+   ```
+
+Now you can run `kubectl` commands, e.g.
+
+```sh
+kubectl get nodes
 ```

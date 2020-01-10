@@ -51,9 +51,7 @@
     "*.{ts,tsx}": [
       "yarn lint"
     ],
-    "*.{tf,tfvars}": [
-      "bash -c 'terraform fmt -check'"
-    ]
+    "*.tf": "bash -c 'terraform fmt -check'"
   },
   "main": "index.js",
   "name": "mhra-mip-website",

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -euo pipefail
 
 PS3='Please enter your current environment: '
@@ -22,10 +22,5 @@ select opt in "${OPTIONS[@]}"; do
   esac
 done
 
-echo $K8_CONFIG_FILE
-
 echo "$(terraform output kube_config)" >~/$K8_CONFIG_FILE
-
-export KUBECONFIG=~/$K8_CONFIG_FILE
-
 echo "MHRA kubernetes config file was created, in ~/${K8_CONFIG_FILE}."
