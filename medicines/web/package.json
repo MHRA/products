@@ -1,6 +1,7 @@
 {
   "author": "Red Badger",
   "dependencies": {
+    "@types/node-fetch": "^2.5.4",
     "@types/react-gtm-module": "^2.0.0",
     "core-js": "^3.4.7",
     "dataloader": "^2.0.0",

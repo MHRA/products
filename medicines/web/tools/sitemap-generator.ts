@@ -1,6 +1,8 @@
 import fs, { promises, readdirSync } from 'fs';
 import moment from 'moment';
 import path from 'path';
+import { stringify } from 'querystring';
+import { facetSearch } from '../services/azure-search';
 
 const pagesDir = path.resolve('./dist');
 const sitemapFile = path.resolve('./dist/sitemap.xml');
@@ -10,7 +12,7 @@ const BASE_URL = 'https://products.mhra.gov.uk';
 const YYY_MM_DD = 'YYYY-MM-DD';
 const CHANGE_FREQUENCY = 'daily';
 
-const createPathsObj = async (): Promise<{ [index: string]: any }> => {
+const createFilePathsObj = async (): Promise<{ [index: string]: any }> => {
   const pages = readdirSync(pagesDir, {
     withFileTypes: true,
   })
@@ -31,27 +33,76 @@ const createPathsObj = async (): Promise<{ [index: string]: any }> => {
   );
 };
 
+const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
+  // Get substance and product page URLs by mimicing the behavour of the A–Z, 0–9 list
+  // on the web site.
+  const searchPathsObj: { [index: string]: any } = {};
+
+  for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+    const facetResult = await facetSearch(letter);
+
+    for (const facet of facetResult[1].facets) {
+      // Value is in the format "letter, substance, product". Substance and product may
+      // not be present.
+      const stringParts = facet.value.split(', ');
+      const substance = stringParts[1];
+      const product = stringParts[2];
+
+      if (product) {
+        // If a product is present, output a product URL.
+        const route =
+          '/?' +
+          stringify({
+            product: true,
+            page: 1,
+            search: product,
+          });
+
+        searchPathsObj[route] = {
+          page: route,
+          lastModified: new Date().toISOString(),
+        };
+      } else if (substance) {
+        // If product is undefined and a substance is present, include a substance URL.
+        const route =
+          '/?' +
+          stringify({
+            substance,
+          });
+
+        searchPathsObj[route] = {
+          page: route,
+          lastModified: new Date().toISOString(),
+        };
+      }
+    }
+  }
+
+  return searchPathsObj;
+};
+
 const createSiteMapString = async () => {
-  const pathsObj = await createPathsObj();
+  const filePathsObj = await createFilePathsObj();
+  const searchPathsObj = await createSearchPathsObj();
+  const pathsObj = { ...filePathsObj, ...searchPathsObj };
 
   const urls = `${Object.keys(pathsObj)
     .map(
       path =>
-        `<url>
-          <loc>${BASE_URL}${path}</loc>
-          <lastmod>${moment(pathsObj[path].lastModified).format(
-            YYY_MM_DD,
-          )}</lastmod>
-          <changefreq>${CHANGE_FREQUENCY}</changefreq>
-        </url>
-        `,
+        `<url>` +
+        `<loc>${BASE_URL}${path}</loc>` +
+        `<lastmod>${moment(pathsObj[path].lastModified).format(
+          YYY_MM_DD,
+        )}</lastmod>` +
+        `<changefreq>${CHANGE_FREQUENCY}</changefreq>` +
+        `</url>`,
     )
-    .join('')}`;
+    .join('\n')}`;
 
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
-      ${urls}
-    </urlset>`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
 
   return sitemapXml;
 };
