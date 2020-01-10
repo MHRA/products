@@ -17,3 +17,11 @@ output "cpd-static-web-url" {
 output "search_admin_key" {
   value = azurerm_search_service.search.primary_key
 }
+
+output "client_certificate" {
+  value = azurerm_kubernetes_cluster.cluster.kube_config.0.client_certificate
+}
+
+output "kube_config" {
+  value = azurerm_kubernetes_cluster.cluster.kube_config_raw
+}

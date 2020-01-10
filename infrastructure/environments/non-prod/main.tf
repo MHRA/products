@@ -1,13 +1,15 @@
 provider "azurerm" {
-  version = "=1.38.0"
+  version = "~> 1.38.0"
 }
 
 terraform {
   required_version = "0.12.18"
 
   backend "azurerm" {
-    resource_group_name = "tfstate"
-    key                 = "non-prod.terraform.tfstate"
+    resource_group_name  = "tfstate"
+    container_name       = "tfstate"
+    storage_account_name = "tfstate4338"
+    key                  = "non-prod.terraform.tfstate"
   }
 }
 
@@ -16,7 +18,7 @@ resource "azurerm_resource_group" "products" {
   location = var.REGION
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -29,7 +31,7 @@ resource "azurerm_storage_account" "products" {
   account_replication_type = "RAGRS"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -59,7 +61,7 @@ resource "azurerm_search_service" "search" {
   sku                 = "basic"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -72,7 +74,7 @@ resource "azurerm_storage_account" "cpd" {
   account_replication_type = "RAGRS"
 
   tags = {
-    environment = "non-prod"
+    environment = var.ENVIROMENT
   }
 }
 
@@ -87,4 +89,43 @@ resource "azurerm_storage_container" "cpd_website" {
 module "cpd_staticweb" {
   source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
   storage_account_name = azurerm_storage_account.cpd.name
+}
+
+# AKS
+
+resource "azurerm_virtual_network" "network" {
+  name                = "aks-vnet"
+  location            = azurerm_resource_group.products.location
+  resource_group_name = azurerm_resource_group.products.name
+  address_space       = ["10.1.0.0/16"]
+}
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "aks-subnet"
+  resource_group_name  = azurerm_resource_group.products.name
+  address_prefix       = "10.1.0.0/24"
+  virtual_network_name = azurerm_virtual_network.network.name
+}
+
+resource "azurerm_kubernetes_cluster" "cluster" {
+  name                = "aks"
+  location            = azurerm_resource_group.products.location
+  dns_prefix          = "aks"
+  resource_group_name = azurerm_resource_group.products.name
+
+  default_node_pool {
+    name       = "products"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+  service_principal {
+    client_id     = var.CLIENT_ID
+    client_secret = var.CLIENT_SECRET
+  }
+
+
+  tags = {
+    Environment = var.ENVIROMENT
+  }
 }

@@ -1,47 +1,76 @@
-## MHRA Infrastructure Automation
+# MHRA Infrastructure Automation
 
 This folder contains all the Terraform files for provisioning infrastructure in Azure.
 
-#### Setup
+The following instructions are divided in:
+
+- [Provisioning a new environment](provisioning-in-a-new-environment)
+- [Provisioning infrastructure in an existing environment](provisioning-infrastructure-in-an-existing-environment)
+- [Connecting to a Kubernetes cluster](connecting-to-a-kubernetes-cluster) using `kubectl`
+
+## Provisioning a new environment
+
+This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
+
+### Setup
 
 1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-1. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
+2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+3. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
 
-   ```bash
+   ```sh
    az login
+   ```
 
-   # SUBSCRIPTION_ID can be found in output from previous command
+4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
+
+   ```sh
    az account set --subscription="SUBSCRIPTION_ID"
    ```
 
-1. If you don't already have a storage account for the Terraform state, create one now:
+5. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
+6. Create an `.env` file following the example from `.env.example`, values to populate these fields are on step 8 and 10. (_Note: Some values are the same for different keys it, e.g. `ARM_CLIENT_ID` & `TF_VAR_CLIENT_ID`, this is because one is for Azure CLI and the other one is to inject the sensible value into a Terraform block_)
 
-   ```bash
-   cd infrastructure
+7. Create a new storage account for the Terraform state,
 
-   # copy and paste the final output from this script to export ENV vars for the steps below
-   ./scripts/create-storage-account.sh
+   ```sh
+   ../../scripts/create-storage-account.sh
    ```
 
-#### Provision infrastructure
+8. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
 
-1. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-1. Initialize terraform (ensure providers/modules are installed and backend is initialized)
-1. Create a plan, or apply the infrastructure
+9. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication replacing `<ServicePrincipalName>` with the name of the account you want to use
 
-   ```bash
-   cd environments/non-prod
+   ```sh
+   az ad sp create-for-rbac --name <ServicePrincipalName>
+   ```
 
-   terraform init \
-     --backend-config "storage_account_name=$TF_VAR_STORAGE_ACCOUNT_NAME" \
-     --backend-config "access_key=$TF_VAR_ACCESS_KEY" \
-     --backend-config "container_name=$TF_VAR_CONTAINER_NAME"
+10. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
 
+## Provisioning infrastructure in an existing environment
+
+1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
+2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values, ask a colleague._
+3. Source the environment variables
+
+   ```sh
+     source .env
+   ```
+
+4. Initialize terraform (ensure providers/modules are installed and backend is initialized)
+
+   ```sh
+     terraform init
+   ```
+
+5. Create a plan, or apply the infrastructure
+
+   ```sh
    terraform plan # optional
    terraform apply
    ```
 
-1. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
+6. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
 
    ```
    Outputs:
@@ -52,3 +81,26 @@ This folder contains all the Terraform files for provisioning infrastructure in 
    products-static-web-url = https://mhraproductsnonprod.z33.web.core.windows.net/
    search_admin_key = CB28B1A47E29FF4620184BD27B89945E
    ```
+
+## Connecting to a Kubernetes cluster
+
+To be able to connect to the cluster, we need to set the Kubernetes credentials file path as the `KUBECONFIG` environment variable.
+
+1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
+2. Source the environment variables
+
+   ```sh
+     source .env
+   ```
+
+3. Create the credentials file running this script
+
+   ```sh
+   ../../scripts/create-kubernetes-config.sh
+   ```
+
+Now you can run `kubectl` commands, e.g.
+
+```sh
+kubectl get nodes
+```
