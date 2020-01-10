@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PS3='Please enter your current enviroment: '
+PS3='Please enter your current environment: '
 OPTIONS=("non-prod" "prod" "quit")
 K8_CONFIG_FILE="mhra-azure-kube-config.yml"
 
