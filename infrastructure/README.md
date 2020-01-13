@@ -145,46 +145,19 @@ kubectl get nodes
    kubectl create namespace istio-system --save-config
    ```
 
-8. Create a file called `istio.aks.yaml`
+8. Apply manifest to the cluster
 
    ```sh
-   touch istio.aks.yaml
+   istioctl manifest apply -f istio.aks.yaml --logtostderr
    ```
 
-9. Populate with a [config profile](https://istio.io/docs/setup/additional-setup/config-profiles/), e.g:
+9. Validate the Istio installation
 
-   ```yml
-   apiVersion: install.istio.io/v1alpha2
-   kind: IstioControlPlane
-   spec:
-     # Use the default profile as the base
-     # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
-     profile: default
-     values:
-       global:
-         # Ensure that the Istio pods are only scheduled to run on Linux nodes
-         defaultNodeSelector:
-           beta.kubernetes.io/os: linux
-         # Enable mutual TLS for the control plane
-         controlPlaneSecurityEnabled: true
-         mtls:
-           # Require all service to service communication to have mtls
-           enabled: false
+   ```sh
+   kubectl get svc --namespace istio-system --output wide
    ```
 
-10. Apply manifest to the cluster
-
-    ```sh
-    istioctl manifest apply -f istio.aks.yaml --logtostderr
-    ```
-
-11. Validate the Istio installation
-
-    ```sh
-    kubectl get svc --namespace istio-system --output wide
-    ```
-
-12. Confirm that the required pods have been created
+10. Confirm that the required pods have been created
     ```sh
     kubectl get pods --namespace istio-system
     ```
