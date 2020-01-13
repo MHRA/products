@@ -4,7 +4,7 @@ This folder contains all the files for provisioning infrastructure in Azure.
 
 The following instructions are divided in:
 
-- [Provisioning a new environment](#provisioning-in-a-new-environment)
+- [Provisioning a new environment](#provisioning-a-new-environment)
 - [Provisioning infrastructure in an existing environment](#provisioning-infrastructure-in-an-existing-environment)
 - [Connecting to a Kubernetes cluster](#connecting-to-a-kubernetes-cluster) using `kubectl`
 - [Installing Istio](#installing-istio)
