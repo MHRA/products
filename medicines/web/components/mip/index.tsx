@@ -4,7 +4,7 @@ import { stringify } from 'querystring';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import { JsonLd } from 'react-schemaorg';
-import { ItemList, Substance } from 'schema-dts';
+import { Drug, ItemList, Substance } from 'schema-dts';
 import styled from 'styled-components';
 
 import { IProduct } from '../../model/substance';
@@ -61,8 +61,9 @@ const Mip: React.FC = () => {
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance, disclaimer },
+    query: { search: searchTerm, page, substance, disclaimer, product },
   } = router;
+  const isProduct = product === 'true';
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
     setSearch(formatSearchTerm(e.currentTarget.value));
@@ -212,7 +213,7 @@ const Mip: React.FC = () => {
         />
       )}
 
-      {/* Structured data for substace list page */}
+      {/* Structured data for substance list page */}
       {products && substance && substance.length === 1 && (
         <JsonLd<ItemList>
           item={{
@@ -240,6 +241,17 @@ const Mip: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'Substance',
             name: products[0].name,
+          }}
+        />
+      )}
+
+      {/* Structured data for product page */}
+      {isProduct && results && (
+        <JsonLd<Drug>
+          item={{
+            '@context': 'https://schema.org',
+            '@type': 'Drug',
+            name: searchTerm,
           }}
         />
       )}
