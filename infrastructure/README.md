@@ -129,7 +129,7 @@ kubectl get nodes
 4. To configure the `istioctl` client tool
 
    ```sh
-   export PATH="\$PATH:/Users/pataruco/istio-1.4.3/bin"
+   export PATH="${PATH}:${HOME}/istio-1.4.3/bin"
    ```
 
 5. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
