@@ -1,8 +1,12 @@
 import moment from 'moment';
 import { useRouter } from 'next/router';
+import { stringify } from 'querystring';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
+import { JsonLd } from 'react-schemaorg';
+import { ItemList, Substance } from 'schema-dts';
 import styled from 'styled-components';
+
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
@@ -205,6 +209,38 @@ const Mip: React.FC = () => {
           pageSize={pageSize}
           searchTerm={search}
           disclaimerAgree={disclaimerAgree}
+        />
+      )}
+
+      {/* Structured data for substace list page */}
+      {products && substance && substance.length === 1 && (
+        <JsonLd<ItemList>
+          item={{
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            itemListElement: products.map((product, index) => {
+              return {
+                '@type': 'ListItem',
+                position: index,
+                item: {
+                  '@type': 'Substance',
+                  name: product.name,
+                  url: '/?' + stringify({ substance: product.name }),
+                },
+              };
+            }),
+          }}
+        />
+      )}
+
+      {/* Structured data for substance page */}
+      {products && substance && substance.length > 1 && (
+        <JsonLd<Substance>
+          item={{
+            '@context': 'https://schema.org',
+            '@type': 'Substance',
+            name: products[0].name,
+          }}
         />
       )}
     </StyledMip>

@@ -12,6 +12,8 @@
     "react-dom": "^16.12.0",
     "react-ga-gtm": "^2.5.3-beta",
     "react-gtm-module": "^2.0.8",
+    "react-schemaorg": "^1.0.0",
+    "schema-dts": "^0.4.5",
     "styled-components": "^4.4.1",
     "styled-normalize": "^8.0.6",
     "whatwg-fetch": "^3.0.0"
