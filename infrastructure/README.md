@@ -9,11 +9,9 @@ The following instructions are divided in:
 - [Connecting to a Kubernetes cluster](#connecting-to-a-kubernetes-cluster) using `kubectl`
 - [Installing Istio](#installing-istio)
 
-## Provisioning a new environment
+## Prerequisites
 
-This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
-
-### Setup
+Before working with the infrastructure, you will need to run through the following steps:
 
 1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
 2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
@@ -30,9 +28,13 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
    ```
 
 5. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-6. Create an `.env` file following the example from `.env.example`, values to populate these fields are on step 8 and 10. (_Note: Some values are the same for different keys it, e.g. `ARM_CLIENT_ID` & `TF_VAR_CLIENT_ID`, this is because one is for Azure CLI and the other one is to inject the sensible value into a Terraform block_)
+6. Create an `.env` file following the example from `.env.example`. You'll need to speak with the development team to get appropriate values for this file.
 
-7. Create a new storage account for the Terraform state,
+## Provisioning a new environment
+
+This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
+
+7. Create a new storage account for the Terraform state.
 
    ```sh
    ../../scripts/create-storage-account.sh
