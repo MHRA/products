@@ -33,6 +33,10 @@ async fn graphql(
         .body(user))
 }
 
+async fn healthz() -> impl actix_web::Responder {
+    "OK"
+}
+
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
@@ -48,6 +52,7 @@ async fn main() -> io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
+            .service(web::resource("/healthz").route(web::get().to(healthz)))
     })
     .bind("127.0.0.1:8080")?
     .run()
