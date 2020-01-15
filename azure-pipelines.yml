@@ -32,10 +32,17 @@ stages:
               yarn export
             displayName: Build web
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
           - script: |
               yarn a11y
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
+          - script: |
+              yarn end-to-end-tests
+            displayName: Run end-to-end tests
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
           - task: CopyFiles@2
             displayName: Copy Files
             inputs:
