@@ -3,3 +3,4 @@ dist/
 yarn-error.log
 .next
 out/
+cypress/videos/
