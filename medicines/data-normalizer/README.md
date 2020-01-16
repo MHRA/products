@@ -27,4 +27,3 @@ It takes three input variables:
 Example:
 
 `perl normalize.pl SPCPIL downloads/input.tsv docs/spcpil/metadata.csv`
-
