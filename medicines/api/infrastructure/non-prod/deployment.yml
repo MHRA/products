@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    app: api
+  name: api
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - image: api
+          name: api
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "50m"
+            limits:
+              memory: "400Mi"
+              cpu: "100m"
