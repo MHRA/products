@@ -3,8 +3,6 @@ provider "azurerm" {
 }
 
 terraform {
-  required_version = "0.12.18"
-
   backend "azurerm" {
     resource_group_name  = "tfstate"
     container_name       = "tfstate"
