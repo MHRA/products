@@ -96,6 +96,7 @@ const Search: React.FC<ISearchProps> = props => (
         <input
           type="search"
           id="search"
+          name="search"
           value={props.search}
           onChange={props.onSearchChange}
           onBlur={props.onSearchBlur}
