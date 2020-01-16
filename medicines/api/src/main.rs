@@ -5,6 +5,7 @@ use listenfd::ListenFd;
 use std::{io, sync::Arc};
 
 mod schema;
+mod pagination;
 
 use crate::schema::{create_schema, Schema};
 
