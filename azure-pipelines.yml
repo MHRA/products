@@ -34,6 +34,11 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
+              apt-get install -y curl
+              curl "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&%24count=true&%24top=10&%24skip=0&search=paracetamol%7E1+paracetamol%5E4&scoringProfile=preferKeywords"
+            displayName: Run curl search
+
+          - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
               export AZURE_SEARCH_API_VERSION=2017-11-11
               export AZURE_SEARCH_EXACTNESS_BOOST=4
