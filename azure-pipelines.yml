@@ -43,6 +43,18 @@ stages:
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
+          - task: PublishBuildArtifacts@1
+            displayName: Publish end-to-end test screenshots
+            condition: always()
+            inputs:
+              pathtoPublish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/screenshots
+              artifactName: CypressScreenshots
+
+          - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/videos
+            displayName: Publish end-to-end test videos
+            artifact: CypressVideo
+            condition: always()
+
           - task: CopyFiles@2
             displayName: Copy Files
             inputs:
