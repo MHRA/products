@@ -3,3 +3,6 @@ members = [
     "import",
     "search",
 ]
+exclude = [
+    "api"
+]
