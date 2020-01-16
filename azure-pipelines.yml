@@ -34,12 +34,12 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
-              yarn a11y
+              yarn start & sleep 5 && yarn run pa11y-ci && kill $!
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
-              yarn end-to-end-tests
+              yarn start & sleep 5 && yarn run cypress run && kill $!
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 

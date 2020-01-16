@@ -59,14 +59,12 @@
   "name": "mhra-mip-website",
   "private": false,
   "scripts": {
-    "a11y": "yarn dev & sleep 5 && yarn run pa11y-ci && kill $!",
     "build": "next build",
     "dev": "next",
     "lint": "yarn tslint",
     "start": "next start",
     "export": "next export -o dist && yarn sitemap",
-    "sitemap": "ts-node --project tools/tsconfig.json tools/sitemap-generator.ts",
-    "end-to-end-tests": "yarn dev & sleep 5 && yarn run cypress run && kill $!"
+    "sitemap": "ts-node --project tools/tsconfig.json tools/sitemap-generator.ts"
   },
   "version": "1.0.0"
 }
