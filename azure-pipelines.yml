@@ -34,7 +34,12 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
-              yarn dev & sleep 5 && yarn run cypress run && kill $!
+              apt-get install -y wget
+              wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+              sudo dpkg -i google-chrome-stable_current_amd64.deb
+              yarn dev & sleep 5
+              yarn run cypress run --browser chrome
+              kill $!
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
