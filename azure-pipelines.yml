@@ -34,11 +34,6 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
-              yarn start & sleep 5 && yarn run pa11y-ci && kill $!
-            displayName: Check accessibility
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
-
-          - script: |
               yarn start & sleep 5 && yarn run cypress run && kill $!
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
@@ -54,6 +49,11 @@ stages:
             displayName: Publish end-to-end test videos
             artifact: CypressVideo
             condition: always()
+
+          - script: |
+              yarn start & sleep 5 && yarn run pa11y-ci && kill $!
+            displayName: Check accessibility
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - task: CopyFiles@2
             displayName: Copy Files
