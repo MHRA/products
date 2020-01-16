@@ -5,6 +5,7 @@ describe('Search', function() {
         win.sessionStorage.clear();
       },
     });
+    cy.contains('Accept cookies').click();
     cy.get("input[type='search']").type('paracetamol');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer').click();
@@ -20,6 +21,7 @@ describe('A-Z Index', function() {
         win.sessionStorage.clear();
       },
     });
+    cy.contains('Accept cookies').click();
     cy.get('nav')
       .contains('P')
       .click();
