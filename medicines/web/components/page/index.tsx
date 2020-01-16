@@ -7,7 +7,6 @@ import { desktopMaxWidth } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
-import consoleHack from './consolehack';
 
 const WithStyles = styled.div`
   display: flex;
@@ -63,10 +62,8 @@ const App: React.FC<IPageProps> = props => {
           httpEquiv="Content-Security-Policy-Report-Only"
           content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
         />
-        <script dangerouslySetInnerHTML={{__html: consoleHack}} />
       </Head>
       <WithStyles>
-        <pre id="loggity">THISISTHELOG</pre>
         <Normalize />
         <CookieBanner />
         <Header title={props.title} />
