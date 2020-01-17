@@ -2,7 +2,9 @@ FROM rust:1.40 AS build
 
 WORKDIR /usr/src/api
 
-COPY . .
+COPY Cargo.toml .
+COPY Cargo.lock .
+
 # Layer hack: Build an empty program to compile dependencies and place on their own layer.
 # This cuts down build time
 RUN mkdir -p ./src/ && \
