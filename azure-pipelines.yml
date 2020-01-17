@@ -44,6 +44,7 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
+              export DEBUG=cypress:*
               yarn dev & sleep 5
               yarn run cypress run && kill $!
             displayName: Run end-to-end tests
