@@ -280,6 +280,7 @@ dependencies = [
  "actix-web",
  "env_logger",
  "juniper",
+ "listenfd",
  "serde",
  "serde_derive",
  "serde_json",
@@ -831,7 +832,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "url",
- "uuid",
+ "uuid 0.7.4",
 ]
 
 [[package]]
@@ -878,6 +879,17 @@ name = "linked-hash-map"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae91b68aebc4ddb91978b11a1b02ddd8602a05ec19002801c5666000e05e0f83"
+
+[[package]]
+name = "listenfd"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "492158e732f2e2de81c592f0a2427e57e12cd3d59877378fe7af624b6bbe0ca1"
+dependencies = [
+ "libc",
+ "uuid 0.6.5",
+ "winapi 0.3.8",
+]
 
 [[package]]
 name = "lock_api"
@@ -1474,6 +1486,15 @@ dependencies = [
  "idna",
  "matches",
  "percent-encoding",
+]
+
+[[package]]
+name = "uuid"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1436e58182935dcd9ce0add9ea0b558e8a87befe01c1a301e6020aeb0876363"
+dependencies = [
+ "cfg-if",
 ]
 
 [[package]]
