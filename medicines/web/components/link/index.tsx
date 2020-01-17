@@ -8,20 +8,23 @@ const deduplicateSlashes = (url: string) => {
 
 type Url = string | UrlObject;
 const MhraLink: React.FC<LinkProps> = props => {
-  const { baseUrl, appendix } = getConfig().publicRuntimeConfig;
-  let href: Url;
-  if (typeof props.href === 'string') {
-    href = deduplicateSlashes(`${baseUrl}${props.href}${appendix}`);
-  } else {
-    href = {
-      ...props.href,
-      pathname: deduplicateSlashes(
-        `${baseUrl}${props.href.pathname}${appendix}`,
-      ),
-    };
-  }
+  const href: Url = modifyUrl(props.href);
 
   return <Link {...props} href={href} />;
 };
 
 export default MhraLink;
+
+export function modifyUrl(url: Url) {
+  const { baseUrl, appendix } = getConfig().publicRuntimeConfig;
+  let href: Url;
+  if (typeof url === 'string') {
+    href = deduplicateSlashes(`${baseUrl}${url}${appendix}`);
+  } else {
+    href = {
+      ...url,
+      pathname: deduplicateSlashes(`${baseUrl}${url.pathname}${appendix}`),
+    };
+  }
+  return href;
+}

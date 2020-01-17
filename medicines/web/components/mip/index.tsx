@@ -1,8 +1,8 @@
 import moment from 'moment';
-import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
+import { useMhraRouter } from '../../components/router';
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
@@ -54,7 +54,7 @@ const Mip: React.FC = () => {
   const [products, setProducts] = React.useState<IProduct[] | null>(null);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
 
-  const router = useRouter();
+  const router = useMhraRouter();
 
   const {
     query: { search: searchTerm, page, substance, disclaimer },
