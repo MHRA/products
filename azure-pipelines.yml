@@ -14,7 +14,7 @@ stages:
       - job: web
         dependsOn: []
         pool:
-          vmImage: macOS-latest
+          vmImage: ubuntu-latest
         steps:
           - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
