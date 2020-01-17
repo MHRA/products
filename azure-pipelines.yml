@@ -15,7 +15,9 @@ stages:
         dependsOn: []
         pool:
           vmImage: ubuntu-latest
+
         steps:
+
           - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
               export AZURE_SEARCH_API_VERSION=2017-11-11
@@ -32,21 +34,61 @@ stages:
               yarn export
             displayName: Build web
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
           - script: |
-              yarn a11y
+              export AZURE_SEARCH_API_VERSION=2017-11-11
+              export AZURE_SEARCH_EXACTNESS_BOOST=4
+              export AZURE_SEARCH_INDEX=products-index
+              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+              export AZURE_SEARCH_SERVICE=mhraproductsdev
+              export AZURE_SEARCH_WORD_FUZZINESS=1
+              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+              export GOOGLE_TRACKING_ID=UA-6838115-11
+              mkdir -p cypress/screenshots
+              yarn dev & yarn wait-on http://localhost:3000
+              yarn run cypress run
+            displayName: Run end-to-end tests
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
+          - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/screenshots
+            displayName: Publish end-to-end test screenshots
+            artifact: CypressScreenshots
+            condition: always()
+
+          - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/videos
+            displayName: Publish end-to-end test videos
+            artifact: CypressVideo
+            condition: always()
+
+          - script: |
+              export AZURE_SEARCH_API_VERSION=2017-11-11
+              export AZURE_SEARCH_EXACTNESS_BOOST=4
+              export AZURE_SEARCH_INDEX=products-index
+              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+              export AZURE_SEARCH_SERVICE=mhraproductsdev
+              export AZURE_SEARCH_WORD_FUZZINESS=1
+              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+              export GOOGLE_TRACKING_ID=UA-6838115-11
+              yarn dev & yarn wait-on http://localhost:3000
+              yarn run pa11y-ci
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
           - task: CopyFiles@2
             displayName: Copy Files
             inputs:
               SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
               TargetFolder: $(build.artifactstagingdirectory)
               CleanTargetFolder: true
+
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build-medicines
+
       - job: learning_web
         dependsOn: []
         pool:
