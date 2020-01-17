@@ -1,20 +1,28 @@
+describe('XHR test', function() {
+  it('My XHR test runs OK.', function() {
+    cy.visit('https://www.craiga.id.au/xhr');
+    cy.contains('This page made an XML HTTP request');
+  });
+});
 describe('Search', function() {
   it('Can at least get to Azure search thingy', function() {
-    cy.request("https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&%24count=true&%24top=10&%24skip=0&search=paracetamol%7E1+paracetamol%5E4&scoringProfile=preferKeywords")
+    cy.request(
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&%24count=true&%24top=10&%24skip=0&search=paracetamol%7E1+paracetamol%5E4&scoringProfile=preferKeywords',
+    );
   }),
-  it('Search for Paracetamol', function() {
-    cy.visit('/', {
-      onBeforeLoad: win => {
-        win.sessionStorage.clear();
-      },
+    it('Search for Paracetamol', function() {
+      cy.visit('/', {
+        onBeforeLoad: win => {
+          win.sessionStorage.clear();
+        },
+      });
+      cy.get("input[type='search']").type('paracetamol');
+      cy.contains('Search').click();
+      cy.contains('I have read and understand the disclaimer').click();
+      cy.contains('Agree').click();
+      cy.contains('Next').click();
+      cy.get("a[href*='docs/']");
     });
-    cy.get("input[type='search']").type('paracetamol');
-    cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
-    cy.contains('Agree').click();
-    cy.contains('Next').click();
-    cy.get("a[href*='docs/']");
-  });
 });
 describe('A-Z Index', function() {
   it('Navigate to Paracetamol via A-Z index', function() {
