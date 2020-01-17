@@ -1,12 +1,10 @@
 describe('Search', function() {
   it('Search for Paracetamol', function() {
-    cy.visit('/', {
+    cy.visit('/?search=paracetamol&page=1', {
       onBeforeLoad: win => {
         win.sessionStorage.clear();
       },
     });
-    cy.get("input[type='search']").type('paracetamol');
-    cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
