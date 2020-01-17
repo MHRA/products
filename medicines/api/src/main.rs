@@ -58,7 +58,7 @@ async fn main() -> io::Result<()> {
         server.listen(l)?
     } else {
         server.bind(format!(
-            "127.0.0.1:{}",
+            "0.0.0.0:{}",
             std::env::var("PORT").unwrap_or_else(|e| {
                 eprintln!(
                     "Error reading $PORT env var (defaulting to {}): {}",
