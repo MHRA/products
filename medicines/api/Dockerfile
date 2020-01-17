@@ -38,6 +38,4 @@ USER svc
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-RUN ls -lah
-
 CMD ["/api"]
