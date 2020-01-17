@@ -18,7 +18,7 @@ spec:
         env: non-prod
     spec:
       containers:
-        - image: api
+        - image: mhraproductsnonprod.azurecr.io/products/api
           name: api
           readinessProbe:
             httpGet:
