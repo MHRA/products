@@ -127,3 +127,16 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     Environment = var.ENVIROMENT
   }
 }
+
+
+
+resource "azurerm_container_registry" "container_registry" {
+  name                = "mhraProductsNonProd"
+  resource_group_name = azurerm_resource_group.products.name
+  location            = azurerm_resource_group.products.location
+  sku                 = "Basic"
+
+  tags = {
+    Environment = var.ENVIROMENT
+  }
+}

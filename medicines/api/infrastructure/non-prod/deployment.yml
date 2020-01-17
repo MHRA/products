@@ -18,7 +18,7 @@ spec:
         env: non-prod
     spec:
       containers:
-        - image: ../../Dockerfile
+        - image: api
           name: api
           readinessProbe:
             httpGet:
