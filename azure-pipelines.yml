@@ -14,7 +14,7 @@ stages:
       - job: web
         dependsOn: []
         pool:
-          vmImage: ubuntu-latest
+          vmImage: macOS-latest
         steps:
           - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
@@ -44,11 +44,8 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
-              apt-get install -y wget
-              wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-              sudo dpkg -i google-chrome-stable_current_amd64.deb
               yarn dev & sleep 5
-              yarn run cypress run --browser chrome && kill $!
+              yarn run cypress run && kill $!
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
