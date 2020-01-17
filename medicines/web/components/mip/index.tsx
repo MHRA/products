@@ -4,7 +4,11 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { docSearch, ISearchResult } from '../../services/azure-search';
+import {
+  buildSearchUrl,
+  docSearch,
+  ISearchResult,
+} from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
@@ -171,6 +175,7 @@ const Mip: React.FC = () => {
 
   return (
     <StyledMip>
+      <p>{buildSearchUrl('query', 1, 10)}</p>
       <section className="search">
         <Search
           search={search}

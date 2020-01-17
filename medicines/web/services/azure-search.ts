@@ -74,7 +74,7 @@ const buildFuzzyQuery = (query: string): string => {
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-const buildSearchUrl = (
+export const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
