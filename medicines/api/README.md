@@ -30,7 +30,7 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 1. Navigate to this directory, `/medicines/api`
 2. Run `docker build . -t api`
 3. Run `docker run -p 8080:8000 api`
-4. Open the browser and go to `http://0.0.0.0:8000/healthz`
+4. Open the browser and go to `http://localhost:8080/healthz`
 5. Yo should see an **Ok** and a server log in your terminal
 
 ## Deploy API pod in Kuberbetes cluster ⎈
@@ -39,7 +39,7 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 2. Create [Kubernetes Service](https://kubernetes.io/docs/concepts/services-networking/service/)
 
    ```sh
-   kubectl apply -f ./infrastructure/non-prod/deployment.yml
+   kubectl apply -f ./infrastructure/non-prod/service.yml
    ```
 
 3. Deploy [Kubernetes pod](https://kubernetes.io/docs/concepts/workloads/pods/pod/) by applying a deployment
@@ -54,7 +54,7 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
    stern api
    ```
 
-5. You should reeceive a health server log like this
+5. You should receive a health server log like this
 
    ```sh
    api-558646c969-9mdxp api [2020-01-20T15:02:57Z INFO  actix_web::middleware::logger] 10.244.1.1:51524 "GET /healthz HTTP/1.1" 200 2 "-" "kube-probe/1.14" 0.000059
