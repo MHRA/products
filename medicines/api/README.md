@@ -18,3 +18,11 @@ If you're using homebrew, you should be able to install `rustup` by running:
 4. You should see **OK** rendered on the page
 
 To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
+
+## Running in Docker container 🐳
+
+1. Navigate to this directory, `/medicines/api`
+2. Run `docker build . -t api`
+3. Run `docker run -p 8080:8000 api`
+4. Open the browser and go to `http://0.0.0.0:8000/healthz`
+5. Yo should see an **Ok** and a server log in your terminal
