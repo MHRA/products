@@ -25,3 +25,11 @@ output "client_certificate" {
 output "kube_config" {
   value = azurerm_kubernetes_cluster.cluster.kube_config_raw
 }
+
+output "container_registry_id" {
+  value = azurerm_container_registry.container_registry.id
+}
+
+output "container_registry_login_server" {
+  value = azurerm_container_registry.container_registry.login_server
+}

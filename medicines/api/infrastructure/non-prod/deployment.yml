@@ -15,14 +15,21 @@ spec:
     metadata:
       labels:
         app: api
+        env: non-prod
     spec:
       containers:
-        - image: api
+        - image: mhraproductsnonprod.azurecr.io/products/api
           name: api
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 3
           resources:
             requests:
-              memory: "200Mi"
-              cpu: "50m"
+              cpu: 100m
+              memory: 128Mi
             limits:
-              memory: "400Mi"
-              cpu: "100m"
+              cpu: 250m
+              memory: 256Mi

@@ -15,7 +15,7 @@ source ../../../infrastructure/non-prod/.env
 2. Deploy the kubernetes pod for your chosen environment, e.g. _non-prod_:
 
 ```sh
-kubectl apply -f ./non-prod/deployment.yml
+kubectl apply -f ./infrastructure/non-prod/deployment.yml
 ```
 
 3. See the pods running

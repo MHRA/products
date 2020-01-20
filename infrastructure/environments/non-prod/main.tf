@@ -113,7 +113,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
   default_node_pool {
     name       = "products"
-    node_count = 1
+    node_count = 2
     vm_size    = "Standard_D2_v2"
   }
 
@@ -122,6 +122,19 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     client_secret = var.CLIENT_SECRET
   }
 
+
+  tags = {
+    Environment = var.ENVIROMENT
+  }
+}
+
+
+
+resource "azurerm_container_registry" "container_registry" {
+  name                = "mhraProductsNonProd"
+  resource_group_name = azurerm_resource_group.products.name
+  location            = azurerm_resource_group.products.location
+  sku                 = "Basic"
 
   tags = {
     Environment = var.ENVIROMENT

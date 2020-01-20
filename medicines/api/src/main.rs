@@ -1,7 +1,8 @@
 const PORT: u16 = 8000;
 use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer};
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
-use std::{io, sync::Arc};use listenfd::ListenFd;
+use listenfd::ListenFd;
+use std::{io, sync::Arc};
 
 mod schema;
 
@@ -39,7 +40,6 @@ async fn main() -> io::Result<()> {
 
     let mut listenfd = ListenFd::from_env();
 
-
     // Create Juniper schema
     let schema = std::sync::Arc::new(create_schema());
 
@@ -52,7 +52,6 @@ async fn main() -> io::Result<()> {
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
             .service(web::resource("/healthz").route(web::get().to(healthz)))
     });
-
 
     server = if let Some(l) = listenfd.take_tcp_listener(0)? {
         server.listen(l)?
@@ -70,5 +69,4 @@ async fn main() -> io::Result<()> {
     };
 
     server.run().await
- 
 }
