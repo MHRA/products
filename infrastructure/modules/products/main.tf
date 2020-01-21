@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "products" {
 
 
 resource "azurerm_storage_account" "products" {
-  name                     = "mhraproductsnonprod"
+  name                     = var.namespace
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_kind             = "StorageV2"
@@ -42,7 +42,7 @@ module "products_staticweb" {
 }
 
 resource "azurerm_search_service" "search" {
-  name                = "mhraproductsnonprod"
+  name                = var.namespace
   resource_group_name = var.resource_group_name
   location            = var.location
   sku                 = "basic"
