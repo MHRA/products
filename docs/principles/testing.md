@@ -4,14 +4,14 @@
 
 End-to-end testing tests an entire product, service or application. Individual products should each have their own tests.
 
-### Cypress
+### Websites tested by Cypress
 
 Websites should be tested by Cypress.
 
 - `/medicines/web`
 - `/learning/web`
 
-### API
+### APIs tested by Jest
 
 GraphQL APIs should be tested by Jest.
 
@@ -19,21 +19,21 @@ GraphQL APIs should be tested by Jest.
 
 ## Unit Testing
 
-### Jest
+### Helpers tested by Jest
 
 JavaScript and Typescript helpers should be tested by Jest.
 Where Typescript support is required, [Jest supports this via `@babel/preset-typescript`][jest typescript]
 
 - `/medicines/web/services`
 
-### Enzyme
+### React componenents tested by Enzyme
 
 React components should be tested by [Enzyme via Jest][enzyme].
 
 - `/medicines/web/components`
 - `/learning/web/src/components`
 
-### Rust
+### Rust tested by Rust
 
 Rust code should be tested by Rust, using its [unit testing framework][rust unit testing].
 
