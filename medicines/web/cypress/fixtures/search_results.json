@@ -5,10 +5,7 @@
     {
       "@search.score": 0.9,
       "@search.highlights": {
-        "content": [
-          "My cool document's content.",
-          "Some more cool content."
-        ]
+        "content": ["My cool document's content.", "Some more cool content."]
       },
       "rev_label": null,
       "metadata_storage_path": "https://example.com/my-cool-document.pdf",
@@ -21,11 +18,7 @@
       "metadata_storage_size": 1922897,
       "metadata_storage_name": "cc2f4e4bb346a002b98ca55cabf770dc4d435ece",
       "doc_type": "Par",
-      "suggestions": [
-        "cool",
-        "document",
-        "test"
-      ],
+      "suggestions": ["cool", "document", "test"],
       "substance_name": [],
       "facets": []
     },
@@ -50,11 +43,7 @@
       "metadata_storage_size": 1922897,
       "metadata_storage_name": "cc2f4e4bb346a002b98ca55cabf770dc4d435ece",
       "doc_type": "Par",
-      "suggestions": [
-        "warm",
-        "document",
-        "test"
-      ],
+      "suggestions": ["warm", "document", "test"],
       "substance_name": [],
       "facets": []
     }
