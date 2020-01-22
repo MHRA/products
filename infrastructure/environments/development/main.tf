@@ -17,7 +17,7 @@ locals {
   environment         = var.ENVIROMENT
   client_id           = var.CLIENT_ID
   client_secret       = var.CLIENT_SECRET
-  namespace           = "mhraProductsDev"
+  namespace           = "mhraproductsdevelopment"
 }
 
 # website
