@@ -53,12 +53,12 @@ stages:
 
           - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/screenshots
             displayName: Publish end-to-end test screenshots
-            artifact: CypressScreenshots
+            artifact: MedicinesCypressScreenshots
             condition: always()
 
           - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/videos
             displayName: Publish end-to-end test videos
-            artifact: CypressVideo
+            artifact: MedicinesCypressVideo
             condition: always()
 
           - script: |
@@ -97,31 +97,53 @@ stages:
           GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
           GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
         steps:
+
           - script: |
               yarn && yarn build
             displayName: Build learning web (master)
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
+
           - script: |
               export PATH_PREFIX=$(Build.SourceBranchName) && yarn && yarn build
             displayName: Build learning web (branch)
             condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
+
           - script: |
               yarn a11y
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/learning/web
+
+          - script: |
+              mkdir -p cypress/screenshots
+              yarn test-e2e
+            displayName: Run end-to-end tests
+            workingDirectory: $(Build.SourcesDirectory)/learning/web
+
+          - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/screenshots
+            displayName: Publish end-to-end test screenshots
+            artifact: LearningCypressScreenshots
+            condition: always()
+
+          - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/videos
+            displayName: Publish end-to-end test videos
+            artifact: LearningCypressVideo
+            condition: always()
+
           - task: CopyFiles@2
             displayName: Copy Files
             inputs:
               SourceFolder: $(Build.SourcesDirectory)/learning/web/public
               TargetFolder: $(build.artifactstagingdirectory)
               CleanTargetFolder: true
+
           - task: PublishBuildArtifacts@1
             displayName: Publish Build Artifacts
             inputs:
               PathtoPublish: $(build.artifactstagingdirectory)
               ArtifactName: build-learning
+
   - stage: deploy_web
     dependsOn: [web]
     jobs:
