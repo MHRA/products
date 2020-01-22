@@ -2,7 +2,12 @@
 
 ## End-to-End Testing
 
-End-to-end testing tests an entire product, service or application. Individual products should each have their own tests.
+End-to-end testing tests an entire product, service or application.
+Individual products should each have their own tests.
+
+Where possible, external dependencies (such as Azure Search) should be mocked.
+This is because external dependencies can slow down these tests and make them brittle.
+Testing with external dependencies should be carried out manually.
 
 ### Websites tested by Cypress
 
@@ -21,7 +26,7 @@ GraphQL APIs should be tested by Jest.
 
 ### Helpers tested by Jest
 
-JavaScript and Typescript helpers should be tested by Jest.
+JavaScript and TypeScript helpers should be tested by Jest.
 Where Typescript support is required, [Jest supports this via `@babel/preset-typescript`][jest typescript]
 
 - `/medicines/web/services`
