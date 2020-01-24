@@ -46,8 +46,7 @@ stages:
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
               mkdir -p cypress/screenshots
-              yarn dev & yarn wait-on http://localhost:3000
-              yarn run cypress run
+              yarn test-e2e
             displayName: Run end-to-end tests
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
@@ -71,8 +70,7 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
-              yarn dev & yarn wait-on http://localhost:3000
-              yarn run pa11y-ci
+              yarn a11y
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
