@@ -77,9 +77,9 @@ We used below approach when testing.
 
 We tested all functions of the website on:
 
-* Chrome
-* Firefox
-* Internet Explorer 11
+- Chrome
+- Firefox
+- Internet Explorer 11
 
 We tested different search terms on the website, including PIL numbers. We also tested the A-Z/0-9 Active substance functionality with different areas selected.
 
