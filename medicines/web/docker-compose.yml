@@ -1,0 +1,16 @@
+version: '3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - AZURE_SEARCH_API_VERSION
+        - AZURE_SEARCH_EXACTNESS_BOOST
+        - AZURE_SEARCH_INDEX
+        - AZURE_SEARCH_KEY
+        - AZURE_SEARCH_SCORING_PROFILE
+        - AZURE_SEARCH_SERVICE
+        - AZURE_SEARCH_WORD_FUZZINESS
+    ports:
+      - '3000:3000'
