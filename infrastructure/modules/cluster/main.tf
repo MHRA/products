@@ -110,29 +110,23 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   resource_group_name = var.resource_group_name
 
   default_node_pool {
-    name       = "products"
-    node_count = 2
-    vm_size    = "Standard_D2_v2"
+    name           = "products"
+    node_count     = 2
+    vm_size        = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_subnet.backend.id
   }
+
 
   service_principal {
     client_id     = var.client_id
     client_secret = var.client_secret
   }
 
-
-  tags = {
-    Environment = var.environment
+  network_profile {
+    network_plugin = "kubenet"
   }
-}
 
 
-
-resource "azurerm_container_registry" "container_registry" {
-  name                = var.namespace
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  sku                 = "Basic"
 
   tags = {
     Environment = var.environment

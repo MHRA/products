@@ -15,10 +15,10 @@ spec:
     metadata:
       labels:
         app: api
-        env: non-prod
+        env: development
     spec:
       containers:
-        - image: mhraproductsdevelopmentregistry.azurecr.io/products/api
+        - image: mhraproductsdevregistry.azurecr.io/products/api
           name: api
           readinessProbe:
             httpGet:
