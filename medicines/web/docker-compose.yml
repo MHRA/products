@@ -12,5 +12,7 @@ services:
         - AZURE_SEARCH_SCORING_PROFILE
         - AZURE_SEARCH_SERVICE
         - AZURE_SEARCH_WORD_FUZZINESS
+        - GOOGLE_GTM_CONTAINER_ID
+        - GOOGLE_TRACKING_ID
     ports:
       - '3000:3000'
