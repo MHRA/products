@@ -65,7 +65,7 @@
     "lint": "yarn tslint",
     "start": "next start",
     "export": "next export -o dist && yarn sitemap",
-    "sitemap": "ts-node --project tools/tsconfig.json tools/sitemap-generator.ts"
+    "sitemap": "ts-node --project src/tools/tsconfig.json src/tools/sitemap-generator.ts"
   },
   "version": "1.0.0"
 }
