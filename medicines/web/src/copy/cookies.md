@@ -16,7 +16,7 @@ We do this to find out such things as the number of visitors to the various part
 
 This information is only processed in a way that does not identify anyone.
 We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website.
-Please visit Google’s  [overview of privacy and safeguarding data][google privacy] to know more about their policies.
+Please visit Google’s [overview of privacy and safeguarding data][google privacy] to know more about their policies.
 
 Google Analytics cookies we use are:
 
