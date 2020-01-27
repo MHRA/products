@@ -8,3 +8,7 @@ output "public_ip" {
 output "host" {
   value = module.cluster.host
 }
+
+output "client_certificate" {
+  value = module.cluster.client_certificate
+}
