@@ -16,4 +16,4 @@ spec:
         enabled: false
     gateways:
       istio-ingressgateway:
-        loadBalancerIP: 51.132.9.162
+        loadBalancerIP: 51.105.5.181
