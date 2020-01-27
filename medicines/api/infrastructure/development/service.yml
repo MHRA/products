@@ -4,6 +4,8 @@ metadata:
   name: api
 spec:
   ports:
-    - port: 8000
+    - name: http
+      port: 80
+      targetPort: 8000
   selector:
     app: api
