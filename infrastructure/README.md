@@ -6,4 +6,4 @@ The following instructions are divided in:
 
 - [Provisioning infrastructure](./docs/infrastructure.md)
 - [Connect to Medicines microservices](./docs/kubernetes.md)
-- [Destroy and provision a Kubernetes cluster](./docs/destroy-provision-aks)
+- [Destroy and provision a Kubernetes cluster](./docs/destroy-provision-aks.md)
