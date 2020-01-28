@@ -46,9 +46,11 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "cypress": "^3.8.2",
     "minimatch": "^3.0.4",
     "pa11y-ci": "^2.3.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "wait-on": "^4.0.0"
   },
   "homepage": "https://github.com/MHRA/products#readme",
   "keywords": [
@@ -60,13 +62,13 @@
     "url": "git+https://github.com/MHRA/products.git"
   },
   "scripts": {
-    "a11y": "yarn serve & sleep 5 && yarn run pa11y-ci && kill $!",
+    "a11y": "yarn dev --verbose & wait-on http://localhost:8000; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e": "yarn dev & wait-on http://localhost:8000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "build": "gatsby build --prefix-paths",
     "dev": "gatsby develop",
     "pretty": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "yarn run develop",
     "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "clean": "gatsby clean"
   }
 }
