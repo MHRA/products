@@ -1,4 +1,4 @@
-apiVersion: install.istio.io/v1alpha2
+apiVersion: install.istio.io/v1alpha3
 kind: IstioControlPlane
 spec:
   # Use the default profile as the base
@@ -14,3 +14,8 @@ spec:
       mtls:
         # Require all service to service communication to have mtls
         enabled: false
+    gateways:
+      istio-ingressgateway:
+        loadBalancerIP: 51.11.35.34
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-resource-group: MHRA-dev
