@@ -54,28 +54,28 @@ const CookieForm: React.FC<ICookieForm> = props => {
 
   return (
     <StyledCookieForm>
-      <form>
-        <label htmlFor="cookie-on">
-          <input
-            type="radio"
-            name="cookie"
-            id="cookie-on"
-            checked={props.storageAllowed}
-            onChange={handleCookiesOn}
-          />
-          On
-        </label>
-        <label htmlFor="cookie-off">
-          <input
-            type="radio"
-            name="cookie"
-            id="cookie-off"
-            checked={!props.storageAllowed}
-            onChange={handleCookiesOff}
-          />
-          Off
-        </label>
-      </form>
+      <label htmlFor="cookie-on">
+        <input
+          type="radio"
+          name="cookie"
+          id="cookie-on"
+          checked={props.storageAllowed}
+          onChange={handleCookiesOn}
+          role="button"
+        />
+        On
+      </label>
+      <label htmlFor="cookie-off">
+        <input
+          type="radio"
+          name="cookie"
+          id="cookie-off"
+          checked={!props.storageAllowed}
+          onChange={handleCookiesOff}
+          role="button"
+        />
+        Off
+      </label>
     </StyledCookieForm>
   );
 };
