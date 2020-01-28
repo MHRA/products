@@ -1,8 +1,8 @@
 # Destroy and provision Kubernetes cluster for development
 
-To reduce develoment cost every weekday night we destroy the kubernetes cluster and provision it again the next morning.
+To reduce development cost, every weekday night we destroy the kubernetes cluster and provision it again the next morning.
 
-The following instructions are divided in:
+The following instructions are divided into:
 
 - [Destroy cluster](#destroy-cluster)
 - [Provision cluster](#provision-cluster)
@@ -16,7 +16,9 @@ You should have installed the following tools
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [Istio](https://github.com/istio/istio/releases/)
 
-## Destroy cluster 💣
+## Setting up
+
+Before either destroying or provisioning a kubernetes cluster, take these setup steps.
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
 2. Source the environment variables
@@ -31,53 +33,49 @@ You should have installed the following tools
      terraform init
    ```
 
-4. Destroy cluster
+## Destroy cluster 💣
+
+First, follow the [setup steps above](#setting-up).
+
+Destroying the cluster is now just one step:
+
    ```sh
      terraform destroy --target=module.cluster.azurerm_kubernetes_cluster.cluster
    ```
+   
+This should give a nice message saying well done on a good destruction job: `Destruction complete.`
 
 ## Provision cluster ⎈
 
-1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-2. Source the environment variables
+First, follow the [setup steps above](#setting-up).
+
+1. Provision cluster.
 
    ```sh
-     source .env
+   terraform apply --target=module.cluster.azurerm_kubernetes_cluster.cluster
    ```
 
-3. Initialize terraform (ensure providers/modules are installed and backend is initialized)
-
-   ```sh
-     terraform init
-   ```
-
-4. Provision cluster
-
-   ```sh
-     terraform apply --target=module.cluster.azurerm_kubernetes_cluster.cluster
-   ```
-
-5. Create the credentials file running this script
+2. Create the credentials file by running this script.
 
    ```sh
    ../../scripts/create-kubernetes-config.sh
    ```
 
-6. Install Istio with a load balancer
+3. Install Istio with a load balancer.
 
    ```sh
-     istioctl manifest apply -f control-plane.yaml
+   istioctl manifest apply -f control-plane.yaml
    ```
 
-7. Go to the microservice do you want to deploy into the cluster (e.g. API)
+The cluster is now ready.
+
+### Deploying services
+
+You can now deploy microservices, for example if you want to deploy `/medicines/api`,
+you can go to `/medicines/api/infrastructure/development` and deploy the services using the scripts there.
 
    ```sh
-    cd ../../../medicines/api/infrastructure/development
-   ```
-
-8. Deploy services
-   ```sh
-    kubectl apply -f deployment.yml
-    kubectl apply -f service.yml
-    kubectl apply -f virtual-service.yml
+   kubectl apply -f deployment.yml
+   kubectl apply -f service.yml
+   kubectl apply -f virtual-service.yml
    ```
