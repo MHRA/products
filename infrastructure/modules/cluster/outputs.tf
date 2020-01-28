@@ -14,6 +14,6 @@ output "host" {
   value = azurerm_kubernetes_cluster.cluster.kube_config.0.host
 }
 
-output resource_group_name {
+output "resource_group_name" {
   value = azurerm_kubernetes_cluster.cluster.resource_group_name
 }
