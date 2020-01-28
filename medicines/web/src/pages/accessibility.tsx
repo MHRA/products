@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import accessibility from '../copy/accessibility.md';
+import { useLocalStorage } from '../hooks';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
@@ -18,8 +19,16 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  const [storageAllowed, setStorageAllowed] = useLocalStorage(
+    'allowStorage',
+    false,
+  );
   return (
-    <Page title="Accessibility Statement">
+    <Page
+      title="Accessibility Statement"
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       <StyledMain dangerouslySetInnerHTML={{ __html: accessibility }} />
     </Page>
   );

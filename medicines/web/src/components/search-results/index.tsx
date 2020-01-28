@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
-import { useSessionStorage } from '../../hooks';
+import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
@@ -189,10 +189,21 @@ const SearchResults = (props: {
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
 }) => {
-  const [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
-    'showDisclaimer',
-    true,
+  const [storageAllowed, setStorageAllowed] = useLocalStorage(
+    'allowStorage',
+    false,
   );
+
+  // Keep track of whether we should show the disclaimer warning.
+  // If storage is not allowed, use React state.
+  let [showDisclaimerWarning, setShowDisclaimerWarning] = React.useState(true);
+  if (storageAllowed) {
+    // If storage is allowed, use session storage.
+    [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
+      'showDisclaimer',
+      true,
+    );
+  }
 
   const {
     disclaimerAgree,

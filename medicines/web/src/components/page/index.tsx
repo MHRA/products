@@ -1,7 +1,11 @@
 import Head from 'next/head';
 import React from 'react';
+import ReactGA from 'react-ga-gtm';
+import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
+
+import { useLocalStorage } from '../../hooks';
 import { anchorColour, mhra } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
@@ -51,9 +55,20 @@ const Wrapper = styled.main`
 interface IPageProps {
   children: React.ReactNode;
   title: string;
+  storageAllowed: boolean;
+  setStorageAllowed: any;
 }
 
 const App: React.FC<IPageProps> = props => {
+  if (props.storageAllowed) {
+    TagManager.initialize({
+      gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
+    });
+    ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
+      debug: true,
+    });
+  }
+
   return (
     <>
       <Head>
@@ -65,7 +80,10 @@ const App: React.FC<IPageProps> = props => {
       </Head>
       <WithStyles>
         <Normalize />
-        <CookieBanner />
+        <CookieBanner
+          storageAllowed={props.storageAllowed}
+          setStorageAllowed={props.setStorageAllowed}
+        />
         <Header title={props.title} />
         <Wrapper>{props.children}</Wrapper>
         <Footer />

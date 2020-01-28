@@ -18,16 +18,5 @@ This information is only processed in a way that does not identify anyone.
 We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website.
 Please visit Google’s [overview of privacy and safeguarding data][google privacy] to know more about their policies.
 
-Google Analytics cookies we use are:
-
-| Name   | Expiration | Time                           |
-| ------ | ---------- | ------------------------------ |
-| `_ga`  | 2 years    | Used to distinguish users.     |
-| `_gid` | 24 hours   | Used to distinguish users.     |
-| `_gat` | 1 minute   | Used to throttle request rate. |
-
-We do not currently have the functionality to allow you to disable Google Analytics, so please note that if you continue to use this site, all cookies are enabled.
-We will rectify this shortly.
-
 [ico]: https://ico.org.uk/for-the-public/online/cookies/
 [google privacy]: https://support.google.com/analytics/answer/6004245
