@@ -1,37 +1,14 @@
 use juniper::{FieldResult, RootNode};
 
-use juniper::GraphQLObject;
-
 use crate::substance::{Substances, get_substances};
-
-#[derive(GraphQLObject)]
-#[graphql(description = "A medical product containing active ingredients")]
-struct Product {
-    id: String,
-    name: String,
-    pdf_url: Option<String>,
-    substances: Option<Vec<String>>,
-    file_name: Option<String>,
-    release_state: Option<String>,
-    doc_type: Option<String>,
-    title: Option<String>,
-}
+use crate::product::{Product, get_product};
 
 pub struct QueryRoot;
 
 #[juniper::object]
 impl QueryRoot {
-    fn product(id: String) -> FieldResult<Product> {
-        Ok(Product {
-            id: "1234".to_owned(),
-            name: "Nurofen".to_owned(),
-            pdf_url: None,
-            substances: None,
-            file_name: None,
-            release_state: None,
-            doc_type: None,
-            title: None,
-        })
+    fn products(id: String) -> FieldResult<Product> {
+        Ok(get_product(id))
     }
 
     fn substances(first: i32) -> FieldResult<Substances> {

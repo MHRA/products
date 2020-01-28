@@ -7,6 +7,7 @@ use std::{io, sync::Arc};
 mod schema;
 mod pagination;
 mod substance;
+mod product;
 
 use crate::schema::{create_schema, Schema};
 
