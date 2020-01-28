@@ -51,25 +51,31 @@ You should have installed the following tools
      terraform init
    ```
 
-4. Destroy cluster
+4. Provision cluster
 
    ```sh
      terraform apply --target=module.cluster.azurerm_kubernetes_cluster.cluster
    ```
 
-5. Install Istio with a load balancer
+5. Create the credentials file running this script
+
+   ```sh
+   ../../scripts/create-kubernetes-config.sh
+   ```
+
+6. Install Istio with a load balancer
 
    ```sh
      istioctl manifest apply -f control-plane.yaml
    ```
 
-6. Go to the microservice do you want to deploy into the cluster (e.g. API)
+7. Go to the microservice do you want to deploy into the cluster (e.g. API)
 
    ```sh
     cd ../../../medicines/api/infrastructure/development
    ```
 
-7. Deploy services
+8. Deploy services
    ```sh
     kubectl apply -f deployment.yml
     kubectl apply -f service.yml
