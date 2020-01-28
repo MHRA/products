@@ -16,7 +16,7 @@ variable "CLIENT_SECRET" {
   description = "Service Principal Client Secret"
 }
 
-variable "ENVIROMENT" {
-  description = "Enviroment name"
+variable "ENVIRONMENT" {
+  description = "Environment name"
   default     = "dev"
 }

@@ -12,7 +12,7 @@ terraform {
 locals {
   resource_group_name = var.RESOURCE_GROUP_PRODUCTS
   location            = var.REGION
-  environment         = var.ENVIROMENT
+  environment         = var.ENVIRONMENT
   client_id           = var.CLIENT_ID
   client_secret       = var.CLIENT_SECRET
 }

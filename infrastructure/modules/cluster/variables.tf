@@ -5,7 +5,7 @@ variable "location" {
   description = "Resource group location"
 }
 variable "environment" {
-  description = "Enviroment name to use as a tag"
+  description = "Environment name to use as a tag"
 }
 
 variable "client_id" {
