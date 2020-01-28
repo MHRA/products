@@ -5,7 +5,7 @@ variable "REGION" {
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products"
+  default     = "MHRA-dev"
 }
 
 variable "CLIENT_ID" {
@@ -18,5 +18,5 @@ variable "CLIENT_SECRET" {
 
 variable "ENVIRONMENT" {
   description = "Environment name"
-  default     = "non-prod"
+  default     = "dev"
 }

@@ -1,4 +1,4 @@
-apiVersion: install.istio.io/v1alpha2
+apiVersion: install.istio.io/v1alpha3
 kind: IstioControlPlane
 spec:
   # Use the default profile as the base
@@ -14,3 +14,10 @@ spec:
       mtls:
         # Require all service to service communication to have mtls
         enabled: false
+    gateways:
+      istio-ingressgateway:
+        # FIXME: Change for the public IP
+        loadBalancerIP: 0.0.0.0
+        serviceAnnotations:
+          # FIXME: Change for the resource group name
+          service.beta.kubernetes.io/azure-load-balancer-resource-group: ResourceGroupName

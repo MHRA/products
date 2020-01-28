@@ -98,7 +98,7 @@ exports.onPostBuild = async ({ graphql, reporter }) => {
         )
     )
     .map(page => {
-      return `http://localhost:9000${page.node.path}`
+      return `http://localhost:8000${page.node.path}`
     })
 
   fs.writeFileSync(".pa11yci", JSON.stringify({ urls: urls }, "", 2))

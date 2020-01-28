@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PS3='Please enter your current environment: '
-OPTIONS=("non-prod" "prod" "quit")
+OPTIONS=("non-prod" "prod" "dev" "quit")
 K8_CONFIG_FILE="mhra-azure-kube-config.yml"
 
 select opt in "${OPTIONS[@]}"; do
@@ -13,6 +13,10 @@ select opt in "${OPTIONS[@]}"; do
     ;;
   prod,* | *,prod)
     K8_CONFIG_FILE="prod-${K8_CONFIG_FILE}"
+    break
+    ;;
+  dev,* | *,dev)
+    K8_CONFIG_FILE="dev-${K8_CONFIG_FILE}"
     break
     ;;
   quit,* | *,quit)

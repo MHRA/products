@@ -40,7 +40,7 @@
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^4.1.0",
     "typescript": "^3.7.2",
-    "wait-on": "^3.3.0"
+    "wait-on": "^4.0.0"
   },
   "husky": {
     "hooks": {
@@ -66,7 +66,9 @@
     "lint": "yarn tslint",
     "start": "next start",
     "export": "next export -o dist && yarn sitemap",
-    "sitemap": "ts-node --project src/tools/tsconfig.json src/tools/sitemap-generator.ts"
+    "sitemap": "ts-node --project src/tools/tsconfig.json src/tools/sitemap-generator.ts",
+    "a11y": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";"
   },
   "version": "1.0.0"
 }
