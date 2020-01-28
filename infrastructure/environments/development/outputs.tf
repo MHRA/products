@@ -12,3 +12,7 @@ output "host" {
 output "client_certificate" {
   value = module.cluster.client_certificate
 }
+
+output "resource_group_name" {
+  value = module.cluster.resource_group_name
+}
