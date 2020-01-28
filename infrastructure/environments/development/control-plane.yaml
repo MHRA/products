@@ -16,4 +16,6 @@ spec:
         enabled: false
     gateways:
       istio-ingressgateway:
-        loadBalancerIP: 51.105.5.181
+        loadBalancerIP: 51.11.35.34
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-resource-group: MHRA-dev
