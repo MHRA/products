@@ -49,7 +49,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
     }
 
     // Reload the page. Seems to be the only way to stop analytics.
-    window.location.reload();
+    window.history.go(0);
   };
 
   return (
