@@ -1,18 +1,8 @@
-import React, { FormEvent } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Cookies from 'universal-cookie';
 
-import { useLocalStorage } from '../../hooks';
-import {
-  black,
-  mhra70,
-  mhraBlue90,
-  mhraGray,
-  mhraWhite,
-  primaryColor,
-  white,
-} from '../../styles/colors';
-import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import { baseSpace } from '../../styles/dimensions';
 
 const StyledCookieForm = styled.section`
   label {
@@ -32,7 +22,6 @@ interface ICookieForm {
 const CookieForm: React.FC<ICookieForm> = props => {
   // NOTE: By "cookies", we mean "cookies and similar technologies". This includes
   // local storage, session storage, etc.
-
   const handleCookiesOn = () => {
     props.setStorageAllowed(true, true);
   };
@@ -49,7 +38,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
     }
 
     // Reload the page. Seems to be the only way to stop analytics.
-    window.history.go(0);
+    window.location.href = '/cookies';
   };
 
   return (

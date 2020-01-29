@@ -5,7 +5,6 @@ import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 
-import { useLocalStorage } from '../../hooks';
 import { anchorColour, mhra } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
 import CookieBanner from '../cookie-policy';
