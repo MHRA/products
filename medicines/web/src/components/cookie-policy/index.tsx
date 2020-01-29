@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { mhra, mhra10, mhraGray10 } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
@@ -57,7 +57,17 @@ const CookieBanner: React.FC<ICookieBanner> = props => {
   const buttonOnClick = () => {
     props.setStorageAllowed(true, true);
   };
-  if (!props.storageAllowed) {
+
+  // Set up state so that the banner is hidden by default.
+  const [showBanner, setShowBanner] = React.useState(false);
+
+  // Update showBanner with whether the user has consented to cookies after the page
+  // has loaded.
+  React.useEffect(() => {
+    setShowBanner(!props.storageAllowed);
+  });
+
+  if (showBanner) {
     return (
       <StyledCookieBanner>
         <div>
