@@ -6,8 +6,7 @@ You can find out more about [how to manage cookies][ico] on the Information Com
 
 ## Necessary cookies
 
-We use necessary cookies to make our website work.
-These enable core functionality such as security, network management and accessibility.
+There are no necessary cookies on this website.
 
 ## Google Analytics cookies
 

@@ -62,11 +62,10 @@ const CookieBanner: React.FC<ICookieBanner> = props => {
       <StyledCookieBanner>
         <div>
           <p>
-            MHRA uses cookies which are essential for the site to work. We do
-            not collect any data that would identify you directly. We would like
-            to use Google Analytics to help us improve our services. You can
-            allow this by clicking <b>accept all cookies</b> or find out more
-            first by visiting our&nbsp;
+            MHRA does not collect any data that would identify you directly. We
+            would like to use Google Analytics to help us improve our services.
+            You can allow this by clicking <b>accept all cookies</b> or find out
+            more first by visiting our&nbsp;
             <Link href="/cookies">
               <a>cookie policy page</a>
             </Link>
