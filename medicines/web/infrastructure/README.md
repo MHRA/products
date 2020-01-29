@@ -52,7 +52,10 @@ docker run -it --rm -p 3000:3000 mhraproductsdevregistry.azurecr.io/products/web
 ```
 
 Head to [http://localhost:3000][localhost] in your browser to see a locally hosted version of the docker image you've pushed.
-   
+
+If you're unfamiliar with the command above, it's worth [reading the `docker run` documentation][docker run].
+In short, the `-it` parameters above allow command-line input (which means shortcuts like <kbd>Ctrl</kbd>+<kbd>C</kbd> will work),
+and `--rm` instructs docker to cleanup the container automatically when you're finished.
 
 ## To-do Steps
 
@@ -82,6 +85,7 @@ The steps below are a guide to get to the desired infrastructure.
    Update this documentation with information on how we've used server-side rendering, as a guide for additional development later.
 
 [localhost]: http://localhost:3000 'Your friendly neighbourhood localhost'
+[docker run]: https://docs.docker.com/engine/reference/run/ 'docker run | Docker Documentation'
 [repo kubernetes setup]: ../../../infrastructure/docs/kubernetes.md 'MHRA Medicines microservices - Kubernetes'
 [nextjs ssr]: https://nextjs.org/docs/basic-features/pages#server-side-rendering 'Pages - Documentation | Nextjs'
 [nextjs getinitialprops]: https://nextjs.org/docs/api-reference/data-fetching/getInitialProps 'getInitialProps - Documentation | Nextjs'
