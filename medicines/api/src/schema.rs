@@ -7,8 +7,8 @@ pub struct QueryRoot;
 
 #[juniper::graphql_object]
 impl QueryRoot {
-    async fn products(id: String) ->FieldResult<Option<Products>> {
-        Ok(get_product(id).await)
+    async fn products(search_term: String) ->FieldResult<Option<Products>> {
+        Ok(get_product(search_term).await)
     }
 
     async fn substances(first: i32) -> FieldResult<Substances> {

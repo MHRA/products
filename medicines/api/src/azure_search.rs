@@ -44,7 +44,7 @@ fn get_env(key: &str) -> String {
     }
 }
 
-pub async fn azure_search() -> Result<AzureSearchResults, reqwest::Error> {
+pub async fn azure_search(search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
     let search_service = get_env("AZURE_SEARCH_SERVICE");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let api_key = get_env("AZURE_SEARCH_KEY");
@@ -66,7 +66,7 @@ pub async fn azure_search() -> Result<AzureSearchResults, reqwest::Error> {
             ("@count","true"),
             ("@top","10"),
             ("@skip","0"),
-            ("search","ibuprofen"),
+            ("search", &search_term),
             ("scoringProfile","preferKeywords")])
         .build()
         .unwrap();

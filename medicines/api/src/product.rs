@@ -18,8 +18,8 @@ pub struct Product {
 
 pagination!{Products, ProductEdge, Product}
 
-pub async fn get_product(_id: String) -> Option<Products> {
-    let azure_result = azure_search().await;
+pub async fn get_product(search_term: String) -> Option<Products> {
+    let azure_result = azure_search(search_term).await;
     let r = match azure_result {
         Ok(n)  => n,
         Err(_) => return None,
