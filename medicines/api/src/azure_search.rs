@@ -34,11 +34,44 @@ pub struct AzureSearchResults {
     #[serde(rename="@odata.context")]
     context: String,
     #[serde(rename="@odata.count")]
-    count: i32,
+    count: Option<i32>,
+}
+
+fn get_env(key: &str) -> String {
+    match std::env::var(key) {
+        Ok(b) => b,
+        Err(_) => "".to_owned()
+    }
 }
 
 pub async fn azure_search() -> Result<AzureSearchResults, reqwest::Error> {
-    let r = reqwest::get("https://mhraproductsprod-1.search.windows.net/indexes/products-index-20200120/docs?api-key=45E5B47F3127148F3CE04EC272D0E458&api-version=2017-11-11&highlight=content&queryType=full&%24count=true&%24top=10&%24skip=0&search=ibuprofen&scoringProfile=preferKeywords")
+    let search_service = get_env("AZURE_SEARCH_SERVICE");
+    let search_index = get_env("AZURE_SEARCH_INDEX");
+    let api_key = get_env("AZURE_SEARCH_KEY");
+
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = search_service,
+        search_index = search_index
+    );
+
+    let client = reqwest::Client::new();
+    let req = client
+        .get(&base_url)
+        .query(&[
+            ("api-version","2017-11-11"),
+            ("api-key", &api_key),
+            ("highlight","content"),
+            ("queryType","full"),
+            ("@count","true"),
+            ("@top","10"),
+            ("@skip","0"),
+            ("search","ibuprofen"),
+            ("scoringProfile","preferKeywords")])
+        .build()
+        .unwrap();
+
+    let r = client.execute(req)
         .await;
 
     let s = match r {
