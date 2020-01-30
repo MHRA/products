@@ -7,12 +7,12 @@ pub struct QueryRoot;
 
 #[juniper::graphql_object]
 impl QueryRoot {
-    fn products(id: String) -> FieldResult<Product> {
+    async fn products(id: String) -> FieldResult<Product> {
         Ok(get_product(id))
     }
 
-    fn substances(first: i32) -> FieldResult<Substances> {
-        Ok(get_substances(first))
+    async fn substances(first: i32) -> FieldResult<Substances> {
+        Ok(get_substances(first).await)
     }
 }
 

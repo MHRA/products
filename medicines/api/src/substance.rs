@@ -16,7 +16,7 @@ impl Substance {
 
 pagination!{Substances, SubstanceEdge, Substance}
 
-pub fn get_substances(first: i32) -> Substances {
+pub async fn get_substances(first: i32) -> Substances {
   let substances: [&str; 1000] = ["Ibuprofen"; 1000];
   let e = substances.iter().take(first as usize).map(|x| Substance {
       name: x.to_owned().to_owned()

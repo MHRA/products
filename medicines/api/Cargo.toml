@@ -10,7 +10,8 @@ edition = "2018"
 actix-rt = "1.0.0"
 actix-web = "2.0.0"
 env_logger = "0.7.1"
-juniper = { git = "https://github.com/graphql-rust/juniper" }
+futures = "0.3.1"
+juniper = { git = "https://github.com/graphql-rust/juniper", features = ["async"] }
 listenfd = "0.3.3"
 serde = "1.0.103"
 serde_derive = "1.0.103"

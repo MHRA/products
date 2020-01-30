@@ -279,6 +279,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "env_logger",
+ "futures",
  "juniper",
  "listenfd",
  "serde",
@@ -826,6 +827,7 @@ source = "git+https://github.com/graphql-rust/juniper#211737cee0c6b79ad86246d69e
 dependencies = [
  "chrono",
  "fnv",
+ "futures",
  "indexmap",
  "juniper_codegen",
  "serde",
@@ -1409,9 +1411,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "0.2.9"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffa2fdcfa937b20cb3c822a635ceecd5fc1a27a6a474527e5516aa24b8c8820a"
+checksum = "8fdd17989496f49cdc57978c96f0c9fe5e4a58a8bddc6813c449a4624f6a030b"
 dependencies = [
  "bytes",
  "fnv",
