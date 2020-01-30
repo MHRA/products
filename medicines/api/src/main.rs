@@ -8,6 +8,7 @@ mod schema;
 mod pagination;
 mod substance;
 mod product;
+mod azure_search;
 
 use crate::schema::{create_schema, Schema};
 
