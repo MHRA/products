@@ -5,7 +5,7 @@ use crate::product::{Product, get_product};
 
 pub struct QueryRoot;
 
-#[juniper::object]
+#[juniper::graphql_object]
 impl QueryRoot {
     fn products(id: String) -> FieldResult<Product> {
         Ok(get_product(id))
@@ -18,7 +18,7 @@ impl QueryRoot {
 
 pub struct MutationRoot;
 
-#[juniper::object]
+#[juniper::graphql_object]
 impl MutationRoot {}
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot>;

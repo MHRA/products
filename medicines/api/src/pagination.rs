@@ -11,20 +11,11 @@ macro_rules! pagination {
         pagination!($name, $edgename, $type, ());
     };
     ($name:ident, $edgename:ident, $type:ty, $context:ty) => {
+        #[derive(juniper::GraphQLObject)]
         pub struct $edgename {
             node: $type,
             cursor: String
         }
-
-        juniper::graphql_object!($edgename: () |&self| {
-            field node() -> &$type {
-                &self.node
-            }
-
-            field cursor() -> &String {
-                &self.cursor
-            }
-        });
 
         impl $edgename {
             #[allow(dead_code)]
@@ -36,20 +27,11 @@ macro_rules! pagination {
             }
         }
 
+        #[derive(juniper::GraphQLObject)]
         pub struct $name {
             page_info: $crate::pagination::PageInfo,
             edges: Vec<$edgename>
         }
-
-        juniper::graphql_object!($name: () |&self| {
-            field page_info() -> &$crate::pagination::PageInfo {
-                &self.page_info
-            }
-
-            field edges() -> &Vec<$edgename> {
-                &self.edges
-            }
-        });
 
         impl $name {
             #[allow(dead_code)]

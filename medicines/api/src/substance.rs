@@ -1,13 +1,14 @@
 use crate::{pagination};
 use crate::pagination::{PageInfo};
 
+#[derive(juniper::GraphQLObject)]
+#[graphql(description = "An active ingredient found in medical products")]
 struct Substance {
     name: String,
 }
 
-#[juniper::object]
-#[graphql(description = "An active ingredient found in medical products")]
 impl Substance {
+    #[allow(dead_code)]
     fn name(&self) -> &str {
         &self.name
     }
