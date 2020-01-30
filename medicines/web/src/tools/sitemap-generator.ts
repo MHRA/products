@@ -90,7 +90,7 @@ const createSiteMapString = async () => {
     .map(
       path =>
         `<url>` +
-        `<loc>${BASE_URL}${path}</loc>` +
+        `<loc><![CDATA[${BASE_URL}${path}]]></loc>` +
         `<lastmod>${moment(pathsObj[path].lastModified).format(
           YYY_MM_DD,
         )}</lastmod>` +
