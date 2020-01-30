@@ -8,7 +8,7 @@ the Products website.
 
 ## To-Do
 
-- Implement stub API to solidify contracts & unblock integrations;
+- Dockerize stub API;
 - Implement functioning API with XML support;
 - Implement functioning API with JSON support;
 - Connect APIs to pub/sub;
