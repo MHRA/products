@@ -10,7 +10,7 @@
     "removeComments": true,
     "sourceMap": false,
     "target": "esnext",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types", "./typings.d.ts"]
   },
   "exclude": ["node_modules", "out", ".next"]
 }
