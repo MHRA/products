@@ -20,6 +20,12 @@ stages:
         steps:
 
           - script: |
+              yarn
+              yarn test:ci
+            displayName: Run unit tests 🧪
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+
+          - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
               export AZURE_SEARCH_API_VERSION=2017-11-11
               export AZURE_SEARCH_EXACTNESS_BOOST=4
