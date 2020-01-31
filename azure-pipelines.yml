@@ -19,11 +19,11 @@ stages:
 
         steps:
 
-          - script: |
-              yarn install --frozen-lockfile
-              yarn test:ci
-            displayName: Run unit tests 🧪
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+          # - script: |
+          #     yarn install --frozen-lockfile
+          #     yarn test:ci
+          #   displayName: Run unit tests 🧪
+          #   workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
