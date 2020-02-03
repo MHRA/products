@@ -1,65 +1,45 @@
-# name: $(Date:yyyyMMdd)$(Rev:.r)
+name: $(Date:yyyyMMdd)$(Rev:.r)
 
-# stages:
-#   - stage: Build
-#     displayName: Build stage
-#     jobs:  
-#     - job: Build
-#       displayName: Build job
-#       pool:
-#         vmImage: $(vmImageName)
-#       steps:
-#       - task: Docker@2
-#         displayName: Build and push an image to container registry
-#         inputs:
-#           command: buildAndPush
-#           repository: $(imageRepository)
-#           dockerfile: $(dockerfilePath)
-#           containerRegistry: $(dockerRegistryServiceConnection)
-#           tags: |
-#             $(tag)
-            
-#       - task: PublishPipelineArtifact@1
-#         inputs:
-#           artifactName: 'manifests'
-#           path: 'manifests'
-
-#   - stage: Deploy
-#     displayName: Deploy stage
-#     dependsOn: Build
-#     jobs:
-#     - deployment: Deploy
-#       displayName: Deploy job
-#       pool:
-#         vmImage: $(vmImageName)
-#       environment: 'azooinmyluggagepipelinesjavascriptdocker.aksnamespace'
-#       strategy:
-#         runOnce:
-#           deploy:
-#             steps:
-#             - task: DownloadPipelineArtifact@2
-#               inputs:
-#                 artifactName: 'manifests'
-#                 downloadPath: '$(System.ArtifactsDirectory)/manifests'
-
-#             - task: KubernetesManifest@0
-#               displayName: Create imagePullSecret
-#               inputs:
-#                 action: createSecret
-#                 secretName: $(imagePullSecret)
-#                 namespace: $(k8sNamespace)
-#                 dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-                
-#             - task: KubernetesManifest@0
-#               displayName: Deploy to Kubernetes cluster
-#               inputs:
-#                 action: deploy
-#                 namespace: $(k8sNamespace)
-#                 manifests: |
-#                   $(System.ArtifactsDirectory)/manifests/deployment.yml
-#                   $(System.ArtifactsDirectory)/manifests/service.yml
-#                 imagePullSecrets: |
-#                   $(imagePullSecret)
-#                 containers: |
-#                   $(containerRegistry)/$(imageRepository):$(tag)
-
+stages:
+  - stage: Build
+    displayName: Build stage
+    jobs:  
+    - job: Build
+      displayName: Build job
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+      - task: Docker@2
+        displayName: Build and push an image to container registry
+        inputs:
+          command: buildAndPush
+          repository: products/api
+          dockerfile: $(Build.SourcesDirectory)/medicines/api/Dockerfile
+          containerRegistry: mhraproductsdevregistry
+          tags: |
+            api-pipeline
+####################
+  # - stage: Deploy
+  #   displayName: Deploy stage
+  #   dependsOn: Build
+  #   jobs:
+  #   - deployment: Deploy
+  #     displayName: Deploy job
+  #     pool:
+  #       vmImage: ubuntu-latest
+  #     environment: dev
+  #     strategy:
+  #       runOnce:
+  #         deploy:
+  #           steps:
+  #           - task: KubernetesManifest@0
+  #             displayName: Deploy to Kubernetes cluster
+  #             inputs:
+  #               action: deploy
+  #               namespace: api
+  #               manifests: |
+  #                 $(System.ArtifactsDirectory)/infrastructure/development/deployment.yml
+  #                 $(System.ArtifactsDirectory)/infrastructure/development/service.yml
+  #                 $(System.ArtifactsDirectory)/infrastructure/development/virtual-service.yml
+  #               containers: |
+  #                 $(containerRegistry)/$(imageRepository):$(tag)
