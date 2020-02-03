@@ -1,3 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Pdf should render 1`] = `ShallowWrapper {}`;
+exports[`Pdf should render 1`] = `
+<styled.section>
+  <h2>
+    Help viewing PDFs
+  </h2>
+  <ul>
+    <li>
+      <OutboundLink
+        eventLabel="Help viewing PDF files"
+        onClick={null}
+        target="_new"
+        to="https://helpx.adobe.com/support/acrobat.html"
+      >
+        Help viewing PDF files
+      </OutboundLink>
+    </li>
+    <li>
+      <OutboundLink
+        eventLabel="Download Acrobat reader for free"
+        onClick={null}
+        target="_new"
+        to="http://www.adobe.com/products/acrobat/readstep2.html"
+      >
+        Download Acrobat reader for free
+      </OutboundLink>
+    </li>
+    <li>
+      <OutboundLink
+        eventLabel="Adobe text conversion tools"
+        onClick={null}
+        target="_new"
+        to="http://www.adobe.com/products/acrobat/access_onlinetools.html"
+      >
+        Adobe text conversion tools
+      </OutboundLink>
+    </li>
+  </ul>
+</styled.section>
+`;

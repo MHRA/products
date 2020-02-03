@@ -1,3 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CookieBanner should render 🍪 1`] = `ShallowWrapper {}`;
+exports[`CookieBanner should render 🍪 1`] = `
+<Fragment>
+   
+</Fragment>
+`;

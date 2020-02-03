@@ -1,3 +1,61 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Footer should render 1`] = `ShallowWrapper {}`;
+exports[`Footer should render 1`] = `
+<styled.footer>
+  <div
+    className="wrapper"
+  >
+    <picture>
+      <SvgAgencyDigitalLogo />
+    </picture>
+    <nav>
+      <ul>
+        <li>
+          <p>
+            <Link
+              href="/cookies"
+            >
+              <a>
+                Cookie Policy
+              </a>
+            </Link>
+          </p>
+        </li>
+        <li>
+          <p>
+            <Link
+              href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice"
+            >
+              <a>
+                Privacy Policy
+              </a>
+            </Link>
+          </p>
+        </li>
+        <li>
+          <p>
+            <Link
+              href="/accessibility"
+            >
+              <a>
+                Accessibility Statement
+              </a>
+            </Link>
+          </p>
+        </li>
+        <li>
+          <p>
+            <Link
+              href="/about"
+            >
+              <a>
+                About this service
+              </a>
+            </Link>
+          </p>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</styled.footer>
+`;

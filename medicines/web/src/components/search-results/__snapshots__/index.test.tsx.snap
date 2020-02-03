@@ -1,3 +1,157 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SearchResults should render 1`] = `ShallowWrapper {}`;
+exports[`SearchResults should render 1`] = `
+<Fragment>
+  <styled.div>
+    <div>
+      <h1
+        className="title"
+      >
+        Showing results for Tea
+      </h1>
+      <p
+        className="no-of-results"
+      >
+        1 to 2 of 200
+      </p>
+      <p
+        className="ema-message"
+      >
+        If the product information you are seeking does not appear below, it is possible that the product holds a European licence and its information may be available at the 
+        <a
+          href="https://www.ema.europa.eu/en"
+          target="_new"
+        >
+          European Medicines Agency
+        </a>
+         website.
+      </p>
+      <p>
+        Before a medicine can be sold in the UK, a number of licences are essential. Products with a UK marketing authorisation have a licence number in the format ‘PL 12345/0001’. The first 2 characters are always the letters ‘PL’, and this can be found on the packaging of the product.
+      </p>
+      <p>
+        You can identify the product in the list below using the PL number.
+      </p>
+      <p>
+        The information about a medicine will be updated when new evidence becomes available. This may mean that there are differences between the information in the pack and the information here. The most up-to-date information will be available on this site.
+      </p>
+    </div>
+    <dl>
+      <article
+        key="0"
+      >
+        <dt
+          className="left"
+        >
+          <p
+            className="icon"
+          >
+            STRING
+          </p>
+        </dt>
+        <dd
+          className="right"
+        >
+          <a
+            className="doc-type-string"
+            href="string"
+          >
+            <p
+              className="title"
+            >
+              string
+            </p>
+            <p
+              className="subtitle"
+            >
+              string
+            </p>
+          </a>
+          <p
+            className="metadata"
+          >
+            File size: 
+            string
+             KB
+          </p>
+          <p
+            className="metadata"
+          >
+            Active substances:
+             
+            Tea, Coffee
+          </p>
+          <p
+            className="context"
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "string",
+              }
+            }
+          />
+        </dd>
+      </article>
+      <article
+        key="1"
+      >
+        <dt
+          className="left"
+        >
+          <p
+            className="icon"
+          >
+            STRING
+          </p>
+        </dt>
+        <dd
+          className="right"
+        >
+          <a
+            className="doc-type-string"
+            href="string"
+          >
+            <p
+              className="title"
+            >
+              string
+            </p>
+            <p
+              className="subtitle"
+            >
+              string
+            </p>
+          </a>
+          <p
+            className="metadata"
+          >
+            File size: 
+            string
+             KB
+          </p>
+          <p
+            className="metadata"
+          >
+            Active substances:
+             
+            Tea, Coffee
+          </p>
+          <p
+            className="context"
+            dangerouslySetInnerHTML={
+              Object {
+                "__html": "string",
+              }
+            }
+          />
+        </dd>
+      </article>
+    </dl>
+  </styled.div>
+  <Pagination
+    currentPage={1}
+    pageSize={20}
+    resultCount={200}
+    searchTerm="Tea"
+  />
+</Fragment>
+`;
