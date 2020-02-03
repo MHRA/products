@@ -4,11 +4,11 @@ use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
 use std::{io, sync::Arc};
 
-mod schema;
-mod pagination;
-mod substance;
-mod product;
 mod azure_search;
+mod pagination;
+mod product;
+mod schema;
+mod substance;
 
 use crate::schema::{create_schema, Schema};
 

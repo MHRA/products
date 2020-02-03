@@ -1,13 +1,15 @@
 use juniper::{FieldResult, RootNode};
 
-use crate::substance::{Substances, get_substances};
-use crate::product::{Products, get_product};
+use crate::{
+    product::{get_product, Products},
+    substance::{get_substances, Substances},
+};
 
 pub struct QueryRoot;
 
 #[juniper::graphql_object]
 impl QueryRoot {
-    async fn products(search_term: String) ->FieldResult<Option<Products>> {
+    async fn products(search_term: String) -> FieldResult<Option<Products>> {
         Ok(get_product(search_term).await)
     }
 
