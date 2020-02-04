@@ -7,7 +7,7 @@ This is where the API rust server lives.
 You should have `rust` installed, ideally `rustup`.
 If you're using homebrew, you should be able to install `rustup` by running:
 
-1. `brew instal rustup-init`
+1. `brew install rustup-init`
 2. `rustup-init` and following the instructions
 
 You should also have installed:
