@@ -9,7 +9,10 @@ import {
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
+import SearchFilter from '../search-filter';
 import Pagination from './pagination';
+
+import { ISearchFilters } from '../../services/azure-search';
 
 const StyledDrugList = styled.div`
   .title {
@@ -188,6 +191,8 @@ const SearchResults = (props: {
   searchTerm: string;
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
+  filters: ISearchFilters;
+  setFilters: any;
 }) => {
   const [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
     'showDisclaimer',
@@ -202,6 +207,8 @@ const SearchResults = (props: {
     resultCount,
     searchTerm,
     showingResultsForTerm,
+    filters,
+    setFilters,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -258,47 +265,56 @@ const SearchResults = (props: {
             searchTerm={searchTerm}
           />
         ) : (
-          <dl>
-            {hasDrugs &&
-              drugs.map((drug, i) => (
-                <article key={i}>
-                  <dt className="left">
-                    <p className="icon">{drug.docType.toUpperCase()}</p>
-                  </dt>
-                  <dd className="right">
-                    <a
-                      href={drug.url}
-                      className={'doc-type-' + drug.docType.toLowerCase()}
-                    >
-                      {drug.product != null ? (
-                        <>
-                          <p className="title">{drug.product}</p>
-                          <p className="subtitle">{drug.name}</p>
-                        </>
-                      ) : (
-                        <p className="title">{drug.name}</p>
-                      )}
-                    </a>
-                    <p className="metadata">File size: {drug.fileSize} KB</p>
-                    {drug.activeSubstances != null &&
-                      drug.activeSubstances.length > 0 && (
+          <div className="row">
+            <div className="column filter">
+              <SearchFilter filters={filters} setFilters={setFilters} />
+            </div>
+            <div className="column results">
+              <dl>
+                {hasDrugs &&
+                  drugs.map((drug, i) => (
+                    <article key={i}>
+                      <dt className="left">
+                        <p className="icon">{drug.docType.toUpperCase()}</p>
+                      </dt>
+                      <dd className="right">
+                        <a
+                          href={drug.url}
+                          className={'doc-type-' + drug.docType.toLowerCase()}
+                        >
+                          {drug.product != null ? (
+                            <>
+                              <p className="title">{drug.product}</p>
+                              <p className="subtitle">{drug.name}</p>
+                            </>
+                          ) : (
+                            <p className="title">{drug.name}</p>
+                          )}
+                        </a>
                         <p className="metadata">
-                          Active substances:{' '}
-                          {drug.activeSubstances
-                            .map(substance => toSentenceCase(substance))
-                            .join(', ')}
+                          File size: {drug.fileSize} KB
                         </p>
-                      )}
-                    <p
-                      className="context"
-                      dangerouslySetInnerHTML={{
-                        __html: normalizeDescription(drug.context),
-                      }}
-                    />
-                  </dd>
-                </article>
-              ))}
-          </dl>
+                        {drug.activeSubstances != null &&
+                          drug.activeSubstances.length > 0 && (
+                            <p className="metadata">
+                              Active substances:{' '}
+                              {drug.activeSubstances
+                                .map(substance => toSentenceCase(substance))
+                                .join(', ')}
+                            </p>
+                          )}
+                        <p
+                          className="context"
+                          dangerouslySetInnerHTML={{
+                            __html: normalizeDescription(drug.context),
+                          }}
+                        />
+                      </dd>
+                    </article>
+                  ))}
+              </dl>
+            </div>
+          </div>
         )}
       </StyledDrugList>
 

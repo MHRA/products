@@ -35,6 +35,23 @@ const StyledMip = styled.div`
       padding: 1.25rem;
     }
   }
+
+  .column {
+    float: left;
+  }
+  .filter {
+    width: 40%;
+  }
+  .results {
+    width: 60%;
+  }
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
 `;
 
 const sanitizeTitle = (title: string | null): string => {
@@ -73,10 +90,13 @@ const Mip: React.FC = () => {
     },
   } = router;
 
-  const filters: ISearchFilters = {};
-  if (typeof doc === 'string') {
+  const [filters, setFilters] = React.useState<ISearchFilters>({
+    docType: [],
+    sortOrder: 'a-z',
+  });
+  /*if (typeof doc === 'string') {
     filters.docType = DocType[doc as keyof typeof DocType];
-  }
+  }*/
   if (typeof substance === 'string') {
     filters.substanceName = substance;
   }
@@ -214,7 +234,8 @@ const Mip: React.FC = () => {
       loadHomepage();
     }
     window.scrollTo(0, 0);
-  }, [page, searchTerm, substance, disclaimer]);
+    setFilters(filters);
+  }, [page, searchTerm, substance, disclaimer, filters]);
 
   return (
     <StyledMip>
@@ -252,6 +273,8 @@ const Mip: React.FC = () => {
           pageSize={pageSize}
           searchTerm={search}
           disclaimerAgree={disclaimerAgree}
+          filters={filters}
+          setFilters={setFilters}
         />
       )}
     </StyledMip>

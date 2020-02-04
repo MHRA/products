@@ -141,9 +141,10 @@ const getJson = async (url: string): Promise<any> => {
 };
 
 export interface ISearchFilters {
-  docType?: DocType;
+  docType: DocType[];
   substanceName?: string;
   productName?: string;
+  sortOrder: string;
 }
 
 interface ISearchQuery {
@@ -181,7 +182,11 @@ export const facetSearch = async (
 const createFilter = (filters: ISearchFilters) => {
   const filterParams: string[] = [];
   if (filters.docType) {
-    filterParams.push(`doc_type eq '${filters.docType}'`);
+    const docTypeFilters = [];
+    for (const docType of filters.docType) {
+      docTypeFilters.push(`doc_type eq '${docType}'`);
+    }
+    filterParams.push(docTypeFilters.join(' or '));
   }
   if (filters.substanceName) {
     filterParams.push(
