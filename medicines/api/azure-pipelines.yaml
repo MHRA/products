@@ -1,9 +1,7 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
-
-                  # $(containerRegistry)/$(imageRepository):$(tag)
-
+ 
 stages:
-  - stage: Build
+  - stage: Build 🏗
     displayName: Build stage
     jobs:  
     - job: Build
@@ -12,7 +10,7 @@ stages:
         vmImage: ubuntu-latest
       steps:
       - task: Docker@2
-        displayName: Build and push an image to container registry
+        displayName: Build and push an image to container registry 🏗🤜📦
         inputs:
           command: buildAndPush
           repository: products/api
@@ -21,6 +19,7 @@ stages:
           tags: |
             latest
       - task: PublishPipelineArtifact@1
+        displayName: Publish pipeline artifact 🖌
         inputs:
           artifactName: manifests
           path:  $(Build.SourcesDirectory)/medicines/api/infrastructure/development
@@ -30,7 +29,7 @@ stages:
     dependsOn: Build
     jobs:
     - deployment: Deploy
-      displayName: Deploy job
+      displayName: Deploy job 💫
       pool:
         vmImage: ubuntu-latest
       environment: development
@@ -39,12 +38,13 @@ stages:
           deploy:
             steps:
             - task: DownloadPipelineArtifact@2
+              displayName: Download pipeline artifact 🖌
               inputs:
                 artifactName: manifests
                 downloadPath: $(System.ArtifactsDirectory)/medicines/api/infrastructure/development
 
             - task: KubernetesManifest@0
-              displayName: Create imagePullSecret
+              displayName: Create image secret 🕵️‍♂️
               inputs:
                 action: createSecret
                 secretName: cluster-cred
@@ -53,7 +53,7 @@ stages:
                 dockerRegistryEndpoint: mhraproductsdevregistry
 
             - task: KubernetesManifest@0
-              displayName: Deploy to Kubernetes cluster
+              displayName: Deploy to Kubernetes cluster ⎈ 🐳 💥
               inputs:
                 kubernetesServiceConnection: aks
                 action: deploy
