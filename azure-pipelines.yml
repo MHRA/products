@@ -14,7 +14,8 @@ stages:
       - job: web
         dependsOn: []
         pool:
-          vmImage: ubuntu-latest
+          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+          vmImage: ubuntu-16.04 
 
         steps:
 
@@ -90,7 +91,8 @@ stages:
       - job: learning_web
         dependsOn: []
         pool:
-          vmImage: ubuntu-latest
+          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+          vmImage: ubuntu-16.04 
         variables:
           GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
           GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
@@ -232,7 +234,8 @@ stages:
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         dependsOn: []
         pool:
-          vmImage: ubuntu-latest
+          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+          vmImage: ubuntu-16.04 
         steps:
           - script: |
               set -xeo pipefail
@@ -257,7 +260,8 @@ stages:
         condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
         dependsOn: []
         pool:
-          vmImage: ubuntu-latest
+          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+          vmImage: ubuntu-16.04 
         steps:
           - script: |
               set -xeo pipefail

@@ -1,0 +1,5 @@
+.next/
+cypress/
+dist/
+infrastructure/
+node_modules/
