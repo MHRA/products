@@ -10,7 +10,10 @@ mod product;
 mod schema;
 mod substance;
 
-use crate::schema::{create_schema, Schema};
+use crate::{
+    azure_search::{create_context, AzureContext},
+    schema::{create_schema, Schema},
+};
 
 async fn graphiql() -> HttpResponse {
     let html = graphiql_source("/graphql");
@@ -22,8 +25,9 @@ async fn graphiql() -> HttpResponse {
 async fn graphql(
     st: web::Data<Arc<Schema>>,
     data: web::Json<GraphQLRequest>,
+    context: web::Data<Arc<AzureContext>>,
 ) -> Result<HttpResponse, Error> {
-    let res = data.execute_async(&st, &()).await;
+    let res = data.execute_async(&st, &context).await;
     let body = serde_json::to_string(&res)?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
@@ -43,11 +47,13 @@ async fn main() -> io::Result<()> {
 
     // Create Juniper schema
     let schema = std::sync::Arc::new(create_schema());
+    let context = std::sync::Arc::new(create_context());
 
     // Start http server
     let mut server = HttpServer::new(move || {
         App::new()
             .data(schema.clone())
+            .data(context.clone())
             .wrap(middleware::Logger::default())
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))

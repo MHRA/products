@@ -1,4 +1,4 @@
-use crate::{azure_search::azure_search, pagination, pagination::PageInfo};
+use crate::{azure_search::AzureSearchClient, pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
 
 #[derive(GraphQLObject)]
@@ -16,8 +16,8 @@ pub struct Product {
 
 pagination! {Products, ProductEdge, Product}
 
-pub async fn get_product(search_term: String) -> Option<Products> {
-    let azure_result = azure_search(search_term).await;
+pub async fn get_product(search_term: String, client: &AzureSearchClient) -> Option<Products> {
+    let azure_result = client.azure_search(search_term).await;
     let r = match azure_result {
         Ok(n) => n,
         Err(_) => return None,
