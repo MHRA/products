@@ -23,8 +23,8 @@ stages:
 
       - task: PublishPipelineArtifact@1
         inputs:
-          artifactName: 'manifests'
-          path: 'manifests'
+          artifactName: manifests
+          path:  $(Build.SourcesDirectory)/medicines/api/infrastructure/development
 ####################
   - stage: Deploy
     displayName: Deploy stage
@@ -41,8 +41,8 @@ stages:
             steps:
             - task: DownloadPipelineArtifact@2
               inputs:
-                artifactName: 'manifests'
-                downloadPath: '$(System.ArtifactsDirectory)/manifests'
+                artifactName: manifests
+                downloadPath: $(System.ArtifactsDirectory)/medicines/api/infrastructure/development
             - task: KubernetesManifest@0
               displayName: Deploy to Kubernetes cluster
               inputs:
@@ -50,8 +50,8 @@ stages:
                 action: deploy
                 namespace: default
                 manifests: |
-                  $(System.ArtifactsDirectory)/manifests/deployment.yml
-                  $(System.ArtifactsDirectory)/manifests/service.yml
-                  $(System.ArtifactsDirectory)/manifests/virtual-service.yml
+                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/deployment.yml
+                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/service.yml
+                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/virtual-service.yml
                 containers: |
                   mhraproductsdevregistry/products/api:api-pipeline
