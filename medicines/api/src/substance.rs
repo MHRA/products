@@ -17,7 +17,7 @@ pagination! {Substances, SubstanceEdge, Substance}
 
 pub async fn get_substances(first: i32) -> Substances {
     let substances: [&str; 1000] = ["Ibuprofen"; 1000];
-    let e = substances
+    let edges = substances
         .iter()
         .take(first as usize)
         .map(|x| Substance {
@@ -30,7 +30,7 @@ pub async fn get_substances(first: i32) -> Substances {
         .collect();
 
     Substances {
-        edges: e,
+        edges,
         page_info: PageInfo {
             has_previous_page: false,
             has_next_page: first < 1000,

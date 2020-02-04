@@ -34,7 +34,7 @@ pub async fn get_product(search_term: String) -> Option<Products> {
         title: Some(x.title),
     });
 
-    let e = products
+    let edges = products
         .map(|y| ProductEdge {
             node: y,
             cursor: "cursor".to_owned(),
@@ -42,7 +42,7 @@ pub async fn get_product(search_term: String) -> Option<Products> {
         .collect();
 
     Some(Products {
-        edges: e,
+        edges,
         page_info: PageInfo {
             has_previous_page: false,
             has_next_page: false,
