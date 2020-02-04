@@ -1,8 +1,8 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
  
 stages:
-  - stage: Build 🏗
-    displayName: Build stage
+  - stage: Build
+    displayName: Build API 🏗
     jobs:  
     - job: Build
       displayName: Build job
@@ -23,9 +23,8 @@ stages:
         inputs:
           artifactName: manifests
           path:  $(Build.SourcesDirectory)/medicines/api/infrastructure/development
-####################
   - stage: Deploy
-    displayName: Deploy stage
+    displayName: Deploy API 💫
     dependsOn: Build
     jobs:
     - deployment: Deploy
