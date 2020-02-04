@@ -1,11 +1,10 @@
 FROM perl:5.26
 
-RUN cpanm Carton && mkdir /usr/src/stub
 WORKDIR /usr/src/stub
+COPY . .
 
-ONBUILD COPY cpanfile /usr/src/stub
-ONBUILD RUN carton install
+RUN cpanm Carton
+run carton install
 
-ONBUILD COPY . /usr/src/stub
-
-CMD ["perl", "./stub.pl"]
+EXPOSE 8080
+CMD ["carton", "exec", "plackup", "-s", "Starman", "-p", "8080", "-a", "stub.pl"]

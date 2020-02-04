@@ -1,4 +1,7 @@
-requires 'Dancer2', '0.3';
+requires 'Dancer2', '0.300000';
 requires 'Dancer2::Serializer::XML', '0.04';
-requires 'JSON::XS', '4.02';
+requires 'JSON', '4.02';
+requires 'Plack', '1.0047';
+requires 'Plack::Handler::Starman';
+requires 'Starman', '0.4015';
 requires 'XML::Simple', '2.25';
