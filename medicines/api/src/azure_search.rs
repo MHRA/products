@@ -117,12 +117,9 @@ async fn azure_search(
         .build()
         .unwrap();
 
-    let r = client.execute(req).await;
-
-    let s = match r {
-        Ok(t) => t,
-        Err(e) => return Err(e),
-    };
-
-    s.json::<AzureSearchResults>().await
+    client
+        .execute(req)
+        .await?
+        .json::<AzureSearchResults>()
+        .await
 }
