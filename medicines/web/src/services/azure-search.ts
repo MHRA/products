@@ -95,6 +95,7 @@ const buildSearchUrl = (
   );
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
+  url.searchParams.append('searchMode', 'all');
 
   return url.toString();
 };
@@ -113,6 +114,7 @@ const buildFacetUrl = (query: string): string => {
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
+  url.searchParams.append('searchMode', 'all');
 
   return url.toString();
 };
