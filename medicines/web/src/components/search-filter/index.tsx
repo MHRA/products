@@ -64,7 +64,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
           checked={filters.docType.includes(DocType.Pil)}
           onChange={createCheckboxHandler(DocType.Pil)}
         />
-        <label htmlFor="filter-pil">Public Information Leaflet (PIL)</label>
+        <label htmlFor="filter-pil">Patient Information Leaflet (PIL)</label>
       </p>
       <p>
         <input
