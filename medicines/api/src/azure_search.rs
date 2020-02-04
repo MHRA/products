@@ -114,8 +114,7 @@ async fn azure_search(
             ("search", &search_term),
             ("scoringProfile", "preferKeywords"),
         ])
-        .build()
-        .unwrap();
+        .build()?;
 
     client
         .execute(req)
