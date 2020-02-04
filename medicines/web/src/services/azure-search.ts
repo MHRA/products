@@ -42,8 +42,8 @@ const extractProductLicenseRegExp: RegExp = new RegExp(
   'ig',
 );
 
-const escapeSpecialCharacters = (word: string): string =>
-  word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
+const escapeSpecialWords = (word: string): string =>
+  word.replace(/(\|\||&&|\bAND\b|\bOR\b|\bNOT\b)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
@@ -63,10 +63,12 @@ const addNormalizedProductLicenses = (q: string): string => {
   return `${q}`;
 };
 
+const splitByNonSearchableCharacters = (query: string) =>
+  query.split(/(?:[,+\-!(){}\[\]^~*?:\/]|\s+)/gi);
+
 const buildFuzzyQuery = (query: string): string => {
-  return addNormalizedProductLicenses(query)
-    .split(' ')
-    .map(word => escapeSpecialCharacters(word))
+  return splitByNonSearchableCharacters(addNormalizedProductLicenses(query))
+    .map(word => escapeSpecialWords(word))
     .map(word => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
 };
