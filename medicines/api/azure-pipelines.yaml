@@ -21,27 +21,28 @@ stages:
           tags: |
             api-pipeline
 ####################
-  # - stage: Deploy
-  #   displayName: Deploy stage
-  #   dependsOn: Build
-  #   jobs:
-  #   - deployment: Deploy
-  #     displayName: Deploy job
-  #     pool:
-  #       vmImage: ubuntu-latest
-  #     environment: dev
-  #     strategy:
-  #       runOnce:
-  #         deploy:
-  #           steps:
-  #           - task: KubernetesManifest@0
-  #             displayName: Deploy to Kubernetes cluster
-  #             inputs:
-  #               action: deploy
-  #               namespace: default
-  #               manifests: |
-  #                  $(Build.SourcesDirectory)/medicines/api/infrastructure/development/deployment.yml
-  #                  $(Build.SourcesDirectory)/medicines/api/infrastructure/development/service.yml
-  #                  $(Build.SourcesDirectory)/medicines/api/infrastructure/development/virtual-service.yml
-  #               containers: |
-  #                 mhraproductsdevregistry/products/api:api-pipeline
+  - stage: Deploy
+    displayName: Deploy stage
+    dependsOn: Build
+    jobs:
+    - deployment: Deploy
+      displayName: Deploy job
+      pool:
+        vmImage: ubuntu-latest
+      environment: dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: KubernetesManifest@0
+              displayName: Deploy to Kubernetes cluster
+              inputs:
+                kubernetesServiceConnection: aks
+                action: deploy
+                namespace: default
+                manifests: |
+                    $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/deployment.yml
+                    $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/service.yml
+                    $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/virtual-service.yml
+                containers: |
+                  mhraproductsdevregistry/products/api:api-pipeline
