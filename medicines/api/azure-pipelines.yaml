@@ -10,15 +10,17 @@ variables:
 
 trigger:
   branches:
+    include:
+      - '*'
     exclude:
       - master
   paths:
     include:
-      - $(Build.SourcesDirectory)/medicines/api
+      - $(Build.SourcesDirectory)/medicines/api/*
   
 stages:
   - stage: Build
-    displayName: Build API 🏗
+    displayName: Build API 🏗 
     jobs:  
     - job: Build
       displayName: Build job
