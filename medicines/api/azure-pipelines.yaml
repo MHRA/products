@@ -6,7 +6,7 @@ variables:
   tag: latest
   devAksServiceConnection: aks
   apiNamespace: default
- 
+  environmentPath: medicines/api/infrastructure/development
 stages:
   - stage: Build
     displayName: Build API 🏗
@@ -29,7 +29,8 @@ stages:
         displayName: Publish pipeline artifact 🖌
         inputs:
           artifactName: manifests
-          path:  $(Build.SourcesDirectory)/medicines/api/infrastructure/development
+          path:  $(Build.SourcesDirectory)/$(environmentPath)
+
   - stage: Deploy
     displayName: Deploy API 💫
     dependsOn: Build
@@ -47,7 +48,7 @@ stages:
               displayName: Download pipeline artifact 🖌
               inputs:
                 artifactName: manifests
-                downloadPath: $(System.ArtifactsDirectory)/medicines/api/infrastructure/development
+                downloadPath: $(System.ArtifactsDirectory)/$(environmentPath)
 
             - task: KubernetesManifest@0
               displayName: Create image secret 🕵️‍♂️
@@ -65,9 +66,9 @@ stages:
                 action: deploy
                 namespace: $(apiNamespace)
                 manifests: |
-                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/deployment.yml
-                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/service.yml
-                  $(System.ArtifactsDirectory)/medicines/api/infrastructure/development/virtual-service.yml
+                  $(System.ArtifactsDirectory)/$(environmentPath)/deployment.yml
+                  $(System.ArtifactsDirectory)/$(environmentPath)/service.yml
+                  $(System.ArtifactsDirectory)/$(environmentPath)/virtual-service.yml
                 imagePullSecrets: |
                   cluster-cred
                 containers: |
