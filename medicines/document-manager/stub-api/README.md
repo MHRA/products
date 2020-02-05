@@ -18,17 +18,12 @@ update the status of the document as it progresses.
 
 ## Running
 
-**NOTE: THIS STILL NEEDS TO BE CONTAINERIZED.**
-
-You will need to have perl installed.
-
 ```
-$ curl -LO http://xrl.us/cpanm
-$ perl cpanm --installdeps .
-$ perl stub.pl
+$ docker build -t stub-document-manager-api 
+$ docker run -p 8080:8080 -it --rm stub-document-manager-api
 ```
 
-The webserver listens on http://0.0.0.0:3000 by default.
+The webserver listens on http://0.0.0.0:8080 by default.
 
 ## Endpoints
 
