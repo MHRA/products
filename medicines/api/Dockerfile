@@ -1,4 +1,4 @@
-FROM rust:1.40 AS build
+FROM rust:1.41.0 AS build
 
 WORKDIR /usr/src/api
 
@@ -29,6 +29,7 @@ FROM debian:buster-slim AS release
 
 RUN apt-get update && apt-get install -y \
   tini \
+  libssl-dev \
   ;
 
 RUN useradd svc
@@ -36,6 +37,14 @@ RUN useradd svc
 COPY --from=build /usr/src/api/target/release/api /
 
 RUN chown -R svc /api
+
+ARG AZURE_SEARCH_INDEX
+ARG AZURE_SEARCH_KEY
+ARG AZURE_SEARCH_SERVICE
+
+ENV AZURE_SEARCH_INDEX=${AZURE_SEARCH_INDEX}
+ENV AZURE_SEARCH_KEY=${AZURE_SEARCH_KEY}
+ENV AZURE_SEARCH_SERVICE=${AZURE_SEARCH_SERVICE}
 
 USER svc
 
