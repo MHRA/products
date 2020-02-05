@@ -75,9 +75,9 @@ const CookieForm: React.FC<ICookieForm> = props => {
       // value in local storage" error.
       props.setStorageAllowed(true, true);
     } else {
-      props.setStorageAllowed(false);
+      props.setStorageAllowed(false, true);
 
-      // Delete *everything*
+      // Delete *everything*.
       window.localStorage.clear();
       window.sessionStorage.clear();
       const cookies = new Cookies();
