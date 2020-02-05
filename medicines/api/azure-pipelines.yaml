@@ -9,12 +9,12 @@ variables:
   environmentPath: medicines/api/infrastructure/development
 
 trigger:
-  # branches:
-  #   include:
-  #     - master
+  branches:
+    exclude:
+      - master
   paths:
     include:
-      - $(Build.SourcesDirectory)/medicines/api/
+      - $(Build.SourcesDirectory)/medicines/api
   
 stages:
   - stage: Build
