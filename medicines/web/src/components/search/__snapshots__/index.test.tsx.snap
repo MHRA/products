@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Search should render 1`] = `
+<styled.section>
+  <form
+    aria-label="Search for medicines"
+    onSubmit={[MockFunction]}
+    role="search"
+  >
+    <label
+      htmlFor="search"
+    >
+      Enter a product, active substance, or PL number:
+    </label>
+    <div
+      className="searchbar"
+    >
+      <input
+        id="search"
+        onBlur={[MockFunction]}
+        onChange={[MockFunction]}
+        type="search"
+        value="drug"
+      />
+      <input
+        type="submit"
+        value="Search"
+      />
+    </div>
+  </form>
+</styled.section>
+`;

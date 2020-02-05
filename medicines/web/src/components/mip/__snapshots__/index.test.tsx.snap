@@ -1,0 +1,134 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Mip should render 1`] = `
+<styled.div>
+  <section
+    className="search"
+  >
+    <Search
+      onSearchBlur={[Function]}
+      onSearchChange={[Function]}
+      onSearchSubmit={[Function]}
+      search=""
+    />
+    <DrugIndex
+      horizontal={true}
+      items={
+        Array [
+          Object {
+            "name": "A",
+          },
+          Object {
+            "name": "B",
+          },
+          Object {
+            "name": "C",
+          },
+          Object {
+            "name": "D",
+          },
+          Object {
+            "name": "E",
+          },
+          Object {
+            "name": "F",
+          },
+          Object {
+            "name": "G",
+          },
+          Object {
+            "name": "H",
+          },
+          Object {
+            "name": "I",
+          },
+          Object {
+            "name": "J",
+          },
+          Object {
+            "name": "K",
+          },
+          Object {
+            "name": "L",
+          },
+          Object {
+            "name": "M",
+          },
+          Object {
+            "name": "N",
+          },
+          Object {
+            "name": "O",
+          },
+          Object {
+            "name": "P",
+          },
+          Object {
+            "name": "Q",
+          },
+          Object {
+            "name": "R",
+          },
+          Object {
+            "name": "S",
+          },
+          Object {
+            "name": "T",
+          },
+          Object {
+            "name": "U",
+          },
+          Object {
+            "name": "V",
+          },
+          Object {
+            "name": "W",
+          },
+          Object {
+            "name": "X",
+          },
+          Object {
+            "name": "Y",
+          },
+          Object {
+            "name": "Z",
+          },
+          Object {
+            "name": "0",
+          },
+          Object {
+            "name": "1",
+          },
+          Object {
+            "name": "2",
+          },
+          Object {
+            "name": "3",
+          },
+          Object {
+            "name": "4",
+          },
+          Object {
+            "name": "5",
+          },
+          Object {
+            "name": "6",
+          },
+          Object {
+            "name": "7",
+          },
+          Object {
+            "name": "8",
+          },
+          Object {
+            "name": "9",
+          },
+        ]
+      }
+      title="or find by active substance:"
+    />
+  </section>
+  <YellowCard />
+  <MipText />
+</styled.div>
+`;

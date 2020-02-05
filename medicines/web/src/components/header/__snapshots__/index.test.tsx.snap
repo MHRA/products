@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`header should render 1`] = `
+<styled.header>
+  <div
+    className="wrapper"
+  >
+    <picture>
+      <Link
+        href="/"
+      >
+        <a>
+          <SvgMhraLogo />
+        </a>
+      </Link>
+    </picture>
+    <h1>
+      MHRA
+    </h1>
+  </div>
+</styled.header>
+`;

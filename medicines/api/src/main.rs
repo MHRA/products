@@ -4,9 +4,16 @@ use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
 use std::{io, sync::Arc};
 
+mod azure_search;
+mod pagination;
+mod product;
 mod schema;
+mod substance;
 
-use crate::schema::{create_schema, Schema};
+use crate::{
+    azure_search::{create_context, AzureContext},
+    schema::{create_schema, Schema},
+};
 
 async fn graphiql() -> HttpResponse {
     let html = graphiql_source("/graphql");
@@ -18,15 +25,13 @@ async fn graphiql() -> HttpResponse {
 async fn graphql(
     st: web::Data<Arc<Schema>>,
     data: web::Json<GraphQLRequest>,
+    context: web::Data<Arc<AzureContext>>,
 ) -> Result<HttpResponse, Error> {
-    let user = web::block(move || {
-        let res = data.execute(&st, &());
-        Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
-    })
-    .await?;
+    let res = data.execute_async(&st, &context).await;
+    let body = serde_json::to_string(&res)?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .body(user))
+        .body(body))
 }
 
 async fn healthz() -> impl actix_web::Responder {
@@ -42,11 +47,13 @@ async fn main() -> io::Result<()> {
 
     // Create Juniper schema
     let schema = std::sync::Arc::new(create_schema());
+    let context = std::sync::Arc::new(create_context());
 
     // Start http server
     let mut server = HttpServer::new(move || {
         App::new()
             .data(schema.clone())
+            .data(context.clone())
             .wrap(middleware::Logger::default())
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))

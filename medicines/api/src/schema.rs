@@ -1,62 +1,34 @@
-use juniper::FieldResult;
-use juniper::RootNode;
+use juniper::{FieldResult, RootNode};
 
-#[derive(GraphQLEnum)]
-enum Episode {
-  NewHope,
-  Empire,
-  Jedi,
-}
-
-use juniper::{GraphQLEnum, GraphQLInputObject, GraphQLObject};
-
-#[derive(GraphQLObject)]
-#[graphql(description = "A humanoid creature in the Star Wars universe")]
-struct Human {
-  id: String,
-  name: String,
-  appears_in: Vec<Episode>,
-  home_planet: String,
-}
-
-#[derive(GraphQLInputObject)]
-#[graphql(description = "A humanoid creature in the Star Wars universe")]
-struct NewHuman {
-  name: String,
-  appears_in: Vec<Episode>,
-  home_planet: String,
-}
+use crate::{
+    azure_search::AzureContext,
+    product::{get_product, Products},
+    substance::{get_substances, Substances},
+};
 
 pub struct QueryRoot;
 
-#[juniper::object]
+#[juniper::graphql_object(Context = AzureContext)]
 impl QueryRoot {
-  fn human(id: String) -> FieldResult<Human> {
-    Ok(Human {
-      id: "1234".to_owned(),
-      name: "Luke".to_owned(),
-      appears_in: vec![Episode::NewHope],
-      home_planet: "Mars".to_owned(),
-    })
-  }
+    async fn products(
+        context: &AzureContext,
+        search_term: String,
+    ) -> FieldResult<Option<Products>> {
+        Ok(get_product(search_term, &context.client).await)
+    }
+
+    async fn substances(first: i32) -> FieldResult<Substances> {
+        Ok(get_substances(first).await)
+    }
 }
 
 pub struct MutationRoot;
 
-#[juniper::object]
-impl MutationRoot {
-  fn createHuman(new_human: NewHuman) -> FieldResult<Human> {
-    Ok(Human {
-      id: "1234".to_owned(),
-      name: new_human.name,
-      appears_in: new_human.appears_in,
-      home_planet: new_human.home_planet,
-    })
-  }
-}
+#[juniper::graphql_object(Context = AzureContext)]
+impl MutationRoot {}
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot>;
 
 pub fn create_schema() -> Schema {
-  Schema::new(QueryRoot {}, MutationRoot {})
+    Schema::new(QueryRoot {}, MutationRoot {})
 }

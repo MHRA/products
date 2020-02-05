@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`YellowCard should render 1`] = `
+<styled.section>
+  <div
+    className="action-bar"
+  >
+    <header
+      aria-label="Yellow card"
+      role="img"
+    >
+      <picture>
+        <SvgYellowCard />
+      </picture>
+    </header>
+    <p>
+      Report a side effect with a medicine or medical device
+    </p>
+    <a
+      className="primary-button"
+      href="https://yellowcard.mhra.gov.uk/"
+      title="Yellow Card"
+    >
+      Make a report
+    </a>
+  </div>
+</styled.section>
+`;
