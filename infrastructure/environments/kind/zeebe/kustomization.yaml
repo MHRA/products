@@ -1,0 +1,6 @@
+resources:
+  - zeebe-full.yaml
+
+patchesStrategicMerge:
+  - patch-ingress.yaml
+  - patch-operate.yaml
