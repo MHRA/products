@@ -39,7 +39,7 @@ async fn healthz() -> impl actix_web::Responder {
 }
 
 async fn deploy_test() -> impl actix_web::Responder {
-    "I deployed this using AZ pipeline 💥"
+    "I deployed this using AZ pipeline 💥 💫"
 }
 
 #[actix_rt::main]

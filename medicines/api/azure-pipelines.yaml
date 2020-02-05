@@ -5,7 +5,7 @@ variables:
   devContainerRegistry: mhraproductsdevregistry
   tag: latest
   devAksServiceConnection: aks
-  apiNamespace: api
+  apiNamespace: default
  
 stages:
   - stage: Build
