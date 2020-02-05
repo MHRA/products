@@ -8,10 +8,10 @@ the Products website.
 
 ## To-Do
 
-- Dockerize stub API;
-- Implement functioning API with XML support;
-- Implement functioning API with JSON support;
-- Connect APIs to pub/sub;
-- Implement worker to fetch files from SFTP;
-- Implement worker to upload files to Azure blob;
-- Implement worker to update status cache.
+- [x] Dockerize stub API;
+- [ ] Implement functioning API with XML support;
+- [ ] Implement functioning API with JSON support;
+- [ ] Connect APIs to pub/sub;
+- [ ] Implement worker to fetch files from SFTP;
+- [ ] Implement worker to upload files to Azure blob;
+- [ ] Implement worker to update status cache.
