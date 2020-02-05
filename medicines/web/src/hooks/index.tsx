@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+// useSessionStorage and useLocalStorage adapted from
+// https://usehooks.com/useLocalStorage/
+
 export const useSessionStorage = (key: string, initialValue: any): any => {
   const [storedValue, setStoredValue] = useState(() => {
     try {
@@ -7,7 +10,11 @@ export const useSessionStorage = (key: string, initialValue: any): any => {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.error(error);
+      console.warn(
+        `An unhandled error ocurred while retrieving data from session storage.
+This is probably because we can't access the browser window object server-side.
+Returning initial value.`,
+      );
       return initialValue;
     }
   });
@@ -25,7 +32,10 @@ export const useSessionStorage = (key: string, initialValue: any): any => {
       window.sessionStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.error(error);
+      console.warn(
+        `An unhandled error ocurred while setting data in session storage.
+This is probably because we can't access the browser window object server-side.`,
+      );
     }
   };
   return [storedValue, setValue];
@@ -38,7 +48,11 @@ export const useLocalStorage = (key: string, initialValue: any): any => {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.error(error);
+      console.warn(
+        `An unhandled error ocurred while retrieving data from local storage.
+This is probably because we can't access the browser window object server-side.
+Returning initial value.`,
+      );
       return initialValue;
     }
   });
@@ -56,7 +70,10 @@ export const useLocalStorage = (key: string, initialValue: any): any => {
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       // tslint:disable-next-line: no-console
-      console.error(error);
+      console.warn(
+        `An unhandled error ocurred while setting data in local storage.
+This is probably because we can't access the browser window object server-side.`,
+      );
     }
   };
   return [storedValue, setValue];
