@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES5",
     "module": "esnext",
-    "lib": ["dom"],
+    "lib": ["dom", "ESNext"],
     "jsx": "preserve",
     "sourceMap": true,
     "removeComments": true,
@@ -19,5 +19,6 @@
     "isolatedModules": true
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx, **/*.md"],
+  "typeRoots": ["node_modules/@types", "./typings.d.ts"]
 }

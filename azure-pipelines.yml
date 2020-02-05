@@ -18,6 +18,11 @@ stages:
           vmImage: ubuntu-16.04 
 
         steps:
+          - script: |
+              yarn install --frozen-lockfile
+              yarn test:ci
+            displayName: Run unit tests 🧪
+            workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
           - script: |
               export ASSET_PREFIX=$(Build.SourceBranchName)
@@ -30,7 +35,7 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
-              yarn
+              yarn install --frozen-lockfile
               yarn build
               yarn export
             displayName: Build web
