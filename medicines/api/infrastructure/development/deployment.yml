@@ -5,7 +5,7 @@ metadata:
   labels:
     app: api
   name: api
-  namespace: default
+  namespace: api
 spec:
   replicas: 2
   selector:
