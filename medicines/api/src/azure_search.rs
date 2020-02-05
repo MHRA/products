@@ -56,7 +56,16 @@ impl juniper::Context for AzureContext {}
 
 fn get_env(key: &str) -> String {
     match std::env::var(key) {
-        Ok(b) => b,
+        Ok(b) => {
+            if b.is_empty() {
+                panic!(
+                    "Key '{:#}' found in environment variables but was '{:#}",
+                    key,
+                    b
+                )
+            }
+            b
+        },
         Err(e) => panic!(
             "Key '{:#}' not found in environment variables: '{:#}",
             key, e
