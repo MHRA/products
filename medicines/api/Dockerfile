@@ -51,7 +51,7 @@ RUN cargo build --release
 # Create the release
 FROM release-context AS release
 
-COPY --from=build2 /usr/src/api/target/release/api /
+COPY --from=build /usr/src/api/target/release/api /
 
 RUN chown -R svc /api
 
