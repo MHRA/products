@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CookieForm should render 🍪 1`] = `
+<styled.section>
+  <form
+    onSubmit={[Function]}
+  >
+    <p>
+      <label
+        htmlFor="cookie-on"
+      >
+        <input
+          checked={true}
+          id="cookie-on"
+          name="cookie"
+          onChange={[Function]}
+          role="button"
+          type="radio"
+          value="on"
+        />
+        On
+      </label>
+      <label
+        htmlFor="cookie-off"
+      >
+        <input
+          checked={false}
+          id="cookie-off"
+          name="cookie"
+          onChange={[Function]}
+          role="button"
+          type="radio"
+          value="off"
+        />
+        Off
+      </label>
+    </p>
+    <styled.main
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": Object {
+            "process": [Function],
+          },
+        }
+      }
+    />
+    <p>
+      <input
+        type="submit"
+        value="Save your preferences"
+      />
+    </p>
+  </form>
+</styled.section>
+`;
+
+exports[`CookieForm should render 🚫 1`] = `
+<styled.section>
+  <form
+    onSubmit={[Function]}
+  >
+    <p>
+      <label
+        htmlFor="cookie-on"
+      >
+        <input
+          checked={false}
+          id="cookie-on"
+          name="cookie"
+          onChange={[Function]}
+          role="button"
+          type="radio"
+          value="on"
+        />
+        On
+      </label>
+      <label
+        htmlFor="cookie-off"
+      >
+        <input
+          checked={true}
+          id="cookie-off"
+          name="cookie"
+          onChange={[Function]}
+          role="button"
+          type="radio"
+          value="off"
+        />
+        Off
+      </label>
+    </p>
+    <styled.main
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": Object {
+            "process": [Function],
+          },
+        }
+      }
+    />
+    <p>
+      <input
+        type="submit"
+        value="Save your preferences"
+      />
+    </p>
+  </form>
+</styled.section>
+`;
