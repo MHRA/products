@@ -38,10 +38,6 @@ async fn healthz() -> impl actix_web::Responder {
     "OK"
 }
 
-async fn deploy_test() -> impl actix_web::Responder {
-    "I deployed this using AZ pipeline 💥 💫"
-}
-
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info, actix_server=info");
@@ -62,7 +58,6 @@ async fn main() -> io::Result<()> {
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
             .service(web::resource("/healthz").route(web::get().to(healthz)))
-            .service(web::resource("/deploy-test").route(web::get().to(deploy_test)))
     });
 
     server = if let Some(l) = listenfd.take_tcp_listener(0)? {
