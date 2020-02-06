@@ -60,12 +60,11 @@ fn get_env(key: &str) -> String {
             if b.is_empty() {
                 panic!(
                     "Key '{:#}' found in environment variables but was '{:#}",
-                    key,
-                    b
+                    key, b
                 )
             }
             b
-        },
+        }
         Err(e) => panic!(
             "Key '{:#}' not found in environment variables: '{:#}",
             key, e
@@ -124,6 +123,8 @@ async fn azure_search(
             ("scoringProfile", "preferKeywords"),
         ])
         .build()?;
+
+    println!("Requesting from URL: {}", &req.url());
 
     client
         .execute(req)
