@@ -689,8 +689,7 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 1G
-      storageClassName: standard
+          storage: 30Gi
   template:
     metadata:
       name: "elasticsearch-master"
@@ -723,29 +722,12 @@ spec:
         securityContext:
           runAsUser: 0
           privileged: true
-        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
         imagePullPolicy: "IfNotPresent"
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         resources:
           {}
 
-      - name: create
-        image: busybox:1.28
-        command: ["mkdir", "-p", "/usr/share/elasticsearch/data/nodes/"]
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-          - mountPath: /usr/share/elasticsearch/data
-            name: elasticsearch-master
-      - name: file-permissions
-        image: busybox:1.28
-        command: ["chown", "-R", "1000:1000", "/usr/share/elasticsearch/"]
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-          - mountPath: /usr/share/elasticsearch/data
-            name: elasticsearch-master
-      
       containers:
       - name: "elasticsearch"
         securityContext:
@@ -754,7 +736,7 @@ spec:
             - ALL
           runAsNonRoot: true
           runAsUser: 1000
-        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
         imagePullPolicy: "IfNotPresent"
         readinessProbe:
           failureThreshold: 3
@@ -803,10 +785,10 @@ spec:
         resources:
           limits:
             cpu: 1000m
-            memory: 512M
+            memory: 2Gi
           requests:
             cpu: 100m
-            memory: 512M
+            memory: 2Gi
         env:
           - name: node.name
             valueFrom:
@@ -821,7 +803,7 @@ spec:
           - name: network.host
             value: "0.0.0.0"
           - name: ES_JAVA_OPTS
-            value: "-Xmx128m -Xms128m"
+            value: "-Xmx1g -Xms1g"
           - name: node.data
             value: "true"
           - name: node.ingest
@@ -952,64 +934,3 @@ spec:
             backend:
               serviceName: zeebe-operate
               servicePort: 80
----
-# Source: zeebe-full/charts/operate/templates/tests/test-connection.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "zeebe-operate-test-connection"
-  labels:
-    app.kubernetes.io/name: operate
-    helm.sh/chart: operate-0.0.17
-    app.kubernetes.io/instance: zeebe
-    app.kubernetes.io/version: "1.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args:  ['zeebe-operate:80']
-  restartPolicy: Never
----
-# Source: zeebe-full/charts/zeebe/charts/elasticsearch/templates/test/test-elasticsearch-health.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "zeebe-ykihw-test"
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-  - name: "zeebe-xljsi-test"
-    image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
-    command:
-      - "sh"
-      - "-c"
-      - |
-        #!/usr/bin/env bash -e
-        curl -XGET --fail 'elasticsearch-master:9200/_cluster/health?wait_for_status=green&timeout=1s'
-  restartPolicy: Never
----
-# Source: zeebe-full/charts/zeebe/templates/tests/test-connection.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "{{ .Release.Name }}-zeebe-test-connection"
-  labels:
-    app.kubernetes.io/name: zeebe
-    helm.sh/chart: zeebe-0.0.68
-    app.kubernetes.io/instance: zeebe
-    app.kubernetes.io/version: "1.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args:  ['{{ .Release.Name }}-zeebe:9600']
-  restartPolicy: Never

@@ -10,7 +10,7 @@ helm repo update
 - Use `helm template` to generate yaml files:
 
 ```bash
-helm template zeebe zeebe/zeebe-full -f kind-values.yaml > zeebe-full.yaml
+helm template zeebe zeebe/zeebe-full  > zeebe-full.yaml
 ```
 
 - Comment out the empty `storageClassName:` line (which is an error, see https://github.com/kubernetes-sigs/kustomize/issues/2166) in the output file `zeebe-full.yaml`.

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch-master
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-master
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1G
+        storageClassName: standard
+  template:
+    spec:
+      initContainers:
+        - name: configure-sysctl
+        - name: create
+          image: busybox:1.28
+          command: ["mkdir", "-p", "/usr/share/elasticsearch/data/nodes/"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: elasticsearch-master
+        - name: file-permissions
+          image: busybox:1.28
+          command: ["chown", "-R", "1000:1000", "/usr/share/elasticsearch/"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: elasticsearch-master
+
+      containers:
+        - name: "elasticsearch"
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512M
+            requests:
+              cpu: 100m
+              memory: 512M
+          env:
+            - name: ES_JAVA_OPTS
+              value: "-Xmx128m -Xms128m"

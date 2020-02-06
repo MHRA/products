@@ -2,6 +2,7 @@ resources:
   - ../../base
 
 patchesStrategicMerge:
-  - patch-ingress.yaml
-  - patch-operate.yaml
-  - patch-zeebe.yaml
+  - elastic.yaml
+  - ingress.yaml
+  - operate.yaml
+  - zeebe.yaml

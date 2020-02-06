@@ -28,8 +28,7 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 1G
-      storageClassName: standard
+          storage: 30Gi
   template:
     metadata:
       name: "elasticsearch-master"
@@ -62,29 +61,12 @@ spec:
         securityContext:
           runAsUser: 0
           privileged: true
-        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
         imagePullPolicy: "IfNotPresent"
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         resources:
           {}
 
-      - name: create
-        image: busybox:1.28
-        command: ["mkdir", "-p", "/usr/share/elasticsearch/data/nodes/"]
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-          - mountPath: /usr/share/elasticsearch/data
-            name: elasticsearch-master
-      - name: file-permissions
-        image: busybox:1.28
-        command: ["chown", "-R", "1000:1000", "/usr/share/elasticsearch/"]
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-          - mountPath: /usr/share/elasticsearch/data
-            name: elasticsearch-master
-      
       containers:
       - name: "elasticsearch"
         securityContext:
@@ -93,7 +75,7 @@ spec:
             - ALL
           runAsNonRoot: true
           runAsUser: 1000
-        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
+        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
         imagePullPolicy: "IfNotPresent"
         readinessProbe:
           failureThreshold: 3
@@ -142,10 +124,10 @@ spec:
         resources:
           limits:
             cpu: 1000m
-            memory: 512M
+            memory: 2Gi
           requests:
             cpu: 100m
-            memory: 512M
+            memory: 2Gi
         env:
           - name: node.name
             valueFrom:
@@ -160,7 +142,7 @@ spec:
           - name: network.host
             value: "0.0.0.0"
           - name: ES_JAVA_OPTS
-            value: "-Xmx128m -Xms128m"
+            value: "-Xmx1g -Xms1g"
           - name: node.data
             value: "true"
           - name: node.ingest
