@@ -1,0 +1,17 @@
+---
+# Source: zeebe-full/charts/operate/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zeebe-operate
+  labels:
+    app: zeebe-operate
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: zeebe-operate

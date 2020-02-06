@@ -392,30 +392,6 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: elasticsearch-master-headless
-  labels:
-    heritage: "Helm"
-    release: "zeebe"
-    chart: "elasticsearch"
-    app: "elasticsearch-master"
-  annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-spec:
-  clusterIP: None # This is needed for statefulset hostnames like elasticsearch-0 to resolve
-  # Create endpoints also if the related pod isn't ready
-  publishNotReadyAddresses: true
-  selector:
-    app: "elasticsearch-master"
-  ports:
-  - name: http
-    port: 9200
-  - name: transport
-    port: 9300
----
-# Source: zeebe-full/charts/zeebe/charts/elasticsearch/templates/service.yaml
-kind: Service
-apiVersion: v1
-metadata:
   name: elasticsearch-master
   labels:
     heritage: "Helm"
@@ -437,6 +413,30 @@ spec:
     port: 9200
   - name: transport
     protocol: TCP
+    port: 9300
+---
+# Source: zeebe-full/charts/zeebe/charts/elasticsearch/templates/service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: elasticsearch-master-headless
+  labels:
+    heritage: "Helm"
+    release: "zeebe"
+    chart: "elasticsearch"
+    app: "elasticsearch-master"
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  clusterIP: None # This is needed for statefulset hostnames like elasticsearch-0 to resolve
+  # Create endpoints also if the related pod isn't ready
+  publishNotReadyAddresses: true
+  selector:
+    app: "elasticsearch-master"
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
     port: 9300
 ---
 # Source: zeebe-full/charts/zeebe/templates/service.yaml
@@ -924,7 +924,6 @@ spec:
       name: data
     spec:
       accessModes: [ReadWriteOnce]
-      storageClassName: 
       resources:
         requests:
           storage: "10Gi"
@@ -953,3 +952,64 @@ spec:
             backend:
               serviceName: zeebe-operate
               servicePort: 80
+---
+# Source: zeebe-full/charts/operate/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "zeebe-operate-test-connection"
+  labels:
+    app.kubernetes.io/name: operate
+    helm.sh/chart: operate-0.0.17
+    app.kubernetes.io/instance: zeebe
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['zeebe-operate:80']
+  restartPolicy: Never
+---
+# Source: zeebe-full/charts/zeebe/charts/elasticsearch/templates/test/test-elasticsearch-health.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "zeebe-ykihw-test"
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+  - name: "zeebe-xljsi-test"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.3"
+    command:
+      - "sh"
+      - "-c"
+      - |
+        #!/usr/bin/env bash -e
+        curl -XGET --fail 'elasticsearch-master:9200/_cluster/health?wait_for_status=green&timeout=1s'
+  restartPolicy: Never
+---
+# Source: zeebe-full/charts/zeebe/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-zeebe-test-connection"
+  labels:
+    app.kubernetes.io/name: zeebe
+    helm.sh/chart: zeebe-0.0.68
+    app.kubernetes.io/instance: zeebe
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ .Release.Name }}-zeebe:9600']
+  restartPolicy: Never

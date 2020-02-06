@@ -1,0 +1,28 @@
+---
+# Source: zeebe-full/charts/zeebe/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "zeebe-zeebe"
+  labels:
+    app.kubernetes.io/name: zeebe
+    app.kubernetes.io/instance: zeebe
+    app: "zeebe-zeebe"
+    app: zeebe
+  annotations:
+    null    
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  type: ClusterIP
+  ports:
+    - port: 9600
+      protocol: TCP
+      name: http  
+    - port: 26500
+      protocol: TCP
+      name: gateway
+  selector:
+    app.kubernetes.io/name: zeebe
+    app.kubernetes.io/instance: zeebe
+    app: "zeebe-zeebe"

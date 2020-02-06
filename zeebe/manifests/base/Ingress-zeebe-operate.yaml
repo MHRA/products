@@ -1,0 +1,25 @@
+---
+# Source: zeebe-full/charts/operate/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: zeebe-operate
+  labels: 
+    app.kubernetes.io/name: operate
+    helm.sh/chart: operate-0.0.17
+    app.kubernetes.io/instance: zeebe
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - host: 
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: zeebe-operate
+              servicePort: 80

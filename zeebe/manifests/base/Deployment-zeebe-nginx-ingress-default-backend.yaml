@@ -1,0 +1,61 @@
+---
+# Source: zeebe-full/charts/nginx-ingress/templates/default-backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-ingress
+    chart: nginx-ingress-1.26.2
+    component: "default-backend"
+    heritage: Helm
+    release: zeebe
+  name: zeebe-nginx-ingress-default-backend
+spec:
+  selector:
+    matchLabels:
+      app: nginx-ingress
+      release: zeebe
+  replicas: 1
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+        component: "default-backend"
+        release: zeebe
+    spec:
+      containers:
+        - name: nginx-ingress-default-backend
+          image: "k8s.gcr.io/defaultbackend-amd64:1.5"
+          imagePullPolicy: "IfNotPresent"
+          args:
+          securityContext:
+            runAsUser: 65534
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {}
+      serviceAccountName: zeebe-nginx-ingress-backend
+      terminationGracePeriodSeconds: 60

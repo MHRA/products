@@ -1,0 +1,22 @@
+resources:
+  - ClusterRole-zeebe-nginx-ingress.yaml
+  - ClusterRoleBinding-zeebe-nginx-ingress.yaml
+  - ConfigMap-zeebe-operate.yaml
+  - ConfigMap-zeebe-zeebe.yaml
+  - Deployment-zeebe-nginx-ingress-controller.yaml
+  - Deployment-zeebe-nginx-ingress-default-backend.yaml
+  - Deployment-zeebe-operate.yaml
+  - Ingress-zeebe-operate.yaml
+  - PodDisruptionBudget-elasticsearch-master-pdb.yaml
+  - Role-zeebe-nginx-ingress.yaml
+  - RoleBinding-zeebe-nginx-ingress.yaml
+  - Service-elasticsearch-master-headless.yaml
+  - Service-elasticsearch-master.yaml
+  - Service-zeebe-nginx-ingress-controller.yaml
+  - Service-zeebe-nginx-ingress-default-backend.yaml
+  - Service-zeebe-operate.yaml
+  - Service-zeebe-zeebe.yaml
+  - ServiceAccount-zeebe-nginx-ingress-backend.yaml
+  - ServiceAccount-zeebe-nginx-ingress.yaml
+  - StatefulSet-elasticsearch-master.yaml
+  - StatefulSet-zeebe-zeebe.yaml
