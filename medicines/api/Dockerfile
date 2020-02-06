@@ -26,6 +26,8 @@ FROM debian:buster-slim AS release-context
 RUN apt-get update && apt-get install -y \
   tini \
   libssl-dev \
+  openssl \
+  curl \
   ;
 
 RUN useradd svc
