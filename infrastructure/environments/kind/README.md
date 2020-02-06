@@ -1,6 +1,6 @@
 ## Intro
 
-We will create a four node local cluster using [KIND](https://kind.sigs.k8s.io/) (Kubernetes In Docker). There will be one master node and 3 workers. This will allow us to install a [Zeebe](https://docs.zeebe.io/index.html) cluster with 3 nodes.
+We will create a four node local cluster using [KIND](https://kind.sigs.k8s.io/) (Kubernetes In Docker). There will be one master node and 3 workers.
 
 ## Create a local cluster
 
@@ -8,10 +8,4 @@ After creating the cluster, use `kubectl get pod --all-namespaces` and wait for 
 
 ```bash
 make create_cluster
-```
-
-## Install Zeebe
-
-```bash
-make install_zeebe
 ```
