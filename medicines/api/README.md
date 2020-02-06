@@ -71,3 +71,12 @@ To see the graphql explorer, go to http://127.0.0.1:8000/graphiql.
 [stern]: https://github.com/wercker/stern "Stern - GitHub"
 [kubernetes service]: https://kubernetes.io/docs/concepts/services-networking/service/ "Service - Kubernetes Documentation"
 [kubernetes pod]: https://kubernetes.io/docs/concepts/workloads/pods/pod/ "Pod - Kubernetes Documentation"
+
+## Deploy API pod in Kuberbetes cluster via CI/CD pipeline
+
+We are using a [secondary pipeline](./azure-pipeline.yml) instead of the [main pipeline](../../azure-pipelines.yml) because we have created a new development environment that enables us to create and test kubernetes features.
+
+This pipeline is triggered when the following conditions are true:
+
+- a new commit is made on `master` branch
+- the commit made changes in this file path `medicines/api/*`
