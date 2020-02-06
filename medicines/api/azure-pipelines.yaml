@@ -10,10 +10,7 @@ variables:
 
 trigger:
   branches:
-    include:
-      - '*'
-    exclude:
-      - master
+    - master
   paths:
     include:
       - $(Build.SourcesDirectory)/medicines/api/*
