@@ -1,5 +1,4 @@
 name: API 📡$(Date:yyyyMMdd)$(Rev:.r)
-
 variables: 
   ubuntuImage: ubuntu-latest
   devContainerRegistry: mhraproductsdevregistry
@@ -7,14 +6,13 @@ variables:
   devAksServiceConnection: aks
   apiNamespace: default
   environmentPath: medicines/api/infrastructure/development
-
 trigger:
   branches:
-    - master
+    include:
+      - master
   paths:
     include:
       - $(Build.SourcesDirectory)/medicines/api/*
-  
 stages:
   - stage: Build
     displayName: Build API 🏗 
@@ -38,7 +36,6 @@ stages:
         inputs:
           artifactName: manifests
           path:  $(Build.SourcesDirectory)/$(environmentPath)
-
   - stage: Deploy
     displayName: Deploy API 💫
     dependsOn: Build
@@ -57,7 +54,6 @@ stages:
               inputs:
                 artifactName: manifests
                 downloadPath: $(System.ArtifactsDirectory)/$(environmentPath)
-
             - task: KubernetesManifest@0
               displayName: Create image secret 🕵️‍♂️
               inputs:
@@ -66,7 +62,6 @@ stages:
                 namespace: $(apiNamespace)
                 kubernetesServiceConnection: $(devAksServiceConnection)
                 dockerRegistryEndpoint: $(devContainerRegistry)
-
             - task: KubernetesManifest@0
               displayName: Deploy to Kubernetes cluster ⎈ 🐳 💥
               inputs:
