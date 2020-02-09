@@ -1,4 +1,6 @@
-use crate::{csv, hash::hash, metadata, model, pdf, report::Report, storage};
+use crate::{
+    csv, hash::hash, helpers, metadata, model, pdf, report::Report, storage, uploaded_logger,
+};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::*;
 use indicatif::{HumanDuration, ProgressBar};
@@ -15,11 +17,14 @@ pub fn import(
     if let Ok(records) = csv::load_csv(dir) {
         if dryrun {
             println!("This is a dry run, nothing will be uploaded!");
+        } else {
+            storage::create_container(&client, &mut core)?
         }
         let started = Instant::now();
         let mut report = Report::new(verbosity);
         let pdfs = pdf::get_pdfs(dir).expect("Could not load any PDFs.");
         let progress_bar = ProgressBar::new(pdfs.len() as u64);
+        let already_uploaded_files = uploaded_logger::get_uploaded_files();
         for path in pdfs {
             let key = path
                 .file_stem()
@@ -31,6 +36,12 @@ pub fn import(
                 let file_name = metadata::sanitize(&record.filename);
                 metadata.insert("file_name", &file_name);
 
+                let file_data = fs::read(path)?;
+                let hash = hash(&file_data);
+
+                if helpers::is_string_in_list(&already_uploaded_files, &hash) {
+                    continue;
+                }
                 let release_state = metadata::sanitize(&record.release_state);
                 metadata.insert("release_state", &release_state);
                 if release_state != "Y" {
@@ -59,17 +70,21 @@ pub fn import(
                 let author = metadata::sanitize(&record.author);
                 metadata.insert("author", &author);
 
-                let file_data = fs::read(path)?;
-                let hash = hash(&file_data);
-
                 if report.already_uploaded_file_with_hash(&hash) {
                     report.add_skipped_duplicate(&file_name, &hash);
                     continue;
                 }
 
                 if !dryrun {
-                    storage::upload(&hash, &client, &mut core, &file_data, &metadata, verbosity)?;
+                    let result = storage::upload_with_retry(
+                        &hash, &client, &mut core, &file_data, &metadata, verbosity,
+                    );
+                    if let Err(e) = result {
+                        report.print_report();
+                        return Err(e);
+                    }
                 }
+                uploaded_logger::log_uploaded_file(&hash);
                 report.add_uploaded(&file_name, &hash, &pl_numbers);
             } else {
                 report.add_skipped_incomplete(path.to_str().unwrap());
