@@ -45,12 +45,7 @@ const buildSearchUrl = (
   pageSize: number,
   filters: ISearchFilters,
 ): string => {
-  const url = new URL(
-    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
-  );
-
-  url.searchParams.append('api-key', searchKey as string);
-  url.searchParams.append('api-version', searchApiVersion as string);
+  const url = buildBaseUrl();
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('$count', 'true');
@@ -74,13 +69,18 @@ export interface IFacetResult {
   facets: Array<{ count: number; value: string }>;
 }
 
-const buildFacetUrl = (query: string): string => {
+const buildBaseUrl = () => {
   const url = new URL(
     `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
   );
 
   url.searchParams.append('api-key', searchKey as string);
   url.searchParams.append('api-version', searchApiVersion as string);
+  return url;
+};
+
+const buildFacetUrl = (query: string): string => {
+  const url = buildBaseUrl();
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
