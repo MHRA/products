@@ -1,16 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { DocType, ISearchFilters } from '../../services/azure-search';
-import {
-  black,
-  mhra70,
-  mhraBlue90,
-  mhraGray,
-  mhraWhite,
-  primaryColor,
-  white,
-} from '../../styles/colors';
-import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledSearchFilter = styled.section`
   input {
