@@ -27,7 +27,7 @@ Insert User story here
 
 **Effort**
 
-###Exit Criteria met 
+### Exit Criteria met 
 - [ ] Backlog
 - [ ] Discovery
 - [ ] Development 
