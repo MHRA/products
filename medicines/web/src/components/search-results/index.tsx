@@ -14,6 +14,7 @@ import SearchFilter from '../search-filter';
 import Pagination from './pagination';
 
 import { DocType } from '../../services/azure-search';
+import { IDocument } from '../../services/results-converter';
 
 const StyledDrugList = styled.div`
   .title {
@@ -147,17 +148,6 @@ const StyledDrugList = styled.div`
     }
   }
 `;
-
-export interface IDocument {
-  activeSubstances: string[];
-  context: string;
-  created: string;
-  docType: string;
-  fileSize: string;
-  name: string;
-  product: string;
-  url: string;
-}
 
 const emaWebsiteLink = () => (
   <a href="https://www.ema.europa.eu/en" target="_new">

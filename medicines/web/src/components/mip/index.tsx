@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga';
@@ -8,15 +7,16 @@ import {
   docSearch,
   DocType,
   ISearchFilters,
-  ISearchResult,
 } from '../../services/azure-search';
 import Events from '../../services/events';
+import { convertResults, IDocument } from '../../services/results-converter';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+
 import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
-import SearchResults, { IDocument } from '../search-results';
+import SearchResults from '../search-results';
 import YellowCard from '../yellow-card';
 
 const StyledMip = styled.div`
@@ -36,18 +36,6 @@ const StyledMip = styled.div`
     }
   }
 `;
-
-const sanitizeTitle = (title: string | null): string => {
-  let name: string;
-  if (!title) return 'Unknown';
-
-  try {
-    name = decodeURIComponent(title);
-  } catch {
-    name = title;
-  }
-  return name;
-};
 
 const formatDocTypeFilters = (s: string): DocType[] => {
   if (s.length <= 0) {
@@ -100,22 +88,7 @@ const Mip: React.FC = () => {
       pageSize,
       filters: searchFilters,
     });
-    const results = searchResults.results.map((doc: ISearchResult) => {
-      return {
-        activeSubstances: doc.substance_name,
-        product: doc.product_name,
-        context: doc['@search.highlights']?.content.join(' … ') || '',
-        docType: doc.doc_type?.toString().substr(0, 3) || '',
-        fileSize: Math.ceil(
-          (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
-        ).toLocaleString('en-GB'),
-        created: doc.created
-          ? moment(doc.created).format('D MMMM YYYY')
-          : 'Unknown',
-        name: sanitizeTitle(doc.title),
-        url: doc.metadata_storage_path,
-      };
-    });
+    const results = searchResults.results.map(convertResults);
     setResults(results);
     setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
