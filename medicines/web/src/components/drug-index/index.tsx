@@ -132,9 +132,12 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
     <StyledDrugIndex>
       {level === 0 ? <p className="horizontal">{title}</p> : <h3>{title}</h3>}
       <ul className={horizontal ? 'horizontal' : ''}>
-        {items.map(item => {
+        {items.map((item, index) => {
           return (
-            <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+            <li
+              key={item.name + index}
+              className={level > 0 ? 'substance-name' : ''}
+            >
               <Link href={searchLink(item)}>
                 <a>
                   {item.name} {item.count && <>({item.count} files)</>}
