@@ -157,13 +157,15 @@ const Mip: React.FC = () => {
       setSearch(formatSearchTerm(searchTerm));
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      let d = null;
-      if (typeof queryDocFilter === 'string') {
-        d = formatDocTypeFilters(queryDocFilter);
-        setEnabledDocTypes(d);
+      const docTypesToIncludeInSearch =
+        typeof queryDocFilter === 'string' && queryDocFilter.length > 0
+          ? formatDocTypeFilters(queryDocFilter)
+          : null;
+      if (docTypesToIncludeInSearch !== null) {
+        setEnabledDocTypes(docTypesToIncludeInSearch);
       }
       await fetchSearchResults(searchTerm, parsedPage, {
-        docType: d,
+        docType: docTypesToIncludeInSearch,
         sortOrder: 'a-z',
       });
       Events.searchForProductsMatchingKeywords(search, parsedPage);
