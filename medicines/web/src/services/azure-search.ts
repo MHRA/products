@@ -99,6 +99,30 @@ const buildSearchUrl = (
   return url.toString();
 };
 
+const buildProductSearchUrl = (
+  product: string,
+  page: number,
+  pageSize: number,
+): string => {
+  const url = new URL(
+    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
+  );
+
+  url.searchParams.append('api-key', searchKey as string);
+  url.searchParams.append('api-version', searchApiVersion as string);
+  url.searchParams.append('highlight', 'content');
+  url.searchParams.append('queryType', 'full');
+  url.searchParams.append('$count', 'true');
+  url.searchParams.append('$top', `${pageSize}`);
+  url.searchParams.append(
+    '$skip',
+    `${calculatePageStartRecord(page, pageSize)}`,
+  );
+  url.searchParams.append('$filter', "product_name eq '" + product + "'");
+
+  return url.toString();
+};
+
 export interface IFacetResult {
   facets: Array<{ count: number; value: string }>;
 }
@@ -138,6 +162,18 @@ export const docSearch = async (
   const body = await getJson(
     buildSearchUrl(buildFuzzyQuery(query), page, pageSize),
   );
+  return {
+    resultCount: body['@odata.count'],
+    results: body.value,
+  };
+};
+
+export const productSearch = async (
+  product: string,
+  page: number,
+  pageSize: number,
+): Promise<ISearchResults> => {
+  const body = await getJson(buildProductSearchUrl(product, page, pageSize));
   return {
     resultCount: body['@odata.count'],
     results: body.value,

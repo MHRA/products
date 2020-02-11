@@ -125,7 +125,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
       };
     }
 
-    return { query: { product: true, page: 1, search: item.name } };
+    return { query: { product: true, productName: item.name, page: 1 } };
   };
 
   return (

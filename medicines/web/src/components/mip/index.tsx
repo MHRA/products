@@ -4,7 +4,11 @@ import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga-gtm';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { docSearch, ISearchResult } from '../../services/azure-search';
+import {
+  docSearch,
+  ISearchResult,
+  productSearch,
+} from '../../services/azure-search';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
@@ -57,7 +61,7 @@ const Mip: React.FC = () => {
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance, disclaimer },
+    query: { search: searchTerm, page, substance, disclaimer, productName },
   } = router;
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
@@ -68,8 +72,14 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const fetchSearchResults = async (searchTerm: string, page: number) => {
-    const searchResults = await docSearch(searchTerm, page, pageSize);
+  const fetchSearchResults = async (
+    searchTerm: string,
+    page: number,
+    isProductSearch: boolean,
+  ) => {
+    const searchResults = isProductSearch
+      ? await productSearch(searchTerm, page, pageSize)
+      : await docSearch(searchTerm, page, pageSize);
     const results = searchResults.results.map((doc: ISearchResult) => {
       return {
         activeSubstances: doc.substance_name,
@@ -127,7 +137,20 @@ const Mip: React.FC = () => {
   };
 
   useEffect(() => {
-    if (searchTerm && page) {
+    if (productName && page) {
+      if (typeof productName === 'string') {
+        (async () => {
+          setHasIntro(false);
+          let parsedPage = Number(page);
+          if (!parsedPage || parsedPage < 1) {
+            parsedPage = 1;
+          }
+          setPageNumber(parsedPage);
+          if (disclaimer === 'agree') setDisclaimerAgree(true);
+          await fetchSearchResults(productName, parsedPage, true);
+        })();
+      }
+    } else if (searchTerm && page) {
       if (typeof searchTerm === 'string') {
         (async () => {
           setHasIntro(false);
@@ -138,7 +161,7 @@ const Mip: React.FC = () => {
           }
           setPageNumber(parsedPage);
           if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(searchTerm, parsedPage);
+          await fetchSearchResults(searchTerm, parsedPage, false);
         })();
       }
     } else if (substance) {
