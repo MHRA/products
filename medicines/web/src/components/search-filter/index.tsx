@@ -9,46 +9,58 @@ const StyledSearchFilter = styled.section`
 `;
 
 interface ISearchFilterProps {
-  docTypes: DocType[];
-  checkDocType: (d: DocType) => void;
+  currentlyEnabledDocTypes: DocType[];
+  toggleDocType: (d: DocType) => void;
 }
 
 interface IDocTypeCheckboxProps extends ISearchFilterProps {
-  docType: DocType;
+  docTypeForThisCheckbox: DocType;
   name: string;
 }
 
 const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
-  const { docType: d, name, checkDocType, docTypes } = props;
-  const handleCheck = () => checkDocType(d);
-  const id = `filter-${d.toLowerCase()}`;
+  const {
+    docTypeForThisCheckbox,
+    name,
+    toggleDocType,
+    currentlyEnabledDocTypes,
+  } = props;
+  const toggleDocTypeForThisCheckbox = () =>
+    toggleDocType(docTypeForThisCheckbox);
+  const id = `filter-${docTypeForThisCheckbox.toLowerCase()}`;
   return (
     <p>
       <input
         type="checkbox"
         id={id}
         name="doc"
-        value={d}
-        checked={docTypes.includes(d)}
-        onChange={handleCheck}
+        value={docTypeForThisCheckbox}
+        checked={currentlyEnabledDocTypes.includes(docTypeForThisCheckbox)}
+        onChange={toggleDocTypeForThisCheckbox}
       />
       <label htmlFor={id}>
-        {name} ({d.toUpperCase()})
+        {name} ({docTypeForThisCheckbox.toUpperCase()})
       </label>
     </p>
   );
 };
 
 const SearchFilter: React.FC<ISearchFilterProps> = props => {
-  const generateCheckbox = (d: DocType, n: string) => {
-    return <DocTypeCheckbox {...props} docType={d} name={n} />;
+  const generateCheckboxFor = (docType: DocType, name: string) => {
+    return (
+      <DocTypeCheckbox
+        {...props}
+        docTypeForThisCheckbox={docType}
+        name={name}
+      />
+    );
   };
   return (
     <StyledSearchFilter>
       <h2>Filter documents by</h2>
-      {generateCheckbox(DocType.Spc, 'Summary of Product Characteristics')}
-      {generateCheckbox(DocType.Pil, 'Patient Information Leaflet')}
-      {generateCheckbox(DocType.Par, 'Public Assesment Reports')}
+      {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
+      {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
+      {generateCheckboxFor(DocType.Par, 'Public Assesment Reports')}
     </StyledSearchFilter>
   );
 };

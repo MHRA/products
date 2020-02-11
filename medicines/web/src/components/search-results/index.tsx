@@ -288,8 +288,8 @@ const SearchResults = (props: {
           <div className="row">
             <div className="column filter">
               <SearchFilter
-                docTypes={docTypes}
-                checkDocType={handleDocTypeCheckbox}
+                currentlyEnabledDocTypes={docTypes}
+                toggleDocType={handleDocTypeCheckbox}
               />
             </div>
             <div className="column results">
