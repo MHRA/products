@@ -1,7 +1,9 @@
 name: API $(Date:yyyyMMdd)$(Rev:.r)
 variables: 
   ubuntuImage: ubuntu-latest
-  devContainerRegistry: mhraproductsdevregistry
+  # devContainerRegistry: mhraproductsdevregistry
+  devContainerRegistry: mhraproductsdevregistry.azurecr.io
+  devContainerRegistryServiceConnection: azure-container-registry
   tag: latest
   devAksServiceConnection: aks
   apiNamespace: default
@@ -22,15 +24,32 @@ stages:
       pool:
         vmImage: $(ubuntuImage)
       steps:
-      - task: Docker@2
-        displayName: Build and push an image to container registry 🏗🤜📦
+      # - task: DockerCompose@0
+      #   displayName: Container registry login
+      #   inputs:
+      #     containerregistrytype: Azure Container Registry
+      #     azureSubscriptionEndpoint: mhra-dev-pipeline
+      #     azureContainerRegistry: $(devContainerRegistry)
+      - task: DockerCompose@0
+        displayName: Build services
         inputs:
-          command: buildAndPush
-          repository: products/api
-          dockerfile: $(Build.SourcesDirectory)/medicines/api/Dockerfile
-          containerRegistry: $(devContainerRegistry)
-          tags: |
-            $(tag)
+          action: Build services
+          containerregistrytype: Azure Container Registry
+          azureSubscriptionEndpoint: mhra-dev-pipeline
+          azureContainerRegistry: $(devContainerRegistry)
+          dockerComposeFile: $(Build.SourcesDirectory)/medicines/api/docker-compose.yml
+          additionalImageTags: $(Build.BuildId)
+          includeLatestTag: true
+      - task: DockerCompose@0
+        displayName: Push services
+        inputs:
+          action: Push services
+          containerregistrytype: Azure Container Registry
+          azureSubscriptionEndpoint: mhra-dev-pipeline
+          azureContainerRegistry: $(azureContainerRegistry)
+          dockerComposeFile: $(Build.SourcesDirectory)/medicines/api/docker-compose.yml
+          additionalImageTags: $(Build.BuildId)
+          includeLatestTag: true
       - task: PublishPipelineArtifact@1
         displayName: Publish pipeline artifact 🖌
         inputs:
@@ -61,7 +80,7 @@ stages:
                 secretName: cluster-cred
                 namespace: $(apiNamespace)
                 kubernetesServiceConnection: $(devAksServiceConnection)
-                dockerRegistryEndpoint: $(devContainerRegistry)
+                dockerRegistryEndpoint: $(devContainerRegistryServiceConnection)
             - task: KubernetesManifest@0
               displayName: Deploy to Kubernetes cluster ⎈ 🐳 💥
               inputs:
