@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { DocType, ISearchFilters } from '../../services/azure-search';
+import { DocType } from '../../services/azure-search';
 
 const StyledSearchFilter = styled.section`
   input {
@@ -9,24 +9,15 @@ const StyledSearchFilter = styled.section`
 `;
 
 interface ISearchFilterProps {
-  filters: ISearchFilters;
-  setFilters: any;
+  docTypes: DocType[];
+  checkDocType: (d: DocType) => void;
 }
 
 const SearchFilter: React.FC<ISearchFilterProps> = props => {
-  const { filters, setFilters } = props;
+  const { docTypes, checkDocType } = props;
 
-  const createCheckboxHandler = (docType: DocType) => {
-    return () => {
-      let { docType: docTypeClone } = filters;
-      if (docTypeClone.includes(docType)) {
-        const docTypeIndex = docTypeClone.indexOf(docType);
-        docTypeClone = docTypeClone.splice(docTypeIndex, 1);
-      } else {
-        docTypeClone.push(docType);
-      }
-      setFilters({ docType: docTypeClone, ...filters });
-    };
+  const checkDocTypeGetter = (d: DocType) => {
+    return () => checkDocType(d);
   };
 
   return (
@@ -38,8 +29,8 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
           id="filter-spc"
           name="doc"
           value="Spc"
-          checked={filters.docType.includes(DocType.Spc)}
-          onChange={createCheckboxHandler(DocType.Spc)}
+          checked={docTypes.includes(DocType.Spc)}
+          onChange={checkDocTypeGetter(DocType.Spc)}
         />
         <label htmlFor="filter-spc">
           Summary of Product Characteristics (SPC)
@@ -51,8 +42,8 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
           id="filter-pil"
           name="doc"
           value="Pil"
-          checked={filters.docType.includes(DocType.Pil)}
-          onChange={createCheckboxHandler(DocType.Pil)}
+          checked={docTypes.includes(DocType.Pil)}
+          onChange={checkDocTypeGetter(DocType.Pil)}
         />
         <label htmlFor="filter-pil">Patient Information Leaflet (PIL)</label>
       </p>
@@ -62,8 +53,8 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
           id="filter-par"
           name="doc"
           value="Par"
-          checked={filters.docType.includes(DocType.Par)}
-          onChange={createCheckboxHandler(DocType.Par)}
+          checked={docTypes.includes(DocType.Par)}
+          onChange={checkDocTypeGetter(DocType.Par)}
         />
         <label htmlFor="filter-par">Public Assesment Reports (PAR)</label>
       </p>

@@ -12,7 +12,7 @@ import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
 import Pagination from './pagination';
 
-import { ISearchFilters } from '../../services/azure-search';
+import { DocType, ISearchFilters } from '../../services/azure-search';
 
 const StyledDrugList = styled.div`
   .title {
@@ -191,8 +191,8 @@ const SearchResults = (props: {
   searchTerm: string;
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
-  filters: ISearchFilters;
-  setFilters: any;
+  docTypes: DocType[];
+  handleDocTypeCheckbox: (d: DocType) => void;
 }) => {
   const [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
     'showDisclaimer',
@@ -207,8 +207,8 @@ const SearchResults = (props: {
     resultCount,
     searchTerm,
     showingResultsForTerm,
-    filters,
-    setFilters,
+    docTypes,
+    handleDocTypeCheckbox,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -267,7 +267,10 @@ const SearchResults = (props: {
         ) : (
           <div className="row">
             <div className="column filter">
-              <SearchFilter filters={filters} setFilters={setFilters} />
+              <SearchFilter
+                docTypes={docTypes}
+                checkDocType={handleDocTypeCheckbox}
+              />
             </div>
             <div className="column results">
               <dl>

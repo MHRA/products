@@ -66,6 +66,14 @@ const sanitizeTitle = (title: string | null): string => {
   return name;
 };
 
+const formatDocTypeFilters = (s: string): DocType[] => {
+  if (s.length <= 0) {
+    return [];
+  }
+
+  return s.split(',').map(d => DocType[d as keyof typeof DocType]);
+};
+
 const Mip: React.FC = () => {
   const [pageNumber, setPageNumber] = React.useState(1);
   const [hasIntro, setHasIntro] = React.useState(true);
@@ -76,6 +84,7 @@ const Mip: React.FC = () => {
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [products, setProducts] = React.useState<IProduct[] | null>(null);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
+  const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
 
   const router = useRouter();
 
@@ -85,24 +94,9 @@ const Mip: React.FC = () => {
       page,
       substance,
       disclaimer,
-      doc,
-      productName,
+      doc: queryDocFilter,
     },
   } = router;
-
-  const [filters, setFilters] = React.useState<ISearchFilters>({
-    docType: [],
-    sortOrder: 'a-z',
-  });
-  /*if (typeof doc === 'string') {
-    filters.docType = DocType[doc as keyof typeof DocType];
-  }*/
-  if (typeof substance === 'string') {
-    filters.substanceName = substance;
-  }
-  if (typeof productName === 'string') {
-    filters.productName = productName;
-  }
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
     setSearch(formatSearchTerm(e.currentTarget.value));
@@ -112,12 +106,16 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const fetchSearchResults = async (searchTerm: string, page: number) => {
+  const fetchSearchResults = async (
+    searchTerm: string,
+    page: number,
+    searchFilters: ISearchFilters,
+  ) => {
     const searchResults = await docSearch({
       query: searchTerm,
       page,
       pageSize,
-      filters,
+      filters: searchFilters,
     });
     const results = searchResults.results.map((doc: ISearchResult) => {
       return {
@@ -168,10 +166,25 @@ const Mip: React.FC = () => {
     });
   };
 
+  const handleDocTypeCheckbox = async (d: DocType) => {
+    const a = Array.from(docTypes);
+    if (a.includes(d)) {
+      const docTypeIndex = a.indexOf(d);
+      a.splice(docTypeIndex, 1);
+    } else {
+      a.push(d);
+    }
+    setDocTypes(a);
+  };
+
   const rerouteSearchResults = (pageNo: number) => {
     router.push({
       pathname: router.route,
-      query: { search, page: pageNo },
+      query: {
+        search,
+        page: pageNo,
+        doc: docTypes.length > 0 ? docTypes.join(',') : null,
+      },
     });
   };
 
@@ -188,7 +201,15 @@ const Mip: React.FC = () => {
       setSearch(formatSearchTerm(searchTerm));
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      await fetchSearchResults(searchTerm, parsedPage);
+      let d = null;
+      if (typeof queryDocFilter === 'string') {
+        d = formatDocTypeFilters(queryDocFilter);
+        setDocTypes(d);
+      }
+      await fetchSearchResults(searchTerm, parsedPage, {
+        docType: d,
+        sortOrder: 'a-z',
+      });
       Events.searchForProductsMatchingKeywords(search, parsedPage);
     }
   };
@@ -226,6 +247,10 @@ const Mip: React.FC = () => {
   };
 
   useEffect(() => {
+    rerouteSearchResults(1);
+  }, [docTypes]);
+
+  useEffect(() => {
     if (searchTerm && page) {
       loadSearchResults(searchTerm, page);
     } else if (substance) {
@@ -234,8 +259,7 @@ const Mip: React.FC = () => {
       loadHomepage();
     }
     window.scrollTo(0, 0);
-    setFilters(filters);
-  }, [page, searchTerm, substance, disclaimer, filters]);
+  }, [page, searchTerm, substance, disclaimer, queryDocFilter]);
 
   return (
     <StyledMip>
@@ -273,8 +297,8 @@ const Mip: React.FC = () => {
           pageSize={pageSize}
           searchTerm={search}
           disclaimerAgree={disclaimerAgree}
-          filters={filters}
-          setFilters={setFilters}
+          docTypes={docTypes}
+          handleDocTypeCheckbox={handleDocTypeCheckbox}
         />
       )}
     </StyledMip>
