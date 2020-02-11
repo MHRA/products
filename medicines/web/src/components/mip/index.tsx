@@ -35,23 +35,6 @@ const StyledMip = styled.div`
       padding: 1.25rem;
     }
   }
-
-  .column {
-    float: left;
-  }
-  .filter {
-    width: 40%;
-  }
-  .results {
-    width: 60%;
-  }
-
-  /* Clear floats after the columns */
-  .row:after {
-    content: '';
-    display: table;
-    clear: both;
-  }
 `;
 
 const sanitizeTitle = (title: string | null): string => {

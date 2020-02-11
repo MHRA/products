@@ -116,6 +116,23 @@ const StyledDrugList = styled.div`
     font-weight: bold;
     font-style: normal;
   }
+
+  .column {
+    float: left;
+  }
+  .filter {
+    width: 40%;
+  }
+  .results {
+    width: 60%;
+  }
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
 `;
 
 export interface IDocument {
