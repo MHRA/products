@@ -68,6 +68,7 @@ const splitByNonSearchableCharacters = (query: string) =>
 
 const buildFuzzyQuery = (query: string): string => {
   return splitByNonSearchableCharacters(addNormalizedProductLicenses(query))
+    .filter(x => x.length > 0)
     .map(word => escapeSpecialWords(word))
     .map(word => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
