@@ -25,6 +25,50 @@ $ docker run -p 8080:8080 -it --rm stub-document-manager-api
 
 The webserver listens on http://0.0.0.0:8080 by default.
 
+## Deploying to Kubernetes
+
+First, you need to install the `stable/nginx-ingress` and `cert-manager` packages from Helm.
+
+```
+$ export YOUR_IP_ADDRESS=1.2.3.4
+
+$ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+$ helm repo add jetstack https://charts.jetstack.io
+$ helm repo update
+
+$ helm install api-stub stable/nginx-ingress \
+  --set controller.replicaCount=2 \
+  --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+  --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
+  --set controller.service.loadBalancerIP=$YOUR_IP_ADDRESS \
+  --set controller.service.externalTrafficPolicy=Local
+
+$ kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml
+$ helm install cert-manager jetstack/cert-manager
+```
+
+Then you need to build the Docker image and push it to your container registry:
+
+```bash
+$ export STUB_IMAGE=container-registry.yourdomain.com/stub-api:1.0.1
+
+$ docker build -t $STUB_IMAGE
+$ docker push $STUB_IMAGE
+```
+
+There are Kubernetes manifests in the `manifests` directory. You can apply these with `kubectl` as usual:
+
+```bash
+$ export PUBLIC_URL=yourdomain.com
+$ export SSL_EMAIL=you@yourdomain.com
+
+$ envsubst < manifests/cluster-issuer.yaml | kubectl apply -f -
+$ envsubst < manifests/cert.yaml | kubectl apply -f -
+$ envsubst < manifests/ingress.yaml | kubectl apply -f -
+$ envsubst < manifests/deployment.yaml | kubectl apply -f -
+$ envsubst < manifests/svc.yaml | kubectl apply -f -
+```
+
 ## Endpoints
 
 ### GET /documents/:document
