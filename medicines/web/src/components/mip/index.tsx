@@ -126,48 +126,61 @@ const Mip: React.FC = () => {
     });
   };
 
+  const loadSearchResults = async (
+    searchTerm: string | string[],
+    page: string | string[],
+  ) => {
+    if (typeof searchTerm === 'string') {
+      let parsedPage = Number(page);
+      if (!parsedPage || parsedPage < 1) {
+        parsedPage = 1;
+      }
+      setHasIntro(false);
+      setSearch(formatSearchTerm(searchTerm));
+      setPageNumber(parsedPage);
+      if (disclaimer === 'agree') setDisclaimerAgree(true);
+      await fetchSearchResults(searchTerm, parsedPage);
+    }
+  };
+
+  const loadSubstancePage = async (substance: string | string[]) => {
+    if (typeof substance === 'string') {
+      (async () => {
+        setHasIntro(false);
+        setResults([]);
+        setSearch('');
+        setShowingResultsForTerm('');
+        const ss = await substanceLoader.load(substance.charAt(0));
+        const products = ss.find(s => s.name === substance);
+        if (products) {
+          setProducts(products.products);
+        } else {
+          setProducts(ss);
+        }
+        if (disclaimer === 'agree') setDisclaimerAgree(true);
+      })();
+    }
+  };
+
+  const loadHomepage = () => {
+    setHasIntro(true);
+    setResults([]);
+    setSearch('');
+    setShowingResultsForTerm('');
+    setProducts(null);
+    setDisclaimerAgree(false);
+  };
+
   useEffect(() => {
     if (searchTerm && page) {
-      if (typeof searchTerm === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setSearch(formatSearchTerm(searchTerm));
-          let parsedPage = Number(page);
-          if (!parsedPage || parsedPage < 1) {
-            parsedPage = 1;
-          }
-          setPageNumber(parsedPage);
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(searchTerm, parsedPage);
-        })();
-      }
+      loadSearchResults(searchTerm, page);
     } else if (substance) {
-      if (typeof substance === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setResults([]);
-          setSearch('');
-          setShowingResultsForTerm('');
-          const ss = await substanceLoader.load(substance.charAt(0));
-          const products = ss.find(s => s.name === substance);
-          if (products) {
-            setProducts(products.products);
-          } else {
-            setProducts(ss);
-          }
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-        })();
-      }
+      loadSubstancePage(substance);
     } else {
-      setHasIntro(true);
-      setResults([]);
-      setSearch('');
-      setShowingResultsForTerm('');
-      setProducts(null);
-      setDisclaimerAgree(false);
+      loadHomepage();
     }
     window.scrollTo(0, 0);
-  }, [page, searchTerm, substance, disclaimerAgree]);
+  }, [page, searchTerm, substance, disclaimer]);
 
   return (
     <StyledMip>
