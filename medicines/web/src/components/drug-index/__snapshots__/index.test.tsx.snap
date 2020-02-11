@@ -12,7 +12,7 @@ exports[`DrugIndex should render 1`] = `
   >
     <li
       className=""
-      key="A"
+      key="A0"
     >
       <Link
         href={
@@ -32,7 +32,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="B"
+      key="B1"
     >
       <Link
         href={
@@ -52,7 +52,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="C"
+      key="C2"
     >
       <Link
         href={
@@ -72,7 +72,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="D"
+      key="D3"
     >
       <Link
         href={
@@ -92,7 +92,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="E"
+      key="E4"
     >
       <Link
         href={
@@ -112,7 +112,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="F"
+      key="F5"
     >
       <Link
         href={
@@ -132,7 +132,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="G"
+      key="G6"
     >
       <Link
         href={
@@ -152,7 +152,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="H"
+      key="H7"
     >
       <Link
         href={
@@ -172,7 +172,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="I"
+      key="I8"
     >
       <Link
         href={
@@ -192,7 +192,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="J"
+      key="J9"
     >
       <Link
         href={
@@ -212,7 +212,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="K"
+      key="K10"
     >
       <Link
         href={
@@ -232,7 +232,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="L"
+      key="L11"
     >
       <Link
         href={
@@ -252,7 +252,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="M"
+      key="M12"
     >
       <Link
         href={
@@ -272,7 +272,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="N"
+      key="N13"
     >
       <Link
         href={
@@ -292,7 +292,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="O"
+      key="O14"
     >
       <Link
         href={
@@ -312,7 +312,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="P"
+      key="P15"
     >
       <Link
         href={
@@ -332,7 +332,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="Q"
+      key="Q16"
     >
       <Link
         href={
@@ -352,7 +352,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="R"
+      key="R17"
     >
       <Link
         href={
@@ -372,7 +372,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="S"
+      key="S18"
     >
       <Link
         href={
@@ -392,7 +392,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="T"
+      key="T19"
     >
       <Link
         href={
@@ -412,7 +412,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="U"
+      key="U20"
     >
       <Link
         href={
@@ -432,7 +432,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="V"
+      key="V21"
     >
       <Link
         href={
@@ -452,7 +452,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="W"
+      key="W22"
     >
       <Link
         href={
@@ -472,7 +472,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="X"
+      key="X23"
     >
       <Link
         href={
@@ -492,7 +492,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="Y"
+      key="Y24"
     >
       <Link
         href={
@@ -512,7 +512,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="Z"
+      key="Z25"
     >
       <Link
         href={
@@ -532,7 +532,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="0"
+      key="026"
     >
       <Link
         href={
@@ -552,7 +552,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="1"
+      key="127"
     >
       <Link
         href={
@@ -572,7 +572,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="2"
+      key="228"
     >
       <Link
         href={
@@ -592,7 +592,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="3"
+      key="329"
     >
       <Link
         href={
@@ -612,7 +612,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="4"
+      key="430"
     >
       <Link
         href={
@@ -632,7 +632,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="5"
+      key="531"
     >
       <Link
         href={
@@ -652,7 +652,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="6"
+      key="632"
     >
       <Link
         href={
@@ -672,7 +672,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="7"
+      key="733"
     >
       <Link
         href={
@@ -692,7 +692,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="8"
+      key="834"
     >
       <Link
         href={
@@ -712,7 +712,7 @@ exports[`DrugIndex should render 1`] = `
     </li>
     <li
       className=""
-      key="9"
+      key="935"
     >
       <Link
         href={
