@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import { buildFuzzyQuery } from './keyword';
+import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
 const searchIndex = process.env.AZURE_SEARCH_INDEX;
