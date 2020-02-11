@@ -16,7 +16,7 @@ before(() => {
   });
 });
 
-Cypress.on('window:before:load', (win) => {
+Cypress.on('window:before:load', win => {
   delete win.fetch;
   // since the application code does not ship with a polyfill
   // load a polyfilled "fetch" from the test
@@ -25,19 +25,19 @@ Cypress.on('window:before:load', (win) => {
 
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
-})
+});
 
 describe('Search', function() {
   it('Search for Paracetamol', function() {
     cy.server();
     // Mock out first page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords',
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords&searchMode=all',
       'fixture:search_results.json',
     );
     // Mock out second page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords',
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords&searchMode=all',
       'fixture:search_results.json',
     );
 
@@ -56,17 +56,17 @@ describe('A-Z Index', function() {
     cy.server();
     // Mock out list of substances and medcines.
     cy.route(
-      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0",
+      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all",
       'fixture:facets.json',
     );
     // Mock out first page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords',
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all',
       'fixture:search_results.json',
     );
     // Mock out second page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords',
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all',
       'fixture:search_results.json',
     );
 
