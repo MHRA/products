@@ -55,7 +55,7 @@ const Mip: React.FC = () => {
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [products, setProducts] = React.useState<IProduct[] | null>(null);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
-  const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
+  const [enabledDocTypes, setEnabledDocTypes] = React.useState<DocType[]>([]);
 
   const router = useRouter();
 
@@ -122,15 +122,15 @@ const Mip: React.FC = () => {
     });
   };
 
-  const handleDocTypeCheckbox = async (d: DocType) => {
-    const a = Array.from(docTypes);
-    if (a.includes(d)) {
-      const docTypeIndex = a.indexOf(d);
-      a.splice(docTypeIndex, 1);
+  const toggleDocType = async (docTypeToToggle: DocType) => {
+    const currentlyEnabledDocTypes = Array.from(enabledDocTypes);
+    if (currentlyEnabledDocTypes.includes(docTypeToToggle)) {
+      const docTypeIndex = currentlyEnabledDocTypes.indexOf(docTypeToToggle);
+      currentlyEnabledDocTypes.splice(docTypeIndex, 1);
     } else {
-      a.push(d);
+      currentlyEnabledDocTypes.push(docTypeToToggle);
     }
-    setDocTypes(a);
+    setEnabledDocTypes(currentlyEnabledDocTypes);
   };
 
   const rerouteSearchResults = (pageNo: number) => {
@@ -139,7 +139,7 @@ const Mip: React.FC = () => {
       query: {
         search,
         page: pageNo,
-        doc: docTypes.length > 0 ? docTypes.join(',') : null,
+        doc: enabledDocTypes.length > 0 ? enabledDocTypes.join(',') : null,
       },
     });
   };
@@ -160,7 +160,7 @@ const Mip: React.FC = () => {
       let d = null;
       if (typeof queryDocFilter === 'string') {
         d = formatDocTypeFilters(queryDocFilter);
-        setDocTypes(d);
+        setEnabledDocTypes(d);
       }
       await fetchSearchResults(searchTerm, parsedPage, {
         docType: d,
@@ -204,7 +204,7 @@ const Mip: React.FC = () => {
 
   useEffect(() => {
     rerouteSearchResults(1);
-  }, [docTypes]);
+  }, [enabledDocTypes]);
 
   useEffect(() => {
     if (searchTerm && page) {
@@ -253,8 +253,8 @@ const Mip: React.FC = () => {
           pageSize={pageSize}
           searchTerm={search}
           disclaimerAgree={disclaimerAgree}
-          docTypes={docTypes}
-          handleDocTypeCheckbox={handleDocTypeCheckbox}
+          docTypes={enabledDocTypes}
+          handleDocTypeCheckbox={toggleDocType}
         />
       )}
     </StyledMip>
