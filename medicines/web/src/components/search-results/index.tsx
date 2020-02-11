@@ -12,7 +12,7 @@ import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
 import Pagination from './pagination';
 
-import { DocType, ISearchFilters } from '../../services/azure-search';
+import { DocType } from '../../services/azure-search';
 
 const StyledDrugList = styled.div`
   .title {
