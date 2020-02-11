@@ -5,6 +5,7 @@ import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
+  mobileBreakpoint,
   tinyPaddingSizeCss,
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
@@ -132,6 +133,18 @@ const StyledDrugList = styled.div`
     content: '';
     display: table;
     clear: both;
+  }
+
+  @media ${mobileBreakpoint} {
+    .column {
+      float: none;
+    }
+    .filter {
+      width: 100%;
+    }
+    .results {
+      width: 100%;
+    }
   }
 `;
 
