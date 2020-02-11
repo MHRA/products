@@ -57,12 +57,16 @@ const buildSearchUrl = (
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
   url.searchParams.append('searchMode', 'all');
-  const f = createFilter(filters);
-  if (f.length > 0) {
-    url.searchParams.append('$filter', f);
-  }
+  addFilterParameter(url, filters);
 
   return url.toString();
+};
+
+const addFilterParameter = (url: URL, filters: ISearchFilters) => {
+  const filterParameter = createFilter(filters);
+  if (filterParameter.length > 0) {
+    url.searchParams.append('$filter', filterParameter);
+  }
 };
 
 export interface IFacetResult {
