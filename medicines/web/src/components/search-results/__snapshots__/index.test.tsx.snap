@@ -43,8 +43,8 @@ exports[`SearchResults should render 1`] = `
         className="column filter"
       >
         <SearchFilter
-          checkDocType={[Function]}
-          docTypes={Array []}
+          currentlyEnabledDocTypes={Array []}
+          toggleDocType={[Function]}
         />
       </div>
       <div
