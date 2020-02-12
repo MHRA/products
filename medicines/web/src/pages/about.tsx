@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import about from '../copy/about.md';
+import Events from '../services/events';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
@@ -22,6 +23,8 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  Events.page('about');
+
   return (
     <Page title="Products">
       <StyledMain dangerouslySetInnerHTML={{ __html: about }} />

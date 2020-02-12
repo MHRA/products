@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import accessibility from '../copy/accessibility.md';
+import Events from '../services/events';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
@@ -18,6 +19,8 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  Events.page('accessibility');
+
   return (
     <Page title="Accessibility Statement">
       <StyledMain dangerouslySetInnerHTML={{ __html: accessibility }} />

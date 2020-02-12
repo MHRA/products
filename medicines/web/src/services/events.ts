@@ -20,7 +20,7 @@ export default {
   drugIndex: (letter: string) => {
     pushToDataLayer({ event: 'drugIndex', letter });
   },
-  homepage: () => {
-    pushToDataLayer({ event: 'homepage' });
+  page: (pageName: string) => {
+    pushToDataLayer({ event: pageName });
   },
 };
