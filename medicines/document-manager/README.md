@@ -9,6 +9,7 @@ the Products website.
 ## To-Do
 
 - [x] Dockerize stub API;
+- [ ] Remove Helm dependencies;
 - [ ] Implement functioning API with XML support;
 - [ ] Implement functioning API with JSON support;
 - [ ] Connect APIs to pub/sub;

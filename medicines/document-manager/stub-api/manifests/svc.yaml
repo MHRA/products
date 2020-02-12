@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: document-stub
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  labels:
+    app: document
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: document
+    tier: frontend
+  type: LoadBalancer

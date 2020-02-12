@@ -56,7 +56,7 @@ post '/documents' => sub {
         }
     );
 
-    my @expected_fields = ('id', 'name', 'type', 'author', 'product_name', 'keywords', 'pl_number', 'active_substances', 'file_source', 'file_path');
+    my @expected_fields = ('id', 'name', 'type', 'author', 'product_name', 'pl_number', 'active_substances', 'file_source', 'file_path');
 
     for my $expected_field (@expected_fields) {
         if (!defined($document->{$expected_field})) {
