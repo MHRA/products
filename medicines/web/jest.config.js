@@ -13,7 +13,7 @@ module.exports = {
       '<rootDir>/config/assets-transformer.ts',
     '\\.(css|less|scss)$': '<rootDir>/config/assets-transformer.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/config/enzyme.ts'],
+  setupFilesAfterEnv: ['<rootDir>/config/enzyme.ts', '<rootDir>/config/env.ts'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   testMatch: ['**/*.(test|spec).(ts|tsx)'],
   transform: {
