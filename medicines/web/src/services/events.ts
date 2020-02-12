@@ -14,4 +14,7 @@ export default {
       pageNo,
     });
   },
+  substances: (substance: string) => {
+    pushToDataLayer({ event: 'substance', substanceName: substance });
+  },
 };

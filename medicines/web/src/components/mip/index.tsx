@@ -156,6 +156,7 @@ const Mip: React.FC = () => {
         const products = ss.find(s => s.name === substance);
         if (products) {
           setProducts(products.products);
+          Events.substances(substance);
         } else {
           setProducts(ss);
         }
