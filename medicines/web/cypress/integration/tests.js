@@ -28,7 +28,7 @@ Cypress.on('window:before:load', win => {
 });
 
 describe('Search', function() {
-  it('Search for Paracetamol', function() {
+  it('can search for Paracetamol', function() {
     cy.server();
     // Mock out first page of search results.
     cy.route(
@@ -48,6 +48,28 @@ describe('Search', function() {
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
+
+  it('can filter for SPCs', function() {
+    cy.server();
+    // Mock out first page of search results.
+    cy.route(
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all',
+      'fixture:search_results.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'",
+      'fixture:search_results.spc.json',
+    );
+
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
   });
 });
 
