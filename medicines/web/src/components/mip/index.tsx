@@ -2,10 +2,10 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import ReactGA from 'react-ga';
-import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
+import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
@@ -141,14 +141,7 @@ const Mip: React.FC = () => {
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
       await fetchSearchResults(searchTerm, parsedPage);
-      TagManager.dataLayer({
-        dataLayer: {
-          page: 'search',
-          searchTerm: search,
-          pageNo: parsedPage,
-        },
-        dataLayerName: 'dataLayer',
-      });
+      Events.search(search, parsedPage);
     }
   };
 
