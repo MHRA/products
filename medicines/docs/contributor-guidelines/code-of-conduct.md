@@ -12,7 +12,7 @@ The [Civil Service Code](https://www.gov.uk/government/publications/civil-servic
 
 > Note:
 >
-> - where the code of conduct says "project" we mean GDS, `MHRA` and all repositories hosted within it.
+> - where the code of conduct says "project" we mean `MHRA` and all repositories hosted within it.
 > - where the code of conduct says "maintainer" we mean `MHRA` organisation owners
 > - where the code of conduct says "leadership" we mean both `MHRA` organisation owners, line managers, and other leadership within GDS
 

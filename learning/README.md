@@ -11,4 +11,4 @@ This site is for healthcare professionals responsible for prescribing, supplying
 
 ## Contributor guidelines
 
-See [contributor guidelines](./docs/contributor_guidelines).
+See [contributor guidelines](./docs/contributor-guidelines).

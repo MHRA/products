@@ -22,7 +22,7 @@ export GOOGLE_GTM_CONTAINER_ID=
 export GOOGLE_TRACKING_ID=
 ```
 
-It is recommended that you set these in your `.profile` or `.bashrc` file so that it persists past the lifetime of your terminal session.
+We recommend that you set these in your `.profile` or `.bashrc` file so that it persists past the lifetime of your terminal session.
 
 Next, start the service:
 
