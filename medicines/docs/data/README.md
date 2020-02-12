@@ -12,7 +12,7 @@ The main data used by the products site relates predominantly to 3 types of docu
 
 Documents, their metadata and their contents are searchable and can be accessed and opened through the site.
 
-The current architecture of the site can be seen [here](../architecture#progress) and the configuration files to create these resources for each environment can be found [here](../../../infrastructure/).
+Consider checking out the [architecture of the site](../architecture#progress) and the [configuration files](../../../infrastructure/) to create these resources for each environment.
 
 ## Storage
 
@@ -28,9 +28,9 @@ All SPC, PIL and PAR files are stored as blobs in an Azure blob container along 
 - Date created - upload date of document, e.g. “2019-03-08T05:08:00+00:00”
 - Release state - whether the document is released, e.g. “Y”
 - Revision label - version number of the file, e.g. “2”
-  This index is defined in code [here](https://github.com/MHRA/products/blob/master/medicines/search/src/index.rs).
+  This index is defined in [code](https://github.com/MHRA/products/blob/master/medicines/search/src/index.rs).
 
-Each file is stored as a blob with a name that is a hash of the file contents, e.g. “000f6ec9a52b3230d5f880e55fb33a405a1c83d3” and has a unique URI through which it can be accessed.
+Each file is stored as a blob with a name that is a hash of the file contents, e.g. `000f6ec9a52b3230d5f880e55fb33a405a1c83d3` and has a unique URI through which it can be accessed.
 
 ## Updates
 
@@ -70,11 +70,11 @@ No restricted or customer-sensitive data is used on the site.
 
 ## Availability
 
-Azure blob containers used in this project are configured to be of type RAGRS (Read-access Geo-redundant Storage), with a level of availability over a given year of 99.99999999999999% (16 9's), as documented [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage).
+Azure blob containers used in this project are configured to be of type RAGRS (Read-access Geo-redundant Storage), with a level of availability over a given year of 99.99999999999999% (16 9's), [as documented](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage).
 
 ## Redundancy and recovery
 
-The contents of RAGRS Azure blob containers are automatically replicated to a second region, so that in the case of failure or lack of availability of the primary, data can be copied over or directly read from the secondary. Further information can be found [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage).
+The contents of [RAGRS Azure blob containers](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage). are automatically replicated to a second region, so that in the case of failure or lack of availability of the primary, data can be copied over or directly read from the secondary.
 
 ## Analytics
 

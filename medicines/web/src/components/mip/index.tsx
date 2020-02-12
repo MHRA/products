@@ -107,7 +107,6 @@ const Mip: React.FC = () => {
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setSearch(formatSearchTerm(search));
 
     if (search.length > 0) {

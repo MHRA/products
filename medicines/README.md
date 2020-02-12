@@ -1,6 +1,6 @@
 # MHRA Products Portal
 
-This project contains the source code for the medicines information portal, which can be found at: https://products.mhra.gov.uk/
+This project contains the source code for the medicines products portal, which can be found at: https://products.mhra.gov.uk/
 
 This site allows users to find:
 
@@ -23,4 +23,4 @@ This site allows users to find:
 
 ## Contributor guidelines
 
-See [contributor guidelines](./docs/contributor_guidelines).
+See [contributor guidelines](./docs/contributor-guidelines).

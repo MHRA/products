@@ -2,7 +2,7 @@
 
 _Note: all secrets in this doc are for demo purposes only and need replacing with the real ones as you go!_
 
-Make sure you run the setup steps [here](infrastructure/README.md) to login and set the Azure subscription ID correctly. You can use `az account list` to find the correct Azure subscription ID.
+Make sure you run the [setup steps](infrastructure/README.md) to login and set the Azure subscription ID correctly. You can use `az account list` to find the correct Azure subscription ID.
 
 ## Set up a new environment
 
@@ -36,7 +36,7 @@ Apply:
 
 `terraform apply`
 
-For more info check out the readme [here](infrastructure/README.md), but remember to capture the output from the above command as it will be needed in the next steps.
+For more info check out the [readme](infrastructure/README.md), but remember to capture the output from the above command as it will be needed in the next steps.
 
 ## Data Import
 

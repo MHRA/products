@@ -4,9 +4,9 @@
 
 This is a monorepo containing the following domains:
 
-- [Medicines Information Portal](./medicines)
+- [Medicines Products Portal](./medicines)
 - [Continuous Professional Development](./learning)
 
 ## Principles
 
-Read our guiding principles [here](./docs/principles).
+Read our [guiding principles](./docs/principles).
