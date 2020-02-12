@@ -7,14 +7,17 @@ const pushToDataLayer = (dataLayer: any) => {
 };
 
 export default {
-  search: (search: string, pageNo: number) => {
+  search: (searchTerm: string, pageNo: number) => {
     pushToDataLayer({
       event: 'search',
-      searchTerm: search,
+      searchTerm,
       pageNo,
     });
   },
   substances: (substance: string) => {
-    pushToDataLayer({ event: 'substance', substanceName: substance });
+    pushToDataLayer({ event: 'substance', substance });
+  },
+  drugIndex: (letter: string) => {
+    pushToDataLayer({ event: 'drugIndex', letter });
   },
 };

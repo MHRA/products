@@ -159,6 +159,7 @@ const Mip: React.FC = () => {
           Events.substances(substance);
         } else {
           setProducts(ss);
+          Events.drugIndex(substance);
         }
         if (disclaimer === 'agree') setDisclaimerAgree(true);
       })();
