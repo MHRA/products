@@ -173,6 +173,7 @@ const Mip: React.FC = () => {
     setShowingResultsForTerm('');
     setProducts(null);
     setDisclaimerAgree(false);
+    Events.homepage();
   };
 
   useEffect(() => {
