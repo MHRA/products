@@ -141,6 +141,14 @@ const Mip: React.FC = () => {
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
       await fetchSearchResults(searchTerm, parsedPage);
+      TagManager.dataLayer({
+        dataLayer: {
+          page: 'search',
+          searchTerm: search,
+          pageNo: parsedPage,
+        },
+        dataLayerName: 'dataLayer',
+      });
     }
   };
 

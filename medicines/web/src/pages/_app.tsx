@@ -7,6 +7,7 @@ class App extends BaseApp {
   public componentDidMount(): void {
     TagManager.initialize({
       gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
+      dataLayerName: 'dataLayer',
     });
 
     ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
