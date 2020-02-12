@@ -71,6 +71,35 @@ describe('Search', function() {
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
   });
+
+  it('can filter for SPCs and PILs together', function() {
+    cy.server();
+    // Mock out first page of search results.
+    cy.route(
+      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all',
+      'fixture:search_results.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'",
+      'fixture:search_results.spc.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'+or+doc_type+eq+'Pil'",
+      'fixture:search_results.spcpil.json',
+    );
+
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Patient Information Leaflet (PIL)').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
+  });
 });
 
 describe('A-Z Index', function() {
