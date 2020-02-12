@@ -90,7 +90,7 @@ kubectl get nodes
 8. Apply manifest to the cluster
 
    ```sh
-   istioctl manifest apply -f istio.aks.yaml --logtostderr
+   istioctl manifest apply -f control-plane.yml --logtostderr
    ```
 
 9. Validate the Istio installation
