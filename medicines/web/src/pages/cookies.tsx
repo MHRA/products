@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 // @ts-ignore
@@ -37,7 +37,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  Events.page('cookies');
+  useEffect(() => Events.page('cookies'));
 
   return (
     <Page title="Cookie Policy">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
@@ -19,7 +19,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  Events.page('accessibility');
+  useEffect(() => Events.page('accessibility'));
 
   return (
     <Page title="Accessibility Statement">

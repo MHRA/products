@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
@@ -23,7 +23,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  Events.page('about');
+  useEffect(() => Events.page('about'));
 
   return (
     <Page title="Products">
