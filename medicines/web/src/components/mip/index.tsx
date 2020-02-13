@@ -141,25 +141,26 @@ const Mip: React.FC = () => {
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
       await fetchSearchResults(searchTerm, parsedPage);
-      Events.search(search, parsedPage);
+      Events.searchForProductsMatchingKeywords(search, parsedPage);
     }
   };
 
-  const loadSubstancePage = async (substance: string | string[]) => {
-    if (typeof substance === 'string') {
+  const loadSubstancePage = async (substanceName: string | string[]) => {
+    if (typeof substanceName === 'string') {
       (async () => {
         setHasIntro(false);
         setResults([]);
         setSearch('');
         setShowingResultsForTerm('');
-        const ss = await substanceLoader.load(substance.charAt(0));
-        const products = ss.find(s => s.name === substance);
-        if (products) {
-          setProducts(products.products);
-          Events.substances(substance);
+        const letter = substanceName.charAt(0);
+        const substanceIndex = await substanceLoader.load(letter);
+        const substances = substanceIndex.find(s => s.name === substanceName);
+        if (substances) {
+          setProducts(substances.products);
+          Events.viewProductsForSubstance(substanceName);
         } else {
-          setProducts(ss);
-          Events.drugIndex(substance);
+          setProducts(substanceIndex);
+          Events.viewSubstancesStartingWith(letter);
         }
         if (disclaimer === 'agree') setDisclaimerAgree(true);
       })();

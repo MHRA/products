@@ -7,20 +7,20 @@ const pushToDataLayer = (dataLayer: any) => {
 };
 
 export default {
-  search: (searchTerm: string, pageNo: number) => {
+  searchForProductsMatchingKeywords: (searchTerm: string, pageNo: number) => {
     pushToDataLayer({
       event: 'search',
       searchTerm,
       pageNo,
     });
   },
-  substances: (substance: string) => {
+  viewProductsForSubstance: (substance: string) => {
     pushToDataLayer({ event: 'substance', substance });
   },
-  drugIndex: (letter: string) => {
+  viewSubstancesStartingWith: (letter: string) => {
     pushToDataLayer({ event: 'drugIndex', letter });
   },
-  page: (pageName: string) => {
+  viewPage: (pageName: string) => {
     pushToDataLayer({ event: pageName });
   },
 };
