@@ -43,7 +43,7 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 ## Deploy API pod in Kuberbetes cluster ⎈
 
 1. Navigate to this directory, `/medicines/api`
-2. Source environmental variables from the correspondent environment
+2. Source environmental variables from the corresponding environment
    ```sh
    source ./infrastructure/non-prod/.env
    ```
