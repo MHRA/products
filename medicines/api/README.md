@@ -43,25 +43,38 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 ## Deploy API pod in Kuberbetes cluster ⎈
 
 1. Navigate to this directory, `/medicines/api`
-2. Create [Kubernetes Service][kubernetes service]
+2. Source environmental variables from the correspondent environment
+   ```sh
+   source ./infrastructure/non-prod/.env
+   ```
+3. Create [Kubernetes secret][kubernetes secret] for API Pod to consume
+
+   ```sh
+   kubectl create secret generic azure-search-secrets \
+   --from-literal=AZURE_SEARCH_KEY="$AZURE_SEARCH_KEY" \
+   --from-literal=AZURE_SEARCH_INDEX="$AZURE_SEARCH_INDEX" \
+   --from-literal=AZURE_SEARCH_SERVICE="$AZURE_SEARCH_SERVICE" \
+   ```
+
+4. Create [Kubernetes Service][kubernetes service]
 
    ```sh
    kubectl apply -f ./infrastructure/non-prod/service.yml
    ```
 
-3. Deploy [Kubernetes pod][kubernetes pod] by applying a deployment
+5. Deploy [Kubernetes pod][kubernetes pod] by applying a deployment
 
    ```sh
    kubectl apply -f ./infrastructure/non-prod/deployment.yml
    ```
 
-4. Check if the pods are running
+6. Check if the pods are running
 
    ```sh
    stern api
    ```
 
-5. You should receive a health server log like this
+7. You should receive a health server log like this
 
    ```sh
    api-558646c969-9mdxp api [2020-01-20T15:02:57Z INFO  actix_web::middleware::logger] 10.244.1.1:51524 "GET /healthz HTTP/1.1" 200 2 "-" "kube-probe/1.14" 0.000059
@@ -73,6 +86,7 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 [stern]: https://github.com/wercker/stern "Stern - GitHub"
 [kubernetes service]: https://kubernetes.io/docs/concepts/services-networking/service/ "Service - Kubernetes Documentation"
 [kubernetes pod]: https://kubernetes.io/docs/concepts/workloads/pods/pod/ "Pod - Kubernetes Documentation"
+[kubernetes secret]: https://kubernetes.io/docs/concepts/configuration/secret/ "Secret - Kubernetes Documentation"
 
 ## Deploy API pod in Kuberbetes cluster via CI/CD pipeline
 
