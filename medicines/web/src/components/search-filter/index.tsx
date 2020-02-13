@@ -3,8 +3,26 @@ import styled from 'styled-components';
 import { DocType } from '../../services/azure-search';
 
 const StyledSearchFilter = styled.section`
-  input {
-    margin-right: 10px;
+  .checkbox-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 0.25em;
+
+    .checkbox {
+      flex: 0.1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.25em;
+
+      input {
+        flex: 1;
+      }
+    }
+
+    label {
+      flex: 1;
+    }
   }
 `;
 
@@ -29,19 +47,21 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
     toggleDocType(docTypeForThisCheckbox);
   const id = `filter-${docTypeForThisCheckbox.toLowerCase()}`;
   return (
-    <p>
-      <input
-        type="checkbox"
-        id={id}
-        name="doc"
-        value={docTypeForThisCheckbox}
-        checked={currentlyEnabledDocTypes.includes(docTypeForThisCheckbox)}
-        onChange={toggleDocTypeForThisCheckbox}
-      />
+    <div className="checkbox-row">
+      <div className="checkbox">
+        <input
+          type="checkbox"
+          id={id}
+          name="doc"
+          value={docTypeForThisCheckbox}
+          checked={currentlyEnabledDocTypes.includes(docTypeForThisCheckbox)}
+          onChange={toggleDocTypeForThisCheckbox}
+        />
+      </div>
       <label htmlFor={id}>
         {name} ({docTypeForThisCheckbox.toUpperCase()})
       </label>
-    </p>
+    </div>
   );
 };
 
