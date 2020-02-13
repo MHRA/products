@@ -119,31 +119,23 @@ const StyledDrugList = styled.div`
     font-style: normal;
   }
 
-  .column {
-    float: left;
-  }
-  .filter {
-    width: 40%;
-  }
-  .results {
-    width: 60%;
-  }
+  .row {
+    display: flex;
+    flex-direction: row;
 
-  /* Clear floats after the columns */
-  .row:after {
-    content: '';
-    display: table;
-    clear: both;
+    .column {
+      flex: 3;
+      &.filter {
+        flex: 1;
+      }
+    }
   }
 
   @media ${mobileBreakpoint} {
-    .column {
-      float: none;
+    .row {
+      flex-direction: column;
     }
-    .filter {
-      width: 100%;
-    }
-    .results {
+    .column.filter {
       width: 100%;
     }
   }
