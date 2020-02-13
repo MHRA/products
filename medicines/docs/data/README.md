@@ -74,7 +74,7 @@ Azure blob containers used in this project are configured to be of type RAGRS (R
 
 ## Redundancy and recovery
 
-The contents of [RAGRS Azure blob containers](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage). are automatically replicated to a second region, so that in the case of failure or lack of availability of the primary, data can be copied over or directly read from the secondary.
+The contents of [RAGRS Azure blob containers](https://docs.microsoft.com/en-us/azure/storage/common/storage-redundancy-grs#read-access-geo-redundant-storage) are automatically replicated to a second region, so that in the case of failure or lack of availability of the primary, data can be copied over or directly read from the secondary.
 
 ## Analytics
 
