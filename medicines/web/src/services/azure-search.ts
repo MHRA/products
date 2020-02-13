@@ -42,8 +42,8 @@ const extractProductLicenseRegExp: RegExp = new RegExp(
   'ig',
 );
 
-const escapeSpecialCharacters = (word: string): string =>
-  word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
+const escapeSpecialWords = (word: string): string =>
+  word.replace(/(\|\||&&|\bAND\b|\bOR\b|\bNOT\b)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
@@ -63,10 +63,13 @@ const addNormalizedProductLicenses = (q: string): string => {
   return `${q}`;
 };
 
+const splitByNonSearchableCharacters = (query: string) =>
+  query.split(/(?:[,+\-!(){}\[\]^~*?:\/]|\s+)/gi);
+
 const buildFuzzyQuery = (query: string): string => {
-  return addNormalizedProductLicenses(query)
-    .split(' ')
-    .map(word => escapeSpecialCharacters(word))
+  return splitByNonSearchableCharacters(addNormalizedProductLicenses(query))
+    .filter(x => x.length > 0)
+    .map(word => escapeSpecialWords(word))
     .map(word => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
 };
@@ -95,6 +98,7 @@ const buildSearchUrl = (
   );
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
+  url.searchParams.append('searchMode', 'all');
 
   return url.toString();
 };
@@ -113,6 +117,7 @@ const buildFacetUrl = (query: string): string => {
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
+  url.searchParams.append('searchMode', 'all');
 
   return url.toString();
 };

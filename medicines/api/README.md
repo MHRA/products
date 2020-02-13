@@ -25,18 +25,20 @@ You should also have installed:
 
 1. Navigate to this directory, `/medicines/api`
 2. Run `cargo run`
-3. Once compiled, open a browser tab and go to http://127.0.0.1:8080/healthz
+3. Once compiled, open a browser tab and go to http://127.0.0.1:8000/healthz
 4. You should see **OK** rendered on the page
 
-To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
+To see the graphql explorer, go to http://127.0.0.1:8000/graphiql.
 
 ## Running in Docker container 🐳
 
 1. Navigate to this directory, `/medicines/api`
-2. Run `docker build . -t api`
-3. Run `docker run -p 8080:8000 api`
+2. Run `docker-compose build`
+3. Run `docker-compose up`
 4. Open the browser and go to `http://localhost:8080/healthz`
-5. Yo should see an **Ok** and a server log in your terminal
+5. You should see an **Ok** and a server log in your terminal
+
+To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 
 ## Deploy API pod in Kuberbetes cluster ⎈
 
@@ -71,3 +73,12 @@ To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
 [stern]: https://github.com/wercker/stern "Stern - GitHub"
 [kubernetes service]: https://kubernetes.io/docs/concepts/services-networking/service/ "Service - Kubernetes Documentation"
 [kubernetes pod]: https://kubernetes.io/docs/concepts/workloads/pods/pod/ "Pod - Kubernetes Documentation"
+
+## Deploy API pod in Kuberbetes cluster via CI/CD pipeline
+
+We are using a [secondary pipeline](./azure-pipeline.yml) instead of the [main pipeline](../../azure-pipelines.yml) because we have created a new development environment that enables us to create and test kubernetes features.
+
+This pipeline is triggered when the following conditions are true:
+
+- a new commit is made on `master` branch
+- the commit made changes in this file path `medicines/api/*`
