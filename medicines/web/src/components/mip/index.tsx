@@ -174,7 +174,7 @@ const Mip: React.FC = () => {
     setShowingResultsForTerm('');
     setProducts(null);
     setDisclaimerAgree(false);
-    Events.page('homepage');
+    Events.viewPage('homepage');
   };
 
   useEffect(() => {

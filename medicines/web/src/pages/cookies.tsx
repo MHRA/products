@@ -37,7 +37,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  useEffect(() => Events.page('cookies'));
+  useEffect(() => Events.viewPage('cookies'));
 
   return (
     <Page title="Cookie Policy">

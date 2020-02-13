@@ -23,7 +23,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  useEffect(() => Events.page('about'));
+  useEffect(() => Events.viewPage('about'));
 
   return (
     <Page title="Products">

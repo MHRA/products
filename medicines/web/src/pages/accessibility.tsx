@@ -19,7 +19,7 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
-  useEffect(() => Events.page('accessibility'));
+  useEffect(() => Events.viewPage('accessibility'));
 
   return (
     <Page title="Accessibility Statement">
