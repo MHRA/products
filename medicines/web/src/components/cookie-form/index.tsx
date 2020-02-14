@@ -29,6 +29,7 @@ const StyledCookieForm = styled.section`
     border: 1px solid ${mhra};
     display: block;
     padding: 10px 20px;
+    cursor: pointer;
   }
 `;
 
