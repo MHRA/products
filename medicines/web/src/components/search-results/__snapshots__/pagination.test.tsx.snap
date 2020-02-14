@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pagination should render 1`] = `
+<styled.nav>
+  <ul
+    className="pagination"
+  >
+    <li
+      className="arrow"
+    >
+      <Link
+        href={
+          Object {
+            "pathname": "",
+            "query": Object {
+              "doc": "Pil|Par",
+              "page": 1,
+              "search": "Caffeine",
+            },
+          }
+        }
+      >
+        <a>
+          Previous
+        </a>
+      </Link>
+    </li>
+    <div
+      className="pagination-number"
+    >
+      <li
+        key="1"
+      >
+        <Link
+          href={
+            Object {
+              "pathname": "",
+              "query": Object {
+                "doc": "Pil|Par",
+                "page": 1,
+                "search": "Caffeine",
+              },
+            }
+          }
+        >
+          <a>
+            1
+          </a>
+        </Link>
+        <span>
+          –
+        </span>
+      </li>
+      <li
+        key="2"
+      >
+        2
+        <span>
+          –
+        </span>
+      </li>
+      <li
+        key="3"
+      >
+        <Link
+          href={
+            Object {
+              "pathname": "",
+              "query": Object {
+                "doc": "Pil|Par",
+                "page": 3,
+                "search": "Caffeine",
+              },
+            }
+          }
+        >
+          <a>
+            3
+          </a>
+        </Link>
+      </li>
+      <div
+        className="middle-group"
+      />
+      <li>
+        …
+      </li>
+      <li
+        key="6"
+      >
+        <Link
+          href={
+            Object {
+              "pathname": "",
+              "query": Object {
+                "doc": "Pil|Par",
+                "page": 6,
+                "search": "Caffeine",
+              },
+            }
+          }
+        >
+          <a>
+            6
+          </a>
+        </Link>
+      </li>
+    </div>
+    <li
+      className="arrow"
+    >
+      <Link
+        href={
+          Object {
+            "pathname": "",
+            "query": Object {
+              "doc": "Pil|Par",
+              "page": 3,
+              "search": "Caffeine",
+            },
+          }
+        }
+      >
+        <a>
+          Next
+        </a>
+      </Link>
+    </li>
+  </ul>
+</styled.nav>
+`;
