@@ -56,6 +56,12 @@ const mockIbuprofenSpcResults = () =>
     'fixture:search_results.spc.json',
   );
 
+const mockIbuprofenSpcResultsPage2 = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'`,
+    'fixture:search_results.spc.page2.json',
+  );
+
 const mockIbuprofenSpcPilResults = () =>
   cy.route(
     `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'+or+doc_type+eq+'Pil'`,
@@ -103,6 +109,22 @@ describe('Search', function() {
     cy.contains('Patient Information Leaflet (PIL)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
+  });
+
+  it('can filter SPCs then go to next page to see 2nd page filtered documents', function() {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcResultsPage2();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
   });
 });
 

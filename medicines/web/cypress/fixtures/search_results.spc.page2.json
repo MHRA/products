@@ -1,0 +1,54 @@
+{
+  "@odata.context": "https://mhraproductsdev.search.windows.net/indexes('products-index')/$metadata#docs(*)",
+  "@odata.count": 3168,
+  "value": [
+    {
+      "@search.score": 0.9,
+      "@search.highlights": {
+        "content": [
+          "My cool document's content, from Page 2",
+          "Some more cool SPC content, from Page 2"
+        ]
+      },
+      "rev_label": null,
+      "metadata_storage_path": "https://example.com/my-cool-document-spc-page2.pdf",
+      "product_name": null,
+      "created": "2015-10-26T17:22:00+00:00",
+      "release_state": "Y",
+      "keywords": "cool document test",
+      "title": "My Cool SPC Document (Page 2)",
+      "file_name": "ABC123",
+      "metadata_storage_size": 1922897,
+      "metadata_storage_name": "cc2f4e4bb346a002b98ca55cabf770dc4d435ece",
+      "doc_type": "Spc",
+      "suggestions": ["cool", "document", "test"],
+      "substance_name": [],
+      "facets": []
+    },
+    {
+      "@search.score": 0.1,
+      "@search.highlights": {
+        "content": [
+          "My friend got rich by taking pictures of fish in menswear.",
+          "It was like shooting fish in apparel.",
+          "Sometimes I tell dad jokes about SPCs.",
+          "Sometimes he laughs, even on Page 2."
+        ]
+      },
+      "rev_label": null,
+      "metadata_storage_path": "https://example.com/dad-jokes-spc-page-2.pdf",
+      "product_name": null,
+      "created": "2015-10-26T17:22:00+00:00",
+      "release_state": "Y",
+      "keywords": "dad jokes lols",
+      "title": "SPC Dad Jokes (Page 2)",
+      "file_name": "DEF456",
+      "metadata_storage_size": 1922897,
+      "metadata_storage_name": "cc2f4e4bb346a002b98ca55cabf770dc4d435ece",
+      "doc_type": "Spc",
+      "suggestions": ["warm", "document", "test"],
+      "substance_name": [],
+      "facets": []
+    }
+  ]
+}
