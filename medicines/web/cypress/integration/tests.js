@@ -127,7 +127,7 @@ describe('Search', function() {
     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
   });
 
-  it('can go to next page then filter SPCs to see 2nd page filtered documents', function() {
+  it('can go to next page then filter SPCs to see 1st page filtered documents', function() {
     cy.server();
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
@@ -139,8 +139,8 @@ describe('Search', function() {
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
-    cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
-    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
   });
 });
 

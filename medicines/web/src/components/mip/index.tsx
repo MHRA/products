@@ -200,7 +200,7 @@ const Mip: React.FC = () => {
   };
 
   useEffect(() => {
-    rerouteSearchResults(parsePage(page));
+    rerouteSearchResults(1);
   }, [enabledDocTypes]);
 
   useEffect(() => {
