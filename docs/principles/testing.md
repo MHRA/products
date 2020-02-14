@@ -13,14 +13,9 @@ Testing with external dependencies should be carried out manually.
 
 Websites should be tested by Cypress.
 
-- `/medicines/web`
-- `/learning/web`
-
 ### APIs tested by Jest
 
 GraphQL APIs should be tested by Jest.
-
-- `/medicines/api`
 
 ## Unit Testing
 
@@ -29,14 +24,9 @@ GraphQL APIs should be tested by Jest.
 JavaScript and TypeScript helpers should be tested by Jest.
 Where Typescript support is required, [Jest supports this via `@babel/preset-typescript`][jest typescript]
 
-- `/medicines/web/services`
-
 ### React componenents tested by Enzyme
 
 React components should be tested by [Enzyme via Jest][enzyme].
-
-- `/medicines/web/components`
-- `/learning/web/src/components`
 
 ### Rust tested by Rust
 
