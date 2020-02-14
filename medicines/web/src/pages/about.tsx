@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import about from '../copy/about.md';
+import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
 const StyledMain = styled.main`
@@ -23,10 +24,18 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  const [storageAllowed, setStorageAllowed] = useLocalStorage(
+    'allowStorage',
+    false,
+  );
   useEffect(() => Events.viewPage('about'));
 
   return (
-    <Page title="Products">
+    <Page
+      title="Products"
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
     </Page>
   );

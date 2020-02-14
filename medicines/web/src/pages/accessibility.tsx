@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import accessibility from '../copy/accessibility.md';
+import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
 const StyledMain = styled.main`
@@ -19,10 +20,19 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  const [storageAllowed, setStorageAllowed] = useLocalStorage(
+    'allowStorage',
+    false,
+  );
+
   useEffect(() => Events.viewPage('accessibility'));
 
   return (
-    <Page title="Accessibility Statement">
+    <Page
+      title="Accessibility Statement"
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       <StyledMain dangerouslySetInnerHTML={{ __html: accessibility }} />
     </Page>
   );
