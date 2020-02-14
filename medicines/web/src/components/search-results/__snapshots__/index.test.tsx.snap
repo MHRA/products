@@ -165,6 +165,7 @@ exports[`SearchResults should render 1`] = `
   </styled.div>
   <Pagination
     currentPage={1}
+    enabledDocTypes={Array []}
     pageSize={20}
     resultCount={200}
     searchTerm="Tea"
