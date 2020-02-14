@@ -12,6 +12,7 @@ exports[`Pdf should render 1`] = `
         onClick={null}
         target="_new"
         to="https://helpx.adobe.com/support/acrobat.html"
+        trackerNames={null}
       >
         Help viewing PDF files
       </OutboundLink>
@@ -22,6 +23,7 @@ exports[`Pdf should render 1`] = `
         onClick={null}
         target="_new"
         to="http://www.adobe.com/products/acrobat/readstep2.html"
+        trackerNames={null}
       >
         Download Acrobat reader for free
       </OutboundLink>
@@ -32,6 +34,7 @@ exports[`Pdf should render 1`] = `
         onClick={null}
         target="_new"
         to="http://www.adobe.com/products/acrobat/access_onlinetools.html"
+        trackerNames={null}
       >
         Adobe text conversion tools
       </OutboundLink>

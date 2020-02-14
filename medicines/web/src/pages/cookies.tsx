@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 // @ts-ignore
 import cookies from '../copy/cookies.md';
+import Events from '../services/events';
 import { mhra70 } from '../styles/colors';
 import { baseSpace } from '../styles/dimensions';
 
@@ -36,6 +37,8 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  useEffect(() => Events.viewPage('cookies'));
+
   return (
     <Page title="Cookie Policy">
       <StyledMain dangerouslySetInnerHTML={{ __html: cookies }} />

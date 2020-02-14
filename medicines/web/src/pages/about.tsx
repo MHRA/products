@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import about from '../copy/about.md';
+import Events from '../services/events';
 
 const StyledMain = styled.main`
   padding: ${baseSpace};
@@ -22,6 +23,8 @@ const StyledMain = styled.main`
 `;
 
 const App: React.FC = () => {
+  useEffect(() => Events.viewPage('about'));
+
   return (
     <Page title="Products">
       <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
