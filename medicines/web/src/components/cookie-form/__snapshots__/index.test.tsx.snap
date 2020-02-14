@@ -45,10 +45,9 @@ exports[`CookieForm should render 🍪 1`] = `
       }
     />
     <p>
-      <input
-        type="submit"
-        value="Save your preferences"
-      />
+      <button>
+        Save your preferences
+      </button>
     </p>
   </form>
 </styled.section>
@@ -99,10 +98,9 @@ exports[`CookieForm should render 🚫 1`] = `
       }
     />
     <p>
-      <input
-        type="submit"
-        value="Save your preferences"
-      />
+      <button>
+        Save your preferences
+      </button>
     </p>
   </form>
 </styled.section>

@@ -21,7 +21,7 @@ const StyledCookieForm = styled.section`
     }
   }
 
-  input[type='submit'] {
+  button {
     appearance: none;
     color: ${mhraWhite};
     background-color: ${primaryColor};
@@ -84,10 +84,10 @@ const CookieForm: React.FC<ICookieForm> = props => {
       for (const cookieName of Object.keys(cookies.getAll())) {
         cookies.remove(cookieName);
       }
-
-      // Reload the page. Seems to be the only way to stop analytics.
-      window.location.href = '/cookies';
     }
+
+    // Navigate to the home page. Seems to be the only way to stop analytics.
+    window.location.href = '/';
   };
 
   const handleCookiesOn = () => {
@@ -131,7 +131,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
           dangerouslySetInnerHTML={{ __html: cookiesTable }}
         />
         <p>
-          <input type="submit" value="Save your preferences" />
+          <button>Save your preferences</button>
         </p>
       </form>
     </StyledCookieForm>
