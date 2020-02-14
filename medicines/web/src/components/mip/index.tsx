@@ -9,6 +9,10 @@ import {
   ISearchFilters,
 } from '../../services/azure-search';
 import Events from '../../services/events';
+import {
+  docTypesToFilter,
+  parsePage,
+} from '../../services/querystring-interpreter';
 import { convertResults, IDocument } from '../../services/results-converter';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
@@ -36,14 +40,6 @@ const StyledMip = styled.div`
     }
   }
 `;
-
-const formatDocTypeFilters = (s: string): DocType[] => {
-  if (s.length <= 0) {
-    return [];
-  }
-
-  return s.split(',').map(d => DocType[d as keyof typeof DocType]);
-};
 
 const Mip: React.FC = () => {
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -149,18 +145,12 @@ const Mip: React.FC = () => {
     page: string | string[],
   ) => {
     if (typeof searchTerm === 'string') {
-      let parsedPage = Number(page);
-      if (!parsedPage || parsedPage < 1) {
-        parsedPage = 1;
-      }
       setHasIntro(false);
       setSearch(formatSearchTerm(searchTerm));
+      const parsedPage = parsePage(page);
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      const docTypesToIncludeInSearch =
-        typeof queryDocFilter === 'string' && queryDocFilter.length > 0
-          ? formatDocTypeFilters(queryDocFilter)
-          : null;
+      const docTypesToIncludeInSearch = docTypesToFilter(queryDocFilter);
       if (docTypesToIncludeInSearch !== null) {
         setEnabledDocTypes(docTypesToIncludeInSearch);
       }
