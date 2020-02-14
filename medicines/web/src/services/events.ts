@@ -6,12 +6,17 @@ const pushToDataLayer = (dataLayer: any) => {
   });
 };
 
+interface ISearchEvent {
+  searchTerm: string;
+  pageNo: number;
+  docTypes: string;
+}
+
 export default {
-  searchForProductsMatchingKeywords: (searchTerm: string, pageNo: number) => {
+  searchForProductsMatchingKeywords: (searchEvent: ISearchEvent) => {
     pushToDataLayer({
       event: 'search',
-      searchTerm,
-      pageNo,
+      ...searchEvent,
     });
   },
   viewProductsForSubstance: (substance: string) => {

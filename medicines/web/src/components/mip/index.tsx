@@ -159,7 +159,11 @@ const Mip: React.FC = () => {
         docType: docTypesToIncludeInSearch,
         sortOrder: 'a-z',
       });
-      Events.searchForProductsMatchingKeywords(search, parsedPage);
+      Events.searchForProductsMatchingKeywords({
+        searchTerm: search,
+        pageNo: parsedPage,
+        docTypes: queryStringFromDocTypes(docTypesToIncludeInSearch),
+      });
     }
   };
 
