@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactGA from 'react-ga-gtm';
+import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { primaryColor } from '../../styles/colors';
 import { baseSpace } from '../../styles/dimensions';

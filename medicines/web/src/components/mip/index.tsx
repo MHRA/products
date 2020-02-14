@@ -1,10 +1,11 @@
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
-import ReactGA from 'react-ga-gtm';
+import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import { docSearch, ISearchResult } from '../../services/azure-search';
+import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 import DrugIndex, { index } from '../drug-index';
@@ -126,48 +127,66 @@ const Mip: React.FC = () => {
     });
   };
 
+  const loadSearchResults = async (
+    searchTerm: string | string[],
+    page: string | string[],
+  ) => {
+    if (typeof searchTerm === 'string') {
+      let parsedPage = Number(page);
+      if (!parsedPage || parsedPage < 1) {
+        parsedPage = 1;
+      }
+      setHasIntro(false);
+      setSearch(formatSearchTerm(searchTerm));
+      setPageNumber(parsedPage);
+      if (disclaimer === 'agree') setDisclaimerAgree(true);
+      await fetchSearchResults(searchTerm, parsedPage);
+      Events.searchForProductsMatchingKeywords(search, parsedPage);
+    }
+  };
+
+  const loadSubstancePage = async (substanceName: string | string[]) => {
+    if (typeof substanceName === 'string') {
+      (async () => {
+        setHasIntro(false);
+        setResults([]);
+        setSearch('');
+        setShowingResultsForTerm('');
+        const letter = substanceName.charAt(0);
+        const substanceIndex = await substanceLoader.load(letter);
+        const substances = substanceIndex.find(s => s.name === substanceName);
+        if (substances) {
+          setProducts(substances.products);
+          Events.viewProductsForSubstance(substanceName);
+        } else {
+          setProducts(substanceIndex);
+          Events.viewSubstancesStartingWith(letter);
+        }
+        if (disclaimer === 'agree') setDisclaimerAgree(true);
+      })();
+    }
+  };
+
+  const loadHomepage = () => {
+    setHasIntro(true);
+    setResults([]);
+    setSearch('');
+    setShowingResultsForTerm('');
+    setProducts(null);
+    setDisclaimerAgree(false);
+    Events.viewPage('homepage');
+  };
+
   useEffect(() => {
     if (searchTerm && page) {
-      if (typeof searchTerm === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setSearch(formatSearchTerm(searchTerm));
-          let parsedPage = Number(page);
-          if (!parsedPage || parsedPage < 1) {
-            parsedPage = 1;
-          }
-          setPageNumber(parsedPage);
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(searchTerm, parsedPage);
-        })();
-      }
+      loadSearchResults(searchTerm, page);
     } else if (substance) {
-      if (typeof substance === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setResults([]);
-          setSearch('');
-          setShowingResultsForTerm('');
-          const ss = await substanceLoader.load(substance.charAt(0));
-          const products = ss.find(s => s.name === substance);
-          if (products) {
-            setProducts(products.products);
-          } else {
-            setProducts(ss);
-          }
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-        })();
-      }
+      loadSubstancePage(substance);
     } else {
-      setHasIntro(true);
-      setResults([]);
-      setSearch('');
-      setShowingResultsForTerm('');
-      setProducts(null);
-      setDisclaimerAgree(false);
+      loadHomepage();
     }
     window.scrollTo(0, 0);
-  }, [page, searchTerm, substance, disclaimerAgree]);
+  }, [page, searchTerm, substance, disclaimer]);
 
   return (
     <StyledMip>

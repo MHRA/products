@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import React from 'react';
-import ReactGA from 'react-ga-gtm';
+import ReactGA from 'react-ga';
 import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
@@ -62,6 +62,7 @@ const App: React.FC<IPageProps> = props => {
   if (props.storageAllowed) {
     TagManager.initialize({
       gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
+      dataLayerName: 'dataLayer',
     });
     ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
       debug: true,

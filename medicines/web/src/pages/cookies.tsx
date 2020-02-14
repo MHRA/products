@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import CookieForm from '../components/cookie-form';
 import Page from '../components/page';
 // @ts-ignore
 import cookies from '../copy/cookies.md';
 import { useLocalStorage } from '../hooks';
+import Events from '../services/events';
 import { mhra70 } from '../styles/colors';
 import { baseSpace } from '../styles/dimensions';
 
@@ -24,6 +25,9 @@ const App: React.FC = () => {
     'allowStorage',
     false,
   );
+
+  useEffect(() => Events.viewPage('cookies'));
+
   return (
     <Page
       title="Cookie Policy"

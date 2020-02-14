@@ -1,6 +1,7 @@
 import { default as BaseApp } from 'next/app';
 import Router from 'next/router';
 import ReactGA from 'react-ga-gtm';
+import TagManager from 'react-gtm-module';
 
 class App extends BaseApp {
   public componentDidMount(): void {
