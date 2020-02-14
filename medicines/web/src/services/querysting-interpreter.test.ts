@@ -1,5 +1,9 @@
 import { DocType } from './azure-search';
-import { docTypesToFilter, parsePage } from './querystring-interpreter';
+import {
+  docTypesFromQueryString,
+  parsePage,
+  queryStringFromDocTypes,
+} from './querystring-interpreter';
 
 describe(parsePage, () => {
   it('interprets blank as 1', () => {
@@ -11,11 +15,27 @@ describe(parsePage, () => {
   });
 });
 
-describe(docTypesToFilter, () => {
-  it('can separate by comma', () => {
-    expect(docTypesToFilter('Par,Pil')).toStrictEqual([
+describe(docTypesFromQueryString, () => {
+  it('can separate by pipe', () => {
+    expect(docTypesFromQueryString('Par|Pil')).toStrictEqual([
       DocType.Par,
       DocType.Pil,
     ]);
+  });
+
+  it('gives empty filters for empty string', () => {
+    expect(docTypesFromQueryString('')).toStrictEqual([]);
+  });
+});
+
+describe(queryStringFromDocTypes, () => {
+  it('can join by pipe', () => {
+    expect(queryStringFromDocTypes([DocType.Par, DocType.Pil])).toStrictEqual(
+      'Par|Pil',
+    );
+  });
+
+  it('gives empty string for empty filters', () => {
+    expect(queryStringFromDocTypes([])).toStrictEqual('');
   });
 });
