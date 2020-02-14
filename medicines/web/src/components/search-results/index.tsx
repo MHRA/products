@@ -339,6 +339,7 @@ const SearchResults = (props: {
           pageSize={pageSize}
           resultCount={resultCount}
           searchTerm={searchTerm}
+          enabledDocTypes={docTypes}
         />
       ) : (
         ''

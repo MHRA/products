@@ -8,16 +8,27 @@ export const parsePage = (page: string | string[]) => {
   return parsedPage;
 };
 
+const docTypeQueryStringSeparator = '|';
+
 const formatDocTypeFilters = (s: string): DocType[] => {
   if (s.length <= 0) {
     return [];
   }
 
-  return s.split(',').map(d => DocType[d as keyof typeof DocType]);
+  return s
+    .split(docTypeQueryStringSeparator)
+    .map(d => DocType[d as keyof typeof DocType]);
 };
 
-export const docTypesToFilter = (queryDocFilter: string | string[]) => {
+export const queryStringFromDocTypes = (enabledDocTypes: DocType[]): string =>
+  enabledDocTypes.length > 0
+    ? enabledDocTypes.join(docTypeQueryStringSeparator)
+    : '';
+
+export const docTypesFromQueryString = (
+  queryDocFilter: string | string[],
+): DocType[] => {
   return typeof queryDocFilter === 'string' && queryDocFilter.length > 0
     ? formatDocTypeFilters(queryDocFilter)
-    : null;
+    : [];
 };

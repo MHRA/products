@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
+import { DocType } from '../../services/azure-search';
+import { queryStringFromDocTypes } from '../../services/querystring-interpreter';
 import { mhra70, mhraBlue, mhraWhite, primaryColor } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { getPaginationGroups } from './pagination-groups';
@@ -68,6 +70,7 @@ const Pagination = (props: {
   resultCount: number;
   pageSize: number;
   currentPage: number;
+  enabledDocTypes: DocType[];
 }) => {
   const pageCount = Math.floor(props.resultCount / props.pageSize) + 1;
   const { firstGroup, middleGroup, lastGroup } = getPaginationGroups(
@@ -99,7 +102,11 @@ const Pagination = (props: {
 
   const getSearchPage = (pageNo: number) => ({
     pathname: '',
-    query: { search: props.searchTerm, page: pageNo },
+    query: {
+      search: props.searchTerm,
+      page: pageNo,
+      doc: queryStringFromDocTypes(props.enabledDocTypes),
+    },
   });
 
   return (

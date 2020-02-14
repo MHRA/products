@@ -10,8 +10,9 @@ import {
 } from '../../services/azure-search';
 import Events from '../../services/events';
 import {
-  docTypesToFilter,
+  docTypesFromQueryString,
   parsePage,
+  queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
 import { convertResults, IDocument } from '../../services/results-converter';
 import substanceLoader from '../../services/substance-loader';
@@ -135,7 +136,7 @@ const Mip: React.FC = () => {
       query: {
         search,
         page: pageNo,
-        doc: enabledDocTypes.length > 0 ? enabledDocTypes.join(',') : null,
+        doc: queryStringFromDocTypes(enabledDocTypes),
       },
     });
   };
@@ -150,7 +151,7 @@ const Mip: React.FC = () => {
       const parsedPage = parsePage(page);
       setPageNumber(parsedPage);
       if (disclaimer === 'agree') setDisclaimerAgree(true);
-      const docTypesToIncludeInSearch = docTypesToFilter(queryDocFilter);
+      const docTypesToIncludeInSearch = docTypesFromQueryString(queryDocFilter);
       if (docTypesToIncludeInSearch !== null) {
         setEnabledDocTypes(docTypesToIncludeInSearch);
       }
