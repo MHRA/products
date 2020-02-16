@@ -30,6 +30,7 @@ Insert User story here
 ### Exit Criteria met 
 - [ ] Backlog
 - [ ] Discovery
+- [ ] DUXD
 - [ ] Development 
 - [ ] Quality Assurance 
 - [ ] Release and Validate
