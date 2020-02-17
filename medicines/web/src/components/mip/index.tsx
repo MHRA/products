@@ -128,6 +128,7 @@ const Mip: React.FC = () => {
       currentlyEnabledDocTypes.push(docTypeToToggle);
     }
     setEnabledDocTypes(currentlyEnabledDocTypes);
+    setPageNumber(1);
   };
 
   const rerouteSearchResults = (pageNo: number) => {
@@ -200,7 +201,7 @@ const Mip: React.FC = () => {
   };
 
   useEffect(() => {
-    rerouteSearchResults(1);
+    rerouteSearchResults(pageNumber);
   }, [enabledDocTypes]);
 
   useEffect(() => {
