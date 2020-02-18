@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Link should render 🍪 1`] = `
+exports[`Link should render 1`] = `
 <Styled(styled.a)
   href="infinity"
   rel="noopener noreferrer"

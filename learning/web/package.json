@@ -78,6 +78,7 @@
     "serve": "gatsby serve",
     "start": "yarn run develop",
     "test-e2e": "yarn dev & wait-on http://localhost:8000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
-    "test": "yarn jest"
+    "test": "yarn jest",
+    "test:ci": "yarn jest --coverage --ci"
   }
 }

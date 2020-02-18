@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Expander should render 🍪 1`] = `
+exports[`Expander should render 1`] = `
 <styled.div>
   <styled.button
     onClick={[Function]}
