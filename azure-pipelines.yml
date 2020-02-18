@@ -15,7 +15,7 @@ stages:
         dependsOn: []
         pool:
           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04 
+          vmImage: ubuntu-16.04
 
         steps:
           - script: |
@@ -97,20 +97,19 @@ stages:
         dependsOn: []
         pool:
           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04 
+          vmImage: ubuntu-16.04
         variables:
           GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
           GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
         steps:
-
           - script: |
-              yarn && yarn build
+              yarn --frozen-lockfile && yarn build
             displayName: Build learning web (master)
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
           - script: |
-              export PATH_PREFIX=$(Build.SourceBranchName) && yarn && yarn build
+              export PATH_PREFIX=$(Build.SourceBranchName) && yarn --frozen-lockfile && yarn build
             displayName: Build learning web (branch)
             condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
             workingDirectory: $(Build.SourcesDirectory)/learning/web
@@ -118,6 +117,11 @@ stages:
           - script: |
               yarn a11y
             displayName: Check accessibility
+            workingDirectory: $(Build.SourcesDirectory)/learning/web
+
+          - script: |
+              yarn test:ci
+            displayName: Run unit tests
             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
           - script: |
@@ -240,7 +244,7 @@ stages:
         dependsOn: []
         pool:
           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04 
+          vmImage: ubuntu-16.04
         steps:
           - script: |
               set -xeo pipefail
@@ -266,7 +270,7 @@ stages:
         dependsOn: []
         pool:
           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04 
+          vmImage: ubuntu-16.04
         steps:
           - script: |
               set -xeo pipefail

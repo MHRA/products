@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout should render 1`] = `
+<styled.div>
+  <CookieBanner />
+  <styled.header>
+    <styled.div>
+      <HeaderLogoLink />
+      <h1>
+        Hola
+      </h1>
+    </styled.div>
+  </styled.header>
+  <styled.main>
+    <styled.div>
+      <styled.div>
+        <Sidebar
+          location={
+            Object {
+              "pathname": "test",
+            }
+          }
+        />
+        <styled.div />
+      </styled.div>
+    </styled.div>
+  </styled.main>
+  <styled.footer>
+    <styled.div>
+      <styled.picture>
+        <SvgAgencyDigitalLogo />
+      </styled.picture>
+      <styled.nav>
+        <ul>
+          <li>
+            <p>
+              <mockConstructor
+                to="/cookies"
+              >
+                Cookie Policy
+              </mockConstructor>
+            </p>
+          </li>
+          <li>
+            <p>
+              <a
+                href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Privacy Policy
+              </a>
+            </p>
+          </li>
+          <li>
+            <p>
+              <mockConstructor
+                to="/accessibility"
+              >
+                Accessibility Statement
+              </mockConstructor>
+            </p>
+          </li>
+        </ul>
+      </styled.nav>
+    </styled.div>
+  </styled.footer>
+</styled.div>
+`;
