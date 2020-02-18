@@ -4,5 +4,6 @@ members = [
     "search",
 ]
 exclude = [
-    "api"
+    "api",
+    "doc-index-updater"
 ]
