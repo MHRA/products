@@ -117,9 +117,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "doc-index-updater"
+name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
+ "serde",
+ "serde_derive",
  "tokio",
  "uuid",
  "warp",
