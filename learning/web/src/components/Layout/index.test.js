@@ -5,7 +5,7 @@ import { shallow } from "enzyme"
 const location = { pathname: "test" }
 
 describe(Layout, () => {
-  it("should render 🍪", () => {
+  it("should render", () => {
     const component = shallow(
       <Layout
         location={location}

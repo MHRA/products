@@ -3,7 +3,7 @@ import Link from "./index"
 import { shallow } from "enzyme"
 
 describe(Link, () => {
-  it("should render 🍪", () => {
+  it("should render", () => {
     const component = shallow(
       <Link
         children={<> </>}
