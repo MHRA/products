@@ -25,6 +25,8 @@ const drugsMock = [
   },
 ];
 
+const noFeedback = () => {};
+
 describe(SearchResults, () => {
   it('should render', () => {
     const component = shallow(
@@ -36,6 +38,8 @@ describe(SearchResults, () => {
         searchTerm={'Tea'}
         showingResultsForTerm={'Tea'}
         disclaimerAgree
+        docTypes={[]}
+        handleDocTypeCheckbox={noFeedback}
       />,
     );
     expect(component).toMatchSnapshot();
