@@ -1,3 +1,3 @@
 fn main() {
-    doc_index_updater::hello()
+    doc_index_updater::serve()
 }
