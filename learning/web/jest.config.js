@@ -16,6 +16,7 @@ module.exports = {
   globals: {
     __PATH_PREFIX__: ``,
   },
+  roots: ["<rootDir>/src/", "<rootDir>/config/"],
   testURL: `http://localhost`,
   setupFiles: [`<rootDir>/config/loadershim.js`, "<rootDir>/config/enzyme.js"],
   snapshotSerializers: ["enzyme-to-json/serializer"],
