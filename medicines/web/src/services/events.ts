@@ -4,6 +4,16 @@ const pushToDataLayer = (dataLayer: any) => {
   TagManager.dataLayer({
     dataLayer,
   });
+  recordHistoryForNextEvent(dataLayer.event);
+};
+
+const recordHistoryForNextEvent = (event: string) => {
+  TagManager.dataLayer({
+    dataLayer: {
+      previousEvent: event,
+      pageCategory: event,
+    },
+  });
 };
 
 interface ISearchEvent {
