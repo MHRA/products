@@ -4,6 +4,12 @@ const pushToDataLayer = (dataLayer: any) => {
   TagManager.dataLayer({
     dataLayer,
   });
+  TagManager.dataLayer({
+    dataLayer: {
+      previousEvent: dataLayer.event,
+      pageCategory: dataLayer.event,
+    },
+  });
 };
 
 export default {
