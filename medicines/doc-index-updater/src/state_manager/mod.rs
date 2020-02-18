@@ -23,6 +23,6 @@ pub async fn serve() {
             status: JobStatus::Accepted,
         })
     });
-
-    warp::serve(job_status).run(([127, 0, 0, 1], 3030)).await;
+    let routes = job_status.with(warp::log("doc_index_updater"));
+    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
 }
