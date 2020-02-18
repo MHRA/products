@@ -1,5 +1,5 @@
-# Setup rust build environment
-FROM rust:1.41.0 AS build-context
+
+FROM rust:1.40 AS build
 
 WORKDIR /usr/src/api
 
@@ -20,8 +20,13 @@ RUN cargo fetch
 RUN cargo build --release && \
   rm -rf ./target/release/.fingerprint/api-*
 
-# Setup debian release environment
-FROM debian:buster-slim AS release-context
+# Build real binaries now
+COPY ./src ./src
+
+RUN cargo build --release
+
+# ---------------------------------
+FROM debian:buster-slim AS release
 
 RUN apt-get update && apt-get install -y \
   tini \
@@ -31,25 +36,6 @@ RUN apt-get update && apt-get install -y \
   ;
 
 RUN useradd svc
-
-ARG AZURE_SEARCH_INDEX
-ARG AZURE_SEARCH_KEY
-ARG AZURE_SEARCH_SERVICE
-
-ENV AZURE_SEARCH_INDEX=${AZURE_SEARCH_INDEX}
-ENV AZURE_SEARCH_KEY=${AZURE_SEARCH_KEY}
-ENV AZURE_SEARCH_SERVICE=${AZURE_SEARCH_SERVICE}
-ENV PORT=8000
-
-# Build real binaries now, as late as possible
-FROM build-context AS build
-
-COPY ./src ./src
-
-RUN cargo build --release
-
-# Create the release
-FROM release-context AS release
 
 COPY --from=build /usr/src/api/target/release/api /
 

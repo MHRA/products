@@ -33,3 +33,19 @@ spec:
             limits:
               cpu: 250m
               memory: 256Mi
+          env:
+            - name: AZURE_SEARCH_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secrets
+                  key: AZURE_SEARCH_KEY
+            - name: AZURE_SEARCH_INDEX
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secrets
+                  key: AZURE_SEARCH_INDEX
+            - name: AZURE_SEARCH_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secrets
+                  key: AZURE_SEARCH_SERVICE
