@@ -4,10 +4,14 @@ const pushToDataLayer = (dataLayer: any) => {
   TagManager.dataLayer({
     dataLayer,
   });
+  recordHistoryForNextEvent(dataLayer.event);
+};
+
+const recordHistoryForNextEvent = (event: string) => {
   TagManager.dataLayer({
     dataLayer: {
-      previousEvent: dataLayer.event,
-      pageCategory: dataLayer.event,
+      previousEvent: event,
+      pageCategory: event,
     },
   });
 };
