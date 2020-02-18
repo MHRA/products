@@ -34,11 +34,11 @@ exports[`Layout should render 🍪 1`] = `
         <ul>
           <li>
             <p>
-              <ForwardRef
+              <mockConstructor
                 to="/cookies"
               >
                 Cookie Policy
-              </ForwardRef>
+              </mockConstructor>
             </p>
           </li>
           <li>
@@ -54,11 +54,11 @@ exports[`Layout should render 🍪 1`] = `
           </li>
           <li>
             <p>
-              <ForwardRef
+              <mockConstructor
                 to="/accessibility"
               >
                 Accessibility Statement
-              </ForwardRef>
+              </mockConstructor>
             </p>
           </li>
         </ul>
