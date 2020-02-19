@@ -9,7 +9,7 @@ enum JobStatus {
     Accepted,
     Done,
     NotFound,
-    _Error { message: String, code: String },
+    Error { message: String, code: String },
 }
 
 impl FromStr for JobStatus {
@@ -18,7 +18,10 @@ impl FromStr for JobStatus {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
             "Done" => Ok(JobStatus::Done),
-            _ => Ok(JobStatus::NotFound),
+            t => Ok(JobStatus::Error {
+                message: t.to_owned(),
+                code: "0x0".to_owned(),
+            }),
         }
     }
 }
