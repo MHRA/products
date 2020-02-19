@@ -7,6 +7,7 @@ enum JobStatus {
     Accepted,
     _Done,
     _NotFound,
+    _Error { message: String, code: String },
 }
 
 #[derive(Serialize)]
