@@ -45,9 +45,7 @@ fn get_from_redis(id: Uuid) -> redis::RedisResult<JobStatus> {
     let client = redis::Client::open("redis://127.0.0.1:6379/")?;
     let mut con = client.get_connection()?;
 
-    Ok(con
-        .get(id.as_u128().to_string())
-        .unwrap_or(JobStatus::NotFound))
+    Ok(con.get(id.to_string()).unwrap_or(JobStatus::NotFound))
 }
 
 fn handler(id: Uuid) -> impl Reply {
