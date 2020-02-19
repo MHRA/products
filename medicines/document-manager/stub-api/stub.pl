@@ -1,29 +1,26 @@
 use Dancer2;
-use Data::Dumper;
 use XML::Simple qw(:strict);
+use UUID::Tiny ':std';
 set serializer => 'XML';
 
-my %documents_statuses;
+my %documents;
+my %jobs_statuses;
 
-get '/documents/:document' => sub {
-    my $document = route_parameters->get('document');
-    if (exists($documents_statuses{$document})) {
+get '/jobs/:job' => sub {
+    my $job_id = route_parameters->get('job');
+    if (exists($jobs_statuses{$job_id})) {
         my $self = shift;
-        $self->{'serializer_engine'}->{'xml_options'}->{'serialize'} =
+        $self->{serializer_engine}->{xml_options}->{serialize} =
             {RootName => 'document', NoAttr => 1};
 
-        my $status = $documents_statuses{$document};
+        my $status = $jobs_statuses{$job_id};
 
-        if ($status eq 'fetching') {
-            $documents_statuses{$document} = 'staged';
-        } elsif ($status eq 'deleting') {
-            $documents_statuses{$document} = 'deleted';
-        } elsif ($status eq 'staged') {
-            $documents_statuses{$document} = 'checked-in';
+        if ($status->{status} eq 'accepted') {
+            $jobs_statuses{$job_id}->{status} = 'done';
         }
 
         status 'ok';
-        return {id => $document, status => $status};
+        return {id => $job_id, status => $status->{status}};
     } else {
         status 'not_found';
         return '';
@@ -31,8 +28,14 @@ get '/documents/:document' => sub {
 };
 
 del '/documents/:document' => sub {
-    if (exists($documents_statuses{route_parameters->get('document')})) {
-        $documents_statuses{route_parameters->get('document')} = 'deleting';
+    my $document_id = route_parameters->get('document');
+
+    if (exists($documents{$document_id})) {
+        delete($documents{$document_id});
+
+        my $job_id = create_uuid_as_string(UUID_V4);
+        $jobs_statuses{$job_id} = {document_id => $document_id, status => 'accepted'};
+
         status 'accepted';
         return '';
     } else {
@@ -43,20 +46,21 @@ del '/documents/:document' => sub {
 
 post '/documents' => sub {
     my $self = shift;
-    $self->{'serializer_engine'}->{'xml_options'}->{'serialize'} =
+    $self->{serializer_engine}->{xml_options}->{serialize} =
         {RootName => 'document', NoAttr => 1};
 
     my $document = XMLin(
         request->body,
         KeyAttr    => [],
-        ForceArray => ['keyword', 'active_substance'],
+        ForceArray => ['keyword', 'products', 'active_substance'],
         GroupTags  => {
             keywords          => 'keyword',
-            active_substances => 'active_substance'
+            active_substances => 'active_substance',
+            'products'        => 'product'
         }
     );
 
-    my @expected_fields = ('id', 'name', 'type', 'author', 'product_name', 'pl_number', 'active_substances', 'file_source', 'file_path');
+    my @expected_fields = ('id', 'name', 'type', 'author', 'products', 'pl_number', 'active_substances', 'file_source', 'file_path');
 
     for my $expected_field (@expected_fields) {
         if (!defined($document->{$expected_field})) {
@@ -65,30 +69,17 @@ post '/documents' => sub {
         }
     }
 
-    if (defined($documents_statuses{$document->{id}}) && $documents_statuses{$document->{id}} ne 'deleted') {
+    if (defined($documents{$document->{id}})) {
         status 'conflict';
         return {error => "Document $document->{id} already exists."};
     }
 
-    $documents_statuses{$document->{id}} = 'fetching';
+    my $job_id = create_uuid_as_string(UUID_V4);
+    $jobs_statuses{$job_id} = {document_id => $document->{id}, status => 'accepted'};
+    $documents{$document->{id}} = $document;
 
     status 'accepted';
-    return '';
+    return {job_id => $job_id, document_id => $document->{id}};
 };
 
-sub reset_statuses {
-    %documents_statuses = (
-        con10101010 => 'checked-in',
-        con20202020 => 'deleted',
-        con30303030 => 'fetching',
-        con40404040 => 'deleting',
-        con50505050 => 'failed'
-    );
-};
-
-put '/documents/reset' => sub {
-    reset_statuses;
-};
-
-reset_statuses;
 dance;
