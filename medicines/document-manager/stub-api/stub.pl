@@ -1,26 +1,27 @@
 use Dancer2;
 use XML::Simple qw(:strict);
 use UUID::Tiny ':std';
+use Storable 'dclone';
 set serializer => 'XML';
 
 my %documents;
-my %jobs_statuses;
+my %jobs;
 
 get '/jobs/:job' => sub {
     my $job_id = route_parameters->get('job');
-    if (exists($jobs_statuses{$job_id})) {
+    if (exists($jobs{$job_id})) {
         my $self = shift;
-        $self->{serializer_engine}->{xml_options}->{serialize} =
-            {RootName => 'document', NoAttr => 1};
+        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
 
-        my $status = $jobs_statuses{$job_id};
+        my $status = $jobs{$job_id};
+        my $resp = dclone $status;
 
         if ($status->{status} eq 'accepted') {
-            $jobs_statuses{$job_id}->{status} = 'done';
+            $jobs{$job_id}->{status} = 'done';
         }
 
         status 'ok';
-        return {id => $job_id, status => $status->{status}};
+        return $resp;
     } else {
         status 'not_found';
         return '';
@@ -31,13 +32,23 @@ del '/documents/:document' => sub {
     my $document_id = route_parameters->get('document');
 
     if (exists($documents{$document_id})) {
+        my $self = shift;
+        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
+
         delete($documents{$document_id});
 
         my $job_id = create_uuid_as_string(UUID_V4);
-        $jobs_statuses{$job_id} = {document_id => $document_id, status => 'accepted'};
+        my $job = {
+            job_id      => $job_id,
+            job_uri     => uri_for("/jobs/$job_id"),
+            document_id => $document_id,
+            status      => 'accepted',
+            type        => 'delete'
+        };
+        $jobs{$job_id} = $job;
 
         status 'accepted';
-        return '';
+        return $jobs{$job_id};
     } else {
         status 'not_found';
         return '';
@@ -46,10 +57,9 @@ del '/documents/:document' => sub {
 
 post '/documents' => sub {
     my $self = shift;
-    $self->{serializer_engine}->{xml_options}->{serialize} =
-        {RootName => 'document', NoAttr => 1};
+    $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
 
-    my $document = XMLin(
+    my $doc = XMLin(
         request->body,
         KeyAttr    => [],
         ForceArray => ['keyword', 'products', 'active_substance'],
@@ -63,23 +73,30 @@ post '/documents' => sub {
     my @expected_fields = ('id', 'name', 'type', 'author', 'products', 'pl_number', 'active_substances', 'file_source', 'file_path');
 
     for my $expected_field (@expected_fields) {
-        if (!defined($document->{$expected_field})) {
+        if (!defined($doc->{$expected_field})) {
             status 'unprocessable_entity';
             return {error => "Expected '$expected_field' in request."};
         }
     }
 
-    if (defined($documents{$document->{id}})) {
+    if (defined($documents{$doc->{id}})) {
         status 'conflict';
-        return {error => "Document $document->{id} already exists."};
+        return {error => "Document $doc->{id} already exists."};
     }
 
     my $job_id = create_uuid_as_string(UUID_V4);
-    $jobs_statuses{$job_id} = {document_id => $document->{id}, status => 'accepted'};
-    $documents{$document->{id}} = $document;
+    my $job = {
+        job_id      => $job_id,
+        job_uri     => uri_for("/jobs/$job_id"),
+        document_id => $doc->{id},
+        type        => 'check-in',
+        status      => 'accepted'
+    };
+    $jobs{$job_id} = $job;
+    $documents{$doc->{id}} = $doc;
 
     status 'accepted';
-    return {job_id => $job_id, document_id => $document->{id}};
+    return $job;
 };
 
 dance;
