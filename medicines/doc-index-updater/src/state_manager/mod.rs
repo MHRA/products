@@ -1,6 +1,6 @@
 use serde_derive::Serialize;
 use uuid::Uuid;
-use warp::Filter;
+use warp::{Filter, Rejection, Reply};
 
 #[derive(Serialize)]
 enum JobStatus {
@@ -16,17 +16,13 @@ struct JobStatusResponse {
     status: JobStatus,
 }
 
-fn handler(id: Uuid) -> impl warp::reply::Reply {
+fn handler(id: Uuid) -> impl Reply {
     warp::reply::json(&JobStatusResponse {
         id,
         status: JobStatus::Accepted,
     })
 }
 
-#[tokio::main]
-pub async fn serve() {
-    let routes = warp::path!("jobs" / Uuid)
-        .map(handler)
-        .with(warp::log("doc_index_updater"));
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
+pub fn routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("jobs" / Uuid).map(handler)
 }

@@ -1,3 +1,1 @@
-mod state_manager;
-
-pub use state_manager::serve;
+pub mod state_manager;
