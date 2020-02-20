@@ -52,6 +52,17 @@ module cpd {
   namespace           = local.cpd_name_space
 }
 
+# Doc Index Updater
+module doc_index_updater {
+  source = "../../modules/dip"
+
+  client_id           = local.client_id
+  client_secret       = local.client_secret
+  environment         = local.environment
+  location            = local.location
+  resource_group_name = local.resource_group_name
+}
+
 
 
 

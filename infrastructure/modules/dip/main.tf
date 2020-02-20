@@ -1,5 +1,5 @@
 locals {
-  name = "doc-index-updater"
+  name = "dip"
 }
 
 
@@ -16,7 +16,7 @@ resource "azurerm_public_ip" "doc_index_updater_ip" {
 }
 
 resource "azurerm_kubernetes_cluster" "doc_index_updater_cluster" {
-  name                = "${local.name}-cluster"
+  name                = local.name
   location            = var.location
   dns_prefix          = var.environment
   resource_group_name = var.resource_group_name
