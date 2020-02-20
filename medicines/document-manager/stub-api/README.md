@@ -71,36 +71,41 @@ $ envsubst < manifests/svc.yaml | kubectl apply -f -
 
 ## Endpoints
 
-### GET /documents/:document
+### GET /jobs/:job_id
 
-Retrieves the status for :document. Sample documents are con10101010, 
-con20202020, con30303030, con40404040, and con50505050.
+Returns the status of a job specified by :job_id.
 
-Statuses are:
+Sample response:
 
-- `fetching` - indicates that a document needs to be retrieved from the
-source;
-- `staged` - indicates that a document has been retrieved, and needs to be 
-uploaded;
-- `checked-in` - indicates that a document has been uploaded to Blob storage;
-- `deleting` - indicates that a document needs to be deleted from Blob 
-storage;
-- `deleted` - indicates that a document has been deleted from Blob storage.
-
-**Note: This endpoint is designed to be polled in order to get the
-status of a request, so it mocks the progress of a request by automatically
-progressing the status each time it is hit.**
-
-A 200 will be returned on success, and a 404 if the requested document does
-not exist.
+```xml
+<document>
+    <document_id>con33333333</document_id>
+    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
+    <status>done</status>
+    <type>delete</type>
+</document>
+```
 
 ### DELETE /documents/:document
 
 Sends a delete request for :document. Sample documents are con10101010, 
 con20202020, con30303030, con40404040, and con50505050.
 
-A 202 will be returned on success, and a 404 if the requested document 
-does not exist.
+A 202 with a job_id will be returned on success, and a 404 if 
+the requested document does not exist.
+
+Sample response:
+
+```xml
+<document>
+    <document_id>con33333333</document_id>
+    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
+    <status>accepted</status>
+    <type>delete</type>
+</document>
+```
 
 ### POST /documents/
 
@@ -112,7 +117,9 @@ This expects an XML body shaped like the following:
   <name>Name of an SPC</name>
   <type>SPC</type>
   <author>theauthor</author>
-  <product_name>Generic Statin</product_name>
+  <products>
+    <product>Generic Statin</product>
+  </products>
   <keywords>
     <keyword>heart disease</keyword>
     <keyword>statin</keyword>
@@ -126,6 +133,19 @@ This expects an XML body shaped like the following:
 </document>
 ```
 
-It will return a 202 (and the document will have a status) if the shape
-is correct, a 422 if there are missing required fields, and a 409 if the
-ID already exists and is not in the deleted state.
+It will return a 202 with job_id (and the document will have a 
+status) if the shape is correct, a 422 if there are missing 
+required fields, and a 409 if the ID already exists and is not 
+in the deleted state.
+
+Sample response:
+
+```xml
+<document>
+    <document_id>con33333333</document_id>
+    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
+    <status>accepted</status>
+    <type>check-in</type>
+</document>
+```
