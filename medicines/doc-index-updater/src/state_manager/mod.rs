@@ -4,7 +4,7 @@ use std::str::FromStr;
 use uuid::Uuid;
 use warp::{reject, Filter, Rejection, Reply};
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, PartialEq)]
 enum JobStatus {
     Accepted,
     Done,
@@ -13,16 +13,31 @@ enum JobStatus {
 }
 
 impl FromStr for JobStatus {
-    type Err = ();
-    fn from_str(s: &str) -> Result<JobStatus, ()> {
+    type Err = String;
+    fn from_str(s: &str) -> Result<JobStatus, Self::Err> {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
             "Done" => Ok(JobStatus::Done),
-            t => Ok(JobStatus::Error {
-                message: t.to_owned(),
+            "Error" => Ok(JobStatus::Error {
+                message: "Error status".to_owned(),
                 code: "0x0".to_owned(),
             }),
+            e => Err(format!("Status unknown: {}", e)),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case("Accepted", Ok(JobStatus::Accepted))]
+    #[test_case("Done", Ok(JobStatus::Done))]
+    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
+    fn test_parse(input: &str, output: Result<JobStatus, String>) {
+        assert_eq!(input.parse::<JobStatus>(), output);
     }
 }
 
@@ -102,5 +117,5 @@ pub fn jobs() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
 }
 
 pub fn complete() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::path!("complete" / Uuid).map(|id: Uuid| complete_handler(id).unwrap())
+    warp::path!("complete" / Uuid).map(|id| complete_handler(id).unwrap())
 }
