@@ -27,30 +27,13 @@ impl FromStr for JobStatus {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use test_case::test_case;
-
-    #[test_case("Accepted", Ok(JobStatus::Accepted))]
-    #[test_case("Done", Ok(JobStatus::Done))]
-    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
-    #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
-    fn test_parse(input: &str, output: Result<JobStatus, String>) {
-        assert_eq!(input.parse::<JobStatus>(), output);
-    }
-}
-
 impl FromRedisValue for JobStatus {
     fn from_redis_value(t: &Value) -> Result<JobStatus, RedisError> {
         let p = String::from_redis_value(t)?;
-        let status = JobStatus::from_str(&p);
+        let status = p.parse();
         match status {
             Ok(s) => Ok(s),
-            Err(_) => Ok(JobStatus::Error {
-                message: "Redis Error".to_owned(),
-                code: "0x0".to_owned(),
-            }),
+            Err(e) => Err(RedisError::from((redis::ErrorKind::IoError, "", e))),
         }
     }
 }
@@ -118,4 +101,25 @@ pub fn jobs() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
 
 pub fn complete() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("complete" / Uuid).map(|id| complete_handler(id).unwrap())
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case("Accepted", Ok(JobStatus::Accepted))]
+    #[test_case("Done", Ok(JobStatus::Done))]
+    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
+    fn test_parse(input: &str, output: Result<JobStatus, String>) {
+        assert_eq!(input.parse::<JobStatus>(), output);
+    }
+
+    #[test_case(&Value::Status("Accepted".to_string()), Ok(JobStatus::Accepted))]
+    #[test_case(&Value::Status("Done".to_string()), Ok(JobStatus::Done))]
+    #[test_case(&Value::Status("Error".to_string()), Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case(&Value::Status("Bedro".to_string()), Err(RedisError::from((redis::ErrorKind::IoError, "", "Status unknown: Bedro".to_string()))))]
+    fn from_redis_value(input: &Value, output: Result<JobStatus, RedisError>) {
+        assert_eq!(JobStatus::from_redis_value(input), output);
+    }
 }
