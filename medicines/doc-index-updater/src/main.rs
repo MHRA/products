@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         tokio::spawn(async move {
             warp::serve(
                 state_manager::jobs()
-                    .or(state_manager::complete())
+                    .or(state_manager::set_status())
                     .with(warp::log("doc_index_updater")),
             )
             .run(addr.clone())

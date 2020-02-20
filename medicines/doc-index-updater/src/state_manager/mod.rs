@@ -91,8 +91,8 @@ impl From<RedisError> for MyRedisError {
     }
 }
 
-fn complete_handler(id: Uuid) -> Result<impl Reply, MyRedisError> {
-    set_in_redis(id, JobStatus::Done)?;
+fn set_status_handler(id: Uuid, job_status: JobStatus) -> Result<impl Reply, MyRedisError> {
+    set_in_redis(id, job_status)?;
     Ok(warp::reply())
 }
 
@@ -100,9 +100,13 @@ pub fn jobs() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("jobs" / Uuid).map(handler)
 }
 
-pub fn complete() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::path!("complete" / Uuid).map(|id| complete_handler(id).unwrap())
+pub fn set_status() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::post().and(
+        warp::path!("jobs" / Uuid / JobStatus)
+            .map(|id, status| set_status_handler(id, status).unwrap()),
+    )
 }
+
 #[cfg(test)]
 mod test {
     use super::*;
