@@ -1,3 +1,4 @@
+use log::{self, info};
 use redis::{self, Commands, FromRedisValue, RedisError, RedisWrite, ToRedisArgs, Value};
 use serde_derive::Serialize;
 use std::str::FromStr;
@@ -30,12 +31,12 @@ impl FromStr for JobStatus {
 impl FromRedisValue for JobStatus {
     fn from_redis_value(t: &Value) -> Result<JobStatus, RedisError> {
         let p = String::from_redis_value(t)?;
-        let status = p.parse();
-        match status {
-            Ok(s) => Ok(s),
-            Err(e) => Err(RedisError::from((redis::ErrorKind::IoError, "", e))),
-        }
+        p.parse().map_err(to_redis_error)
     }
+}
+
+fn to_redis_error(e: String) -> RedisError {
+    RedisError::from((redis::ErrorKind::IoError, "", e))
 }
 
 impl ToRedisArgs for JobStatus {
@@ -48,7 +49,7 @@ impl ToRedisArgs for JobStatus {
             JobStatus::Done => "Done",
             _ => "No idea, buddy",
         };
-        println!("{:#}", s);
+        info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
 }
@@ -118,7 +119,7 @@ mod test {
     #[test_case(&Value::Status("Accepted".to_string()), Ok(JobStatus::Accepted))]
     #[test_case(&Value::Status("Done".to_string()), Ok(JobStatus::Done))]
     #[test_case(&Value::Status("Error".to_string()), Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
-    #[test_case(&Value::Status("Bedro".to_string()), Err(RedisError::from((redis::ErrorKind::IoError, "", "Status unknown: Bedro".to_string()))))]
+    #[test_case(&Value::Status("Bedro".to_string()), Err(to_redis_error( "Status unknown: Bedro".to_string())))]
     fn from_redis_value(input: &Value, output: Result<JobStatus, RedisError>) {
         assert_eq!(JobStatus::from_redis_value(input), output);
     }
