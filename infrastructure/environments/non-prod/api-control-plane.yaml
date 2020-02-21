@@ -16,8 +16,6 @@ spec:
         enabled: false
     gateways:
       istio-ingressgateway:
-        # FIXME: Change for the public IP
-        loadBalancerIP: 0.0.0.0
+        loadBalancerIP: 51.105.53.132
         serviceAnnotations:
-          # FIXME: Change for the public IP
-          service.beta.kubernetes.io/azure-load-balancer-resource-group: MHRA-dev
+          service.beta.kubernetes.io/azure-load-balancer-resource-group: products-dev
