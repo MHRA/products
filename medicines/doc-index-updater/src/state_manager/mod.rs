@@ -1,32 +1,10 @@
 use log::{self, info};
 use redis::{self, Commands, FromRedisValue, RedisError, RedisWrite, ToRedisArgs, Value};
-use serde_derive::Serialize;
-use std::str::FromStr;
 use uuid::Uuid;
 use warp::{reject, Filter, Rejection, Reply};
 
-#[derive(Serialize, Debug, PartialEq)]
-enum JobStatus {
-    Accepted,
-    Done,
-    NotFound,
-    Error { message: String, code: String },
-}
-
-impl FromStr for JobStatus {
-    type Err = String;
-    fn from_str(s: &str) -> Result<JobStatus, Self::Err> {
-        match s {
-            "Accepted" => Ok(JobStatus::Accepted),
-            "Done" => Ok(JobStatus::Done),
-            "Error" => Ok(JobStatus::Error {
-                message: "Error status".to_owned(),
-                code: "0x0".to_owned(),
-            }),
-            e => Err(format!("Status unknown: {}", e)),
-        }
-    }
-}
+mod models;
+use models::{JobStatus, JobStatusResponse};
 
 impl FromRedisValue for JobStatus {
     fn from_redis_value(t: &Value) -> Result<JobStatus, RedisError> {
@@ -52,12 +30,6 @@ impl ToRedisArgs for JobStatus {
         info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
-}
-
-#[derive(Serialize)]
-struct JobStatusResponse {
-    id: Uuid,
-    status: JobStatus,
 }
 
 fn get_from_redis(id: Uuid) -> redis::RedisResult<JobStatus> {
@@ -111,14 +83,6 @@ pub fn set_status() -> impl Filter<Extract = impl Reply, Error = Rejection> + Cl
 mod test {
     use super::*;
     use test_case::test_case;
-
-    #[test_case("Accepted", Ok(JobStatus::Accepted))]
-    #[test_case("Done", Ok(JobStatus::Done))]
-    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
-    #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
-    fn test_parse(input: &str, output: Result<JobStatus, String>) {
-        assert_eq!(input.parse::<JobStatus>(), output);
-    }
 
     #[test_case(&Value::Status("Accepted".to_string()), Ok(JobStatus::Accepted))]
     #[test_case(&Value::Status("Done".to_string()), Ok(JobStatus::Done))]
