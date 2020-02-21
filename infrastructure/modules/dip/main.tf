@@ -41,8 +41,6 @@ resource "azurerm_kubernetes_cluster" "doc_index_updater_cluster" {
     network_plugin = "kubenet"
   }
 
-
-
   tags = {
     Environment = var.environment
   }

@@ -1,18 +1,18 @@
-output "kube_config" {
-  value = module.cluster.kube_config
+output "api_cluster_kube_config" {
+  value = module.cluster.api_cluster_kube_config
 }
 
-output "public_ip" {
-  value = module.cluster.public_ip
+output "api_cluster_public_ip" {
+  value = module.cluster.api_cluster_public_ip
 }
-output "host" {
-  value = module.cluster.host
-}
-
-output "client_certificate" {
-  value = module.cluster.client_certificate
+output "api_cluster_host" {
+  value = module.cluster.api_cluster_host
 }
 
-output "resource_group_name" {
-  value = module.cluster.resource_group_name
+output "api_cluster_client_certificate" {
+  value = module.cluster.api_cluster_client_certificate
+}
+
+output "api_cluster_resource_group_name" {
+  value = module.cluster.api_cluster_client_certificate
 }
