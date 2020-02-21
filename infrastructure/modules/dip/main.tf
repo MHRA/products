@@ -88,3 +88,14 @@ resource "azurerm_servicebus_subscription" "doc_index_updater_subscription" {
   topic_name          = azurerm_servicebus_topic.doc_index_updater_topic[count.index].name
   max_delivery_count  = 1
 }
+
+resource "azurerm_redis_cache" "doc_index_updater_redis" {
+  name                = local.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  capacity            = 2
+  family              = "C"
+  sku_name            = "Standard"
+  enable_non_ssl_port = false
+  minimum_tls_version = "1.2"
+}
