@@ -24,6 +24,7 @@ To run the following steps, first you should:
    ```
 
 5. [Install `kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+6. [Install `ktx`](https://github.com/heptiolabs/ktx)
 
 ## Connecting to a Kubernetes cluster
 
@@ -39,14 +40,22 @@ To be able to connect to the cluster, we need to set the Kubernetes credentials 
 3. Create the credentials file running this script
 
    ```sh
-   ../../scripts/create-kubernetes-config.sh
+   ../../scripts/create-kubernetes-config-for-document-index-updater.sh
    ```
 
-Now you can run `kubectl` commands, e.g.
+4. Change the **`current-context`** typing `ktx` and then press Tab and it should show the following
 
-```sh
-kubectl get nodes
-```
+   ```sh
+   api      doc-index-updater
+   ```
+
+5. Select the context you want to use and press Enter
+
+6. Now you can run `kubectl` commands, e.g.
+
+   ```sh
+   kubectl get nodes
+   ```
 
 ## Installing Istio
 
@@ -90,16 +99,24 @@ kubectl get nodes
 8. Apply manifest to the cluster
 
    ```sh
-   istioctl manifest apply -f control-plane.yml --logtostderr
+   istioctl manifest apply -f api-control-plane.yml --logtostderr
    ```
 
-9. Validate the Istio installation
+   or
+
+   ```sh
+   istioctl manifest apply -f doc-index-updater-control-plane.yml --logtostderr
+   ```
+
+   depending on which cluster you want to use
+
+9) Validate the Istio installation
 
    ```sh
    kubectl get svc --namespace istio-system --output wide
    ```
 
-10. Confirm that the required pods have been created
+10) Confirm that the required pods have been created
     ```sh
     kubectl get pods --namespace istio-system
     ```
