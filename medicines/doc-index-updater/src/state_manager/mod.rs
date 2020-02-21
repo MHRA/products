@@ -1,20 +1,21 @@
 use uuid::Uuid;
 use warp::{Filter, Rejection, Reply};
-
 mod models;
 use models::{JobStatus, JobStatusResponse};
 
 mod redis;
-use self::redis::{get_from_redis, set_in_redis, MyRedisError};
+use self::redis::{get_client, get_from_redis, set_in_redis, MyRedisError};
 
 fn handler(id: Uuid) -> impl Reply {
-    let status = get_from_redis(id).unwrap();
+    let client = get_client("redis://127.0.0.1:6379/".to_owned()).unwrap();
+    let status = get_from_redis(client, id).unwrap();
 
     warp::reply::json(&JobStatusResponse { id, status })
 }
 
 fn set_status_handler(id: Uuid, job_status: JobStatus) -> Result<impl Reply, MyRedisError> {
-    set_in_redis(id, job_status)?;
+    let client = get_client("redis://127.0.0.1:6379/".to_owned()).unwrap();
+    set_in_redis(client, id, job_status)?;
     Ok(warp::reply())
 }
 
