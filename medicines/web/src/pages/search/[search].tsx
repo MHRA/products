@@ -1,8 +1,8 @@
+import { useRouter } from 'next/router';
 import React from 'react';
-import Page from '../components/page';
-import SearchWrapper from '../components/search-wrapper';
-import MipText from '../components/mip-text';
-import { useLocalStorage } from '../hooks';
+import Page from '../../components/page';
+import SearchWrapper from '../../components/search-wrapper';
+import { useLocalStorage } from '../../hooks';
 
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -16,8 +16,8 @@ const App: React.FC = () => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <SearchWrapper initialSearchValue="">
-        <MipText />
+      <SearchWrapper>
+        <div></div>
       </SearchWrapper>
     </Page>
   );
