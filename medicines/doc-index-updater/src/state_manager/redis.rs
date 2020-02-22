@@ -1,6 +1,7 @@
 use log::info;
 use redis::{
-    self, Client, Commands, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value,
+    self, Client, Commands, Connection, FromRedisValue, RedisError, RedisResult, RedisWrite,
+    ToRedisArgs, Value,
 };
 use uuid::Uuid;
 use warp::reject;
@@ -48,14 +49,10 @@ pub fn get_client(address: String) -> Result<Client, RedisError> {
     Ok(Client::open(address)?)
 }
 
-pub fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> {
-    let mut con = client.get_connection()?;
-
+pub fn get_from_redis(con: &mut Connection, id: Uuid) -> RedisResult<JobStatus> {
     con.get(id.to_string()).or(Ok(JobStatus::NotFound))
 }
-pub fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<()> {
-    let mut con = client.get_connection()?;
-
+pub fn set_in_redis(con: &mut Connection, id: Uuid, status: JobStatus) -> RedisResult<()> {
     con.set(id.to_string(), status)
 }
 

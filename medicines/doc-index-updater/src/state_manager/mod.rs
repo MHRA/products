@@ -7,15 +7,21 @@ mod redis;
 use self::redis::{get_client, get_from_redis, set_in_redis, MyRedisError};
 
 fn handler(id: Uuid) -> impl Reply {
-    let client = get_client("redis://127.0.0.1:6379/".to_owned()).unwrap();
-    let status = get_from_redis(client, id).unwrap();
+    let mut connection = get_client("redis://127.0.0.1:6379/".to_owned())
+        .unwrap()
+        .get_connection()
+        .unwrap();
+    let status = get_from_redis(&mut connection, id).unwrap();
 
     warp::reply::json(&JobStatusResponse { id, status })
 }
 
 fn set_status_handler(id: Uuid, job_status: JobStatus) -> Result<impl Reply, MyRedisError> {
-    let client = get_client("redis://127.0.0.1:6379/".to_owned()).unwrap();
-    set_in_redis(client, id, job_status)?;
+    let mut connection = get_client("redis://127.0.0.1:6379/".to_owned())
+        .unwrap()
+        .get_connection()
+        .unwrap();
+    set_in_redis(&mut connection, id, job_status)?;
     Ok(warp::reply())
 }
 
