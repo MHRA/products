@@ -115,7 +115,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
 
-  const searchLink = (itemName: IProduct) => {
+  const searchLink = (itemName: string) => {
     if (level === 0) {
       return `/substance-index/${itemName}`;
     }
