@@ -27,25 +27,39 @@ const StyledSearchWrapper = styled.div`
 `;
 
 interface ISearchWrapperProps {
+  initialSearchValue: string | string[];
   children: React.ReactNode;
 }
 
 const formatInitialSearchTerm = (searchTerm: string | string[]) => {
-  console.log(searchTerm);
   if (searchTerm) {
-    console.log('returning: ' + decodeURIComponent(searchTerm.toString()));
     return decodeURIComponent(searchTerm.toString());
   }
   return '';
 };
 
+const extractProductLicenseRegExp: RegExp = new RegExp(
+  '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
+  'ig',
+);
+
+const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
+
+const formatSearchTerm = (s: string): string => {
+  return s
+    .replace(extractProductLicenseRegExp, ' PL $3/$5')
+    .replace(whitespaceRegExp, ' ')
+    .trim()
+    .toLowerCase();
+};
+
 const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
-  const router = useRouter();
   const [search, setSearch] = React.useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    setSearch(formatInitialSearchTerm(router.query.search));
-  }, [router.query.search]);
+    setSearch(formatInitialSearchTerm(props.initialSearchValue));
+  }, [props.initialSearchValue]);
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
     setSearch(formatSearchTerm(e.currentTarget.value));
@@ -53,22 +67,6 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
 
   const handleSearchChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
-  };
-
-  const extractProductLicenseRegExp: RegExp = new RegExp(
-    '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
-    'ig',
-  );
-
-  const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
-
-  const formatSearchTerm = (s: string): string => {
-    return encodeURIComponent(
-      s
-        .replace(extractProductLicenseRegExp, ' PL $3/$5')
-        .replace(whitespaceRegExp, ' ')
-        .trim(),
-    );
   };
 
   const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -86,10 +84,11 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
   };
 
   const rerouteSearchResults = (searchTerm: string) => {
-    const searchRoute = `/search/${searchTerm}`;
+    const searchRoute = `/search`;
     router.push({
       pathname: searchRoute,
       query: {
+        q: encodeURIComponent(searchTerm),
         page: 1,
       },
     });
