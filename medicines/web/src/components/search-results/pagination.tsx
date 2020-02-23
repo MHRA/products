@@ -65,13 +65,16 @@ const StyledPagination = styled.nav`
   }
 `;
 
-const Pagination = (props: {
+interface IPaginationProps {
   searchTerm: string;
   resultCount: number;
   pageSize: number;
   currentPage: number;
   enabledDocTypes: DocType[];
-}) => {
+  handlePageChange: (num: number) => void;
+}
+
+const Pagination = (props: IPaginationProps) => {
   const pageCount = Math.floor(props.resultCount / props.pageSize) + 1;
   const { firstGroup, middleGroup, lastGroup } = getPaginationGroups(
     pageCount,
@@ -91,32 +94,22 @@ const Pagination = (props: {
     }
 
     return (
-      <li key={page}>
-        <Link href={getSearchPage(page)}>
-          <a>{page}</a>
-        </Link>
+      <li>
+        <a onClick={() => props.handlePageChange(page)}>{page}</a>
         {separator}
       </li>
     );
   };
 
-  const getSearchPage = (pageNo: number) => ({
-    pathname: '',
-    query: {
-      search: props.searchTerm,
-      page: pageNo,
-      doc: queryStringFromDocTypes(props.enabledDocTypes),
-    },
-  });
-
   return (
     <StyledPagination>
       <ul className="pagination">
         {props.currentPage !== 1 ? (
-          <li className="arrow">
-            <Link href={getSearchPage(props.currentPage - 1)}>
-              <a>Previous</a>
-            </Link>
+          <li
+            className="arrow"
+            onClick={() => props.handlePageChange(props.currentPage - 1)}
+          >
+            <a>Previous</a>
           </li>
         ) : (
           <li className="arrow" />
@@ -131,10 +124,11 @@ const Pagination = (props: {
           {lastGroup.map(createPaginationButton)}
         </div>
         {props.currentPage !== pageCount ? (
-          <li className="arrow">
-            <Link href={getSearchPage(props.currentPage + 1)}>
-              <a>Next</a>
-            </Link>
+          <li
+            className="arrow"
+            onClick={() => props.handlePageChange(props.currentPage + 1)}
+          >
+            <a>Next</a>
           </li>
         ) : (
           <li className="arrow" />

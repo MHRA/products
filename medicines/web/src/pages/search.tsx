@@ -1,19 +1,19 @@
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import Page from '../../components/page';
-import SearchWrapper from '../../components/search-wrapper';
-import { useLocalStorage } from '../../hooks';
+import Page from '../components/page';
+import SearchWrapper from '../components/search-wrapper';
+import { useLocalStorage } from '../hooks';
 import { NextPage, NextPageContext } from 'next';
-import { convertResults, IDocument } from '../../services/results-converter';
+import { convertResults, IDocument } from '../services/results-converter';
 import {
   docTypesFromQueryString,
   parsePage,
   queryStringFromDocTypes,
   parseDisclaimerAgree,
-} from '../../services/querystring-interpreter';
-import { docSearch, DocType } from '../../services/azure-search';
-import Events from '../../services/events';
-import SearchResults from '../../components/search-results';
+} from '../services/querystring-interpreter';
+import { docSearch, DocType } from '../services/azure-search';
+import Events from '../services/events';
+import SearchResults from '../components/search-results';
 
 interface IAppProps {
   results: IDocument[];
