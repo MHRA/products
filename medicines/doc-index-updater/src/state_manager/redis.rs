@@ -1,7 +1,7 @@
 use log::info;
 use redis::{
-    self, aio::MultiplexedConnection, Client, Commands, Connection, FromRedisValue, RedisError,
-    RedisResult, RedisWrite, ToRedisArgs, Value,
+    self, aio::MultiplexedConnection, Client, FromRedisValue, RedisError, RedisResult, RedisWrite,
+    ToRedisArgs, Value,
 };
 use uuid::Uuid;
 use warp::reject;
@@ -64,8 +64,18 @@ pub async fn get_from_redis(con: MultiplexedConnection, id: Uuid) -> RedisResult
         .or(Ok(JobStatus::NotFound))
 }
 
-pub fn set_in_redis(con: &mut Connection, id: Uuid, status: JobStatus) -> RedisResult<()> {
-    con.set(id.to_string(), status)
+pub async fn set_in_redis(
+    con: MultiplexedConnection,
+    id: Uuid,
+    status: JobStatus,
+) -> RedisResult<JobStatus> {
+    let mut con = con.clone();
+    redis::cmd("SET")
+        .arg(id.to_string())
+        .arg(status.clone())
+        .query_async(&mut con)
+        .await
+        .or(Ok(status))
 }
 
 #[cfg(test)]

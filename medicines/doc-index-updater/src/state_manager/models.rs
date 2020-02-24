@@ -2,7 +2,7 @@ use serde_derive::Serialize;
 use std::str::FromStr;
 use uuid::Uuid;
 
-#[derive(Serialize, Debug, PartialEq)]
+#[derive(Serialize, Debug, PartialEq, Clone)]
 pub enum JobStatus {
     Accepted,
     Done,

@@ -34,8 +34,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
-                state_manager::jobs(a.clone())
-                    .or(state_manager::set_status())
+                state_manager::get_job_status(a.clone())
+                    .or(state_manager::set_job_status(a.clone()))
                     .with(warp::log("doc_index_updater")),
             )
             .run(addr.clone())
@@ -45,7 +45,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             let mut addr2 = addr;
             addr2.set_port(addr2.port() + 1);
             warp::serve(
-                state_manager::jobs(connection.clone()).with(warp::log("doc_index_updater")),
+                state_manager::get_job_status(connection.clone())
+                    .with(warp::log("doc_index_updater")),
             )
             .run(addr2)
             .await;

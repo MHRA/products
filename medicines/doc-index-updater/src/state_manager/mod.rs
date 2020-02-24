@@ -8,7 +8,10 @@ use warp::{reply::Json, Filter, Rejection, Reply};
 mod models;
 mod redis;
 
-async fn handler(id: Uuid, connection: MultiplexedConnection) -> Result<Json, Rejection> {
+async fn get_status_handler(
+    id: Uuid,
+    connection: MultiplexedConnection,
+) -> Result<Json, Rejection> {
     let status = get_from_redis(connection, id)
         .await
         .map_err(MyRedisError::from)?;
@@ -16,32 +19,38 @@ async fn handler(id: Uuid, connection: MultiplexedConnection) -> Result<Json, Re
     Ok(warp::reply::json(&JobStatusResponse { id, status }))
 }
 
-fn set_status_handler(id: Uuid, job_status: JobStatus) -> Result<impl Reply, MyRedisError> {
-    let mut connection = get_client("redis://127.0.0.1:6379/".to_owned())
-        .unwrap()
-        .get_connection()
-        .unwrap();
-    set_in_redis(&mut connection, id, job_status)?;
-    Ok(warp::reply())
+async fn set_status_handler(
+    id: Uuid,
+    status: JobStatus,
+    connection: MultiplexedConnection,
+) -> Result<Json, Rejection> {
+    let status = set_in_redis(connection, id, status)
+        .await
+        .map_err(MyRedisError::from)?;
+
+    Ok(warp::reply::json(&JobStatusResponse { id, status }))
 }
 
-pub fn jobs(
+pub fn get_job_status(
     connection: MultiplexedConnection,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("jobs" / Uuid)
         .and(warp::get())
         .and(with_connection(connection))
-        .and_then(handler)
+        .and_then(get_status_handler)
+}
+
+pub fn set_job_status(
+    connection: MultiplexedConnection,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("jobs" / Uuid / JobStatus)
+        .and(warp::post())
+        .and(with_connection(connection))
+        .and_then(set_status_handler)
 }
 
 pub fn with_connection(
     connection: MultiplexedConnection,
 ) -> impl Filter<Extract = (MultiplexedConnection,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || connection.clone())
-}
-
-pub fn set_status() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::path!("jobs" / Uuid / JobStatus)
-        .and(warp::post())
-        .map(|id, status| set_status_handler(id, status).unwrap())
 }
