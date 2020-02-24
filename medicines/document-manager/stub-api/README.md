@@ -97,8 +97,7 @@ Sample response:
 
 ### DELETE /documents/:document
 
-Sends a delete request for :document. Sample documents are con10101010,
-con20202020, con30303030, con40404040, and con50505050.
+Sends a delete request for :document.
 
 A 202 with a job_id will be returned on success, and a 404 if
 the requested document does not exist.
