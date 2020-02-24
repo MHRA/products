@@ -1,7 +1,7 @@
 use log::info;
 use redis::{
-    self, Client, Commands, Connection, FromRedisValue, RedisError, RedisResult, RedisWrite,
-    ToRedisArgs, Value,
+    self, aio::MultiplexedConnection, Client, Commands, Connection, FromRedisValue, RedisError,
+    RedisResult, RedisWrite, ToRedisArgs, Value,
 };
 use uuid::Uuid;
 use warp::reject;
@@ -16,6 +16,12 @@ impl reject::Reject for MyRedisError {}
 impl From<RedisError> for MyRedisError {
     fn from(t: RedisError) -> Self {
         Self(t)
+    }
+}
+
+impl From<MyRedisError> for warp::Rejection {
+    fn from(i: MyRedisError) -> Self {
+        warp::reject::custom(i)
     }
 }
 
@@ -49,9 +55,15 @@ pub fn get_client(address: String) -> Result<Client, RedisError> {
     Ok(Client::open(address)?)
 }
 
-pub fn get_from_redis(con: &mut Connection, id: Uuid) -> RedisResult<JobStatus> {
-    con.get(id.to_string()).or(Ok(JobStatus::NotFound))
+pub async fn get_from_redis(con: MultiplexedConnection, id: Uuid) -> RedisResult<JobStatus> {
+    let mut con = con.clone();
+    redis::cmd("GET")
+        .arg(id.to_string())
+        .query_async(&mut con)
+        .await
+        .or(Ok(JobStatus::NotFound))
 }
+
 pub fn set_in_redis(con: &mut Connection, id: Uuid, status: JobStatus) -> RedisResult<()> {
     con.set(id.to_string(), status)
 }
