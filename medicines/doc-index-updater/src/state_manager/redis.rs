@@ -14,14 +14,14 @@ pub struct MyRedisError(RedisError);
 impl reject::Reject for MyRedisError {}
 
 impl From<RedisError> for MyRedisError {
-    fn from(t: RedisError) -> Self {
-        Self(t)
+    fn from(e: RedisError) -> Self {
+        Self(e)
     }
 }
 
 impl From<MyRedisError> for warp::Rejection {
-    fn from(i: MyRedisError) -> Self {
-        warp::reject::custom(i)
+    fn from(e: MyRedisError) -> Self {
+        warp::reject::custom(e)
     }
 }
 
