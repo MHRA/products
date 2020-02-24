@@ -15,14 +15,7 @@ exports[`DrugIndex should render 1`] = `
       key="A"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "A",
-            },
-          }
-        }
+        href="/index/A"
       >
         <a>
           A
@@ -35,14 +28,7 @@ exports[`DrugIndex should render 1`] = `
       key="B"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "B",
-            },
-          }
-        }
+        href="/index/B"
       >
         <a>
           B
@@ -55,14 +41,7 @@ exports[`DrugIndex should render 1`] = `
       key="C"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "C",
-            },
-          }
-        }
+        href="/index/C"
       >
         <a>
           C
@@ -75,14 +54,7 @@ exports[`DrugIndex should render 1`] = `
       key="D"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "D",
-            },
-          }
-        }
+        href="/index/D"
       >
         <a>
           D
@@ -95,14 +67,7 @@ exports[`DrugIndex should render 1`] = `
       key="E"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "E",
-            },
-          }
-        }
+        href="/index/E"
       >
         <a>
           E
@@ -115,14 +80,7 @@ exports[`DrugIndex should render 1`] = `
       key="F"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "F",
-            },
-          }
-        }
+        href="/index/F"
       >
         <a>
           F
@@ -135,14 +93,7 @@ exports[`DrugIndex should render 1`] = `
       key="G"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "G",
-            },
-          }
-        }
+        href="/index/G"
       >
         <a>
           G
@@ -155,14 +106,7 @@ exports[`DrugIndex should render 1`] = `
       key="H"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "H",
-            },
-          }
-        }
+        href="/index/H"
       >
         <a>
           H
@@ -175,14 +119,7 @@ exports[`DrugIndex should render 1`] = `
       key="I"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "I",
-            },
-          }
-        }
+        href="/index/I"
       >
         <a>
           I
@@ -195,14 +132,7 @@ exports[`DrugIndex should render 1`] = `
       key="J"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "J",
-            },
-          }
-        }
+        href="/index/J"
       >
         <a>
           J
@@ -215,14 +145,7 @@ exports[`DrugIndex should render 1`] = `
       key="K"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "K",
-            },
-          }
-        }
+        href="/index/K"
       >
         <a>
           K
@@ -235,14 +158,7 @@ exports[`DrugIndex should render 1`] = `
       key="L"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "L",
-            },
-          }
-        }
+        href="/index/L"
       >
         <a>
           L
@@ -255,14 +171,7 @@ exports[`DrugIndex should render 1`] = `
       key="M"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "M",
-            },
-          }
-        }
+        href="/index/M"
       >
         <a>
           M
@@ -275,14 +184,7 @@ exports[`DrugIndex should render 1`] = `
       key="N"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "N",
-            },
-          }
-        }
+        href="/index/N"
       >
         <a>
           N
@@ -295,14 +197,7 @@ exports[`DrugIndex should render 1`] = `
       key="O"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "O",
-            },
-          }
-        }
+        href="/index/O"
       >
         <a>
           O
@@ -315,14 +210,7 @@ exports[`DrugIndex should render 1`] = `
       key="P"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "P",
-            },
-          }
-        }
+        href="/index/P"
       >
         <a>
           P
@@ -335,14 +223,7 @@ exports[`DrugIndex should render 1`] = `
       key="Q"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "Q",
-            },
-          }
-        }
+        href="/index/Q"
       >
         <a>
           Q
@@ -355,14 +236,7 @@ exports[`DrugIndex should render 1`] = `
       key="R"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "R",
-            },
-          }
-        }
+        href="/index/R"
       >
         <a>
           R
@@ -375,14 +249,7 @@ exports[`DrugIndex should render 1`] = `
       key="S"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "S",
-            },
-          }
-        }
+        href="/index/S"
       >
         <a>
           S
@@ -395,14 +262,7 @@ exports[`DrugIndex should render 1`] = `
       key="T"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "T",
-            },
-          }
-        }
+        href="/index/T"
       >
         <a>
           T
@@ -415,14 +275,7 @@ exports[`DrugIndex should render 1`] = `
       key="U"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "U",
-            },
-          }
-        }
+        href="/index/U"
       >
         <a>
           U
@@ -435,14 +288,7 @@ exports[`DrugIndex should render 1`] = `
       key="V"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "V",
-            },
-          }
-        }
+        href="/index/V"
       >
         <a>
           V
@@ -455,14 +301,7 @@ exports[`DrugIndex should render 1`] = `
       key="W"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "W",
-            },
-          }
-        }
+        href="/index/W"
       >
         <a>
           W
@@ -475,14 +314,7 @@ exports[`DrugIndex should render 1`] = `
       key="X"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "X",
-            },
-          }
-        }
+        href="/index/X"
       >
         <a>
           X
@@ -495,14 +327,7 @@ exports[`DrugIndex should render 1`] = `
       key="Y"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "Y",
-            },
-          }
-        }
+        href="/index/Y"
       >
         <a>
           Y
@@ -515,14 +340,7 @@ exports[`DrugIndex should render 1`] = `
       key="Z"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "Z",
-            },
-          }
-        }
+        href="/index/Z"
       >
         <a>
           Z
@@ -535,14 +353,7 @@ exports[`DrugIndex should render 1`] = `
       key="0"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "0",
-            },
-          }
-        }
+        href="/index/0"
       >
         <a>
           0
@@ -555,14 +366,7 @@ exports[`DrugIndex should render 1`] = `
       key="1"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "1",
-            },
-          }
-        }
+        href="/index/1"
       >
         <a>
           1
@@ -575,14 +379,7 @@ exports[`DrugIndex should render 1`] = `
       key="2"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "2",
-            },
-          }
-        }
+        href="/index/2"
       >
         <a>
           2
@@ -595,14 +392,7 @@ exports[`DrugIndex should render 1`] = `
       key="3"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "3",
-            },
-          }
-        }
+        href="/index/3"
       >
         <a>
           3
@@ -615,14 +405,7 @@ exports[`DrugIndex should render 1`] = `
       key="4"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "4",
-            },
-          }
-        }
+        href="/index/4"
       >
         <a>
           4
@@ -635,14 +418,7 @@ exports[`DrugIndex should render 1`] = `
       key="5"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "5",
-            },
-          }
-        }
+        href="/index/5"
       >
         <a>
           5
@@ -655,14 +431,7 @@ exports[`DrugIndex should render 1`] = `
       key="6"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "6",
-            },
-          }
-        }
+        href="/index/6"
       >
         <a>
           6
@@ -675,14 +444,7 @@ exports[`DrugIndex should render 1`] = `
       key="7"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "7",
-            },
-          }
-        }
+        href="/index/7"
       >
         <a>
           7
@@ -695,14 +457,7 @@ exports[`DrugIndex should render 1`] = `
       key="8"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "8",
-            },
-          }
-        }
+        href="/index/8"
       >
         <a>
           8
@@ -715,14 +470,7 @@ exports[`DrugIndex should render 1`] = `
       key="9"
     >
       <Link
-        href={
-          Object {
-            "query": Object {
-              "index": true,
-              "substance": "9",
-            },
-          }
-        }
+        href="/index/9"
       >
         <a>
           9
