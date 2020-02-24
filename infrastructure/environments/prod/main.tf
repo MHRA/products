@@ -19,26 +19,40 @@ locals {
 
 # website
 module "products" {
-  source              = "../../modules/products"
-  resource_group_name = local.resource_group_name
-  location            = local.location
+  source = "../../modules/products"
+
   environment         = local.environment
+  location            = local.location
+  resource_group_name = local.resource_group_name
 }
 
 # AKS
 module cluster {
-  source              = "../../modules/cluster"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
+  source = "../../modules/cluster"
+
   client_id           = local.client_id
   client_secret       = local.client_secret
+  environment         = local.environment
+  location            = local.location
+  resource_group_name = local.resource_group_name
 }
 
 # CPD
 module cpd {
-  source              = "../../modules/cpd"
-  resource_group_name = local.resource_group_name
-  location            = local.location
+  source = "../../modules/cpd"
+
   environment         = local.environment
+  location            = local.location
+  resource_group_name = local.resource_group_name
+}
+
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
+
+  client_id           = local.client_id
+  client_secret       = local.client_secret
+  environment         = local.environment
+  location            = local.location
+  resource_group_name = local.resource_group_name
 }
