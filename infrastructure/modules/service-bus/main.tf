@@ -9,7 +9,7 @@ locals {
 
 # Service Bus
 resource "azurerm_servicebus_namespace" "doc_index_updater_service_bus" {
-  name                = local.name
+  name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "Standard"
@@ -49,7 +49,7 @@ resource "azurerm_servicebus_subscription" "doc_index_updater_subscription" {
 }
 
 resource "azurerm_redis_cache" "doc_index_updater_redis" {
-  name                = local.name
+  name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
   capacity            = 1

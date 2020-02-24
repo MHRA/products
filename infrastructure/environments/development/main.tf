@@ -59,5 +59,6 @@ module service_bus {
   client_secret       = local.client_secret
   environment         = local.environment
   location            = local.location
+  name                = "doc-index-updater-dev"
   resource_group_name = local.resource_group_name
 }
