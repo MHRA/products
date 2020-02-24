@@ -1,18 +1,29 @@
 use Dancer2;
-use XML::Simple qw(:strict);
-use UUID::Tiny ':std';
+use Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 use Storable 'dclone';
+use UUID::Tiny ':std';
+use XML::Simple qw(:strict);
+
 set serializer => 'XML';
 
 my %documents;
 my %jobs;
 
-get '/jobs/:job' => sub {
+die "You need to set STUB_USERNAME & STUB_PASSWORD in your environment"
+    unless (defined $ENV{'STUB_USERNAME'} && defined $ENV{'STUB_PASSWORD'});
+
+http_basic_auth_handler check_login => sub {
+    my ($user, $pass) = @_;
+
+    return $user eq $ENV{'STUB_USERNAME'} && $pass eq $ENV{'STUB_PASSWORD'};
+};
+
+get '/jobs/:job' => http_basic_auth required => sub {
+    my $self = shift;
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
+
     my $job_id = route_parameters->get('job');
     if (exists($jobs{$job_id})) {
-        my $self = shift;
-        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
-
         my $status = $jobs{$job_id};
         my $resp = dclone $status;
 
@@ -28,13 +39,13 @@ get '/jobs/:job' => sub {
     }
 };
 
-del '/documents/:document' => sub {
+del '/documents/:document' => http_basic_auth required => sub {
+    my $self = shift;
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
+
     my $document_id = route_parameters->get('document');
 
     if (exists($documents{$document_id})) {
-        my $self = shift;
-        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
-
         delete($documents{$document_id});
 
         my $job_id = create_uuid_as_string(UUID_V4);
@@ -55,9 +66,9 @@ del '/documents/:document' => sub {
     }
 };
 
-post '/documents' => sub {
+post '/documents' => http_basic_auth required => sub {
     my $self = shift;
-    $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
 
     my $doc = XMLin(
         request->body,
@@ -66,7 +77,7 @@ post '/documents' => sub {
         GroupTags  => {
             keywords          => 'keyword',
             active_substances => 'active_substance',
-            'products'        => 'product'
+            products          => 'product'
         }
     );
 
