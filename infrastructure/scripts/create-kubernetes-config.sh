@@ -26,5 +26,5 @@ select opt in "${OPTIONS[@]}"; do
   esac
 done
 
-echo "$(terraform output api_cluster_kube_config)" >~/$K8_CONFIG_FILE
-echo "MHRA kubernetes config for API cluster file was created, in ~/${K8_CONFIG_FILE}."
+echo "$(terraform output kube_config)" >~/$K8_CONFIG_FILE
+echo "MHRA kubernetes config file was created, in ~/${K8_CONFIG_FILE}."
