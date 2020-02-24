@@ -19,7 +19,7 @@ fn set_status_handler(id: Uuid, job_status: JobStatus) -> Result<impl Reply, MyR
 }
 
 pub fn jobs() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::path!("jobs" / Uuid).map(handler)
+    warp::path!("jobs" / Uuid).and(warp::get()).map(handler)
 }
 
 pub fn set_status() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
