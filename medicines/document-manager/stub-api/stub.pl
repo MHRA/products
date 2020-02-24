@@ -19,11 +19,11 @@ http_basic_auth_handler check_login => sub {
 };
 
 get '/jobs/:job' => http_basic_auth required => sub {
+    my $self = shift;
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
+
     my $job_id = route_parameters->get('job');
     if (exists($jobs{$job_id})) {
-        my $self = shift;
-        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
-
         my $status = $jobs{$job_id};
         my $resp = dclone $status;
 
@@ -40,12 +40,12 @@ get '/jobs/:job' => http_basic_auth required => sub {
 };
 
 del '/documents/:document' => http_basic_auth required => sub {
+    my $self = shift;
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
+
     my $document_id = route_parameters->get('document');
 
     if (exists($documents{$document_id})) {
-        my $self = shift;
-        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
-
         delete($documents{$document_id});
 
         my $job_id = create_uuid_as_string(UUID_V4);
@@ -68,7 +68,7 @@ del '/documents/:document' => http_basic_auth required => sub {
 
 post '/documents' => http_basic_auth required => sub {
     my $self = shift;
-    $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
+    $self->{'app'}->{'serializer_engine'}->{'xml_options'}->{'serialize'} = {RootName => 'job', NoAttr => 1};
 
     my $doc = XMLin(
         request->body,
@@ -77,7 +77,7 @@ post '/documents' => http_basic_auth required => sub {
         GroupTags  => {
             keywords          => 'keyword',
             active_substances => 'active_substance',
-            'products'        => 'product'
+            products          => 'product'
         }
     );
 
