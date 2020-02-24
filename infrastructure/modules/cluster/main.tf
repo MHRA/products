@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "products_ip" {
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
-  name                = "api"
+  name                = "aks"
   location            = var.location
   dns_prefix          = var.environment
   resource_group_name = var.resource_group_name

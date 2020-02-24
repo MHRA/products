@@ -3,7 +3,7 @@ set -euo pipefail
 
 PS3='Please enter your current environment: '
 OPTIONS=("non-prod" "prod" "dev" "quit")
-K8_CONFIG_FILE="mhra-azure-kube-config-api.yml"
+K8_CONFIG_FILE="mhra-azure-kube-config.yml"
 
 select opt in "${OPTIONS[@]}"; do
   case "$opt,$REPLY" in

@@ -42,11 +42,11 @@ To be able to connect to the cluster, we need to set the Kubernetes credentials 
    ../../scripts/create-kubernetes-config.sh
    ```
 
-4. Now you can run `kubectl` commands, e.g.
+Now you can run `kubectl` commands, e.g.
 
-   ```sh
-   kubectl get nodes
-   ```
+```sh
+kubectl get nodes
+```
 
 ## Installing Istio
 
@@ -90,16 +90,16 @@ To be able to connect to the cluster, we need to set the Kubernetes credentials 
 8. Apply manifest to the cluster
 
    ```sh
-   istioctl manifest apply -f api-control-plane.yml --logtostderr
+   istioctl manifest apply -f control-plane.yml --logtostderr
    ```
 
-9) Validate the Istio installation
+9. Validate the Istio installation
 
    ```sh
    kubectl get svc --namespace istio-system --output wide
    ```
 
-10) Confirm that the required pods have been created
+10. Confirm that the required pods have been created
     ```sh
     kubectl get pods --namespace istio-system
     ```
