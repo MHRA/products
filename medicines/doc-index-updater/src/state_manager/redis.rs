@@ -46,14 +46,14 @@ pub fn get_from_redis(id: Uuid) -> redis::RedisResult<JobStatus> {
     let client = redis::Client::open("redis://127.0.0.1:6379/")?;
     let mut con = client.get_connection()?;
 
-    Ok(con.get(id.to_string()).unwrap_or(JobStatus::NotFound))
+    con.get(id.to_string()).or(Ok(JobStatus::NotFound))
 }
 
 pub fn set_in_redis(id: Uuid, status: JobStatus) -> redis::RedisResult<()> {
     let client = redis::Client::open("redis://127.0.0.1:6379/")?;
     let mut con = client.get_connection()?;
 
-    Ok(con.set(id.to_string(), status).unwrap())
+    con.set(id.to_string(), status)
 }
 
 #[cfg(test)]

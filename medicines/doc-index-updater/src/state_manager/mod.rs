@@ -23,8 +23,7 @@ pub fn jobs() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
 }
 
 pub fn set_status() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::post().and(
-        warp::path!("jobs" / Uuid / JobStatus)
-            .map(|id, status| set_status_handler(id, status).unwrap()),
-    )
+    warp::path!("jobs" / Uuid / JobStatus)
+        .and(warp::post())
+        .map(|id, status| set_status_handler(id, status).unwrap())
 }
