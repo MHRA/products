@@ -52,9 +52,9 @@ module cpd {
   namespace           = local.cpd_name_space
 }
 
-# Doc Index Updater
-module doc_index_updater {
-  source = "../../modules/dip"
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
 
   client_id           = local.client_id
   client_secret       = local.client_secret
