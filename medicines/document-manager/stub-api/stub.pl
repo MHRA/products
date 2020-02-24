@@ -1,29 +1,27 @@
 use Dancer2;
-use Data::Dumper;
 use XML::Simple qw(:strict);
+use UUID::Tiny ':std';
+use Storable 'dclone';
 set serializer => 'XML';
 
-my %documents_statuses;
+my %documents;
+my %jobs;
 
-get '/documents/:document' => sub {
-    my $document = route_parameters->get('document');
-    if (exists($documents_statuses{$document})) {
+get '/jobs/:job' => sub {
+    my $job_id = route_parameters->get('job');
+    if (exists($jobs{$job_id})) {
         my $self = shift;
-        $self->{'serializer_engine'}->{'xml_options'}->{'serialize'} =
-            {RootName => 'document', NoAttr => 1};
+        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
 
-        my $status = $documents_statuses{$document};
+        my $status = $jobs{$job_id};
+        my $resp = dclone $status;
 
-        if ($status eq 'fetching') {
-            $documents_statuses{$document} = 'staged';
-        } elsif ($status eq 'deleting') {
-            $documents_statuses{$document} = 'deleted';
-        } elsif ($status eq 'staged') {
-            $documents_statuses{$document} = 'checked-in';
+        if ($status->{status} eq 'accepted') {
+            $jobs{$job_id}->{status} = 'done';
         }
 
         status 'ok';
-        return {id => $document, status => $status};
+        return $resp;
     } else {
         status 'not_found';
         return '';
@@ -31,10 +29,26 @@ get '/documents/:document' => sub {
 };
 
 del '/documents/:document' => sub {
-    if (exists($documents_statuses{route_parameters->get('document')})) {
-        $documents_statuses{route_parameters->get('document')} = 'deleting';
+    my $document_id = route_parameters->get('document');
+
+    if (exists($documents{$document_id})) {
+        my $self = shift;
+        $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
+
+        delete($documents{$document_id});
+
+        my $job_id = create_uuid_as_string(UUID_V4);
+        my $job = {
+            job_id      => $job_id,
+            job_uri     => uri_for("/jobs/$job_id"),
+            document_id => $document_id,
+            status      => 'accepted',
+            type        => 'delete'
+        };
+        $jobs{$job_id} = $job;
+
         status 'accepted';
-        return '';
+        return $jobs{$job_id};
     } else {
         status 'not_found';
         return '';
@@ -43,52 +57,46 @@ del '/documents/:document' => sub {
 
 post '/documents' => sub {
     my $self = shift;
-    $self->{'serializer_engine'}->{'xml_options'}->{'serialize'} =
-        {RootName => 'document', NoAttr => 1};
+    $self->{serializer_engine}->{xml_options}->{serialize} = {RootName => 'job', NoAttr => 1};
 
-    my $document = XMLin(
+    my $doc = XMLin(
         request->body,
         KeyAttr    => [],
-        ForceArray => ['keyword', 'active_substance'],
+        ForceArray => ['keyword', 'products', 'active_substance'],
         GroupTags  => {
             keywords          => 'keyword',
-            active_substances => 'active_substance'
+            active_substances => 'active_substance',
+            'products'        => 'product'
         }
     );
 
-    my @expected_fields = ('id', 'name', 'type', 'author', 'product_name', 'pl_number', 'active_substances', 'file_source', 'file_path');
+    my @expected_fields = ('id', 'name', 'type', 'author', 'products', 'pl_number', 'active_substances', 'file_source', 'file_path');
 
     for my $expected_field (@expected_fields) {
-        if (!defined($document->{$expected_field})) {
+        if (!defined($doc->{$expected_field})) {
             status 'unprocessable_entity';
             return {error => "Expected '$expected_field' in request."};
         }
     }
 
-    if (defined($documents_statuses{$document->{id}}) && $documents_statuses{$document->{id}} ne 'deleted') {
+    if (defined($documents{$doc->{id}})) {
         status 'conflict';
-        return {error => "Document $document->{id} already exists."};
+        return {error => "Document $doc->{id} already exists."};
     }
 
-    $documents_statuses{$document->{id}} = 'fetching';
+    my $job_id = create_uuid_as_string(UUID_V4);
+    my $job = {
+        job_id      => $job_id,
+        job_uri     => uri_for("/jobs/$job_id"),
+        document_id => $doc->{id},
+        type        => 'check-in',
+        status      => 'accepted'
+    };
+    $jobs{$job_id} = $job;
+    $documents{$doc->{id}} = $doc;
 
     status 'accepted';
-    return '';
+    return $job;
 };
 
-sub reset_statuses {
-    %documents_statuses = (
-        con10101010 => 'checked-in',
-        con20202020 => 'deleted',
-        con30303030 => 'fetching',
-        con40404040 => 'deleting',
-        con50505050 => 'failed'
-    );
-};
-
-put '/documents/reset' => sub {
-    reset_statuses;
-};
-
-reset_statuses;
 dance;
