@@ -26,6 +26,12 @@ const App: NextPage<IAppProps> = props => {
     }
   }, [props.substanceName]);
 
+  useEffect(() => {
+    if (window) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   return (
     <Page
       title="Products"

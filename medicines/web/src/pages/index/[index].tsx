@@ -1,12 +1,13 @@
-import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import { NextPage, NextPageContext } from 'next';
+import { useRouter } from 'next/router';
+
+import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
-import { NextPage, NextPageContext } from 'next';
 import substanceLoader from '../../services/substance-loader';
 import { ISubstance } from '../../model/substance';
-import DrugIndex from '../../components/drug-index';
 
 interface IAppProps {
   results: ISubstance[];
@@ -25,6 +26,12 @@ const App: NextPage<IAppProps> = props => {
       router.push('/');
     }
   }, [props.substanceIndex]);
+
+  useEffect(() => {
+    if (window) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   return (
     <Page

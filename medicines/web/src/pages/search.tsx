@@ -1,19 +1,20 @@
+import { NextPage, NextPageContext } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+
 import Page from '../components/page';
+import SearchResults from '../components/search-results';
 import SearchWrapper from '../components/search-wrapper';
 import { useLocalStorage } from '../hooks';
-import { NextPage, NextPageContext } from 'next';
-import { convertResults, IDocument } from '../services/results-converter';
-import {
-  docTypesFromQueryString,
-  parsePage,
-  queryStringFromDocTypes,
-  parseDisclaimerAgree,
-} from '../services/querystring-interpreter';
 import { docSearch, DocType } from '../services/azure-search';
 import Events from '../services/events';
-import SearchResults from '../components/search-results';
+import {
+  docTypesFromQueryString,
+  parseDisclaimerAgree,
+  parsePage,
+  queryStringFromDocTypes,
+} from '../services/querystring-interpreter';
+import { convertResults, IDocument } from '../services/results-converter';
 
 interface IAppProps {
   results: IDocument[];
@@ -40,17 +41,24 @@ const App: NextPage<IAppProps> = props => {
     }
   }, [props.query]);
 
+  useEffect(() => {
+    if (window) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   const reroutePage = (
     searchTerm: string,
     page: number,
     docTypes: DocType[],
   ) => {
-    let query = {
+    const query = {
       q: encodeURIComponent(searchTerm),
-      page: page,
+      page,
     };
     if (docTypes.length > 0) {
-      query['doc'] = queryStringFromDocTypes(docTypes);
+      const docKey = 'doc';
+      query[docKey] = queryStringFromDocTypes(docTypes);
     }
     router.push({
       pathname: searchPath,
@@ -102,7 +110,7 @@ App.getInitialProps = async (context: NextPageContext): Promise<IAppProps> => {
     query: { q, page, disclaimer, doc: queryDocFilter },
   } = context;
   const docTypes = docTypesFromQueryString(queryDocFilter);
-  const parsedPage = parsePage(page);
+  const parsedPage = page ? parsePage(page) : 1;
   let results = [];
   let count = 0;
   let query = '';

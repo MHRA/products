@@ -24,7 +24,7 @@ interface IAppProps {
   disclaimerAgree: boolean;
 }
 
-const pageSize = 2;
+const pageSize = 10;
 const productPath = '/product/';
 
 const App: NextPage<IAppProps> = props => {
@@ -39,6 +39,12 @@ const App: NextPage<IAppProps> = props => {
       router.push('/');
     }
   }, [props.productName]);
+
+  useEffect(() => {
+    if (window) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   const reroutePage = (
     productName: string,
