@@ -112,7 +112,7 @@ App.getInitialProps = async (context: NextPageContext): Promise<IAppProps> => {
   let count = 0;
   let productName = '';
   if (product) {
-    productName = decodeURIComponent(product.toString());
+    productName = product.toString();
     const searchResults = await docSearch({
       query: '',
       page: parsedPage,

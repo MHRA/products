@@ -42,9 +42,7 @@ const App: NextPage<IAppProps> = props => {
   }, [props.query]);
 
   useEffect(() => {
-    if (window) {
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, 0);
   }, []);
 
   const reroutePage = (
@@ -115,7 +113,7 @@ App.getInitialProps = async (context: NextPageContext): Promise<IAppProps> => {
   let count = 0;
   let query = '';
   if (q) {
-    query = decodeURIComponent(q.toString());
+    query = q.toString();
     const searchResults = await docSearch({
       query,
       page: parsedPage,

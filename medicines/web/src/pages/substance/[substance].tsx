@@ -56,7 +56,7 @@ App.getInitialProps = async (context: NextPageContext): Promise<IAppProps> => {
   let substanceName = '';
 
   if (substance) {
-    substanceName = decodeURIComponent(substance.toString());
+    substanceName = substance.toString();
     const firstLetter = substanceName.charAt(0);
     const substanceIndex = await substanceLoader.load(firstLetter);
     const substanceMatch = substanceIndex.find(s => s.name === substanceName);
