@@ -52,7 +52,7 @@ resource "azurerm_redis_cache" "doc_index_updater_redis" {
   name                = local.name
   location            = var.location
   resource_group_name = var.resource_group_name
-  capacity            = 2
+  capacity            = 1
   family              = "C"
   sku_name            = "Standard"
   enable_non_ssl_port = false
