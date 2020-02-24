@@ -14,28 +14,20 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     }
     pretty_env_logger::init();
 
-    let addr = format!(
-        "0.0.0.0:{}",
-        env::var("PORT").unwrap_or_else(|e| {
-            eprintln!("defaulting PORT to {} ({})", PORT, e);
-            PORT.to_string()
-        })
-    )
-    .parse::<SocketAddr>()?;
+    let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
+        .parse::<SocketAddr>()?;
 
-    let connection = get_client("redis://127.0.0.1:6379/".to_owned())
-        .unwrap()
+    let redis_addr = get_env_or_default("REDIS_ADDR", "redis://127.0.0.1:6379/".to_string());
+    let connection = get_client(redis_addr)?
         .get_multiplexed_tokio_connection()
-        .await
-        .unwrap();
-
-    let a = connection.clone();
+        .await?;
+    let con2 = connection.clone();
 
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
-                state_manager::get_job_status(a.clone())
-                    .or(state_manager::set_job_status(a.clone()))
+                state_manager::get_job_status(con2.clone())
+                    .or(state_manager::set_job_status(con2.clone()))
                     .with(warp::log("doc_index_updater")),
             )
             .run(addr.clone())
@@ -54,4 +46,11 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     );
 
     Ok(())
+}
+
+fn get_env_or_default(key: &str, default: String) -> String {
+    env::var(key).unwrap_or_else(|e| {
+        eprintln!("defaulting {} to {} ({})", key, &default, e);
+        default.to_string()
+    })
 }
