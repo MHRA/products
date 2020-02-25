@@ -11,7 +11,7 @@ The intended usage pattern is as follows:
 
 - Send a DELETE or POST request for a document;
 - Continue to poll the GET endpoint for that document until the status has
-updated.
+  updated.
 
 In the background, the real API will asynchronously process the request and
 update the status of the document as it progresses.
@@ -19,7 +19,7 @@ update the status of the document as it progresses.
 ## Running
 
 ```
-$ docker build -t stub-document-manager-api 
+$ docker build -t stub-document-manager-api
 $ docker run -p 8080:8080 -it --rm stub-document-manager-api
 ```
 
@@ -52,7 +52,7 @@ Then you need to build the Docker image and push it to your container registry:
 ```bash
 $ export STUB_IMAGE=container-registry.yourdomain.com/stub-api:1.0.1
 
-$ docker build -t $STUB_IMAGE
+$ docker build -t $STUB_IMAGE .
 $ docker push $STUB_IMAGE
 ```
 
@@ -61,6 +61,8 @@ There are Kubernetes manifests in the `manifests` directory. You can apply these
 ```bash
 $ export PUBLIC_URL=yourdomain.com
 $ export SSL_EMAIL=you@yourdomain.com
+$ export STUB_USERNAME=basic_auth_username
+$ export STUB_PASSWORD=basic_auth_password
 
 $ envsubst < manifests/cluster-issuer.yaml | kubectl apply -f -
 $ envsubst < manifests/cert.yaml | kubectl apply -f -
@@ -68,6 +70,12 @@ $ envsubst < manifests/ingress.yaml | kubectl apply -f -
 $ envsubst < manifests/deployment.yaml | kubectl apply -f -
 $ envsubst < manifests/svc.yaml | kubectl apply -f -
 ```
+
+## Authorization
+
+The stub API implements [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication),
+using the credentials set in the previous step. Any request without a valid `Authorization` header will receive
+a 401 response.
 
 ## Endpoints
 
@@ -89,10 +97,9 @@ Sample response:
 
 ### DELETE /documents/:document
 
-Sends a delete request for :document. Sample documents are con10101010, 
-con20202020, con30303030, con40404040, and con50505050.
+Sends a delete request for :document.
 
-A 202 with a job_id will be returned on success, and a 404 if 
+A 202 with a job_id will be returned on success, and a 404 if
 the requested document does not exist.
 
 Sample response:
@@ -133,9 +140,9 @@ This expects an XML body shaped like the following:
 </document>
 ```
 
-It will return a 202 with job_id (and the document will have a 
-status) if the shape is correct, a 422 if there are missing 
-required fields, and a 409 if the ID already exists and is not 
+It will return a 202 with job_id (and the document will have a
+status) if the shape is correct, a 422 if there are missing
+required fields, and a 409 if the ID already exists and is not
 in the deleted state.
 
 Sample response:

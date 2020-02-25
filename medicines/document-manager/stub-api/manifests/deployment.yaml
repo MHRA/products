@@ -21,6 +21,11 @@ spec:
       containers:
         - image: $STUB_IMAGE
           name: document
+          env:
+            - name: STUB_USERNAME
+              value: $STUB_USERNAME
+            - name: STUB_PASSWORD
+              value: $STUB_PASSWORD
           ports:
             - containerPort: 8080
               name: web
