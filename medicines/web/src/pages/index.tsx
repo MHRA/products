@@ -5,6 +5,7 @@ import MipText from '../components/mip-text';
 import Page from '../components/page';
 import SearchWrapper from '../components/search-wrapper';
 import { useLocalStorage } from '../hooks';
+import Events from '../services/events';
 
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -16,6 +17,10 @@ const App: React.FC = () => {
   const {
     query: { search, page, substance, disclaimer, doc },
   } = router;
+
+  useEffect(() => {
+    Events.viewPage('homepage');
+  }, []);
 
   useEffect(() => {
     if (search) {

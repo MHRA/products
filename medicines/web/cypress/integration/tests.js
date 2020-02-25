@@ -154,12 +154,12 @@ describe('A-Z Index', function() {
     );
     // Mock out first page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
       'fixture:search_results.json',
     );
     // Mock out second page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS`,
       'fixture:search_results.json',
     );
 

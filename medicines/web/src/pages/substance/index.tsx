@@ -7,6 +7,7 @@ import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
+import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 
 const App: NextPage = () => {
@@ -35,6 +36,7 @@ const App: NextPage = () => {
         setResults(substanceMatch.products);
       }
       setSubstanceName(substanceStr);
+      Events.viewProductsForSubstance(substanceStr);
     })();
   }, [substance]);
 

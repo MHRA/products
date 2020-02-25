@@ -61,6 +61,11 @@ const App: NextPage = props => {
     setResults(results.results.map(convertResults));
     setCount(results.resultCount);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
+    Events.searchForProductsMatchingKeywords({
+      searchTerm: queryStr,
+      pageNo: parsedPage,
+      docTypes: queryStringFromDocTypes(docTypes),
+    });
   };
 
   useEffect(() => {

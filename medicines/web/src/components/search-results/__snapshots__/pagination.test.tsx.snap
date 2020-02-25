@@ -16,7 +16,9 @@ exports[`Pagination should render 1`] = `
     <div
       className="pagination-number"
     >
-      <li>
+      <li
+        key="1"
+      >
         <a
           onClick={[Function]}
         >
@@ -27,14 +29,16 @@ exports[`Pagination should render 1`] = `
         </span>
       </li>
       <li
-        key="2"
+        key="3"
       >
         2
         <span>
           –
         </span>
       </li>
-      <li>
+      <li
+        key="5"
+      >
         <a
           onClick={[Function]}
         >
@@ -47,7 +51,9 @@ exports[`Pagination should render 1`] = `
       <li>
         …
       </li>
-      <li>
+      <li
+        key="6"
+      >
         <a
           onClick={[Function]}
         >

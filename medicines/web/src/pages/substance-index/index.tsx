@@ -7,6 +7,7 @@ import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { ISubstance } from '../../model/substance';
+import Events from '../../services/events';
 import substanceLoader from '../../services/substance-loader';
 
 const App: NextPage = () => {
@@ -27,8 +28,10 @@ const App: NextPage = () => {
       return;
     }
     (async () => {
-      setResults(await substanceLoader.load(index.toString()));
-      setSubstanceIndex(index.toString());
+      const indexStr = index.toString();
+      setResults(await substanceLoader.load(indexStr));
+      setSubstanceIndex(indexStr);
+      Events.viewSubstancesStartingWith(indexStr);
     })();
   }, [index]);
 
