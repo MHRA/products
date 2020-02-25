@@ -20,7 +20,7 @@ RUN mkdir -p ./src/ && \
 RUN cargo fetch
 
 RUN cargo build --release && \
-  rm -rf ./target/release/.fingerprint/doc-index-updater-*
+  rm -rf ./target/release/.fingerprint/doc_index_updater-*
 
 # Setup debian release environment
 FROM debian:buster-slim AS release-context
