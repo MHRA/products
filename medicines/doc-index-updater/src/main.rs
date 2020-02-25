@@ -1,6 +1,7 @@
 use doc_index_updater::state_manager;
 use state_manager::get_client;
-use std::{env, error, net::SocketAddr};
+use std::{env, error, net::SocketAddr, time::Duration};
+use tokio::time;
 use warp::Filter;
 
 const PORT: u16 = 8000;
@@ -18,9 +19,19 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         .parse::<SocketAddr>()?;
 
     let redis_addr = get_env_or_default("REDIS_ADDR", "redis://127.0.0.1:6379/".to_string());
-    let con1 = get_client(redis_addr)?
-        .get_multiplexed_tokio_connection()
-        .await?;
+    let con1 = loop {
+        match get_client(redis_addr.clone()) {
+            Ok(c) => match c.get_multiplexed_tokio_connection().await {
+                Ok(c) => {
+                    log::info!("Got connection to Redis at {:?}", redis_addr);
+                    break c;
+                }
+                Err(e) => log::error!("Failed to get multiplexed connection: {:?}", e),
+            },
+            Err(e) => log::error!("Failed to get redis client: {:?}", e),
+        }
+        time::delay_for(Duration::from_secs(10)).await;
+    };
     let con2 = con1.clone();
 
     let _ = tokio::join!(
