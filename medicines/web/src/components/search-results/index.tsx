@@ -1,15 +1,20 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
-import { useSessionStorage } from '../../hooks';
+import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
+  mobileBreakpoint,
   tinyPaddingSizeCss,
 } from '../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
+import SearchFilter from '../search-filter';
 import Pagination from './pagination';
+
+import { DocType } from '../../services/azure-search';
+import { IDocument } from '../../services/results-converter';
 
 const StyledDrugList = styled.div`
   .title {
@@ -113,18 +118,28 @@ const StyledDrugList = styled.div`
     font-weight: bold;
     font-style: normal;
   }
-`;
 
-export interface IDocument {
-  activeSubstances: string[];
-  context: string;
-  created: string;
-  docType: string;
-  fileSize: string;
-  name: string;
-  product: string;
-  url: string;
-}
+  .row {
+    display: flex;
+    flex-direction: row;
+
+    .column {
+      flex: 3;
+      &.filter {
+        flex: 1;
+      }
+    }
+  }
+
+  @media ${mobileBreakpoint} {
+    .row {
+      flex-direction: column;
+    }
+    .column.filter {
+      width: 100%;
+    }
+  }
+`;
 
 const emaWebsiteLink = () => (
   <a href="https://www.ema.europa.eu/en" target="_new">
@@ -188,11 +203,24 @@ const SearchResults = (props: {
   searchTerm: string;
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
+  docTypes: DocType[];
+  handleDocTypeCheckbox: (d: DocType) => void;
 }) => {
-  const [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
-    'showDisclaimer',
-    true,
+  const [storageAllowed, setStorageAllowed] = useLocalStorage(
+    'allowStorage',
+    false,
   );
+
+  // Keep track of whether we should show the disclaimer warning.
+  // If storage is not allowed, use React state.
+  let [showDisclaimerWarning, setShowDisclaimerWarning] = React.useState(true);
+  if (storageAllowed) {
+    // If storage is allowed, use session storage.
+    [showDisclaimerWarning, setShowDisclaimerWarning] = useSessionStorage(
+      'showDisclaimer',
+      true,
+    );
+  }
 
   const {
     disclaimerAgree,
@@ -202,6 +230,8 @@ const SearchResults = (props: {
     resultCount,
     searchTerm,
     showingResultsForTerm,
+    docTypes,
+    handleDocTypeCheckbox,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -258,47 +288,59 @@ const SearchResults = (props: {
             searchTerm={searchTerm}
           />
         ) : (
-          <dl>
-            {hasDrugs &&
-              drugs.map((drug, i) => (
-                <article key={i}>
-                  <dt className="left">
-                    <p className="icon">{drug.docType.toUpperCase()}</p>
-                  </dt>
-                  <dd className="right">
-                    <a
-                      href={drug.url}
-                      className={'doc-type-' + drug.docType.toLowerCase()}
-                    >
-                      {drug.product != null ? (
-                        <>
-                          <p className="title">{drug.product}</p>
-                          <p className="subtitle">{drug.name}</p>
-                        </>
-                      ) : (
-                        <p className="title">{drug.name}</p>
-                      )}
-                    </a>
-                    <p className="metadata">File size: {drug.fileSize} KB</p>
-                    {drug.activeSubstances != null &&
-                      drug.activeSubstances.length > 0 && (
+          <div className="row">
+            <div className="column filter">
+              <SearchFilter
+                currentlyEnabledDocTypes={docTypes}
+                toggleDocType={handleDocTypeCheckbox}
+              />
+            </div>
+            <div className="column results">
+              <dl>
+                {hasDrugs &&
+                  drugs.map((drug, i) => (
+                    <article key={i}>
+                      <dt className="left">
+                        <p className="icon">{drug.docType.toUpperCase()}</p>
+                      </dt>
+                      <dd className="right">
+                        <a
+                          href={drug.url}
+                          className={'doc-type-' + drug.docType.toLowerCase()}
+                        >
+                          {drug.product != null ? (
+                            <>
+                              <p className="title">{drug.product}</p>
+                              <p className="subtitle">{drug.name}</p>
+                            </>
+                          ) : (
+                            <p className="title">{drug.name}</p>
+                          )}
+                        </a>
                         <p className="metadata">
-                          Active substances:{' '}
-                          {drug.activeSubstances
-                            .map(substance => toSentenceCase(substance))
-                            .join(', ')}
+                          File size: {drug.fileSize} KB
                         </p>
-                      )}
-                    <p
-                      className="context"
-                      dangerouslySetInnerHTML={{
-                        __html: normalizeDescription(drug.context),
-                      }}
-                    />
-                  </dd>
-                </article>
-              ))}
-          </dl>
+                        {drug.activeSubstances != null &&
+                          drug.activeSubstances.length > 0 && (
+                            <p className="metadata">
+                              Active substances:{' '}
+                              {drug.activeSubstances
+                                .map(substance => toSentenceCase(substance))
+                                .join(', ')}
+                            </p>
+                          )}
+                        <p
+                          className="context"
+                          dangerouslySetInnerHTML={{
+                            __html: normalizeDescription(drug.context),
+                          }}
+                        />
+                      </dd>
+                    </article>
+                  ))}
+              </dl>
+            </div>
+          </div>
         )}
       </StyledDrugList>
 
@@ -308,6 +350,7 @@ const SearchResults = (props: {
           pageSize={pageSize}
           resultCount={resultCount}
           searchTerm={searchTerm}
+          enabledDocTypes={docTypes}
         />
       ) : (
         ''

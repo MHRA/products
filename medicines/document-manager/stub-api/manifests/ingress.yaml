@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: stub-api-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  tls:
+    - hosts:
+        - $PUBLIC_URL
+      secretName: tls
+  rules:
+    - host: $PUBLIC_URL
+      http:
+        paths:
+          - backend:
+              serviceName: document-stub
+              servicePort: 8080
+            path: /(.*)

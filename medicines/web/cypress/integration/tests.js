@@ -6,6 +6,11 @@
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
 let polyfill;
+const baseUrl =
+  'https://mhraproductsdev.search.windows.net/indexes/products-index/docs';
+const apiKey =
+  'api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11';
+const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package
 before(() => {
@@ -16,7 +21,7 @@ before(() => {
   });
 });
 
-Cypress.on('window:before:load', (win) => {
+Cypress.on('window:before:load', win => {
   delete win.fetch;
   // since the application code does not ship with a polyfill
   // load a polyfilled "fetch" from the test
@@ -25,22 +30,49 @@ Cypress.on('window:before:load', (win) => {
 
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
-})
+});
+
+const mockParacetamolResults = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results.json',
+  );
+
+const mockParacetamolResultsPage2 = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results.json',
+  );
+
+const mockIbuprofenResults = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results.json',
+  );
+
+const mockIbuprofenSpcResults = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'`,
+    'fixture:search_results.spc.json',
+  );
+
+const mockIbuprofenSpcResultsPage2 = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'`,
+    'fixture:search_results.spc.page2.json',
+  );
+
+const mockIbuprofenSpcPilResults = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'+or+doc_type+eq+'Pil'`,
+    'fixture:search_results.spcpil.json',
+  );
 
 describe('Search', function() {
-  it('Search for Paracetamol', function() {
+  it('can search for Paracetamol', function() {
     cy.server();
-    // Mock out first page of search results.
-    cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords',
-      'fixture:search_results.json',
-    );
-    // Mock out second page of search results.
-    cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=paracetamol~1+paracetamol^4&scoringProfile=preferKeywords',
-      'fixture:search_results.json',
-    );
-
+    mockParacetamolResults();
+    mockParacetamolResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('paracetamol');
     cy.contains('Search').click();
@@ -49,6 +81,67 @@ describe('Search', function() {
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
   });
+
+  it('can filter for SPCs', function() {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+  });
+
+  it('can filter for SPCs and PILs together', function() {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcPilResults();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Patient Information Leaflet (PIL)').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
+  });
+
+  it('can filter SPCs then go to next page to see 2nd page filtered documents', function() {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcResultsPage2();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
+  });
+
+  it('can go to next page then filter SPCs to see 1st page filtered documents', function() {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcResultsPage2();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.contains('Search').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
+  });
 });
 
 describe('A-Z Index', function() {
@@ -56,17 +149,17 @@ describe('A-Z Index', function() {
     cy.server();
     // Mock out list of substances and medcines.
     cy.route(
-      "https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0",
+      `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
       'fixture:facets.json',
     );
     // Mock out first page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords',
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
       'fixture:search_results.json',
     );
     // Mock out second page of search results.
     cy.route(
-      'https://mhraproductsdev.search.windows.net/indexes/products-index/docs?api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11&highlight=content&queryType=full&$count=true&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords',
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
       'fixture:search_results.json',
     );
 
@@ -80,5 +173,58 @@ describe('A-Z Index', function() {
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
+});
+
+describe('Cookies', function() {
+  const cookie_banner_text =
+    'MHRA does not collect any data that would identify you directly. ' +
+    'We would like to use Google Analytics to help us improve our services.';
+
+  it("Cookies aren't accepted by default", function() {
+    cy.visit('/');
+    cy.contains(cookie_banner_text);
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'Off')
+      .find('input')
+      .should('be.checked');
+    cy.contains('label', 'On')
+      .find('input')
+      .should('not.be.checked');
+  });
+
+  it('Accept cookies via the banner', function() {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains(cookie_banner_text).should('not.exist');
+  });
+
+  it('Accept cookies via the cookie policy form', function() {
+    cy.visit('/');
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'On').click();
+    cy.contains('Save your preferences').click();
+    cy.contains(cookie_banner_text).should('not.exist');
+  });
+
+  it('Accepting cookies is reflected in cookie policy form', function() {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'On')
+      .find('input')
+      .should('be.checked');
+    cy.contains('label', 'Off')
+      .find('input')
+      .should('not.be.checked');
+  });
+
+  it('Decline cookies via the cookie policy form', function() {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'Off').click();
+    cy.contains('Save your preferences').click();
+    cy.contains(cookie_banner_text);
   });
 });

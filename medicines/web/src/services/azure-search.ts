@@ -1,17 +1,16 @@
 import fetch, { Response } from 'node-fetch';
+import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
-const searchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const searchIndex = process.env.AZURE_SEARCH_INDEX;
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
-const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
-enum DocType {
-  Par,
-  Pil,
-  Spc,
+export enum DocType {
+  Par = 'Par',
+  Pil = 'Pil',
+  Spc = 'Spc',
 }
 
 export interface ISearchResult {
@@ -37,40 +36,6 @@ export interface ISearchResults {
   results: ISearchResult[];
 }
 
-const extractProductLicenseRegExp: RegExp = new RegExp(
-  '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
-  'ig',
-);
-
-const escapeSpecialCharacters = (word: string): string =>
-  word.replace(/([+\-!(){}\[\]^~*?:\/]|\|\||&&|AND|OR|NOT)/gi, `\\$1`);
-
-const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
-  `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
-
-const addNormalizedProductLicenses = (q: string): string => {
-  const normalizedProductLicences = q
-    .match(extractProductLicenseRegExp)
-    ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'));
-
-  if (normalizedProductLicences && normalizedProductLicences.length) {
-    const normalizedProductLicencesString: string = normalizedProductLicences.join(
-      ' ',
-    );
-    return `${q} ${normalizedProductLicencesString}`;
-  }
-
-  return `${q}`;
-};
-
-const buildFuzzyQuery = (query: string): string => {
-  return addNormalizedProductLicenses(query)
-    .split(' ')
-    .map(word => escapeSpecialCharacters(word))
-    .map(word => preferExactMatchButSupportFuzzyMatch(word))
-    .join(' ');
-};
-
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
@@ -78,13 +43,9 @@ const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
+  filters: ISearchFilters,
 ): string => {
-  const url = new URL(
-    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
-  );
-
-  url.searchParams.append('api-key', searchKey as string);
-  url.searchParams.append('api-version', searchApiVersion as string);
+  const url = buildBaseUrl();
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('$count', 'true');
@@ -95,24 +56,39 @@ const buildSearchUrl = (
   );
   url.searchParams.append('search', query);
   url.searchParams.append('scoringProfile', searchScoringProfile as string);
+  url.searchParams.append('searchMode', 'all');
+  addFilterParameter(url, filters);
 
   return url.toString();
+};
+
+const addFilterParameter = (url: URL, filters: ISearchFilters) => {
+  const filterParameter = createFilter(filters);
+  if (filterParameter.length > 0) {
+    url.searchParams.append('$filter', filterParameter);
+  }
 };
 
 export interface IFacetResult {
   facets: Array<{ count: number; value: string }>;
 }
 
-const buildFacetUrl = (query: string): string => {
+const buildBaseUrl = () => {
   const url = new URL(
     `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
   );
 
   url.searchParams.append('api-key', searchKey as string);
   url.searchParams.append('api-version', searchApiVersion as string);
+  return url;
+};
+
+const buildFacetUrl = (query: string): string => {
+  const url = buildBaseUrl();
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
+  url.searchParams.append('searchMode', 'all');
 
   return url.toString();
 };
@@ -130,13 +106,30 @@ const getJson = async (url: string): Promise<any> => {
   }
 };
 
+export interface ISearchFilters {
+  docType: DocType[];
+  substanceName?: string;
+  productName?: string;
+  sortOrder: string;
+}
+
+interface ISearchQuery {
+  query: string;
+  page: number;
+  pageSize: number;
+  filters: ISearchFilters;
+}
+
 export const docSearch = async (
-  query: string,
-  page: number,
-  pageSize: number,
+  query: ISearchQuery,
 ): Promise<ISearchResults> => {
   const body = await getJson(
-    buildSearchUrl(buildFuzzyQuery(query), page, pageSize),
+    buildSearchUrl(
+      buildFuzzyQuery(query.query),
+      query.page,
+      query.pageSize,
+      query.filters,
+    ),
   );
   return {
     resultCount: body['@odata.count'],
@@ -150,4 +143,24 @@ export const facetSearch = async (
   const body = await getJson(buildFacetUrl(query));
 
   return [query, body['@search.facets']];
+};
+
+const createFilter = (filters: ISearchFilters) => {
+  const filterParams: string[] = [];
+  if (filters.docType) {
+    const docTypeFilters = [];
+    for (const docType of filters.docType) {
+      docTypeFilters.push(`doc_type eq '${docType}'`);
+    }
+    filterParams.push(docTypeFilters.join(' or '));
+  }
+  if (filters.substanceName) {
+    filterParams.push(
+      `substance_name/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
+    );
+  }
+  if (filters.productName) {
+    filterParams.push(`product_name eq '${filters.productName.toUpperCase()}'`);
+  }
+  return filterParams.join(' and ');
 };

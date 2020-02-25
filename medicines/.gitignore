@@ -1,4 +1,9 @@
 /target
 **/*.rs.bk
 .vscode/
-.env
+.env*
+.DS_Store
+
+# Cypress files
+cypress/videos/
+cypress/screenshots/

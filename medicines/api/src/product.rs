@@ -20,7 +20,10 @@ pub async fn get_product(search_term: String, client: &AzureSearchClient) -> Opt
     let azure_result = client.azure_search(search_term).await;
     let r = match azure_result {
         Ok(n) => n,
-        Err(_) => return None,
+        Err(e) => {
+            println!("Error occurred retrieving products: {:#}", e);
+            return None;
+        }
     };
 
     let products = r.value.into_iter().map(|x| Product {

@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import homepage from '../../copy/homepage.md';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { baseFontSize } from '../../styles/fonts';
-
-// @ts-ignore
-import homepage from '../../copy/homepage.md';
 
 const StyledMipText = styled.section`
   p,

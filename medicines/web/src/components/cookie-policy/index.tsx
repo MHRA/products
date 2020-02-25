@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { mhra, mhra10, mhraGray10 } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
@@ -48,43 +48,46 @@ const StyledCookieBanner = styled.aside`
   }
 `;
 
-const CookieBanner: React.FC = () => {
-  const banner = 'showCookieBanner';
-  const [cookieBanner, setCookieBanner] = React.useState(false);
+interface ICookieBanner {
+  storageAllowed: boolean;
+  setStorageAllowed: any;
+}
 
-  const handleOnClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
-    event.preventDefault();
-    window.localStorage.setItem(banner, String(false));
-    setCookieBanner(false);
+const CookieBanner: React.FC<ICookieBanner> = props => {
+  const buttonOnClick = () => {
+    props.setStorageAllowed(true, true);
   };
 
-  useEffect(() => {
-    const showBanner = window.localStorage.getItem(banner);
-    showBanner === 'false' ? setCookieBanner(false) : setCookieBanner(true);
+  // Set up state so that the banner is hidden by default.
+  const [showBanner, setShowBanner] = React.useState(false);
+
+  // Update showBanner with whether the user has consented to cookies after the page
+  // has loaded.
+  React.useEffect(() => {
+    setShowBanner(!props.storageAllowed);
   });
 
-  return cookieBanner ? (
-    <StyledCookieBanner>
-      <div>
-        <p>
-          MHRA uses cookies which are essential for the site to work. We also
-          use Google Analytics cookies to help us improve our services. We do
-          not collect any data that would identify you directly. To know more
-          about our policies, please go to our&nbsp;
-          <Link href="/cookies">
-            <a>cookie policy page</a>
-          </Link>
-          .&nbsp;By continuing to use this site, you agree to our use of
-          cookies.
-        </p>
-        <button onClick={handleOnClick}>Accept cookies</button>
-      </div>
-    </StyledCookieBanner>
-  ) : (
-    <> </>
-  );
+  if (showBanner) {
+    return (
+      <StyledCookieBanner>
+        <div>
+          <p>
+            MHRA does not collect any data that would identify you directly. We
+            would like to use Google Analytics to help us improve our services.
+            You can allow this by clicking <b>accept all cookies</b> or find out
+            more first by visiting our&nbsp;
+            <Link href="/cookies">
+              <a>cookie policy page</a>
+            </Link>
+            .
+          </p>
+          <button onClick={buttonOnClick}>Accept all cookies</button>
+        </div>
+      </StyledCookieBanner>
+    );
+  } else {
+    return <> </>;
+  }
 };
 
 export default CookieBanner;

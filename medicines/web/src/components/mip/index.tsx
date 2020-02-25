@@ -1,16 +1,27 @@
-import moment from 'moment';
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
-import ReactGA from 'react-ga-gtm';
+import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { docSearch, ISearchResult } from '../../services/azure-search';
+import {
+  docSearch,
+  DocType,
+  ISearchFilters,
+} from '../../services/azure-search';
+import Events from '../../services/events';
+import {
+  docTypesFromQueryString,
+  parsePage,
+  queryStringFromDocTypes,
+} from '../../services/querystring-interpreter';
+import { convertResults, IDocument } from '../../services/results-converter';
 import substanceLoader from '../../services/substance-loader';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+
 import DrugIndex, { index } from '../drug-index';
 import MipText from '../mip-text';
 import Search from '../search';
-import SearchResults, { IDocument } from '../search-results';
+import SearchResults from '../search-results';
 import YellowCard from '../yellow-card';
 
 const StyledMip = styled.div`
@@ -31,18 +42,6 @@ const StyledMip = styled.div`
   }
 `;
 
-const sanitizeTitle = (title: string | null): string => {
-  let name: string;
-  if (!title) return 'Unknown';
-
-  try {
-    name = decodeURIComponent(title);
-  } catch {
-    name = title;
-  }
-  return name;
-};
-
 const Mip: React.FC = () => {
   const [pageNumber, setPageNumber] = React.useState(1);
   const [hasIntro, setHasIntro] = React.useState(true);
@@ -53,11 +52,18 @@ const Mip: React.FC = () => {
   const [showingResultsForTerm, setShowingResultsForTerm] = React.useState('');
   const [products, setProducts] = React.useState<IProduct[] | null>(null);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
+  const [enabledDocTypes, setEnabledDocTypes] = React.useState<DocType[]>([]);
 
   const router = useRouter();
 
   const {
-    query: { search: searchTerm, page, substance, disclaimer },
+    query: {
+      search: searchTerm,
+      page,
+      substance,
+      disclaimer,
+      doc: queryDocFilter,
+    },
   } = router;
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
@@ -68,24 +74,18 @@ const Mip: React.FC = () => {
     setSearch(e.currentTarget.value);
   };
 
-  const fetchSearchResults = async (searchTerm: string, page: number) => {
-    const searchResults = await docSearch(searchTerm, page, pageSize);
-    const results = searchResults.results.map((doc: ISearchResult) => {
-      return {
-        activeSubstances: doc.substance_name,
-        product: doc.product_name,
-        context: doc['@search.highlights']?.content.join(' … ') || '',
-        docType: doc.doc_type?.toString().substr(0, 3) || '',
-        fileSize: Math.ceil(
-          (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
-        ).toLocaleString('en-GB'),
-        created: doc.created
-          ? moment(doc.created).format('D MMMM YYYY')
-          : 'Unknown',
-        name: sanitizeTitle(doc.title),
-        url: doc.metadata_storage_path,
-      };
+  const fetchSearchResults = async (
+    searchTerm: string,
+    page: number,
+    searchFilters: ISearchFilters,
+  ) => {
+    const searchResults = await docSearch({
+      query: searchTerm,
+      page,
+      pageSize,
+      filters: searchFilters,
     });
+    const results = searchResults.results.map(convertResults);
     setResults(results);
     setResultCount(searchResults.resultCount);
     setShowingResultsForTerm(searchTerm);
@@ -119,55 +119,101 @@ const Mip: React.FC = () => {
     });
   };
 
+  const toggleDocType = async (docTypeToToggle: DocType) => {
+    const currentlyEnabledDocTypes = Array.from(enabledDocTypes);
+    if (currentlyEnabledDocTypes.includes(docTypeToToggle)) {
+      const docTypeIndex = currentlyEnabledDocTypes.indexOf(docTypeToToggle);
+      currentlyEnabledDocTypes.splice(docTypeIndex, 1);
+    } else {
+      currentlyEnabledDocTypes.push(docTypeToToggle);
+    }
+    setEnabledDocTypes(currentlyEnabledDocTypes);
+    setPageNumber(1);
+  };
+
   const rerouteSearchResults = (pageNo: number) => {
     router.push({
       pathname: router.route,
-      query: { search, page: pageNo },
+      query: {
+        search,
+        page: pageNo,
+        doc: queryStringFromDocTypes(enabledDocTypes),
+      },
     });
   };
 
+  const loadSearchResults = async (
+    searchTerm: string | string[],
+    page: string | string[],
+  ) => {
+    if (typeof searchTerm === 'string') {
+      setHasIntro(false);
+      setSearch(formatSearchTerm(searchTerm));
+      const parsedPage = parsePage(page);
+      setPageNumber(parsedPage);
+      if (disclaimer === 'agree') setDisclaimerAgree(true);
+      const docTypesToIncludeInSearch = docTypesFromQueryString(queryDocFilter);
+      if (docTypesToIncludeInSearch !== null) {
+        setEnabledDocTypes(docTypesToIncludeInSearch);
+      }
+      await fetchSearchResults(searchTerm, parsedPage, {
+        docType: docTypesToIncludeInSearch,
+        sortOrder: 'a-z',
+      });
+      Events.searchForProductsMatchingKeywords({
+        searchTerm: search,
+        pageNo: parsedPage,
+        docTypes: queryStringFromDocTypes(docTypesToIncludeInSearch),
+      });
+    }
+  };
+
+  const loadSubstancePage = async (substanceName: string | string[]) => {
+    if (typeof substanceName === 'string') {
+      (async () => {
+        setHasIntro(false);
+        setResults([]);
+        setSearch('');
+        setShowingResultsForTerm('');
+        const letter = substanceName.charAt(0);
+        const substanceIndex = await substanceLoader.load(letter);
+        const substances = substanceIndex.find(s => s.name === substanceName);
+        if (substances) {
+          setProducts(substances.products);
+          Events.viewProductsForSubstance(substanceName);
+        } else {
+          setProducts(substanceIndex);
+          Events.viewSubstancesStartingWith(letter);
+        }
+        if (disclaimer === 'agree') setDisclaimerAgree(true);
+      })();
+    }
+  };
+
+  const loadHomepage = () => {
+    setHasIntro(true);
+    setResults([]);
+    setSearch('');
+    setShowingResultsForTerm('');
+    setProducts(null);
+    setDisclaimerAgree(false);
+    Events.viewPage('homepage');
+  };
+
+  useEffect(() => {
+    rerouteSearchResults(pageNumber);
+  }, [enabledDocTypes]);
+
   useEffect(() => {
     if (searchTerm && page) {
-      if (typeof searchTerm === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setSearch(formatSearchTerm(searchTerm));
-          let parsedPage = Number(page);
-          if (!parsedPage || parsedPage < 1) {
-            parsedPage = 1;
-          }
-          setPageNumber(parsedPage);
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-          await fetchSearchResults(searchTerm, parsedPage);
-        })();
-      }
+      loadSearchResults(searchTerm, page);
     } else if (substance) {
-      if (typeof substance === 'string') {
-        (async () => {
-          setHasIntro(false);
-          setResults([]);
-          setSearch('');
-          setShowingResultsForTerm('');
-          const ss = await substanceLoader.load(substance.charAt(0));
-          const products = ss.find(s => s.name === substance);
-          if (products) {
-            setProducts(products.products);
-          } else {
-            setProducts(ss);
-          }
-          if (disclaimer === 'agree') setDisclaimerAgree(true);
-        })();
-      }
+      loadSubstancePage(substance);
     } else {
-      setHasIntro(true);
-      setResults([]);
-      setSearch('');
-      setShowingResultsForTerm('');
-      setProducts(null);
-      setDisclaimerAgree(false);
+      loadHomepage();
     }
     window.scrollTo(0, 0);
-  }, [page, searchTerm, substance, disclaimerAgree]);
+  }, [page, searchTerm, substance, disclaimer, queryDocFilter]);
 
   return (
     <StyledMip>
@@ -205,6 +251,8 @@ const Mip: React.FC = () => {
           pageSize={pageSize}
           searchTerm={search}
           disclaimerAgree={disclaimerAgree}
+          docTypes={enabledDocTypes}
+          handleDocTypeCheckbox={toggleDocType}
         />
       )}
     </StyledMip>

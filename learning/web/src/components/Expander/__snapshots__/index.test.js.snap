@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Expander should render 1`] = `
+<styled.div>
+  <styled.button
+    onClick={[Function]}
+    title="expand"
+  >
+    Hola
+  </styled.button>
+  <styled.div
+    className="hidden"
+  >
+    <styled.button
+      onClick={[Function]}
+      title="close"
+    >
+      <MdClose />
+    </styled.button>
+  </styled.div>
+</styled.div>
+`;

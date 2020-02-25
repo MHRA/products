@@ -1,0 +1,78 @@
+name: API 📡$(Date:yyyyMMdd)$(Rev:.r)
+variables: 
+  ubuntuImage: ubuntu-latest
+  devContainerRegistry: mhraproductsdevregistry
+  tag: latest
+  devAksServiceConnection: aks
+  apiNamespace: default
+  environmentPath: medicines/api/infrastructure/development
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - $(Build.SourcesDirectory)/medicines/api/*
+stages:
+  - stage: Build
+    displayName: Build API 🏗 
+    jobs:  
+    - job: Build
+      displayName: Build job
+      pool:
+        vmImage: $(ubuntuImage)
+      steps:
+      - task: Docker@2
+        displayName: Build and push an image to container registry 🏗🤜📦
+        inputs:
+          command: buildAndPush
+          repository: products/api
+          dockerfile: $(Build.SourcesDirectory)/medicines/api/Dockerfile
+          containerRegistry: $(devContainerRegistry)
+          tags: |
+            $(tag)
+      - task: PublishPipelineArtifact@1
+        displayName: Publish pipeline artifact 🖌
+        inputs:
+          artifactName: manifests
+          path:  $(Build.SourcesDirectory)/$(environmentPath)
+  - stage: Deploy
+    displayName: Deploy API 💫
+    dependsOn: Build
+    jobs:
+    - deployment: Deploy
+      displayName: Deploy job 💫
+      pool:
+        vmImage: $(ubuntuImage)
+      environment: development
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: DownloadPipelineArtifact@2
+              displayName: Download pipeline artifact 🖌
+              inputs:
+                artifactName: manifests
+                downloadPath: $(System.ArtifactsDirectory)/$(environmentPath)
+            - task: KubernetesManifest@0
+              displayName: Create image secret 🕵️‍♂️
+              inputs:
+                action: createSecret
+                secretName: cluster-cred
+                namespace: $(apiNamespace)
+                kubernetesServiceConnection: $(devAksServiceConnection)
+                dockerRegistryEndpoint: $(devContainerRegistry)
+            - task: KubernetesManifest@0
+              displayName: Deploy to Kubernetes cluster ⎈ 🐳 💥
+              inputs:
+                kubernetesServiceConnection: $(devAksServiceConnection)
+                action: deploy
+                namespace: $(apiNamespace)
+                manifests: |
+                  $(System.ArtifactsDirectory)/$(environmentPath)/deployment.yml
+                  $(System.ArtifactsDirectory)/$(environmentPath)/service.yml
+                  $(System.ArtifactsDirectory)/$(environmentPath)/virtual-service.yml
+                imagePullSecrets: |
+                  cluster-cred
+                containers: |
+                  mhraproductsdevregistry.azurecr.io/products/api:latest

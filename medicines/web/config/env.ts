@@ -1,0 +1,2 @@
+process.env.AZURE_SEARCH_EXACTNESS_BOOST = '4';
+process.env.AZURE_SEARCH_WORD_FUZZINESS = '1';

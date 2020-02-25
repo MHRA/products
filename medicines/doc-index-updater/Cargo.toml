@@ -1,0 +1,16 @@
+[package]
+name = "doc_index_updater"
+version = "0.1.0"
+authors = ["Stuart Harris <stuart.harris@red-badger.com>", "Robin James Kerrison <robinjames.kerrison@red-badger.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+pretty_env_logger = "0.4.0"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+tokio = { version = "0.2", features = ["macros"] }
+uuid = { version = "0.8", features = ["serde", "v4"] }
+warp = "0.2"
