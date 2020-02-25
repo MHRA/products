@@ -1,11 +1,10 @@
 pub use self::redis::get_client;
 use self::redis::{get_from_redis, set_in_redis, MyRedisError};
+use crate::models::{JobStatus, JobStatusResponse};
 use ::redis::aio::MultiplexedConnection;
-use models::{JobStatus, JobStatusResponse};
 use uuid::Uuid;
 use warp::{reply::Json, Filter, Rejection, Reply};
 
-mod models;
 mod redis;
 
 async fn get_status_handler(

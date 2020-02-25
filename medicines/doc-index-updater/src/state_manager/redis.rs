@@ -6,7 +6,7 @@ use redis::{
 use uuid::Uuid;
 use warp::reject;
 
-use super::models::JobStatus;
+use crate::models::JobStatus;
 
 #[derive(Debug)]
 pub struct MyRedisError(RedisError);
