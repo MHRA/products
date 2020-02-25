@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-index-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doc-index-updater
+  template:
+    metadata:
+      labels:
+        app: doc-index-updater
+    spec:
+      containers:
+        - name: doc-index-updater
+          image: mhra/doc-index-updater
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REDIS_ADDR
+              value: redis://127.0.0.1:6379/
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
