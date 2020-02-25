@@ -16,5 +16,6 @@ variable "client_secret" {
   description = "Service Principal Client Secret"
 }
 
-
-
+variable "name" {
+  description = "name for the service bus namespace"
+}
