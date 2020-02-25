@@ -20,18 +20,18 @@ const App: React.FC = () => {
   useEffect(() => {
     if (search) {
       const pageNum = page || 1;
-      const docQs = doc ? `&doc=${doc}` : '';
-      const disclaimerQs = disclaimer ? `&disclaimer=${disclaimer}` : '';
-      router.push(
-        `/search?q=${encodeURIComponent(
-          search.toString(),
-        )}&page=${pageNum}${docQs}${disclaimerQs}`,
-      );
+      router.push({
+        pathname: '/search',
+        query: { q: search.toString(), page: pageNum, doc, disclaimer },
+      });
     } else if (substance) {
       if (substance.length === 1) {
-        router.push(`/index/${substance}`);
+        router.push({
+          pathname: '/product-index',
+          query: { index: substance },
+        });
       } else {
-        router.push(`/substance/${encodeURIComponent(substance.toString())}`);
+        router.push({ pathname: '/substance', query: { substance } });
       }
     }
   }, [search, page, substance, disclaimer, doc]);

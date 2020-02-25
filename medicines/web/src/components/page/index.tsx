@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactGA from 'react-ga';
 import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
@@ -61,15 +61,17 @@ interface IPageProps {
 const useGoogleDebugMode = process.env.GOOGLE_DEBUG === 'true';
 
 const App: React.FC<IPageProps> = props => {
-  if (props.storageAllowed) {
-    TagManager.initialize({
-      gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
-      dataLayerName: 'dataLayer',
-    });
-    ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
-      debug: useGoogleDebugMode,
-    });
-  }
+  useEffect(() => {
+    if (props.storageAllowed) {
+      TagManager.initialize({
+        gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
+        dataLayerName: 'dataLayer',
+      });
+      ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
+        debug: useGoogleDebugMode,
+      });
+    }
+  }, [props.storageAllowed]);
 
   return (
     <>

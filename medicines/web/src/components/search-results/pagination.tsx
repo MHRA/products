@@ -81,12 +81,15 @@ const Pagination = (props: IPaginationProps) => {
     props.currentPage,
   );
 
+  const getHandlePageChangeHandler = (num: number) => () =>
+    props.handlePageChange(num);
+
   const createPaginationButton = (page: number, i: number, array: number[]) => {
     const separator = i === array.length - 1 ? '' : <span>&ndash;</span>;
 
     if (page === props.currentPage) {
       return (
-        <li key={page}>
+        <li key={page + i}>
           {page}
           {separator}
         </li>
@@ -94,8 +97,8 @@ const Pagination = (props: IPaginationProps) => {
     }
 
     return (
-      <li>
-        <a onClick={() => props.handlePageChange(page)}>{page}</a>
+      <li key={page + i}>
+        <a onClick={getHandlePageChangeHandler(page)}>{page}</a>
         {separator}
       </li>
     );
@@ -107,7 +110,7 @@ const Pagination = (props: IPaginationProps) => {
         {props.currentPage !== 1 ? (
           <li
             className="arrow"
-            onClick={() => props.handlePageChange(props.currentPage - 1)}
+            onClick={getHandlePageChangeHandler(props.currentPage - 1)}
           >
             <a>Previous</a>
           </li>
@@ -126,7 +129,7 @@ const Pagination = (props: IPaginationProps) => {
         {props.currentPage !== pageCount ? (
           <li
             className="arrow"
-            onClick={() => props.handlePageChange(props.currentPage + 1)}
+            onClick={getHandlePageChangeHandler(props.currentPage + 1)}
           >
             <a>Next</a>
           </li>

@@ -2,19 +2,19 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../components/page';
-import SearchResults from '../components/search-results';
-import SearchWrapper from '../components/search-wrapper';
-import { useLocalStorage } from '../hooks';
-import { docSearch, DocType } from '../services/azure-search';
-import Events from '../services/events';
+import Page from '../../components/page';
+import SearchResults from '../../components/search-results';
+import SearchWrapper from '../../components/search-wrapper';
+import { useLocalStorage } from '../../hooks';
+import { docSearch, DocType } from '../../services/azure-search';
+import Events from '../../services/events';
 import {
   docTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
   queryStringFromDocTypes,
-} from '../services/querystring-interpreter';
-import { convertResults, IDocument } from '../services/results-converter';
+} from '../../services/querystring-interpreter';
+import { convertResults, IDocument } from '../../services/results-converter';
 
 const pageSize = 10;
 const searchPath = '/search';
@@ -88,7 +88,6 @@ const App: NextPage = props => {
     if (docTypes.length > 0) {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
-      console.log(query[docKey]);
     }
     router.push({
       pathname: searchPath,

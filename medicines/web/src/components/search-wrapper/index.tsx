@@ -88,7 +88,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
     router.push({
       pathname: searchRoute,
       query: {
-        q: encodeURIComponent(searchTerm),
+        q: searchTerm,
         page: 1,
       },
     });

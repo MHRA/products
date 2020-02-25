@@ -2,30 +2,30 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../components/page';
-import SearchResults from '../components/search-results';
-import SearchWrapper from '../components/search-wrapper';
-import { useLocalStorage } from '../hooks';
-import { docSearch, DocType } from '../services/azure-search';
-import Events from '../services/events';
+import Page from '../../components/page';
+import SearchResults from '../../components/search-results';
+import SearchWrapper from '../../components/search-wrapper';
+import { useLocalStorage } from '../../hooks';
+import { docSearch, DocType } from '../../services/azure-search';
+import Events from '../../services/events';
 import {
   docTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
   queryStringFromDocTypes,
-} from '../services/querystring-interpreter';
-import { convertResults, IDocument } from '../services/results-converter';
+} from '../../services/querystring-interpreter';
+import { convertResults, IDocument } from '../../services/results-converter';
 
 const pageSize = 10;
-const searchPath = '/search';
+const productPath = '/product';
 
-const App: NextPage = props => {
+const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
   const [results, setResults] = React.useState<IDocument[]>([]);
-  const [query, setQuery] = React.useState();
+  const [productName, setProductName] = React.useState();
   const [count, setCount] = React.useState();
   const [pageNumber, setPageNumber] = React.useState();
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
@@ -33,29 +33,30 @@ const App: NextPage = props => {
 
   const router = useRouter();
   const {
-    query: { q, page, disclaimer, doc },
+    query: { product, page, disclaimer, doc },
   } = router;
 
   const setPageValues = async (
-    query: string | string[],
+    product: string | string[],
     page: string | string[],
     disclaimer: string | string[],
     doc: string | string[],
   ) => {
     const docTypes = docTypesFromQueryString(doc);
     const parsedPage = page ? parsePage(page) : 1;
-    const queryStr = query.toString();
+    const productStr = product.toString();
     const results = await docSearch({
-      query: queryStr,
+      query: '',
       page: parsedPage,
       pageSize,
       filters: {
         docType: docTypes,
         sortOrder: 'a-z',
+        productName: productStr,
       },
     });
 
-    setQuery(queryStr);
+    setProductName(productStr);
     setPageNumber(parsedPage);
     setDocTypes(docTypes);
     setResults(results.results.map(convertResults));
@@ -64,34 +65,35 @@ const App: NextPage = props => {
   };
 
   useEffect(() => {
-    if (!q) {
+    if (!product) {
       return;
     }
     (async () => {
-      await setPageValues(q, page, disclaimer, doc);
+      await setPageValues(product, page, disclaimer, doc);
     })();
-  }, [q, page, disclaimer, doc]);
+  }, [product, page, disclaimer, doc]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [props]);
+    if (window) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   const reroutePage = (
-    searchTerm: string,
+    productName: string,
     page: number,
     docTypes: DocType[],
   ) => {
     const query = {
-      q: searchTerm,
+      product: productName,
       page,
     };
     if (docTypes.length > 0) {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
-      console.log(query[docKey]);
     }
     router.push({
-      pathname: searchPath,
+      pathname: productPath,
       query,
     });
   };
@@ -104,11 +106,11 @@ const App: NextPage = props => {
     } else {
       enabledDocTypes.push(docTypeToToggle);
     }
-    reroutePage(query, 1, enabledDocTypes);
+    reroutePage(productName, 1, enabledDocTypes);
   };
 
   const handlePageChange = async (page: number) => {
-    reroutePage(query, page, docTypes);
+    reroutePage(productName, page, docTypes);
   };
 
   return (
@@ -117,14 +119,14 @@ const App: NextPage = props => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <SearchWrapper initialSearchValue={query}>
+      <SearchWrapper initialSearchValue="">
         <SearchResults
           drugs={results}
-          showingResultsForTerm={query}
+          showingResultsForTerm={productName}
           resultCount={count}
           page={pageNumber}
           pageSize={pageSize}
-          searchTerm={query}
+          searchTerm={productName}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
           handleDocTypeCheckbox={handleToggleDocType}
