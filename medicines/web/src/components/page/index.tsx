@@ -58,6 +58,8 @@ interface IPageProps {
   setStorageAllowed: any;
 }
 
+const useGoogleDebugMode = process.env.GOOGLE_DEBUG === 'true';
+
 const App: React.FC<IPageProps> = props => {
   if (props.storageAllowed) {
     TagManager.initialize({
@@ -65,7 +67,7 @@ const App: React.FC<IPageProps> = props => {
       dataLayerName: 'dataLayer',
     });
     ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
-      debug: true,
+      debug: useGoogleDebugMode,
     });
   }
 
