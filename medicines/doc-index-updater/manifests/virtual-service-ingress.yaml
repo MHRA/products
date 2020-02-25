@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: echo
+  name: doc-index-updater
 spec:
   hosts:
     - doc-index-updater.localhost

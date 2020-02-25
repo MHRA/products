@@ -9,7 +9,7 @@ kustomize build . | kubectl apply -f -
 - Add entry to hosts file:
 
 ```bash
-echo doc-index-updater.localhost 127.0.0.1 | sudo tee -a /etc/hosts
+echo "127.0.0.1 doc-index-updater.localhost" | sudo tee -a /etc/hosts
 ```
 
 - Test service:

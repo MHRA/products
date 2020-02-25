@@ -4,4 +4,8 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
-  - virtual-service.yaml
+  - virtual-service-ingress.yaml
+  - service-entry.yaml
+  - gateway.yaml
+  - virtual-service-egress.yaml
+  - destination-rule.yaml
