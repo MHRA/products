@@ -1,28 +1,55 @@
-use serde_derive::Serialize;
+pub use self::redis::get_client;
+use self::redis::{get_from_redis, set_in_redis, MyRedisError};
+use crate::models::{JobStatus, JobStatusResponse};
+use ::redis::aio::MultiplexedConnection;
 use uuid::Uuid;
-use warp::{Filter, Rejection, Reply};
+use warp::{reply::Json, Filter, Rejection, Reply};
 
-#[derive(Serialize)]
-enum JobStatus {
-    Accepted,
-    _Done,
-    _NotFound,
-    _Error { message: String, code: String },
+mod redis;
+
+async fn get_status_handler(
+    id: Uuid,
+    connection: MultiplexedConnection,
+) -> Result<Json, Rejection> {
+    let status = get_from_redis(connection, id)
+        .await
+        .map_err(MyRedisError::from)?;
+
+    Ok(warp::reply::json(&JobStatusResponse { id, status }))
 }
 
-#[derive(Serialize)]
-struct JobStatusResponse {
+async fn set_status_handler(
     id: Uuid,
     status: JobStatus,
+    connection: MultiplexedConnection,
+) -> Result<Json, Rejection> {
+    let status = set_in_redis(connection, id, status)
+        .await
+        .map_err(MyRedisError::from)?;
+
+    Ok(warp::reply::json(&JobStatusResponse { id, status }))
 }
 
-fn handler(id: Uuid) -> impl Reply {
-    warp::reply::json(&JobStatusResponse {
-        id,
-        status: JobStatus::Accepted,
-    })
+pub fn get_job_status(
+    connection: MultiplexedConnection,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("jobs" / Uuid)
+        .and(warp::get())
+        .and(with_connection(connection))
+        .and_then(get_status_handler)
 }
 
-pub fn routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    warp::path!("jobs" / Uuid).map(handler)
+pub fn set_job_status(
+    connection: MultiplexedConnection,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("jobs" / Uuid / JobStatus)
+        .and(warp::post())
+        .and(with_connection(connection))
+        .and_then(set_status_handler)
+}
+
+pub fn with_connection(
+    connection: MultiplexedConnection,
+) -> impl Filter<Extract = (MultiplexedConnection,), Error = std::convert::Infallible> + Clone {
+    warp::any().map(move || connection.clone())
 }
