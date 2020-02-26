@@ -28,7 +28,7 @@ const StyledPagination = styled.nav`
     margin-right: 0.5rem;
   }
 
-  li span {
+  li .link-text {
     padding-left: 0.5rem;
   }
 
@@ -36,16 +36,16 @@ const StyledPagination = styled.nav`
     font-size: 0.875rem;
   }
 
-  .pagination a {
+  .pagination .link-text {
     color: ${mhraBlue};
     text-decoration: underline;
   }
 
-  .pagination a:hover {
+  .pagination .link-text:hover {
     cursor: pointer;
   }
 
-  .arrow a {
+  .arrow .link-text {
     color: ${mhraWhite};
     background-color: ${primaryColor};
     padding: 12px 15px;
@@ -53,12 +53,12 @@ const StyledPagination = styled.nav`
     text-decoration: none;
   }
 
-  .arrow a:hover {
+  .arrow .link-text:hover {
     background-color: ${mhra70};
   }
 
   @media ${mobileBreakpoint} {
-    .arrow a {
+    .arrow .link-text {
       padding: 7px 10px;
       border-radius: 4px;
     }
@@ -81,7 +81,7 @@ const Pagination = (props: IPaginationProps) => {
     props.currentPage,
   );
 
-  const getHandlePageChangeHandler = (num: number) => () =>
+  const getPageChangeHandler = (num: number) => () =>
     props.handlePageChange(num);
 
   const createPaginationButton = (page: number, i: number, array: number[]) => {
@@ -89,7 +89,11 @@ const Pagination = (props: IPaginationProps) => {
 
     if (page === props.currentPage) {
       return (
-        <li key={page + i}>
+        <li
+          key={page}
+          aria-label={`Current Page, Page ${page}`}
+          aria-current="true"
+        >
           {page}
           {separator}
         </li>
@@ -97,8 +101,12 @@ const Pagination = (props: IPaginationProps) => {
     }
 
     return (
-      <li key={page + i}>
-        <a onClick={getHandlePageChangeHandler(page)}>{page}</a>
+      <li
+        key={page}
+        onClick={getPageChangeHandler(page)}
+        aria-label={`Goto Page ${page}`}
+      >
+        <span className="link-text">{page}</span>
         {separator}
       </li>
     );
@@ -106,37 +114,41 @@ const Pagination = (props: IPaginationProps) => {
 
   return (
     <StyledPagination>
-      <ul className="pagination">
-        {props.currentPage !== 1 ? (
-          <li
-            className="arrow"
-            onClick={getHandlePageChangeHandler(props.currentPage - 1)}
-          >
-            <a>Previous</a>
-          </li>
-        ) : (
-          <li className="arrow" />
-        )}
-        <div className="pagination-number">
-          {firstGroup.map(createPaginationButton)}
-          {middleGroup.length > 0 ? <li>&hellip;</li> : ''}
-          <div className="middle-group">
-            {middleGroup.map(createPaginationButton)}
+      <nav role="navigation" aria-label="Pagination Navigation">
+        <ul className="pagination">
+          {props.currentPage !== 1 ? (
+            <li
+              className="arrow"
+              onClick={getPageChangeHandler(props.currentPage - 1)}
+              aria-label={`Goto previous page, Page ${props.currentPage - 1}`}
+            >
+              <span className="link-text">Previous</span>
+            </li>
+          ) : (
+            <li className="arrow" />
+          )}
+          <div className="pagination-number">
+            {firstGroup.map(createPaginationButton)}
+            {middleGroup.length > 0 ? <li>&hellip;</li> : ''}
+            <div className="middle-group">
+              {middleGroup.map(createPaginationButton)}
+            </div>
+            {lastGroup.length > 0 ? <li>&hellip;</li> : ''}
+            {lastGroup.map(createPaginationButton)}
           </div>
-          {lastGroup.length > 0 ? <li>&hellip;</li> : ''}
-          {lastGroup.map(createPaginationButton)}
-        </div>
-        {props.currentPage !== pageCount ? (
-          <li
-            className="arrow"
-            onClick={getHandlePageChangeHandler(props.currentPage + 1)}
-          >
-            <a>Next</a>
-          </li>
-        ) : (
-          <li className="arrow" />
-        )}
-      </ul>
+          {props.currentPage !== pageCount ? (
+            <li
+              className="arrow"
+              onClick={getPageChangeHandler(props.currentPage + 1)}
+              aria-label={`Goto next page, Page ${props.currentPage + 1}`}
+            >
+              <span className="link-text">Next</span>
+            </li>
+          ) : (
+            <li className="arrow" />
+          )}
+        </ul>
+      </nav>
     </StyledPagination>
   );
 };
