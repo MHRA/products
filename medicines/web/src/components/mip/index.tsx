@@ -69,7 +69,6 @@ const Mip: React.FC = () => {
       doc: queryDocFilter,
     },
   } = router;
-  // const isProduct = product === 'true';
 
   const handleSearchBlur = (e: FormEvent<HTMLInputElement>) => {
     setSearch(formatSearchTerm(e.currentTarget.value));
