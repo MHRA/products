@@ -1,12 +1,9 @@
+use crate::models::JobStatus;
+use ::redis::Client;
 use log::info;
-use redis::{
-    self, aio::MultiplexedConnection, Client, FromRedisValue, RedisError, RedisResult, RedisWrite,
-    ToRedisArgs, Value,
-};
+use redis::{self, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value};
 use uuid::Uuid;
 use warp::reject;
-
-use crate::models::JobStatus;
 
 #[derive(Debug)]
 pub struct MyRedisError(RedisError);
@@ -55,8 +52,8 @@ pub fn get_client(address: String) -> Result<Client, RedisError> {
     Ok(Client::open(address)?)
 }
 
-pub async fn get_from_redis(con: MultiplexedConnection, id: Uuid) -> RedisResult<JobStatus> {
-    let mut con = con.clone();
+pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> {
+    let mut con = client.get_async_connection().await?;
     redis::cmd("GET")
         .arg(id.to_string())
         .query_async(&mut con)
@@ -64,12 +61,8 @@ pub async fn get_from_redis(con: MultiplexedConnection, id: Uuid) -> RedisResult
         .or(Ok(JobStatus::NotFound))
 }
 
-pub async fn set_in_redis(
-    con: MultiplexedConnection,
-    id: Uuid,
-    status: JobStatus,
-) -> RedisResult<JobStatus> {
-    let mut con = con.clone();
+pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
+    let mut con = client.get_async_connection().await?;
     redis::cmd("SET")
         .arg(id.to_string())
         .arg(status.clone())
