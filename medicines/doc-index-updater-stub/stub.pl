@@ -110,4 +110,9 @@ post '/documents' => http_basic_auth required => sub {
     return $job;
 };
 
+get '/health' => http_basic_auth required => sub {
+    status 'ok';
+    return '';
+};
+
 dance;
