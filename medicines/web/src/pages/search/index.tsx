@@ -33,20 +33,20 @@ const App: NextPage = props => {
 
   const router = useRouter();
   const {
-    query: { q, page, disclaimer, doc },
+    query: { search, page, disclaimer, doc },
   } = router;
 
   const setPageValues = async (
-    query: string | string[],
+    search: string | string[],
     page: string | string[],
     disclaimer: string | string[],
     doc: string | string[],
   ) => {
     const docTypes = docTypesFromQueryString(doc);
     const parsedPage = page ? parsePage(page) : 1;
-    const queryStr = query.toString();
+    const searchStr = search.toString();
     const results = await docSearch({
-      query: queryStr,
+      query: searchStr,
       page: parsedPage,
       pageSize,
       filters: {
@@ -55,27 +55,27 @@ const App: NextPage = props => {
       },
     });
 
-    setQuery(queryStr);
+    setQuery(searchStr);
     setPageNumber(parsedPage);
     setDocTypes(docTypes);
     setResults(results.results.map(convertResults));
     setCount(results.resultCount);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
     Events.searchForProductsMatchingKeywords({
-      searchTerm: queryStr,
+      searchTerm: searchStr,
       pageNo: parsedPage,
       docTypes: queryStringFromDocTypes(docTypes),
     });
   };
 
   useEffect(() => {
-    if (!q) {
+    if (!search) {
       return;
     }
     (async () => {
-      await setPageValues(q, page, disclaimer, doc);
+      await setPageValues(search, page, disclaimer, doc);
     })();
-  }, [q, page, disclaimer, doc]);
+  }, [search, page, disclaimer, doc]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -87,7 +87,7 @@ const App: NextPage = props => {
     docTypes: DocType[],
   ) => {
     const query = {
-      q: searchTerm,
+      search: searchTerm,
       page,
     };
     if (docTypes.length > 0) {

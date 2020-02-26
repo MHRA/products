@@ -58,8 +58,6 @@ interface IPageProps {
   setStorageAllowed: any;
 }
 
-const useGoogleDebugMode = process.env.GOOGLE_DEBUG === 'true';
-
 const App: React.FC<IPageProps> = props => {
   useEffect(() => {
     if (props.storageAllowed) {
@@ -68,7 +66,7 @@ const App: React.FC<IPageProps> = props => {
         dataLayerName: 'dataLayer',
       });
       ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
-        debug: useGoogleDebugMode,
+        debug: true,
       });
     }
   }, [props.storageAllowed]);
