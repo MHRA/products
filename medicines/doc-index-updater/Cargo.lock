@@ -308,6 +308,7 @@ dependencies = [
 name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
+ "azure_sdk_core",
  "azure_sdk_service_bus",
  "log 0.4.8",
  "pretty_env_logger",
@@ -315,6 +316,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "test-case",
+ "time",
  "tokio",
  "uuid",
  "warp",
