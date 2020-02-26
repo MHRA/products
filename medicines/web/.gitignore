@@ -3,3 +3,6 @@ dist/
 yarn-error.log
 .next
 out/
+cypress/videos/
+cypress/screenshots/
+coverage/

@@ -1,0 +1,735 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DrugIndex should render 1`] = `
+<styled.nav>
+  <p
+    className="horizontal"
+  >
+    Coffee
+  </p>
+  <ul
+    className="horizontal"
+  >
+    <li
+      className=""
+      key="A"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "A",
+            },
+          }
+        }
+      >
+        <a>
+          A
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="B"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "B",
+            },
+          }
+        }
+      >
+        <a>
+          B
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="C"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "C",
+            },
+          }
+        }
+      >
+        <a>
+          C
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="D"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "D",
+            },
+          }
+        }
+      >
+        <a>
+          D
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="E"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "E",
+            },
+          }
+        }
+      >
+        <a>
+          E
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="F"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "F",
+            },
+          }
+        }
+      >
+        <a>
+          F
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="G"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "G",
+            },
+          }
+        }
+      >
+        <a>
+          G
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="H"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "H",
+            },
+          }
+        }
+      >
+        <a>
+          H
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="I"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "I",
+            },
+          }
+        }
+      >
+        <a>
+          I
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="J"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "J",
+            },
+          }
+        }
+      >
+        <a>
+          J
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="K"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "K",
+            },
+          }
+        }
+      >
+        <a>
+          K
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="L"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "L",
+            },
+          }
+        }
+      >
+        <a>
+          L
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="M"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "M",
+            },
+          }
+        }
+      >
+        <a>
+          M
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="N"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "N",
+            },
+          }
+        }
+      >
+        <a>
+          N
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="O"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "O",
+            },
+          }
+        }
+      >
+        <a>
+          O
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="P"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "P",
+            },
+          }
+        }
+      >
+        <a>
+          P
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="Q"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "Q",
+            },
+          }
+        }
+      >
+        <a>
+          Q
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="R"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "R",
+            },
+          }
+        }
+      >
+        <a>
+          R
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="S"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "S",
+            },
+          }
+        }
+      >
+        <a>
+          S
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="T"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "T",
+            },
+          }
+        }
+      >
+        <a>
+          T
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="U"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "U",
+            },
+          }
+        }
+      >
+        <a>
+          U
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="V"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "V",
+            },
+          }
+        }
+      >
+        <a>
+          V
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="W"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "W",
+            },
+          }
+        }
+      >
+        <a>
+          W
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="X"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "X",
+            },
+          }
+        }
+      >
+        <a>
+          X
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="Y"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "Y",
+            },
+          }
+        }
+      >
+        <a>
+          Y
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="Z"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "Z",
+            },
+          }
+        }
+      >
+        <a>
+          Z
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="0"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "0",
+            },
+          }
+        }
+      >
+        <a>
+          0
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="1"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "1",
+            },
+          }
+        }
+      >
+        <a>
+          1
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="2"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "2",
+            },
+          }
+        }
+      >
+        <a>
+          2
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="3"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "3",
+            },
+          }
+        }
+      >
+        <a>
+          3
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="4"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "4",
+            },
+          }
+        }
+      >
+        <a>
+          4
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="5"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "5",
+            },
+          }
+        }
+      >
+        <a>
+          5
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="6"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "6",
+            },
+          }
+        }
+      >
+        <a>
+          6
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="7"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "7",
+            },
+          }
+        }
+      >
+        <a>
+          7
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="8"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "8",
+            },
+          }
+        }
+      >
+        <a>
+          8
+           
+        </a>
+      </Link>
+    </li>
+    <li
+      className=""
+      key="9"
+    >
+      <Link
+        href={
+          Object {
+            "query": Object {
+              "index": true,
+              "substance": "9",
+            },
+          }
+        }
+      >
+        <a>
+          9
+           
+        </a>
+      </Link>
+    </li>
+  </ul>
+</styled.nav>
+`;

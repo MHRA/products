@@ -5,7 +5,7 @@ variable "REGION" {
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products"
+  default     = "products-dev"
 }
 
 variable "CLIENT_ID" {
@@ -16,7 +16,7 @@ variable "CLIENT_SECRET" {
   description = "Service Principal Client Secret"
 }
 
-variable "ENVIROMENT" {
-  description = "Enviroment name"
+variable "ENVIRONMENT" {
+  description = "Environment name"
   default     = "non-prod"
 }

@@ -1,0 +1,48 @@
+{
+  "@odata.context": "https://mhraproductsdev.search.windows.net/indexes('products-index')/$metadata#docs(*)",
+  "@search.facets": {
+    "facets": [
+      {
+        "count": 399,
+        "value": "A"
+      },
+      {
+        "count": 3,
+        "value": "A, A SUBSTANCE CONTAINING THE LETTER P"
+      },
+      {
+        "count": 5738,
+        "value": "P"
+      },
+      {
+        "count": 2,
+        "value": "P, PERFECTLY LEGITIMATE SUBSTANCE"
+      },
+      {
+        "count": 2,
+        "value": "P, PERFECTLY LEGITIMATE SUBSTANCE, PERFECTLY LEGITIMATE TABLES"
+      },
+      {
+        "count": 1438,
+        "value": "P, PARACETAMOL"
+      },
+      {
+        "count": 1438,
+        "value": "P, PARACETAMOL, PARACETAMOL TABLETS"
+      },
+      {
+        "count": 1438,
+        "value": "P, PARACETAMOL, PARACETAMOL CAPSULES"
+      },
+      {
+        "count": 55,
+        "value": "Y"
+      },
+      {
+        "count": 2,
+        "value": "Y, YET ANOTHER SUBSTANCE CONTAINING THE LETTER P"
+      }
+    ]
+  },
+  "value": []
+}
