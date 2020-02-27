@@ -14,7 +14,11 @@ az keyvault secret show \
   --output tsv > sealed-secrets-key.yaml
 ```
 
-- apply to cluster: `kustomize build . | kubectl apply -f -`
+- apply to cluster:
+
+```bash
+kustomize build . | kubectl apply -f -
+```
 
 - **remove the private key** from your laptop:
 
@@ -22,13 +26,17 @@ az keyvault secret show \
 rm sealed-secrets-key.yaml
 ```
 
-### Upgrade to new version of `SealedSecrets`
+### Only if you want to upgrade to new version of `SealedSecrets`...
 
 - download `controller.yaml` from https://github.com/bitnami-labs/sealed-secrets/releases
 
-- split into multiple yaml files: `k8s-yaml-splitter ./controller.yaml .`
+- split into multiple yaml files:
 
-### Create a new sealing key:
+```bash
+k8s-yaml-splitter ./controller.yaml .
+```
+
+### Only if this is a new class of cluster and you need to create a new sealing key...
 
 - install as above but without a sealing key (you will need to comment out the resource entry for the secret in `kustomization.yaml`)
 
