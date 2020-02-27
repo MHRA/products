@@ -2,6 +2,7 @@ namespace: doc-index-updater
 
 resources:
   - namespace.yaml
+  - SealedSecret-redis-key.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml

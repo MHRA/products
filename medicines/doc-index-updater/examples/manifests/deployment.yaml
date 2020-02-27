@@ -17,8 +17,15 @@ spec:
           image: mhra/doc-index-updater
           imagePullPolicy: IfNotPresent
           env:
-            - name: REDIS_ADDR
-              value: redis://:LdPbPP2X0KD7nknL7r96UCR8TBU6h5HyRlk5E2Uzi0k=@doc-index-updater-dev.redis.cache.windows.net:6379/
+            - name: REDIS_SERVER
+              value: doc-index-updater-dev.redis.cache.windows.net
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: redis-key
+                  key: key
           ports:
             - containerPort: 8000
           resources:

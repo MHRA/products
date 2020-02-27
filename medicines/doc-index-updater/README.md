@@ -28,3 +28,7 @@ stunnel stunnel.conf
 ```bash
 REDIS_ADDR=redis://:<password>@127.0.0.1:6379/ ./target/debug/doc_index_updater # replace <password> with real password
 ```
+
+## To run in a local cluster:
+
+- follow the [README.md](./examples/local-cluster/README.md)
