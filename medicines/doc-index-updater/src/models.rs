@@ -1,4 +1,4 @@
-use serde_derive::Serialize;
+use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -29,6 +29,27 @@ impl FromStr for JobStatus {
 pub struct JobStatusResponse {
     pub id: Uuid,
     pub status: JobStatus,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Document {
+    id: String,
+    name: String,
+    #[serde(rename = "type")]
+    document_type: DocumentType,
+    author: String,
+    products: Vec<String>,
+    keywords: Option<Vec<String>>,
+    pl_number: String,
+    active_substances: Vec<String>,
+    file_source: String,
+    file_path: String,
+}
+
+pub enum DocumentType {
+    SPC,
+    PIL,
+    PAR,
 }
 
 #[cfg(test)]
