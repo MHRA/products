@@ -25,7 +25,7 @@ impl FromStr for JobStatus {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct JobStatusResponse {
     pub id: Uuid,
     pub status: JobStatus,
@@ -46,6 +46,7 @@ pub struct Document {
     file_path: String,
 }
 
+#[derive(Serialize, Debug, Clone)]
 pub enum DocumentType {
     SPC,
     PIL,
