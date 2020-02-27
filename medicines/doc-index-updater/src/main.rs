@@ -1,6 +1,4 @@
-use doc_index_updater::{
-    document_manager, health, service_bus_client::delete_queue_client, state_manager,
-};
+use doc_index_updater::{document_manager, health, state_manager};
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr};
 use warp::Filter;
@@ -37,29 +35,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         .run(addr.clone())
         .await;
     }),);
-
-    let delete_queue = delete_queue_client();
-
-    let messages = vec![
-        "These", "are", "useless", "messages", "provided", "for", "free", "with", "love",
-    ];
-
-    println!(
-        "Sending the following messages: {:?}. \
-         Please note they will be sent out of order!",
-        messages
-    );
-
-    let mut v = Vec::new();
-    for s in messages.into_iter() {
-        v.push(delete_queue.send_event(s.to_owned(), time::Duration::days(1)))
-    }
-
-    // match client.send_event(&s, time::Duration::days(1)).await {
-    //     Ok(_) => println!("{:?} message sent!", s),
-
-    //     Err(error) => println!("{:?} failed to send message", error),
-    // }
 
     Ok(())
 }
