@@ -3,3 +3,4 @@ resources:
 
 patchesStrategicMerge:
   - deployment.yaml
+  - ingress.yaml
