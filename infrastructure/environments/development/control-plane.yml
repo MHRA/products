@@ -13,7 +13,9 @@ spec:
       controlPlaneSecurityEnabled: true
       mtls:
         # Require all service to service communication to have mtls
-        enabled: false
+        enabled: true
+      outboundTrafficPolicy:
+        mode: REGISTRY_ONLY
     gateways:
       istio-ingressgateway:
         loadBalancerIP: 51.11.35.34
