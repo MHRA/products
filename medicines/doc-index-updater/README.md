@@ -5,7 +5,7 @@
 ```bash
 docker build \
   --tag doc-index-updater \
-  --tag mhraproductsdevregistry.azurecr.io/products/doc-image-updater \
+  --tag mhraproductsdevregistry.azurecr.io/products/doc-index-updater \
   .
 ```
 
@@ -14,7 +14,7 @@ docker build \
 ```bash
 az acr login --name mhraproductsdevregistry
 
-docker push mhraproductsdevregistry.azurecr.io/products/doc-image-updater
+docker push mhraproductsdevregistry.azurecr.io/products/doc-index-updater
 ```
 
 ## To run locally (by tunneling redis connection to Azure over TLS):
