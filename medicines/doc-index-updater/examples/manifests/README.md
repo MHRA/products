@@ -2,8 +2,16 @@
 
 - Deploy doc-index-updater:
 
+For local cluster:
+
 ```bash
-kustomize build . | kubectl apply -f -
+kustomize build ./overlays/local | kubectl apply -f -
+```
+
+For development cluster in AKS:
+
+```bash
+kustomize build ./overlays/development | kubectl apply -f -
 ```
 
 - Add entry to hosts file:

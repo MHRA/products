@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-index-updater
+spec:
+  template:
+    spec:
+      containers:
+        - name: doc-index-updater
+          image: mhraproductsdevregistry.azurecr.io/products/doc-index-updater

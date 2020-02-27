@@ -1,5 +1,22 @@
 ### doc-index-updater
 
+## To build a docker image:
+
+```bash
+docker build \
+  --tag doc-index-updater \
+  --tag mhraproductsdevregistry.azurecr.io/products/doc-image-updater \
+  .
+```
+
+## To push image to Azure container registry (ACR):
+
+```bash
+az acr login --name mhraproductsdevregistry
+
+docker push mhraproductsdevregistry.azurecr.io/products/doc-image-updater
+```
+
 ## To run locally (by tunneling redis connection to Azure over TLS):
 
 - install `stunnel` with homebrew:

@@ -1,10 +1,10 @@
-## Bitnami `SealedSecrets`
+# Bitnami `SealedSecrets`
 
 See https://github.com/bitnami-labs/sealed-secrets
 
-### Install
+## Install the `SealedSecrets` controller into the cluster...
 
-- retrieve the sealing key from Azure Vault (so we don't have to reseal all our dev secrets):
+- retrieve the sealing key from Azure Vault (so we don't have to re-encrypt all our dev secrets):
 
 ```bash
 az keyvault secret show \
@@ -20,13 +20,15 @@ az keyvault secret show \
 kustomize build . | kubectl apply -f -
 ```
 
-- **remove the private key** from your laptop:
+- don't forget to **remove the private key** from your computer:
 
 ```bash
 rm sealed-secrets-key.yaml
 ```
 
-### Only if you want to upgrade to new version of `SealedSecrets`...
+---
+
+## Only if you want to upgrade to new version of `SealedSecrets`...
 
 - download `controller.yaml` from https://github.com/bitnami-labs/sealed-secrets/releases
 
@@ -35,6 +37,8 @@ rm sealed-secrets-key.yaml
 ```bash
 k8s-yaml-splitter ./controller.yaml .
 ```
+
+---
 
 ### Only if this is a new class of cluster and you need to create a new sealing key...
 
@@ -49,6 +53,10 @@ kubectl get secrets \
   -o yaml > sealed-secrets-key.yaml
 
 az keyvault secret set --vault-name sealedsecrets-keys --name dev --file sealed-secrets-key.yaml
+```
 
+- don't forget to **remove the private key** from your computer:
+
+```bash
 rm sealed-secrets-key.yaml
 ```
