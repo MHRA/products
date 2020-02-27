@@ -90,12 +90,12 @@ pub fn create_context() -> AzureContext {
 }
 
 impl AzureSearchClient {
-    pub async fn azure_search(
-        &self,
-        search_term: String,
-    ) -> Result<AzureSearchResults, reqwest::Error> {
-        azure_search(search_term, &self.client, &self.config).await
-    }
+    // pub async fn azure_search(
+    //     &self,
+    //     search_term: String,
+    // ) -> Result<AzureSearchResults, reqwest::Error> {
+    //     azure_search(search_term, &self.client, &self.config).await
+    // }
 
     pub async fn filter_by_collection(
         &self,
@@ -107,40 +107,40 @@ impl AzureSearchClient {
     }
 }
 
-async fn azure_search(
-    search_term: String,
-    client: &reqwest::Client,
-    config: &AzureConfig,
-) -> Result<AzureSearchResults, reqwest::Error> {
-    let base_url = format!(
-        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
-        search_service = config.search_service,
-        search_index = config.search_index
-    );
-
-    let req = client
-        .get(&base_url)
-        .query(&[
-            ("api-version", "2017-11-11"),
-            ("api-key", &config.api_key),
-            ("highlight", "content"),
-            ("queryType", "full"),
-            ("@count", "true"),
-            ("@top", "10"),
-            ("@skip", "0"),
-            ("search", &search_term),
-            ("scoringProfile", "preferKeywords"),
-        ])
-        .build()?;
-
-    println!("Requesting from URL: {}", &req.url());
-
-    client
-        .execute(req)
-        .await?
-        .json::<AzureSearchResults>()
-        .await
-}
+// async fn azure_search(
+//     search_term: String,
+//     client: &reqwest::Client,
+//     config: &AzureConfig,
+// ) -> Result<AzureSearchResults, reqwest::Error> {
+//     let base_url = format!(
+//         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+//         search_service = config.search_service,
+//         search_index = config.search_index
+//     );
+//
+//     let req = client
+//         .get(&base_url)
+//         .query(&[
+//             ("api-version", "2017-11-11"),
+//             ("api-key", &config.api_key),
+//             ("highlight", "content"),
+//             ("queryType", "full"),
+//             ("@count", "true"),
+//             ("@top", "10"),
+//             ("@skip", "0"),
+//             ("search", &search_term),
+//             ("scoringProfile", "preferKeywords"),
+//         ])
+//         .build()?;
+//
+//     println!("Requesting from URL: {}", &req.url());
+//
+//     client
+//         .execute(req)
+//         .await?
+//         .json::<AzureSearchResults>()
+//         .await
+// }
 
 fn build_filter_by_collection_request(
     field_name: &String,
