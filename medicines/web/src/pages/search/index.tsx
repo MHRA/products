@@ -45,6 +45,12 @@ const App: NextPage = props => {
     const docTypes = docTypesFromQueryString(doc);
     const parsedPage = page ? parsePage(page) : 1;
     const searchStr = search.toString();
+
+    setQuery(searchStr);
+    setPageNumber(parsedPage);
+    setDocTypes(docTypes);
+    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
+
     const results = await docSearch({
       query: searchStr,
       page: parsedPage,
@@ -55,12 +61,8 @@ const App: NextPage = props => {
       },
     });
 
-    setQuery(searchStr);
-    setPageNumber(parsedPage);
-    setDocTypes(docTypes);
     setResults(results.results.map(convertResults));
     setCount(results.resultCount);
-    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
     Events.searchForProductsMatchingKeywords({
       searchTerm: searchStr,
       pageNo: parsedPage,

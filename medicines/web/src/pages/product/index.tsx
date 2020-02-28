@@ -42,9 +42,15 @@ const App: NextPage = () => {
     disclaimer: string | string[],
     doc: string | string[],
   ) => {
-    const docTypes = docTypesFromQueryString(doc);
-    const parsedPage = page ? parsePage(page) : 1;
     const productStr = product.toString();
+    const parsedPage = page ? parsePage(page) : 1;
+    const docTypes = docTypesFromQueryString(doc);
+
+    setProductName(productStr);
+    setPageNumber(parsedPage);
+    setDocTypes(docTypes);
+    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
+
     const results = await docSearch({
       query: '',
       page: parsedPage,
@@ -56,12 +62,8 @@ const App: NextPage = () => {
       },
     });
 
-    setProductName(productStr);
-    setPageNumber(parsedPage);
-    setDocTypes(docTypes);
     setResults(results.results.map(convertResults));
     setCount(results.resultCount);
-    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
     Events.viewResultsForProduct({
       productName: productStr,
       pageNo: parsedPage,
