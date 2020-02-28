@@ -122,6 +122,7 @@ describe('Search', function() {
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.get('https://example.com/an-example-par.pdf').should('not.exist');
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
@@ -138,6 +139,7 @@ describe('Search', function() {
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
+    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
