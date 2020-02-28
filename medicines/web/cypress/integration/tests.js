@@ -74,7 +74,7 @@ const mockIbuprofenSpcPilResults = () =>
     'fixture:search_results.spcpil.json',
   );
 
-const longerTimout = 20000;
+const longerTimeout = 20000;
 
 describe('Search', function() {
   it('can search for Paracetamol', function() {
@@ -85,7 +85,7 @@ describe('Search', function() {
     cy.get("input[type='search']").type('paracetamol');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
-      timeout: longerTimout,
+      timeout: longerTimeout,
     }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
@@ -100,7 +100,7 @@ describe('Search', function() {
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
-      timeout: longerTimout,
+      timeout: longerTimeout,
     }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
@@ -116,7 +116,7 @@ describe('Search', function() {
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
-      timeout: longerTimout,
+      timeout: longerTimeout,
     }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
@@ -134,7 +134,7 @@ describe('Search', function() {
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
-      timeout: longerTimout,
+      timeout: longerTimeout,
     }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
@@ -156,7 +156,7 @@ describe('Search', function() {
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
-      timeout: longerTimout,
+      timeout: longerTimeout,
     }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
