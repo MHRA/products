@@ -62,7 +62,7 @@ del '/documents/:document' => http_basic_auth required => sub {
     $jobs{$job_id} = $job;
 
     status 'accepted';
-    return $jobs{$job_id};
+    return {id => $job_id, status => 'Accepted'};
 };
 
 post '/documents' => http_basic_auth required => sub {
