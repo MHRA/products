@@ -86,13 +86,21 @@ Returns the status of a job specified by :job_id.
 Sample response:
 
 ```xml
-<document>
-    <document_id>con33333333</document_id>
+<job>
     <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
-    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
-    <status>done</status>
-    <type>delete</type>
-</document>
+    <status>Done</status>
+</job>
+```
+
+Note that a job which has encountered an unrecoverable error will have additional fields:
+
+```xml
+<job>
+    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <status>Error</status>
+    <error_code>15</error_code>
+    <error_message>Invalid file source provided.</error_message>
+</job>
 ```
 
 ### DELETE /documents/:document
@@ -105,13 +113,10 @@ the requested document does not exist.
 Sample response:
 
 ```xml
-<document>
-    <document_id>con33333333</document_id>
-    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
-    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
-    <status>accepted</status>
-    <type>delete</type>
-</document>
+<job>
+    <id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</id>
+    <status>Accepted</status>
+</job>
 ```
 
 ### POST /documents/
@@ -148,11 +153,8 @@ in the deleted state.
 Sample response:
 
 ```xml
-<document>
-    <document_id>con33333333</document_id>
+<job>
     <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
-    <job_uri>https://example.com/jobs/c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_uri>
-    <status>accepted</status>
-    <type>check-in</type>
-</document>
+    <status>Accepted</status>
+</job>
 ```
