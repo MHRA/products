@@ -15,7 +15,14 @@ const App: React.FC = () => {
 
   const router = useRouter();
   const {
-    query: { search, page, substance, disclaimer, doc },
+    query: {
+      search: searchQS,
+      page: pageQS,
+      substance: substanceQS,
+      disclaimer: disclaimerQS,
+      doc: docQS,
+      product: productQS,
+    },
   } = router;
 
   useEffect(() => {
@@ -23,23 +30,30 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (search) {
-      const pageNum = page || 1;
+    // handle and redirect legacy urls
+    if (searchQS) {
+      const page = pageQS || 1;
+      const pathname = productQS ? '/product' : '/search';
       router.push({
-        pathname: '/search',
-        query: { q: search.toString(), page: pageNum, doc, disclaimer },
+        pathname,
+        query: {
+          query: searchQS.toString(),
+          page,
+          doc: docQS,
+          disclaimer: disclaimerQS,
+        },
       });
-    } else if (substance) {
-      if (substance.length === 1) {
+    } else if (substanceQS) {
+      if (substanceQS.length === 1) {
         router.push({
-          pathname: '/product-index',
-          query: { index: substance },
+          pathname: '/substance-index',
+          query: { query: substanceQS },
         });
       } else {
-        router.push({ pathname: '/substance', query: { substance } });
+        router.push({ pathname: '/substance', query: { query: substanceQS } });
       }
     }
-  }, [search, page, substance, disclaimer, doc]);
+  }, [searchQS, pageQS, substanceQS, disclaimerQS, docQS, productQS]);
 
   return (
     <Page
