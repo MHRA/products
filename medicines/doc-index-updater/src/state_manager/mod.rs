@@ -46,8 +46,26 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
+fn log_and_return_error(e: MyRedisError) -> MyRedisError {
+    log::error!("{:?}", e);
+    e
+}
+
 async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
-    let response = mgr.get_status(id).await?;
+    let response = match mgr.get_status(id).await {
+        Ok(status) => Ok(status),
+        Err(e) => match e {
+            MyRedisError::IncompatibleType(e) => {
+                log::warn!("{}", e);
+                Ok(JobStatusResponse {
+                    id,
+                    status: JobStatus::NotFound,
+                })
+            }
+            MyRedisError::Auth(_) => Err(log_and_return_error(e)),
+            MyRedisError::Other(_) => Err(log_and_return_error(e)),
+        },
+    }?;
     let json = warp::reply::json(&response);
     match response.status {
         JobStatus::NotFound => Ok(warp::reply::with_status(json, StatusCode::NOT_FOUND)),

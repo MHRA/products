@@ -6,13 +6,21 @@ use uuid::Uuid;
 use warp::reject;
 
 #[derive(Debug)]
-pub struct MyRedisError(RedisError);
+pub enum MyRedisError {
+    Auth(RedisError),
+    IncompatibleType(RedisError),
+    Other(RedisError),
+}
 
 impl reject::Reject for MyRedisError {}
 
 impl From<RedisError> for MyRedisError {
     fn from(e: RedisError) -> Self {
-        Self(e)
+        match e.kind() {
+            redis::ErrorKind::AuthenticationFailed => Self::Auth(e),
+            redis::ErrorKind::TypeError => Self::IncompatibleType(e),
+            _ => Self::Other(e),
+        }
     }
 }
 
@@ -54,21 +62,21 @@ pub fn get_client(address: String) -> Result<Client, RedisError> {
 
 pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
-    redis::cmd("GET")
+
+    Ok(redis::cmd("GET")
         .arg(id.to_string())
         .query_async(&mut con)
-        .await
-        .or(Ok(JobStatus::NotFound))
+        .await?)
 }
 
 pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
-    redis::cmd("SET")
+
+    Ok(redis::cmd("SET")
         .arg(id.to_string())
         .arg(status.clone())
         .query_async(&mut con)
-        .await
-        .or(Ok(status))
+        .await?)
 }
 
 #[cfg(test)]
