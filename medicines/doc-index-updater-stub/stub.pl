@@ -27,8 +27,8 @@ get '/jobs/:job' => http_basic_auth required => sub {
         my $status = $jobs{$job_id};
         my $resp = dclone $status;
 
-        if ($status->{status} eq 'accepted') {
-            $jobs{$job_id}->{status} = 'done';
+        if ($status->{status} eq 'Accepted') {
+            $jobs{$job_id}->{status} = 'Done';
         }
 
         status 'ok';
@@ -45,25 +45,24 @@ del '/documents/:document' => http_basic_auth required => sub {
 
     my $document_id = route_parameters->get('document');
 
-    if (exists($documents{$document_id})) {
-        delete($documents{$document_id});
+    my $job_id = create_uuid_as_string(UUID_V4);
+    my $job = {
+        id     => $job_id,
+        status => 'Accepted'
+    };
 
-        my $job_id = create_uuid_as_string(UUID_V4);
-        my $job = {
-            job_id      => $job_id,
-            job_uri     => uri_for("/jobs/$job_id"),
-            document_id => $document_id,
-            status      => 'accepted',
-            type        => 'delete'
-        };
-        $jobs{$job_id} = $job;
-
-        status 'accepted';
-        return $jobs{$job_id};
+    unless (exists($documents{$document_id})) {
+        $job->{status}        = 'Error';
+        $job->{error_code}    = 0x0;
+        $job->{error_message} = 'The document requested could not be deleted.';
     } else {
-        status 'not_found';
-        return '';
+        delete($documents{$document_id});
     }
+
+    $jobs{$job_id} = $job;
+
+    status 'accepted';
+    return $jobs{$job_id};
 };
 
 post '/documents' => http_basic_auth required => sub {
@@ -97,11 +96,8 @@ post '/documents' => http_basic_auth required => sub {
 
     my $job_id = create_uuid_as_string(UUID_V4);
     my $job = {
-        job_id      => $job_id,
-        job_uri     => uri_for("/jobs/$job_id"),
-        document_id => $doc->{id},
-        type        => 'check-in',
-        status      => 'accepted'
+        id     => $job_id,
+        status => 'Accepted'
     };
     $jobs{$job_id} = $job;
     $documents{$doc->{id}} = $doc;
@@ -110,9 +106,9 @@ post '/documents' => http_basic_auth required => sub {
     return $job;
 };
 
-get '/health' => http_basic_auth required => sub {
+get '/healthz' => http_basic_auth required => sub {
     status 'ok';
-    return '';
+    return {healthy => true};
 };
 
 dance;
