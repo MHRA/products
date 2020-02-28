@@ -121,15 +121,15 @@ mod test {
     fn test_sort_products() {
         let mut products = Vec::<Product>::new();
         products.push(Product {
-            name: "B",
+            name: "B".to_string(),
             document_count: 1,
         });
         products.push(Product {
-            name: "C",
+            name: "C".to_string(),
             document_count: 1,
         });
         products.push(Product {
-            name: "A",
+            name: "A".to_string(),
             document_count: 1,
         });
         products.sort();
