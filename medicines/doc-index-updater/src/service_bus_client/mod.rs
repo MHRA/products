@@ -1,5 +1,6 @@
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::*;
+use std::time::Duration;
 use tokio::time::delay_for;
 
 pub async fn delete_queue_client() -> Result<Client, AzureError> {
@@ -43,6 +44,6 @@ pub async fn delete_service_worker() -> Result<String, AzureError> {
         // TODO: delete file in blob storage
         // TODO: Update index
         // TODO: Notify state manager
-        delay_for(Duration::from_secs(1)).await;
+        delay_for(Duration::from_secs(10)).await;
     }
 }
