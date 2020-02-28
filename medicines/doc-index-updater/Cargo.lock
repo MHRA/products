@@ -53,7 +53,7 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 [[package]]
 name = "azure_sdk_core"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust#7cac5215c644470498a587d5b475e03d6dda88bf"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-read-event#c4af5c09c63cef399ad3e49b29124440b0d9df1d"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -83,7 +83,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_service_bus"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust#7cac5215c644470498a587d5b475e03d6dda88bf"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-read-event#c4af5c09c63cef399ad3e49b29124440b0d9df1d"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
