@@ -43,7 +43,7 @@ stunnel stunnel.conf
 - run the service:
 
 ```bash
-REDIS_ADDR=redis://:<password>@127.0.0.1:6379/ ./target/debug/doc_index_updater # replace <password> with real password
+./target/debug/doc_index_updater
 ```
 
 ## To run in a local cluster:
