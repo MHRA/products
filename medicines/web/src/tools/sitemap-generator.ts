@@ -52,7 +52,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
       if (product) {
         // If a product is present, output a product URL.
         const route =
-          'product?' +
+          '/product/?' +
           stringify({
             query: encodeURIComponent(product),
           });
@@ -63,7 +63,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
       } else if (substance) {
         // If product is undefined and a substance is present, include a substance URL.
         const route =
-          'substance?' +
+          '/substance/?' +
           stringify({
             query: encodeURIComponent(substance),
           });
@@ -74,7 +74,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
       } else if (index) {
         // If substance is undefined and an index is present, include an index URL.
         const route =
-          'substance-index?' +
+          '/substance-index/?' +
           stringify({
             query: index,
           });
