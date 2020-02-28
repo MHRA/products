@@ -74,6 +74,8 @@ const mockIbuprofenSpcPilResults = () =>
     'fixture:search_results.spcpil.json',
   );
 
+const longerTimout = 20000;
+
 describe('Search', function() {
   it('can search for Paracetamol', function() {
     cy.server();
@@ -82,7 +84,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('paracetamol');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
@@ -95,7 +99,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
@@ -109,7 +115,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.contains('Patient Information Leaflet (PIL)').click();
@@ -125,7 +133,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/an-example-par.pdf']").should(
@@ -145,7 +155,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
