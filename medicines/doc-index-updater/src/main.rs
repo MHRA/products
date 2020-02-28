@@ -22,35 +22,23 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_key = get_env_or_default("REDIS_KEY", "".to_string());
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
-    let client = get_client(redis_addr.clone())?;
-    let client2 = get_client(redis_addr)?;
-    let _ = tokio::join!(
-        tokio::spawn(async move {
-            warp::serve(
-                state_manager::get_job_status(client.clone())
-                    .or(state_manager::set_job_status(client))
-                    .with(warp::log("doc_index_updater")),
-            )
-            .run(addr.clone())
-            .await;
-        }),
-        tokio::spawn(async move {
-            let mut addr2 = addr;
-            addr2.set_port(addr2.port() + 1);
-            warp::serve(
-                state_manager::get_job_status(client2).with(warp::log("doc_index_updater")),
-            )
-            .run(addr2)
-            .await;
-        })
-    );
+    let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
+    let _ = tokio::join!(tokio::spawn(async move {
+        warp::serve(
+            state_manager::get_job_status(state.clone())
+                .or(state_manager::set_job_status(state))
+                .with(warp::log("doc_index_updater")),
+        )
+        .run(addr.clone())
+        .await;
+    }),);
 
     Ok(())
 }
 
 fn get_env_or_default(key: &str, default: String) -> String {
     env::var(key).unwrap_or_else(|e| {
-        eprintln!("defaulting {} to {} ({})", key, &default, e);
+        log::error!("defaulting {} to {} ({})", key, &default, e);
         default.to_string()
     })
 }
