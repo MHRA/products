@@ -48,7 +48,11 @@ pub fn get_job_status(
 }
 
 async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<Json, Rejection> {
-    Ok(warp::reply::json(&mgr.get_status(id).await?))
+    let response = mgr.get_status(id).await?;
+    match response.status {
+        JobStatus::NotFound => Err(warp::reject::not_found()),
+        _ => Ok(warp::reply::json(&response)),
+    }
 }
 
 pub fn set_job_status(
