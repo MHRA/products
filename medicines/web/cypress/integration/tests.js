@@ -50,6 +50,12 @@ const mockIbuprofenResults = () =>
     'fixture:search_results.json',
   );
 
+const mockIbuprofenResultsPage2 = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results.page2.json',
+  );
+
 const mockIbuprofenSpcResults = () =>
   cy.route(
     `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
@@ -122,7 +128,9 @@ describe('Search', function() {
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
-    cy.get('https://example.com/an-example-par.pdf').should('not.exist');
+    cy.get("a[href='https://example.com/an-example-par.pdf']").should(
+      'not.exist',
+    );
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
@@ -131,15 +139,16 @@ describe('Search', function() {
   it('can go to next page then filter SPCs to see 1st page filtered documents', function() {
     cy.server();
     mockIbuprofenResults();
+    mockIbuprofenResults();
+    mockIbuprofenResultsPage2();
     mockIbuprofenSpcResults();
-    mockIbuprofenSpcResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
-    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
