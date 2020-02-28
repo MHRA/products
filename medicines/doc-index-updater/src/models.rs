@@ -1,8 +1,8 @@
-use serde_derive::Serialize;
+use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
-#[derive(Serialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum JobStatus {
     Accepted,
     Done,
@@ -25,10 +25,32 @@ impl FromStr for JobStatus {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct JobStatusResponse {
     pub id: Uuid,
     pub status: JobStatus,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Document {
+    pub id: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub document_type: DocumentType,
+    pub author: String,
+    pub products: Vec<String>,
+    pub keywords: Option<Vec<String>>,
+    pub pl_number: String,
+    pub active_substances: Vec<String>,
+    pub file_source: String,
+    pub file_path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum DocumentType {
+    SPC,
+    PIL,
+    PAR,
 }
 
 #[cfg(test)]
@@ -40,7 +62,7 @@ mod test {
     #[test_case("Done", Ok(JobStatus::Done))]
     #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
     #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
-    fn test_parse(input: &str, output: Result<JobStatus, String>) {
+    fn test_parse_job_status(input: &str, output: Result<JobStatus, String>) {
         assert_eq!(input.parse::<JobStatus>(), output);
     }
 }
