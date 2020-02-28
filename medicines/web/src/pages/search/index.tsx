@@ -25,7 +25,7 @@ const App: NextPage = props => {
     false,
   );
   const [results, setResults] = React.useState<IDocument[]>([]);
-  const [query, setQuery] = React.useState();
+  const [query, setQuery] = React.useState('');
   const [count, setCount] = React.useState();
   const [pageNumber, setPageNumber] = React.useState();
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);

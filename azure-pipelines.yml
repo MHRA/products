@@ -44,10 +44,10 @@ stages:
           - script: |
               export AZURE_SEARCH_API_VERSION=2017-11-11
               export AZURE_SEARCH_EXACTNESS_BOOST=4
-              export AZURE_SEARCH_INDEX=products-index-test
-              export AZURE_SEARCH_KEY=test-key
+              export AZURE_SEARCH_INDEX=products-index
+              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
               export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
-              export AZURE_SEARCH_SERVICE=mhraproductstest
+              export AZURE_SEARCH_SERVICE=mhraproductsdev
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
