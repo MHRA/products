@@ -20,20 +20,20 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { index },
+    query: { query: queryQS },
   } = router;
 
   useEffect(() => {
-    if (!index) {
+    if (!queryQS) {
       return;
     }
     (async () => {
-      const indexStr = index.toString();
-      setResults(await substanceLoader.load(indexStr));
-      setSubstanceIndex(indexStr);
-      Events.viewSubstancesStartingWith(indexStr);
+      const index = queryQS.toString();
+      setResults(await substanceLoader.load(index));
+      setSubstanceIndex(index);
+      Events.viewSubstancesStartingWith(index);
     })();
-  }, [index]);
+  }, [queryQS]);
 
   useEffect(() => {
     if (window) {

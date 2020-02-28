@@ -20,15 +20,15 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { substance },
+    query: { query: queryQS },
   } = router;
 
   useEffect(() => {
-    if (!substance) {
+    if (!queryQS) {
       return;
     }
     (async () => {
-      const substanceStr = substance.toString();
+      const substanceStr = queryQS.toString();
       const firstLetter = substanceStr.charAt(0);
       const substanceIndex = await substanceLoader.load(firstLetter);
       const substanceMatch = substanceIndex.find(s => s.name === substanceStr);
@@ -38,7 +38,7 @@ const App: NextPage = () => {
       setSubstanceName(substanceStr);
       Events.viewProductsForSubstance(substanceStr);
     })();
-  }, [substance]);
+  }, [queryQS]);
 
   useEffect(() => {
     if (window) {

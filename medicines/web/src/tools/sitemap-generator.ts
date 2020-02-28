@@ -54,7 +54,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
         const route =
           'product?' +
           stringify({
-            product: encodeURIComponent(product),
+            query: encodeURIComponent(product),
           });
         searchPathsObj[route] = {
           page: route,
@@ -65,7 +65,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
         const route =
           'substance?' +
           stringify({
-            substance: encodeURIComponent(substance),
+            query: encodeURIComponent(substance),
           });
         searchPathsObj[route] = {
           page: route,
@@ -76,7 +76,7 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
         const route =
           'substance-index?' +
           stringify({
-            index,
+            query: index,
           });
         searchPathsObj[route] = {
           page: route,

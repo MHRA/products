@@ -117,12 +117,12 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   const searchLink = (itemName: string) => {
     if (level === 0) {
-      return `/substance-index?index=${itemName}`;
+      return `/substance-index?query=${itemName}`;
     }
     if (level === 1) {
-      return `/substance?substance=${encodeURIComponent(itemName)}`;
+      return `/substance?query=${encodeURIComponent(itemName)}`;
     }
-    return `/product?product=${encodeURIComponent(itemName)}`;
+    return `/product?query=${encodeURIComponent(itemName)}`;
   };
 
   return (

@@ -33,51 +33,52 @@ const App: NextPage = props => {
 
   const router = useRouter();
   const {
-    query: { search, page, disclaimer, doc },
+    query: {
+      query: queryQS,
+      page: pageQS,
+      disclaimer: disclaimerQS,
+      doc: docQS,
+    },
   } = router;
 
-  const setPageValues = async (
-    search: string | string[],
-    page: string | string[],
-    disclaimer: string | string[],
-    doc: string | string[],
+  const getResults = async (
+    query: string,
+    page: number,
+    docTypes: DocType[],
   ) => {
-    const docTypes = docTypesFromQueryString(doc);
-    const parsedPage = page ? parsePage(page) : 1;
-    const searchStr = search.toString();
-
-    setQuery(searchStr);
-    setPageNumber(parsedPage);
-    setDocTypes(docTypes);
-    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
-
-    const results = await docSearch({
-      query: searchStr,
-      page: parsedPage,
+    return docSearch({
+      query,
+      page,
       pageSize,
       filters: {
         docType: docTypes,
         sortOrder: 'a-z',
       },
     });
-
-    setResults(results.results.map(convertResults));
-    setCount(results.resultCount);
-    Events.searchForProductsMatchingKeywords({
-      searchTerm: searchStr,
-      pageNo: parsedPage,
-      docTypes: queryStringFromDocTypes(docTypes),
-    });
   };
 
   useEffect(() => {
-    if (!search) {
+    if (!queryQS) {
       return;
     }
+    const query = queryQS.toString();
+    const page = pageQS ? parsePage(pageQS) : 1;
+    const docTypes = docTypesFromQueryString(docQS);
+    setQuery(query);
+    setPageNumber(page);
+    setDocTypes(docTypes);
+    setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      await setPageValues(search, page, disclaimer, doc);
+      const results = await getResults(query, page, docTypes);
+      setResults(results.results.map(convertResults));
+      setCount(results.resultCount);
+      Events.searchForProductsMatchingKeywords({
+        searchTerm: query,
+        pageNo: page,
+        docTypes: queryStringFromDocTypes(docTypes),
+      });
     })();
-  }, [search, page, disclaimer, doc]);
+  }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -89,7 +90,7 @@ const App: NextPage = props => {
     docTypes: DocType[],
   ) => {
     const query = {
-      search: searchTerm,
+      query: searchTerm,
       page,
     };
     if (docTypes.length > 0) {

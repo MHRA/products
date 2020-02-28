@@ -33,52 +33,53 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { product, page, disclaimer, doc },
+    query: {
+      query: queryQS,
+      page: pageQS,
+      disclaimer: disclaimerQS,
+      doc: docQS,
+    },
   } = router;
 
-  const setPageValues = async (
-    product: string | string[],
-    page: string | string[],
-    disclaimer: string | string[],
-    doc: string | string[],
+  const getResults = async (
+    product: string,
+    page: number,
+    docTypes: DocType[],
   ) => {
-    const productStr = product.toString();
-    const parsedPage = page ? parsePage(page) : 1;
-    const docTypes = docTypesFromQueryString(doc);
-
-    setProductName(productStr);
-    setPageNumber(parsedPage);
-    setDocTypes(docTypes);
-    setDisclaimerAgree(parseDisclaimerAgree(disclaimer));
-
-    const results = await docSearch({
+    return docSearch({
       query: '',
-      page: parsedPage,
+      page,
       pageSize,
       filters: {
         docType: docTypes,
         sortOrder: 'a-z',
-        productName: productStr,
+        productName: product,
       },
-    });
-
-    setResults(results.results.map(convertResults));
-    setCount(results.resultCount);
-    Events.viewResultsForProduct({
-      productName: productStr,
-      pageNo: parsedPage,
-      docTypes: queryStringFromDocTypes(docTypes),
     });
   };
 
   useEffect(() => {
-    if (!product) {
+    if (!queryQS) {
       return;
     }
+    const product = queryQS.toString();
+    const page = pageQS ? parsePage(pageQS) : 1;
+    const docTypes = docTypesFromQueryString(docQS);
+    setProductName(product);
+    setPageNumber(page);
+    setDocTypes(docTypes);
+    setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      await setPageValues(product, page, disclaimer, doc);
+      const results = await getResults(product, page, docTypes);
+      setResults(results.results.map(convertResults));
+      setCount(results.resultCount);
+      Events.viewResultsForProduct({
+        productName: product,
+        pageNo: page,
+        docTypes: queryStringFromDocTypes(docTypes),
+      });
     })();
-  }, [product, page, disclaimer, doc]);
+  }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {
     if (window) {
@@ -92,7 +93,7 @@ const App: NextPage = () => {
     docTypes: DocType[],
   ) => {
     const query = {
-      product: productName,
+      query: productName,
       page,
     };
     if (docTypes.length > 0) {
