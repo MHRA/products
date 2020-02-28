@@ -17,7 +17,7 @@ impl StateManager {
         StateManager { client }
     }
 
-    async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
+    pub async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
         let status = get_from_redis(self.client.clone(), id)
             .await
             .map_err(MyRedisError::from)?;
@@ -25,7 +25,7 @@ impl StateManager {
         Ok(JobStatusResponse { id, status })
     }
 
-    async fn set_status(
+    pub async fn set_status(
         &self,
         id: Uuid,
         status: JobStatus,
