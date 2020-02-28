@@ -7,9 +7,8 @@
 
 let polyfill;
 const baseUrl =
-  'https://mhraproductsdev.search.windows.net/indexes/products-index/docs';
-const apiKey =
-  'api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11';
+  'https://mhraproductstest.search.windows.net/indexes/products-index-test/docs';
+const apiKey = 'api-key=test-key&api-version=2017-11-11';
 const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package
