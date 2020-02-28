@@ -3,8 +3,7 @@ use self::redis::{get_from_redis, set_in_redis, MyRedisError};
 use crate::models::{JobStatus, JobStatusResponse};
 use ::redis::Client;
 use uuid::Uuid;
-use warp::{reply::Json, Filter, Rejection, Reply};
-
+use warp::{http::StatusCode, reply::Json, Filter, Rejection, Reply};
 mod redis;
 
 #[derive(Clone)]
@@ -47,11 +46,12 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
-async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<Json, Rejection> {
+async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
     let response = mgr.get_status(id).await?;
+    let json = warp::reply::json(&response);
     match response.status {
-        JobStatus::NotFound => Err(warp::reject::not_found()),
-        _ => Ok(warp::reply::json(&response)),
+        JobStatus::NotFound => Ok(warp::reply::with_status(json, StatusCode::NOT_FOUND)),
+        _ => Ok(warp::reply::with_status(json, StatusCode::OK)),
     }
 }
 

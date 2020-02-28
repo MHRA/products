@@ -41,7 +41,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
 fn get_env_or_default(key: &str, default: String) -> String {
     env::var(key).unwrap_or_else(|e| {
-        log::error!("defaulting {} to {} ({})", key, &default, e);
+        log::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
         default.to_string()
     })
 }
