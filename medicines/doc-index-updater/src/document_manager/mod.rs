@@ -3,6 +3,7 @@ use crate::{
     state_manager::{with_state, StateManager},
 };
 use azure_sdk_service_bus::prelude::*;
+use std::time::duration::Duration;
 use uuid::Uuid;
 use warp::{reply::Json, Filter, Rejection, Reply};
 
@@ -29,7 +30,7 @@ async fn del_document_handler(
         document_content_id,
     };
 
-    match client.send_event(message, time::Duration::days(1)) {
+    match client.send_event(message, Duration::days(1)) {
         Ok(_) => Ok(warp::reply::json(
             &state_manager.set_status(id, JobStatus::Accepted).await?,
         )),
@@ -51,7 +52,7 @@ async fn check_in_document_handler(
         document: doc,
     };
 
-    match client.send_event(message, time::Duration::days(1)) {
+    match client.send_event(message, Duration::days(1) {
         Ok(_) => Ok(warp::reply::json(
             &state_manager.set_status(id, JobStatus::Accepted).await?,
         )),
