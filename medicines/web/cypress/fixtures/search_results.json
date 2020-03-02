@@ -46,6 +46,26 @@
       "suggestions": ["warm", "document", "test"],
       "substance_name": [],
       "facets": []
+    },
+    {
+      "@search.score": 0.9,
+      "@search.highlights": {
+        "content": ["A PAR.", "Some content about a PAR."]
+      },
+      "rev_label": null,
+      "metadata_storage_path": "https://example.com/an-example-par.pdf",
+      "product_name": null,
+      "created": "2015-10-26T17:22:00+00:00",
+      "release_state": "Y",
+      "keywords": "example par",
+      "title": "An example PAR",
+      "file_name": "ABC123",
+      "metadata_storage_size": 1922897,
+      "metadata_storage_name": "cc2f4e4bb346a002b98ca55cabf770dc4d435ece",
+      "doc_type": "Par",
+      "suggestions": ["PAR", "example"],
+      "substance_name": [],
+      "facets": []
     }
   ]
 }

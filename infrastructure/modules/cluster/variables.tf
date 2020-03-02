@@ -16,9 +16,5 @@ variable "client_secret" {
   description = "Service Principal Client Secret"
 }
 
-variable "namespace" {
-  description = "Namespace to use on cluster and storage"
-}
-
 
 

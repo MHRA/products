@@ -12,12 +12,12 @@ terraform {
 }
 
 locals {
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
-  location            = var.REGION
-  environment         = var.ENVIRONMENT
   client_id           = var.CLIENT_ID
   client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
   namespace           = "mhraproductsdevelopment"
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # website
@@ -26,8 +26,8 @@ module "products" {
 
   environment         = local.environment
   location            = local.location
-  resource_group_name = local.resource_group_name
   namespace           = local.namespace
+  resource_group_name = local.resource_group_name
 }
 
 # AKS
@@ -38,7 +38,6 @@ module cluster {
   client_secret       = local.client_secret
   environment         = local.environment
   location            = local.location
-  namespace           = local.namespace
   resource_group_name = local.resource_group_name
 }
 
@@ -52,6 +51,14 @@ module cpd {
   resource_group_name = local.resource_group_name
 }
 
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
 
-
-
+  client_id           = local.client_id
+  client_secret       = local.client_secret
+  environment         = local.environment
+  location            = local.location
+  name                = "doc-index-updater-dev"
+  resource_group_name = local.resource_group_name
+}

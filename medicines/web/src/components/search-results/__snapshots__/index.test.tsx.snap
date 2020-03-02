@@ -166,6 +166,7 @@ exports[`SearchResults should render 1`] = `
   <Pagination
     currentPage={1}
     enabledDocTypes={Array []}
+    handlePageChange={[Function]}
     pageSize={20}
     resultCount={200}
     searchTerm="Tea"
