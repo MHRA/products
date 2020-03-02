@@ -1,6 +1,9 @@
 # A nice friendly title for what this PR does
 
-Relates to issue #(an issue)/bug found due to #(previous pull request).
+_Give a short description of what the PR covers._
+
+_Include "Relates to issue #(an issue)" or
+"fixes bug found due to #(previous pull request)" if you can._
 
 ![]('gif_link_here')
 
