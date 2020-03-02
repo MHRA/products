@@ -1,2 +1,12 @@
 **/.idea
 .env
+
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+flycheck_*.el
