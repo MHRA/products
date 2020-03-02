@@ -4,9 +4,10 @@
     "http://localhost:3000/about",
     "http://localhost:3000/accessibility",
     "http://localhost:3000/cookies",
-    "http://localhost:3000/?search=eyes&page=1",
-    "http://localhost:3000/?search=eyes&page=1&disclaimer=agree",
-    "http://localhost:3000/?substance=A&index=true",
-    "http://localhost:3000/?&product=true&page=1&search=OLBAS%20OIL&disclaimer=agree"
+    "http://localhost:3000/search?query=eyes&page=1",
+    "http://localhost:3000/search?query=eyes&page=1&disclaimer=agree",
+    "http://localhost:3000/substance-index?query=A",
+    "http://localhost:3000/substance?query=IBUPROFEN",
+    "http://localhost:3000/product?query=OLBAS%20OIL&page=1&disclaimer=agree"
   ]
 }
