@@ -24,8 +24,9 @@ async fn del_document_handler(
     client: Client,
 ) -> Result<Json, Rejection> {
     let id = Uuid::new_v4();
+    let message = DeleteMessage {job_id: id, document_content_id};
 
-    match client.send_event(DeleteMessage {id, document_content_id}) {
+    match client.send_event(message, time::Duration::days(1)) {
         Ok(_) => Ok(warp::reply::json(
             &state_manager.set_status(id, JobStatus::Accepted).await?,
         )),
@@ -37,13 +38,14 @@ async fn del_document_handler(
 }
 
 async fn check_in_document_handler(
-    _doc: Document,
+    doc: Document,
     state_manager: StateManager,
     client: Client,
 ) -> Result<Json, Rejection> {
     let id = Uuid::new_v4();
+    let message = CreateMessage {job_id: id, document: doc};
 
-    match client.send_event(CreateMessage {id, document}) {
+    match client.send_event(message, time::Duration::days(1)) {
         Ok(_) => Ok(warp::reply::json(
             &state_manager.set_status(id, JobStatus::Accepted).await?,
         )),
