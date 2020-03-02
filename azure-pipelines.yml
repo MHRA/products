@@ -176,26 +176,6 @@ stages:
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT_PRODUCTS)
                     containerName: $web
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
-                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-medicines
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_PRODUCTS)
-                    containerName: $(Build.SourceBranchName)
-                - task: AzureCLI@2
-                  displayName: Set bucket to be public
-                  inputs:
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    scriptType: ps
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az storage container set-permission `
-                        --public-access container `
-                        --name $(Build.SourceBranchName) `
-                        --account-name=$(STORAGE_ACCOUNT_PRODUCTS)
       - deployment: DeployCPDWeb
         displayName: Deploy CPD Web
         pool:
@@ -216,26 +196,6 @@ stages:
                     destination: azureBlob
                     storage: $(STORAGE_ACCOUNT_CPD)
                     containerName: $web
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
-                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-learning
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_CPD)
-                    containerName: $(Build.SourceBranchName)
-                - task: AzureCLI@2
-                  displayName: Set bucket to be public
-                  inputs:
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    scriptType: ps
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az storage container set-permission `
-                        --public-access container `
-                        --name $(Build.SourceBranchName) `
-                        --account-name=$(STORAGE_ACCOUNT_CPD)
   - stage: services
     dependsOn: []
     jobs:
