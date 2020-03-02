@@ -6,8 +6,8 @@ Relates to issue #(an issue)/bug found due to #(previous pull request).
 
 ### Acceptance Criteria
 
-- [ ] _The first thing this PR must achieve
-- [ ] _The second thing this PR must achieve
+- [ ] _The first thing this PR must achieve_
+- [ ] _The second thing this PR must achieve_
 - [ ] _etc_
 
 ### Testing information
