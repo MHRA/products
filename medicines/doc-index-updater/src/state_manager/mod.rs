@@ -6,7 +6,7 @@ use uuid::Uuid;
 use warp::{http::StatusCode, reply::Json, Filter, Rejection, Reply};
 mod redis;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StateManager {
     pub client: Client,
 }
@@ -42,11 +42,12 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
+#[tracing::instrument]
 async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
     mgr.get_status(id)
         .await
         .or_else(|e| {
-            log::error!("{}", e);
+            tracing::error!("{}", e);
             if let MyRedisError::IncompatibleType(_) = e {
                 Ok(JobStatusResponse {
                     id,
@@ -75,6 +76,7 @@ pub fn set_job_status(
         .and_then(set_status_handler)
 }
 
+#[tracing::instrument]
 async fn set_status_handler(
     id: Uuid,
     status: JobStatus,

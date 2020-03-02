@@ -1,7 +1,6 @@
 use crate::models::JobStatus;
 use ::redis::Client;
 use anyhow::{anyhow, Result};
-use log::info;
 use redis::{self, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value};
 use thiserror::Error;
 use uuid::Uuid;
@@ -55,7 +54,7 @@ impl ToRedisArgs for JobStatus {
             JobStatus::Done => "Done",
             _ => "No idea, buddy",
         };
-        info!("{:#}", s);
+        tracing::info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
 }
