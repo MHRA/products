@@ -17,9 +17,7 @@ impl StateManager {
     }
 
     pub async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
-        let status = get_from_redis(self.client.clone(), id)
-            .await
-            .map_err(MyRedisError::from)?;
+        let status = get_from_redis(self.client.clone(), id).await?;
 
         Ok(JobStatusResponse { id, status })
     }
@@ -29,9 +27,7 @@ impl StateManager {
         id: Uuid,
         status: JobStatus,
     ) -> Result<JobStatusResponse, MyRedisError> {
-        let status = set_in_redis(self.client.clone(), id, status)
-            .await
-            .map_err(MyRedisError::from)?;
+        let status = set_in_redis(self.client.clone(), id, status).await?;
 
         Ok(JobStatusResponse { id, status })
     }
@@ -46,38 +42,28 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
-fn log_and_return_error(e: MyRedisError) -> MyRedisError {
-    log::error!("{:?}", e);
-    e
-}
-
-fn handle_redis_known_error(
-    id: Uuid,
-    response: Result<JobStatusResponse, MyRedisError>,
-) -> Result<JobStatusResponse, MyRedisError> {
-    match response {
-        Ok(status) => Ok(status),
-        Err(e) => match e {
-            MyRedisError::IncompatibleType(e) => {
-                log::warn!("{}", e);
+async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+    mgr.get_status(id)
+        .await
+        .or_else(|e| {
+            log::error!("{}", e);
+            if let MyRedisError::IncompatibleType(_) = e {
                 Ok(JobStatusResponse {
                     id,
                     status: JobStatus::NotFound,
                 })
+            } else {
+                Err(e)
             }
-            MyRedisError::Auth(_) => Err(log_and_return_error(e)),
-            MyRedisError::Other(_) => Err(log_and_return_error(e)),
-        },
-    }
-}
-
-async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
-    let response = handle_redis_known_error(id, mgr.get_status(id).await)?;
-    let json = warp::reply::json(&response);
-    match response.status {
-        JobStatus::NotFound => Ok(warp::reply::with_status(json, StatusCode::NOT_FOUND)),
-        _ => Ok(warp::reply::with_status(json, StatusCode::OK)),
-    }
+        })
+        .map_err(Into::into)
+        .map(|response| {
+            let json = warp::reply::json(&response);
+            match response.status {
+                JobStatus::NotFound => warp::reply::with_status(json, StatusCode::NOT_FOUND),
+                _ => warp::reply::with_status(json, StatusCode::OK),
+            }
+        })
 }
 
 pub fn set_job_status(
@@ -94,7 +80,10 @@ async fn set_status_handler(
     status: JobStatus,
     mgr: StateManager,
 ) -> Result<Json, Rejection> {
-    Ok(warp::reply::json(&mgr.set_status(id, status).await?))
+    mgr.set_status(id, status)
+        .await
+        .map_err(Into::into)
+        .map(|r| warp::reply::json(&r))
 }
 
 pub fn with_state(
