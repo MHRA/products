@@ -14,6 +14,7 @@ services:
         - AZURE_SEARCH_WORD_FUZZINESS
         - GOOGLE_GTM_CONTAINER_ID
         - GOOGLE_TRACKING_ID
+        - GOOGLE_USE_DEBUG
     image: web:latest
     ports:
       - '3000:3000'
