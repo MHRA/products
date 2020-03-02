@@ -8,16 +8,32 @@ use warp::{reply::Json, Filter, Rejection, Reply};
 
 mod service_bus;
 
+struct CreateMessage {
+    job_id: Uuid,
+    document: Document
+}
+
+struct DeleteMessage {
+    job_id: Uuid,
+    document_content_id: String
+}
+
 async fn del_document_handler(
-    _document_content_id: String,
+    document_content_id: String,
     state_manager: StateManager,
     client: Client,
 ) -> Result<Json, Rejection> {
     let id = Uuid::new_v4();
 
-    Ok(warp::reply::json(
-        &state_manager.set_status(id, JobStatus::Accepted).await?,
-    ))
+    match client.send_event(DeleteMessage {id, document_content_id}) {
+        Ok(_) => Ok(warp::reply::json(
+            &state_manager.set_status(id, JobStatus::Accepted).await?,
+        )),
+        # TODO: Handle errors
+        Err(_) => Ok(warp::reply::json(
+            &state_manager.set_status(id, JobStatus::Accepted).await?,
+        ))
+    }
 }
 
 async fn check_in_document_handler(
@@ -27,9 +43,15 @@ async fn check_in_document_handler(
 ) -> Result<Json, Rejection> {
     let id = Uuid::new_v4();
 
-    Ok(warp::reply::json(
-        &state_manager.set_status(id, JobStatus::Accepted).await?,
-    ))
+    match client.send_event(CreateMessage {id, document}) {
+        Ok(_) => Ok(warp::reply::json(
+            &state_manager.set_status(id, JobStatus::Accepted).await?,
+        )),
+        # TODO: Handle errors
+        Err(_) => Ok(warp::reply::json(
+            &state_manager.set_status(id, JobStatus::Accepted).await?,
+        ))
+    }
 }
 
 pub fn del_document(
