@@ -10,6 +10,18 @@ pub enum JobStatus {
     Error { message: String, code: String },
 }
 
+impl std::fmt::Display for JobStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        let a = match self {
+            JobStatus::Accepted => "Accepted".to_string(),
+            JobStatus::Done => "Done".to_string(),
+            JobStatus::NotFound => "NotFound".to_string(),
+            JobStatus::Error { message, code } => format!("Error({}: {})", code, message),
+        };
+        write!(f, "{}", a)
+    }
+}
+
 impl FromStr for JobStatus {
     type Err = String;
     fn from_str(s: &str) -> Result<JobStatus, Self::Err> {

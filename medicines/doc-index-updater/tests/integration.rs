@@ -27,6 +27,29 @@ fn set_get_compatibility_on_state_manager(status: JobStatus) {
     assert_eq!(response.status, status);
 }
 
+#[test_case(JobStatus::Done)]
+#[test_case(JobStatus::Accepted)]
+fn set_get_on_state_manager_endpoints(status: JobStatus) {
+    let ctx = TestContext::new();
+
+    let state = state_manager::StateManager::new(ctx.client);
+    let id = Uuid::new_v4();
+
+    let r = block_on(
+        warp::test::request()
+            .method("POST")
+            .path(&format!("/jobs/{}/{}", id, status))
+            .reply(&state_manager::set_job_status(state.clone())),
+    );
+
+    let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
+
+    assert_eq!(response.status, status.clone());
+
+    let response = block_on(state.get_status(id)).unwrap();
+    assert_eq!(response.status, status);
+}
+
 #[test]
 fn delete_endpoint_sets() {
     let ctx = TestContext::new();
