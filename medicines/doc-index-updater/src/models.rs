@@ -60,9 +60,12 @@ pub struct Document {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum DocumentType {
-    SPC,
-    PIL,
-    PAR,
+    #[serde(rename = "SPC")]
+    Spc,
+    #[serde(rename = "PIL")]
+    Pil,
+    #[serde(rename = "PAR")]
+    Par,
 }
 
 #[cfg(test)]

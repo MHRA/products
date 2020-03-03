@@ -3,7 +3,7 @@ extern crate doc_index_updater;
 mod support;
 use doc_index_updater::{
     document_manager,
-    models::{JobStatus, JobStatusResponse},
+    models::{Document, DocumentType, JobStatus, JobStatusResponse},
     state_manager,
 };
 use support::TestContext;
@@ -58,7 +58,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
 }
 
 #[test]
-fn delete_endpoint_sets() {
+fn delete_endpoint_sets_state() {
     let ctx = TestContext::new();
 
     let state = state_manager::StateManager::new(ctx.client);
@@ -69,6 +69,42 @@ fn delete_endpoint_sets() {
             .method("DELETE")
             .path("/documents/hello-string")
             .reply(&delete_filter),
+    );
+
+    let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
+    assert_eq!(response.status, JobStatus::Accepted);
+    let id = response.id;
+    let response = block_on(state.get_status(id)).unwrap();
+    assert_eq!(response.status, JobStatus::Accepted);
+}
+
+#[test]
+fn create_endpoint_sets_state() {
+    let ctx = TestContext::new();
+
+    let state = state_manager::StateManager::new(ctx.client);
+    let create_filter = document_manager::check_in_document(state.clone());
+
+    let document_json = serde_json::to_string(&Document {
+        id: "id".to_string(),
+        name: "name".to_string(),
+        document_type: DocumentType::Pil,
+        author: "author".to_string(),
+        products: vec!["products".to_string()],
+        keywords: Some(vec!["keywords".to_string()]),
+        pl_number: "pl_number".to_string(),
+        active_substances: vec!["active_substances".to_string()],
+        file_source: "file_source".to_string(),
+        file_path: "file_path".to_string(),
+    })
+    .unwrap();
+
+    let r = block_on(
+        warp::test::request()
+            .method("POST")
+            .body(document_json)
+            .path("/documents")
+            .reply(&create_filter),
     );
 
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
