@@ -133,15 +133,15 @@ class Layout extends React.Component {
     // If cookies are allowed and they haven't already been initialised,
     // initialise Google Analytics and Tag Manager.
     if (window.localStorage.getItem("showCookieBanner") === "false" && !Layout.cookiesInitialized) {
-      if (process.env.GOOGLE_TAG_MANAGER_ID) {
+      if (process.env.GATSBY_GOOGLE_TAG_MANAGER_ID) {
         TagManager.initialize({
-          gtmId: process.env.GOOGLE_TAG_MANAGER_ID,
+          gtmId: process.env.GATSBY_GOOGLE_TAG_MANAGER_ID,
           dataLayerName: 'dataLayer',
         });
       }
 
-      if (process.env.GOOGLE_ANALYTICS_TRACKING_ID) {
-        ReactGA.initialize(process.env.GOOGLE_ANALYTICS_TRACKING_ID);
+      if (process.env.GATSBY_GOOGLE_ANALYTICS_TRACKING_ID) {
+        ReactGA.initialize(process.env.GATSBY_GOOGLE_ANALYTICS_TRACKING_ID);
       }
 
       Layout.cookiesInitialized = true;

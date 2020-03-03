@@ -49,20 +49,22 @@ class CookiePolicy extends React.Component {
     });
   }
 
+  deleteAllStorage() {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+    const cookies = new Cookies();
+    for (const cookieName of Object.keys(cookies.getAll())) {
+      cookies.remove(cookieName);
+    }
+  }
+
   handleCookieFormSubmit = (e) => {
     e.preventDefault();
 
     if (this.state.cookiesAllowed) {
       window.localStorage.setItem("showCookieBanner", "false")
     } else {
-      // Delete *everything*.
-      window.localStorage.clear();
-      window.sessionStorage.clear();
-      const cookies = new Cookies();
-      console.log(cookies);
-      for (const cookieName of Object.keys(cookies.getAll())) {
-        cookies.remove(cookieName);
-      }
+      this.deleteAllStorage();
     }
 
     // Navigate to the home page. Seems to be the only way to stop analytics.
