@@ -8,7 +8,8 @@ describe('Navigate website', function() {
 
 describe('Cookies', function() {
    const cookie_banner_text =
-     'MHRA does not collect any data that would identify you directly. ' +
+     'MHRA uses cookies which are essential for the site to work. ' +
+     'We do not collect any data that would identify you directly. ' +
      'We would like to use Google Analytics to help us improve our services.';
 
     it("Cookies aren't accepted by default", function() {
