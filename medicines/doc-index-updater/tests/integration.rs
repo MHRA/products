@@ -7,22 +7,24 @@ use doc_index_updater::{
     state_manager,
 };
 use support::TestContext;
+use test_case::test_case;
 use tokio_test::block_on;
 use uuid::Uuid;
 
-#[test]
-fn set_get_compatibility_on_state_manager() {
+#[test_case(JobStatus::Done)]
+#[test_case(JobStatus::Accepted)]
+fn set_get_compatibility_on_state_manager(status: JobStatus) {
     let ctx = TestContext::new();
 
     let state = state_manager::StateManager::new(ctx.client);
     let id = Uuid::new_v4();
 
-    let response = block_on(state.set_status(id, JobStatus::Accepted)).unwrap();
+    let response = block_on(state.set_status(id, status.clone())).unwrap();
 
-    assert_eq!(response.status, JobStatus::Accepted);
+    assert_eq!(response.status, status.clone());
 
     let response = block_on(state.get_status(id)).unwrap();
-    assert_eq!(response.status, JobStatus::Accepted);
+    assert_eq!(response.status, status);
 }
 
 #[test]
