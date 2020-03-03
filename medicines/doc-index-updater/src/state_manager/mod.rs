@@ -42,29 +42,33 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
+fn handle_known_errors(id: Uuid, e: MyRedisError) -> Result<JobStatusResponse, MyRedisError> {
+    tracing::error!("{}", e);
+    if let MyRedisError::IncompatibleType(_) = e {
+        Ok(JobStatusResponse {
+            id,
+            status: JobStatus::NotFound,
+        })
+    } else {
+        Err(e)
+    }
+}
+
+fn to_response_with_status(response: JobStatusResponse) -> impl Reply {
+    let json = warp::reply::json(&response);
+    match response.status {
+        JobStatus::NotFound => warp::reply::with_status(json, StatusCode::NOT_FOUND),
+        _ => warp::reply::with_status(json, StatusCode::OK),
+    }
+}
+
 #[tracing::instrument]
 async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
     mgr.get_status(id)
         .await
-        .or_else(|e| {
-            tracing::error!("{}", e);
-            if let MyRedisError::IncompatibleType(_) = e {
-                Ok(JobStatusResponse {
-                    id,
-                    status: JobStatus::NotFound,
-                })
-            } else {
-                Err(e)
-            }
-        })
+        .or_else(|e| handle_known_errors(id, e))
         .map_err(Into::into)
-        .map(|response| {
-            let json = warp::reply::json(&response);
-            match response.status {
-                JobStatus::NotFound => warp::reply::with_status(json, StatusCode::NOT_FOUND),
-                _ => warp::reply::with_status(json, StatusCode::OK),
-            }
-        })
+        .map(to_response_with_status)
 }
 
 pub fn set_job_status(
