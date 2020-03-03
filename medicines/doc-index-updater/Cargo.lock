@@ -175,6 +175,7 @@ name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "net2",
  "redis",
  "serde",
  "serde_derive",

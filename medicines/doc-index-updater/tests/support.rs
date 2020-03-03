@@ -15,7 +15,19 @@ pub struct RedisServer {
 
 impl RedisServer {
     pub fn new() -> RedisServer {
-        let addr = redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), 6379);
+        let listener = net2::TcpBuilder::new_v4()
+            .unwrap()
+            .reuse_address(true)
+            .unwrap()
+            .bind("127.0.0.1:0")
+            .unwrap()
+            .listen(1)
+            .unwrap();
+
+        let server_port = dbg!(listener.local_addr().unwrap().port());
+
+        let addr = redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), server_port);
+
         RedisServer::new_with_addr(addr, |cmd| cmd.spawn().unwrap())
     }
 
@@ -34,9 +46,7 @@ impl RedisServer {
                     .arg("--bind")
                     .arg(bind);
             }
-            redis::ConnectionAddr::Unix(ref path) => {
-                cmd.arg("--port").arg("0").arg("--unixsocket").arg(&path);
-            }
+            _ => unimplemented!(),
         };
 
         RedisServer {
