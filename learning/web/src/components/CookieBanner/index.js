@@ -58,6 +58,7 @@ const CookieBanner = () => {
     event.preventDefault()
     window.localStorage.setItem(banner, String(false))
     setCookieBanner(false)
+    window.location.reload();
   }
 
   useEffect(() => {
@@ -65,19 +66,21 @@ const CookieBanner = () => {
     showBanner === "false" ? setCookieBanner(false) : setCookieBanner(true)
   }, [])
 
+
   return cookieBanner ? (
     <StyledCookieBanner>
       <div>
         <p>
-          MHRA uses cookies which are essential for the site to work. We also
-          use Google Analytics cookies to help us improve our services. We do not collect
-          any data that would identify you directly. To know more about our policies, please 
-          go to our&nbsp;
-          <Link to="/cookies">cookie policy page</Link>
-          .&nbsp;By continuing to use this site, you agree to our use of
-          cookies.
+          MHRA does not collect any data that would identify you directly. We
+          would like to use Google Analytics to help us improve our services.
+          You can allow this by clicking <b>accept all cookies</b> or find out
+          more first by visiting our&nbsp;
+          <Link href="/cookies">
+            <a>cookie policy page</a>
+          </Link>
+          .
         </p>
-        <button onClick={handleOnClick}>Accept cookies</button>
+        <button onClick={handleOnClick}>Accept all cookies</button>
       </div>
     </StyledCookieBanner>
   ) : (
