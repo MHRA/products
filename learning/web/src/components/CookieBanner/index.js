@@ -76,7 +76,7 @@ const CookieBanner = () => {
           You can allow this by clicking <b>accept all cookies</b> or find out
           more first by visiting our&nbsp;
           <Link href="/cookies">
-            <a>cookie policy page</a>
+            cookie policy page
           </Link>
           .
         </p>
