@@ -49,11 +49,7 @@ impl ToRedisArgs for JobStatus {
     where
         W: ?Sized + RedisWrite,
     {
-        let s = match self {
-            JobStatus::Accepted => "Accepted",
-            JobStatus::Done => "Done",
-            _ => "No idea, buddy",
-        };
+        let s = self.to_string();
         tracing::info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }

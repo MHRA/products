@@ -22,3 +22,6 @@ warp = "0.2"
 
 [dev-dependencies]
 test-case = "1.0.0"
+tokio-test = "0.2.0"
+serde_json = "1.0.48"
+net2 = "0.2.33"
