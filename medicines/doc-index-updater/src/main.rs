@@ -31,10 +31,9 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_key = get_env_or_default("REDIS_KEY", "".to_string());
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
-    let azure_sb_namespace = get_env_or_default("AZURE_SB_NAMESPACE", "".to_string());
-    let azure_sb_event_hub_name = get_env_or_default("AZURE_SB_EVENT_HUB_NAME", "".to_string());
-    let azure_sb_policy_name = get_env_or_default("AZURE_SB_POLICY_NAME", "".to_string());
-    let azure_sb_policy_key = get_env_or_default("AZURE_SB_POLICY_KEY", "".to_string());
+    let azure_sb_namespace = get_env_or_default("SERVICE_BUS_NAMESPACE", "".to_string());
+    let azure_sb_policy_name = get_env_or_default("SERVICE_BUS_POLICY_NAME", "".to_string());
+    let azure_sb_policy_key = get_env_or_default("SERVICE_BUS_POLICY_KEY", "".to_string());
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);

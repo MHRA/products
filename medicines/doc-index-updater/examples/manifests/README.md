@@ -45,3 +45,23 @@ kubectl create secret generic redis-key \
 | kubeseal \
  --format yaml > SealedSecret-redis-key.yaml
 ```
+
+### Encrypt the service bus key as a Sealed Secret
+
+- retrieve the keys for the service bus access policy from the Azure Portal or the CLI:
+
+```bash
+az servicebus namespace authorization-rule keys list --resource-group MHRA-dev --namespace-name doc-index-updater-dev --name RootManageSharedAccessKey --output tsv
+```
+
+- create the sealed secret with one of the above keys (replace `<insert key here>` with the key):
+
+```bash
+kubectl create secret generic service-bus-key \
+ -n doc-index-updater \
+ -o json \
+ --dry-run \
+ --from-literal key=<insert key here> \
+| kubeseal \
+ --format yaml > SealedSecret-service-bus-key.yaml
+```

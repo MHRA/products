@@ -17,6 +17,15 @@ spec:
           image: doc-index-updater
           imagePullPolicy: IfNotPresent
           env:
+            - name: SERVICE_BUS_NAMESPACE
+              value: doc-index-updater-dev
+            - name: SERVICE_BUS_POLICY_NAME
+              value: documents
+            - name: SERVICE_BUS_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-bus-key
+                  key: key
             - name: REDIS_SERVER
               value: doc-index-updater-dev.redis.cache.windows.net
             - name: REDIS_PORT

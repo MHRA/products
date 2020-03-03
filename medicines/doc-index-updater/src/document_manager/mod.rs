@@ -11,7 +11,6 @@ use warp::{reply::Json, Filter, Rejection, Reply};
 #[derive(Clone)]
 pub struct ServiceBusCredentials {
     pub namespace: String,
-    pub event_hub: String,
     pub policy_name: String,
     pub policy_key: String,
 }
@@ -42,7 +41,7 @@ async fn del_document_handler(
 ) -> Result<Json, Rejection> {
     if let Ok(mut client) = Client::new(
         credentials.namespace,
-        credentials.event_hub,
+        "delete",
         credentials.policy_name,
         credentials.policy_key,
     ) {
@@ -74,7 +73,7 @@ async fn check_in_document_handler(
 ) -> Result<Json, Rejection> {
     if let Ok(mut client) = Client::new(
         credentials.namespace,
-        credentials.event_hub,
+        "create",
         credentials.policy_name,
         credentials.policy_key,
     ) {
