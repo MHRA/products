@@ -178,9 +178,11 @@ dependencies = [
  "redis",
  "serde",
  "serde_derive",
+ "serde_json",
  "test-case",
  "thiserror",
  "tokio",
+ "tokio-test",
  "tracing",
  "tracing-futures",
  "tracing-log",
@@ -1210,6 +1212,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tokio-test"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09cf9705471976fa5fc6817d3fbc9c4ff9696a6647af0e5c1870c81ca7445b05"
+dependencies = [
+ "bytes 0.5.4",
+ "futures-core",
+ "tokio",
 ]
 
 [[package]]
