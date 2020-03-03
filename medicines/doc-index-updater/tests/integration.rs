@@ -46,7 +46,14 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
 
     assert_eq!(response.status, status.clone());
 
-    let response = block_on(state.get_status(id)).unwrap();
+    let r = block_on(
+        warp::test::request()
+            .method("GET")
+            .path(&format!("/jobs/{}", id))
+            .reply(&state_manager::get_job_status(state.clone())),
+    );
+
+    let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
     assert_eq!(response.status, status);
 }
 
