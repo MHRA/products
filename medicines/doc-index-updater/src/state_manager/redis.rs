@@ -79,7 +79,9 @@ pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisR
         .arg(id.to_string())
         .arg(status.clone())
         .query_async(&mut con)
-        .await
+        .await?;
+
+    get_from_redis(client, id).await
 }
 
 #[cfg(test)]
