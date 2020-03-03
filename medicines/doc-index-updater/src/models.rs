@@ -2,6 +2,11 @@ use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
+#[derive(Serialize)]
+pub struct ErrorMessage {
+    error: String,
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum JobStatus {
     Accepted,

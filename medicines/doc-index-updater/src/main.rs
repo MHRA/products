@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 use azure_sdk_service_bus::prelude::Client;
 use doc_index_updater::{delete_manager, document_manager, health, state_manager};
+=======
+use doc_index_updater::{document_manager, health, state_manager};
+use document_manager::ServiceBusCredentials;
+>>>>>>> Implement error handling, pass credentials into routes instead of Client, make it compile.
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr};
 use tracing::Level;
@@ -34,12 +39,11 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
 
-    let azure_sb_client = Client::new(
-        azure_sb_namespace,
-        azure_sb_event_hub_name,
-        azure_sb_policy_name,
-        azure_sb_policy_key,
-    );
+    let azure_sb_creds = ServiceBusCredentials {
+        namespace: azure_sb_namespace,
+        policy_name: azure_sb_policy_name,
+        policy_key: azure_sb_policy_key,
+    };
 
     let _ = tokio::join!(
         tokio::spawn(async move {

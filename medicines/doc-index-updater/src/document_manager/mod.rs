@@ -3,91 +3,126 @@ use crate::{
     state_manager::{with_state, StateManager},
 };
 use azure_sdk_service_bus::prelude::*;
-use std::time::duration::Duration;
+use serde_derive::Serialize;
+use time::Duration;
 use uuid::Uuid;
 use warp::{reply::Json, Filter, Rejection, Reply};
 
-mod service_bus;
+#[derive(Clone)]
+pub struct ServiceBusCredentials {
+    pub namespace: String,
+    pub event_hub: String,
+    pub policy_name: String,
+    pub policy_key: String,
+}
 
+#[derive(Serialize)]
 struct CreateMessage {
     job_id: Uuid,
     document: Document,
 }
 
+#[derive(Serialize)]
 struct DeleteMessage {
     job_id: Uuid,
     document_content_id: String,
 }
 
+#[derive(Debug)]
+struct FailedToDispatchToQueue;
+#[derive(Debug)]
+struct FailedToDeserialize;
+impl warp::reject::Reject for FailedToDispatchToQueue {}
+impl warp::reject::Reject for FailedToDeserialize {}
+
 async fn del_document_handler(
     document_content_id: String,
     state_manager: StateManager,
-    client: Client,
+    credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    let id = Uuid::new_v4();
-    let message = DeleteMessage {
-        job_id: id,
-        document_content_id,
-    };
+    if let Ok(mut client) = Client::new(
+        credentials.namespace,
+        credentials.event_hub,
+        credentials.policy_name,
+        credentials.policy_key,
+    ) {
+        let id = Uuid::new_v4();
+        let message = DeleteMessage {
+            job_id: id,
+            document_content_id,
+        };
+        let duration = Duration::days(1);
 
-    match client.send_event(message, Duration::days(1)) {
-        Ok(_) => Ok(warp::reply::json(
-            &state_manager.set_status(id, JobStatus::Accepted).await?,
-        )),
-        // TODO: Handle errors
-        Err(_) => Ok(warp::reply::json(
-            &state_manager.set_status(id, JobStatus::Accepted).await?,
-        )),
+        match serde_json::to_string(&message) {
+            Ok(evt) => match client.send_event(evt.as_str(), duration).await {
+                Ok(_) => Ok(warp::reply::json(
+                    &state_manager.set_status(id, JobStatus::Accepted).await?,
+                )),
+                Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
+            },
+            Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
+        }
+    } else {
+        Err(warp::reject::custom(FailedToDispatchToQueue))
     }
 }
 
 async fn check_in_document_handler(
     doc: Document,
     state_manager: StateManager,
-    client: Client,
+    credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    let id = Uuid::new_v4();
-    let message = CreateMessage {
-        job_id: id,
-        document: doc,
-    };
-
-    match client.send_event(message, Duration::days(1) {
-        Ok(_) => Ok(warp::reply::json(
-            &state_manager.set_status(id, JobStatus::Accepted).await?,
-        )),
-        // TODO: Handle errors
-        Err(_) => Ok(warp::reply::json(
-            &state_manager.set_status(id, JobStatus::Accepted).await?,
-        )),
+    if let Ok(mut client) = Client::new(
+        credentials.namespace,
+        credentials.event_hub,
+        credentials.policy_name,
+        credentials.policy_key,
+    ) {
+        let id = Uuid::new_v4();
+        let message = CreateMessage {
+            job_id: id,
+            document: doc,
+        };
+        let duration = Duration::days(1);
+        match serde_json::to_string(&message) {
+            Ok(evt) => match client.send_event(evt.as_str(), duration).await {
+                Ok(_) => Ok(warp::reply::json(
+                    &state_manager.set_status(id, JobStatus::Accepted).await?,
+                )),
+                Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
+            },
+            Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
+        }
+    } else {
+        Err(warp::reject::custom(FailedToDispatchToQueue))
     }
 }
 
 pub fn del_document(
     state_manager: StateManager,
-    client: Client,
+    credentials: ServiceBusCredentials,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
         .and(with_state(state_manager))
-        .and(with_client(client))
+        .and(with_credentials(credentials))
         .and_then(del_document_handler)
 }
 
 pub fn check_in_document(
     state_manager: StateManager,
-    client: Client,
+    credentials: ServiceBusCredentials,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents")
         .and(warp::post())
         .and(warp::body::json())
         .and(with_state(state_manager))
-        .and(with_client(client))
+        .and(with_credentials(credentials))
         .and_then(check_in_document_handler)
 }
 
-fn with_client(
-    client: Client,
-) -> impl Filter<Extract = (Client,), Error = std::convert::Infallible> + Clone {
-    warp::any().map(move || client.clone())
+fn with_credentials(
+    credentials: ServiceBusCredentials,
+) -> impl Filter<Extract = (ServiceBusCredentials,), Error = std::convert::Infallible> + Clone {
+    warp::any().map(move || credentials.clone())
 }
