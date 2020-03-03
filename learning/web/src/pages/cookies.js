@@ -93,7 +93,7 @@ class CookiePolicy extends React.Component {
           <p>We use cookies to store information about how you use the Learning Modules for Continuous Professional Development website, such as the pages you visit.</p>
           <p>You can find out more about <a href="https://ico.org.uk/your-data-matters/online/cookies/">how to manage cookies</a> on the Information Commissioner’s Office (ICO) website.</p>
           <h3>Necessary cookies</h3>
-          <p>There are no necessary cookies on this website.</p>
+          <p>We use necessary cookies to make our website work. These enable core functionality such as security, network management and accessibility.</p>
 
           <h3>Google Analytics cookies</h3>
 
