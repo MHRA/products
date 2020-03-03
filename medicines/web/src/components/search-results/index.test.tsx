@@ -25,7 +25,7 @@ const drugsMock = [
   },
 ];
 
-const noFeedback = () => {};
+const noFeedback = () => undefined;
 
 describe(SearchResults, () => {
   it('should render', () => {
@@ -40,6 +40,7 @@ describe(SearchResults, () => {
         disclaimerAgree
         docTypes={[]}
         handleDocTypeCheckbox={noFeedback}
+        handlePageChange={noFeedback}
       />,
     );
     expect(component).toMatchSnapshot();

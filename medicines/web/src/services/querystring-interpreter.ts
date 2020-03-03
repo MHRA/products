@@ -32,3 +32,9 @@ export const docTypesFromQueryString = (
     ? formatDocTypeFilters(queryDocFilter)
     : [];
 };
+
+export const parseDisclaimerAgree = (
+  queryDisclaimerAgree: string | string[],
+): boolean => {
+  return queryDisclaimerAgree === 'agree';
+};

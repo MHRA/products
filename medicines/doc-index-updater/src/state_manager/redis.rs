@@ -1,31 +1,42 @@
 use crate::models::JobStatus;
 use ::redis::Client;
-use log::info;
+use anyhow::{anyhow, Result};
 use redis::{self, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value};
+use thiserror::Error;
 use uuid::Uuid;
 use warp::reject;
 
-#[derive(Debug)]
-pub struct MyRedisError(RedisError);
+#[derive(Debug, Error)]
+pub enum MyRedisError {
+    #[error("Authentication Error ({0:?})")]
+    Auth(RedisError),
+    #[error("Incompatible Type (maybe NOT FOUND) ({0:?})")]
+    IncompatibleType(RedisError),
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
 
 impl reject::Reject for MyRedisError {}
 
 impl From<RedisError> for MyRedisError {
     fn from(e: RedisError) -> Self {
-        Self(e)
+        match e.kind() {
+            redis::ErrorKind::AuthenticationFailed => Self::Auth(e),
+            redis::ErrorKind::TypeError => Self::IncompatibleType(e),
+            _ => Self::Other(e.into()),
+        }
     }
 }
 
 impl From<MyRedisError> for warp::Rejection {
-    fn from(e: MyRedisError) -> Self {
-        warp::reject::custom(e)
+    fn from(_e: MyRedisError) -> Self {
+        warp::reject::custom(MyRedisError::Other(anyhow!("Server Error")))
     }
 }
 
 impl FromRedisValue for JobStatus {
     fn from_redis_value(t: &Value) -> Result<JobStatus, RedisError> {
-        let p = String::from_redis_value(t)?;
-        p.parse().map_err(to_redis_error)
+        String::from_redis_value(t)?.parse().map_err(to_redis_error)
     }
 }
 
@@ -43,32 +54,32 @@ impl ToRedisArgs for JobStatus {
             JobStatus::Done => "Done",
             _ => "No idea, buddy",
         };
-        info!("{:#}", s);
+        tracing::info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
 }
 
-pub fn get_client(address: String) -> Result<Client, RedisError> {
+pub fn get_client(address: String) -> Result<Client> {
     Ok(Client::open(address)?)
 }
 
 pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
+
     redis::cmd("GET")
         .arg(id.to_string())
         .query_async(&mut con)
         .await
-        .or(Ok(JobStatus::NotFound))
 }
 
 pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
+
     redis::cmd("SET")
         .arg(id.to_string())
         .arg(status.clone())
         .query_async(&mut con)
         .await
-        .or(Ok(status))
 }
 
 #[cfg(test)]

@@ -8,7 +8,7 @@
         "content": ["My cool document's content.", "Some more cool content."]
       },
       "rev_label": null,
-      "metadata_storage_path": "https://example.com/my-cool-document.pdf",
+      "metadata_storage_path": "https://example.com/my-cool-document-page-2.pdf",
       "product_name": null,
       "created": "2015-10-26T17:22:00+00:00",
       "release_state": "Y",
@@ -33,7 +33,7 @@
         ]
       },
       "rev_label": null,
-      "metadata_storage_path": "https://example.com/dad-jokes.pdf",
+      "metadata_storage_path": "https://example.com/dad-jokes-page-2.pdf",
       "product_name": null,
       "created": "2015-10-26T17:22:00+00:00",
       "release_state": "Y",
@@ -53,7 +53,7 @@
         "content": ["A PAR.", "Some content about a PAR."]
       },
       "rev_label": null,
-      "metadata_storage_path": "https://example.com/an-example-par.pdf",
+      "metadata_storage_path": "https://example.com/an-example-par-page-2.pdf",
       "product_name": null,
       "created": "2015-10-26T17:22:00+00:00",
       "release_state": "Y",

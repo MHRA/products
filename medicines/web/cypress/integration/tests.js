@@ -50,23 +50,31 @@ const mockIbuprofenResults = () =>
     'fixture:search_results.json',
   );
 
+const mockIbuprofenResultsPage2 = () =>
+  cy.route(
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results.page2.json',
+  );
+
 const mockIbuprofenSpcResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
     'fixture:search_results.spc.json',
   );
 
 const mockIbuprofenSpcResultsPage2 = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
     'fixture:search_results.spc.page2.json',
   );
 
 const mockIbuprofenSpcPilResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=doc_type+eq+'Spc'+or+doc_type+eq+'Pil'`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=ibuprofen~1+ibuprofen^4&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc'+or+doc_type+eq+'Pil')`,
     'fixture:search_results.spcpil.json',
   );
+
+const longerTimeout = 20000;
 
 describe('Search', function() {
   it('can search for Paracetamol', function() {
@@ -76,7 +84,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('paracetamol');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
@@ -89,7 +99,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
@@ -103,7 +115,9 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.contains('Patient Information Leaflet (PIL)').click();
@@ -119,9 +133,14 @@ describe('Search', function() {
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.get("a[href='https://example.com/an-example-par.pdf']").should(
+      'not.exist',
+    );
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
@@ -130,14 +149,18 @@ describe('Search', function() {
   it('can go to next page then filter SPCs to see 1st page filtered documents', function() {
     cy.server();
     mockIbuprofenResults();
+    mockIbuprofenResults();
+    mockIbuprofenResultsPage2();
     mockIbuprofenSpcResults();
-    mockIbuprofenSpcResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
     cy.contains('Search').click();
-    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
     cy.contains('Agree').click();
     cy.contains('Next').click();
+    cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
@@ -154,12 +177,12 @@ describe('A-Z Index', function() {
     );
     // Mock out first page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
       'fixture:search_results.json',
     );
     // Mock out second page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=PARACETAMOL~1+PARACETAMOL^4+TABLETS~1+TABLETS^4&scoringProfile=preferKeywords&searchMode=all`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS`,
       'fixture:search_results.json',
     );
 

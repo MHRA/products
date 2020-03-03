@@ -22,6 +22,12 @@ interface ISearchEvent {
   docTypes: string;
 }
 
+interface IProductSearchEvent {
+  productName: string;
+  pageNo: number;
+  docTypes: string;
+}
+
 export default {
   searchForProductsMatchingKeywords: (searchEvent: ISearchEvent) => {
     pushToDataLayer({
@@ -34,6 +40,9 @@ export default {
   },
   viewSubstancesStartingWith: (letter: string) => {
     pushToDataLayer({ event: 'drugIndex', letter });
+  },
+  viewResultsForProduct: (productSearch: IProductSearchEvent) => {
+    pushToDataLayer({ event: 'product', ...productSearch });
   },
   viewPage: (pageName: string) => {
     pushToDataLayer({ event: pageName });
