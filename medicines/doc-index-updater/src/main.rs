@@ -9,8 +9,8 @@ const PORT: u16 = 8000;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
     let subscriber = tracing_subscriber::fmt::Subscriber::builder()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_max_level(Level::INFO)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();
 
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
