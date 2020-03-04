@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-fn get_env_or_default(key: &str, default: String) -> String {
+pub fn get_env_or_default(key: &str, default: String) -> String {
     env::var(key).unwrap_or_else(|e| {
         tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
         default.to_string()

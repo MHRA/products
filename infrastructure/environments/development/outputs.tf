@@ -16,3 +16,11 @@ output "client_certificate" {
 output "resource_group_name" {
   value = module.cluster.resource_group_name
 }
+# Service Bus
+output "queues_default_primary_connection_string" {
+  value = module.service_bus.queues_default_primary_connection_string
+}
+
+output "queues_default_primary_key" {
+  value = module.service_bus.queues_default_primary_key
+}
