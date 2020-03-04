@@ -1,5 +1,16 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
+# specific path build
+trigger:
+  branches:
+    include:
+      - "*"
+  paths:
+    include:
+      - "*"
+    exclude:
+      - medicines/doc-index-updater
+
 variables:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: 1

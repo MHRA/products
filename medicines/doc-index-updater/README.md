@@ -1,6 +1,6 @@
 ### doc-index-updater
 
-![](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
+![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
 
 ## To build a docker image:
 
