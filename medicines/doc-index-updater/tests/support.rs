@@ -13,8 +13,8 @@ pub struct RedisServer {
     addr: redis::ConnectionAddr,
 }
 
-impl RedisServer {
-    pub fn new() -> RedisServer {
+impl Default for RedisServer {
+    fn default() -> Self {
         let listener = net2::TcpBuilder::new_v4()
             .unwrap()
             .reuse_address(true)
@@ -30,7 +30,9 @@ impl RedisServer {
 
         RedisServer::new_with_addr(addr, |cmd| cmd.spawn().unwrap())
     }
+}
 
+impl RedisServer {
     pub fn new_with_addr<F: FnOnce(&mut process::Command) -> process::Child>(
         addr: redis::ConnectionAddr,
         spawner: F,
@@ -83,9 +85,9 @@ pub struct TestContext {
     pub client: redis::Client,
 }
 
-impl TestContext {
-    pub fn new() -> TestContext {
-        let server = RedisServer::new();
+impl Default for TestContext {
+    fn default() -> Self {
+        let server = RedisServer::default();
 
         let client = redis::Client::open(redis::ConnectionInfo {
             addr: Box::new(server.get_client_addr().clone()),
@@ -95,15 +97,15 @@ impl TestContext {
         .unwrap();
         let mut con;
 
-        let millisecond = Duration::from_millis(1);
+        let try_connection_after = Duration::from_secs(1);
+        sleep(try_connection_after);
         loop {
             match client.get_connection() {
                 Err(err) => {
-                    if err.is_connection_refusal() {
-                        sleep(millisecond);
-                    } else {
+                    if !err.is_connection_refusal() {
                         panic!("Could not connect: {}", err);
                     }
+                    sleep(try_connection_after);
                 }
                 Ok(x) => {
                     con = x;
@@ -115,7 +117,9 @@ impl TestContext {
 
         TestContext { server, client }
     }
+}
 
+impl TestContext {
     pub fn connection(&self) -> redis::Connection {
         self.client.get_connection().unwrap()
     }
