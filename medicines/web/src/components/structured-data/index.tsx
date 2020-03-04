@@ -2,7 +2,25 @@ import React from 'react';
 import { JsonLd } from 'react-schemaorg';
 import { Drug, ItemList, Substance } from 'schema-dts';
 
-export const SubstanceStructuredData: React.FC = ({ substanceName }) => {
+interface ISubstanceStructuredDataProps {
+  substanceName: string;
+}
+
+interface ISubstanceListStructuredDataProps {
+  substanceNames: string[];
+}
+
+interface IDrugStructuredDataProps {
+  drugName: string;
+}
+
+interface IDrugListStructuredDataProps {
+  drugNames: string[];
+}
+
+export const SubstanceStructuredData: React.FC<ISubstanceStructuredDataProps> = ({
+  substanceName,
+}) => {
   return (
     <JsonLd<Substance>
       item={{
@@ -14,7 +32,9 @@ export const SubstanceStructuredData: React.FC = ({ substanceName }) => {
   );
 };
 
-export const SubstanceListStructuredData: React.FC = ({ substanceNames }) => {
+export const SubstanceListStructuredData: React.FC<ISubstanceListStructuredDataProps> = ({
+  substanceNames,
+}) => {
   return (
     <JsonLd<ItemList>
       item={{
@@ -38,7 +58,9 @@ export const SubstanceListStructuredData: React.FC = ({ substanceNames }) => {
   );
 };
 
-export const DrugStructuredData: React.FC = ({ drugName }) => {
+export const DrugStructuredData: React.FC<IDrugStructuredDataProps> = ({
+  drugName,
+}) => {
   return (
     <JsonLd<Drug>
       item={{
@@ -50,7 +72,9 @@ export const DrugStructuredData: React.FC = ({ drugName }) => {
   );
 };
 
-export const DrugListStructuredData: React.FC = ({ drugNames }) => {
+export const DrugListStructuredData: React.FC<IDrugListStructuredDataProps> = ({
+  drugNames,
+}) => {
   return (
     <JsonLd<ItemList>
       item={{
