@@ -2,8 +2,6 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import { JsonLd } from 'react-schemaorg';
-import { ItemList } from 'schema-dts';
 import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
