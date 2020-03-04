@@ -2,6 +2,8 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
+import { JsonLd } from 'react-schemaorg';
+import { ItemList } from 'schema-dts';
 import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
@@ -49,6 +51,25 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         <DrugIndex title={`${substanceIndex || '...'}`} items={results} />
+        <JsonLd<ItemList>
+          item={{
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            itemListElement: results.map((substance, index) => {
+              return {
+                '@type': 'ListItem',
+                position: index,
+                item: {
+                  '@type': 'Substance',
+                  name: substance.name,
+                  url:
+                    'https://products.mhra.gov.uk/substance?query=' +
+                    encodeURIComponent(substance.name),
+                },
+              };
+            }),
+          }}
+        />
       </SearchWrapper>
     </Page>
   );

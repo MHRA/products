@@ -2,6 +2,8 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
+import { JsonLd } from 'react-schemaorg';
+import { Drug } from 'schema-dts';
 import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
@@ -139,6 +141,13 @@ const App: NextPage = () => {
           docTypes={docTypes}
           handleDocTypeCheckbox={handleToggleDocType}
           handlePageChange={handlePageChange}
+        />
+        <JsonLd<Drug>
+          item={{
+            '@context': 'https://schema.org',
+            '@type': 'Drug',
+            name: productName,
+          }}
         />
       </SearchWrapper>
     </Page>
