@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         working-directory: ./medicines/doc-index-updater
-        run: cargo build --verbose
+        run: cargo build
       - name: Setup redis
         uses: shogo82148/actions-setup-redis@v1
         with:
@@ -24,4 +24,4 @@ jobs:
           auto-start: "false"
       - name: Run tests
         working-directory: ./medicines/doc-index-updater
-        run: cargo test --verbose
+        run: cargo test
