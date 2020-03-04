@@ -14,7 +14,7 @@ use uuid::Uuid;
 #[test_case(JobStatus::Done)]
 #[test_case(JobStatus::Accepted)]
 fn set_get_compatibility_on_state_manager(status: JobStatus) {
-    let ctx = TestContext::new();
+    let ctx = TestContext::default();
 
     let state = state_manager::StateManager::new(ctx.client);
     let id = Uuid::new_v4();
@@ -30,7 +30,7 @@ fn set_get_compatibility_on_state_manager(status: JobStatus) {
 #[test_case(JobStatus::Done)]
 #[test_case(JobStatus::Accepted)]
 fn set_get_on_state_manager_endpoints(status: JobStatus) {
-    let ctx = TestContext::new();
+    let ctx = TestContext::default();
 
     let state = state_manager::StateManager::new(ctx.client);
     let id = Uuid::new_v4();
@@ -50,7 +50,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
         warp::test::request()
             .method("GET")
             .path(&format!("/jobs/{}", id))
-            .reply(&state_manager::get_job_status(state.clone())),
+            .reply(&state_manager::get_job_status(state)),
     );
 
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
@@ -59,7 +59,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
 
 #[test]
 fn delete_endpoint_sets_state() {
-    let ctx = TestContext::new();
+    let ctx = TestContext::default();
 
     let state = state_manager::StateManager::new(ctx.client);
     let delete_filter = document_manager::del_document(state.clone());
@@ -80,7 +80,7 @@ fn delete_endpoint_sets_state() {
 
 #[test]
 fn create_endpoint_sets_state() {
-    let ctx = TestContext::new();
+    let ctx = TestContext::default();
 
     let state = state_manager::StateManager::new(ctx.client);
     let create_filter = document_manager::check_in_document(state.clone());
