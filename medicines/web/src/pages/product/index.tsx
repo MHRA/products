@@ -2,11 +2,10 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import { JsonLd } from 'react-schemaorg';
-import { Drug } from 'schema-dts';
 import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
+import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
@@ -142,13 +141,7 @@ const App: NextPage = () => {
           handleDocTypeCheckbox={handleToggleDocType}
           handlePageChange={handlePageChange}
         />
-        <JsonLd<Drug>
-          item={{
-            '@context': 'https://schema.org',
-            '@type': 'Drug',
-            name: productName,
-          }}
-        />
+        <DrugStructuredData drugName={productName} />
       </SearchWrapper>
     </Page>
   );

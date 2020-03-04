@@ -2,11 +2,13 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import { JsonLd } from 'react-schemaorg';
-import { ItemList, Substance } from 'schema-dts';
 import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
+import {
+  DrugListStructuredData,
+  SubstanceStructuredData,
+} from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
@@ -56,31 +58,9 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         <DrugIndex title={`${substanceName || '...'}`} items={results} />
-        <JsonLd<Substance>
-          item={{
-            '@context': 'https://schema.org',
-            '@type': 'Substance',
-            name: substanceName,
-          }}
-        />
-        <JsonLd<ItemList>
-          item={{
-            '@context': 'https://schema.org',
-            '@type': 'ItemList',
-            itemListElement: results.map((product, index) => {
-              return {
-                '@type': 'ListItem',
-                position: index,
-                item: {
-                  '@type': 'Drug',
-                  name: product.name,
-                  url:
-                    'https://products.mhra.gov.uk/product?query=' +
-                    encodeURIComponent(product.name),
-                },
-              };
-            }),
-          }}
+        <SubstanceStructuredData substanceName={substanceName} />
+        <DrugListStructuredData
+          drugNames={results.map(product => product.name)}
         />
       </SearchWrapper>
     </Page>
