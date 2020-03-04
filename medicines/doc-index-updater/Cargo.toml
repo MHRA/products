@@ -1,21 +1,27 @@
 [package]
 name = "doc_index_updater"
 version = "0.1.0"
-authors = ["Stuart Harris <stuart.harris@red-badger.com>", "Robin James Kerrison <robinjames.kerrison@red-badger.com>"]
+authors = ["Stuart Harris <stuart.harris@red-badger.com>", "Robin James Kerrison <robinjames.kerrison@red-badger.com>", "Matt Doughty <matt.doughty@red-badger.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4"
-pretty_env_logger = "0.4.0"
+anyhow = "1.0.26"
 redis = { version = "0.15.1", features = ["tokio-rt-core"] }
 serde = "1.0.104"
 serde_derive = "1.0.104"
+thiserror = "1.0.11"
 tokio = { version = "0.2", features = ["macros"] }
+tracing = { version = "0.1", features = ["attributes"] }
+tracing-futures = "0.2.3"
+tracing-log = "0.1.1"
+tracing-subscriber = "0.2.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 warp = "0.2"
 
-
 [dev-dependencies]
 test-case = "1.0.0"
+tokio-test = "0.2.0"
+serde_json = "1.0.48"
+net2 = "0.2.33"

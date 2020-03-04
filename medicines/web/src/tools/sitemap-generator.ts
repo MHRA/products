@@ -1,4 +1,4 @@
-import fs, { promises, readdirSync } from 'fs';
+import fs, { readdirSync } from 'fs';
 import moment from 'moment';
 import path from 'path';
 import { stringify } from 'querystring';
@@ -45,19 +45,17 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
       // Value is in the format "letter, substance, product". Substance and product may
       // not be present.
       const stringParts = facet.value.split(', ');
+      const index = stringParts[0];
       const substance = stringParts[1];
       const product = stringParts[2];
 
       if (product) {
         // If a product is present, output a product URL.
         const route =
-          '/?' +
+          '/product/?' +
           stringify({
-            product: true,
-            page: 1,
-            search: product,
+            query: encodeURIComponent(product),
           });
-
         searchPathsObj[route] = {
           page: route,
           lastModified: new Date().toISOString(),
@@ -65,11 +63,21 @@ const createSearchPathsObj = async (): Promise<{ [index: string]: any }> => {
       } else if (substance) {
         // If product is undefined and a substance is present, include a substance URL.
         const route =
-          '/?' +
+          '/substance/?' +
           stringify({
-            substance,
+            query: encodeURIComponent(substance),
           });
-
+        searchPathsObj[route] = {
+          page: route,
+          lastModified: new Date().toISOString(),
+        };
+      } else if (index) {
+        // If substance is undefined and an index is present, include an index URL.
+        const route =
+          '/substance-index/?' +
+          stringify({
+            query: index,
+          });
         searchPathsObj[route] = {
           page: route,
           lastModified: new Date().toISOString(),

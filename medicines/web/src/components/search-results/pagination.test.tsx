@@ -9,6 +9,8 @@ const resultCount = 50;
 const searchTerm = 'Caffeine';
 const docTypes = [DocType.Pil, DocType.Par];
 
+const dummyFunc = () => undefined;
+
 describe(Pagination, () => {
   it('should render', () => {
     const component = shallow(
@@ -18,6 +20,7 @@ describe(Pagination, () => {
         resultCount={resultCount}
         searchTerm={searchTerm}
         enabledDocTypes={docTypes}
+        handlePageChange={dummyFunc}
       />,
     );
     expect(component).toMatchSnapshot();
