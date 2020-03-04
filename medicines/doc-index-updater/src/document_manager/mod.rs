@@ -2,6 +2,7 @@ use crate::{
     models::{Document, JobStatus},
     state_manager::{with_state, StateManager},
 };
+use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::*;
 use serde_derive::Serialize;
 use time::Duration;
@@ -13,6 +14,17 @@ pub struct ServiceBusCredentials {
     pub namespace: String,
     pub policy_name: String,
     pub policy_key: String,
+}
+
+impl ServiceBusCredentials {
+    pub fn build_client(&self, queue_name: String) -> Result<Client, AzureError> {
+        Client::new(
+            &self.namespace,
+            &queue_name,
+            &self.policy_name,
+            &self.policy_key,
+        )
+    }
 }
 
 #[derive(Serialize)]
@@ -39,12 +51,7 @@ async fn del_document_handler(
     state_manager: StateManager,
     credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = Client::new(
-        credentials.namespace,
-        "delete",
-        credentials.policy_name,
-        credentials.policy_key,
-    ) {
+    if let Ok(mut client) = credentials.build_client("delete".to_string()) {
         let id = Uuid::new_v4();
         let message = DeleteMessage {
             job_id: id,
@@ -71,12 +78,7 @@ async fn check_in_document_handler(
     state_manager: StateManager,
     credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = Client::new(
-        credentials.namespace,
-        "create",
-        credentials.policy_name,
-        credentials.policy_key,
-    ) {
+    if let Ok(mut client) = credentials.build_client("create".to_string()) {
         let id = Uuid::new_v4();
         let message = CreateMessage {
             job_id: id,
