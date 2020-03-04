@@ -49,11 +49,7 @@ impl ToRedisArgs for JobStatus {
     where
         W: ?Sized + RedisWrite,
     {
-        let s = match self {
-            JobStatus::Accepted => "Accepted",
-            JobStatus::Done => "Done",
-            _ => "No idea, buddy",
-        };
+        let s = self.to_string();
         tracing::info!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
@@ -79,7 +75,9 @@ pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisR
         .arg(id.to_string())
         .arg(status.clone())
         .query_async(&mut con)
-        .await
+        .await?;
+
+    get_from_redis(client, id).await
 }
 
 #[cfg(test)]
