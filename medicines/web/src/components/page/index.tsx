@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactGA from 'react-ga';
 import TagManager from 'react-gtm-module';
 import styled from 'styled-components';
@@ -7,6 +7,7 @@ import { Normalize } from 'styled-normalize';
 
 import { anchorColour, mhra } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
+import { useGACookieToTestInitialization } from '../../hooks';
 import CookieBanner from '../cookie-policy';
 import Footer from '../footer';
 import Header from '../header';
@@ -59,8 +60,13 @@ interface IPageProps {
 }
 
 const App: React.FC<IPageProps> = props => {
+  const [trackingInitialized, setTrackingInitialized] = useState(false);
+
   useEffect(() => {
-    if (props.storageAllowed) {
+    console.log('USING EFFECT');
+    if (props.storageAllowed && !trackingInitialized) {
+      console.log('INITIALIZING SCRIPTS');
+      setTrackingInitialized(true);
       TagManager.initialize({
         gtmId: process.env.GOOGLE_GTM_CONTAINER_ID as string,
         dataLayerName: 'dataLayer',
