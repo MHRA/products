@@ -1,7 +1,19 @@
+# Rust ignores
 /target
 **/*.rs.bk
+
+# VSCode ignores
 .vscode/
+
+# Emacs ignores
+*~
+\#*\#
+.\#
+
+# Environment ignores
 .env*
+
+# Mac OS X ignores
 .DS_Store
 
 # Cypress files
