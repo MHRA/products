@@ -1,5 +1,7 @@
 ### doc-index-updater
 
+![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
+
 You will need the keys specified by `.env.example`.
 You can find these by going to [portal.azure.com][azure portal].
 

@@ -1,0 +1,27 @@
+name: doc-index-updater
+
+on:
+  push:
+    paths:
+      - medicines/doc-index-updater/**
+  pull_request:
+    paths:
+      - medicines/doc-index-updater/**
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        working-directory: ./medicines/doc-index-updater
+        run: cargo build
+      - name: Setup redis
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: "5.0"
+          auto-start: "false"
+      - name: Run tests
+        working-directory: ./medicines/doc-index-updater
+        run: cargo test

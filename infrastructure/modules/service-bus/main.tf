@@ -47,7 +47,7 @@ resource "azurerm_redis_cache" "doc_index_updater_redis" {
   name = var.name
 
   capacity            = 0
-  enable_non_ssl_port = false # FIXME: Set to true to enable development / Change this before go to prod
+  enable_non_ssl_port = false
   family              = "C"
   location            = var.location
   minimum_tls_version = "1.2"
