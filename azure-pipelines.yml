@@ -6,10 +6,11 @@ trigger:
     include:
       - "*"
   paths:
-    include:
-      - "*"
     exclude:
-      - medicines/doc-index-updater
+      - docs/
+      - infrastructure/
+      - medicines/doc-index-updater/
+      - medicines/doc-index-updater-stub/
 
 variables:
   CARGO_INCREMENTAL: 0
