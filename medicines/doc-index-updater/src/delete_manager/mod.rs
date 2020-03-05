@@ -1,4 +1,5 @@
 use crate::service_bus_client::delete_factory;
+use azure_sdk_core::errors::AzureError;
 use std::time::Duration;
 use tokio::time::delay_for;
 
@@ -7,7 +8,7 @@ pub async fn delete_service_worker() -> Result<String, AzureError> {
 
     loop {
         let message = delete_client
-            .peek_lock(time::Duration::days(1), time::Duration::from_secs(1))
+            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(1)))
             .await?;
         println!("{:?} message receive!", message);
         // TODO: delete file in blob storage
