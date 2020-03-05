@@ -77,15 +77,7 @@ async fn del_document_handler(
                 Ok(_) => Ok(warp::reply::json(
                     &state_manager.set_status(id, JobStatus::Accepted).await?,
                 )),
-                Err(err) => {
-                    println!(
-                        "{:?} ;; {} ;; {}",
-                        err,
-                        credentials.delete_queue_policy_name,
-                        credentials.delete_queue_policy_key
-                    );
-                    Err(warp::reject::custom(FailedToDispatchToQueue))
-                }
+                Err(err) => Err(warp::reject::custom(FailedToDispatchToQueue)),
             },
             Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
         }
