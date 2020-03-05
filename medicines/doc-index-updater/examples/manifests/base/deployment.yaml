@@ -15,7 +15,7 @@ spec:
       containers:
         - name: doc-index-updater
           image: doc-index-updater
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: REDIS_SERVER
               value: doc-index-updater-dev.redis.cache.windows.net
