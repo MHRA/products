@@ -2,6 +2,12 @@
 
 ![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
 
+You will need the keys specified by `.env.example`.
+You can find these by going to [portal.azure.com][azure portal].
+
+Rename this to `.env`, fill the values and run `source .env`.
+Never commit `.env`.
+
 ## To build a docker image:
 
 ```bash
@@ -51,3 +57,5 @@ stunnel stunnel.conf
 ## To run in a local cluster:
 
 - follow the [README.md](./examples/local-cluster/README.md)
+
+[azure portal]: https://portal.azure.com/
