@@ -1,9 +1,9 @@
 # Rust ignores
-/target
+**/target
 **/*.rs.bk
 
 # VSCode ignores
-.vscode/
+**/.vscode/
 
 # Emacs ignores
 **/*~
@@ -11,11 +11,11 @@
 **/.\#*
 
 # Environment ignores
-.env*
+**/.env*
 
 # Mac OS X ignores
-.DS_Store
+**/.DS_Store
 
 # Cypress files
-cypress/videos/
-cypress/screenshots/
+**/cypress/videos/
+**/cypress/screenshots/
