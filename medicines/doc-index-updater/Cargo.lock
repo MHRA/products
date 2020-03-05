@@ -51,7 +51,7 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 [[package]]
 name = "azure_sdk_core"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-read-event#8d395ff5f672186eaf39638067432539d17a6417"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#30005f19e88df45b9cad6f17c26703231d96e05b"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -80,8 +80,8 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_service_bus"
-version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-read-event#8d395ff5f672186eaf39638067432539d17a6417"
+version = "0.42.0"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#30005f19e88df45b9cad6f17c26703231d96e05b"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
