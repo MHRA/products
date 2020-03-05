@@ -15,7 +15,7 @@ spec:
       containers:
         - name: doc-index-updater
           image: doc-index-updater
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: REDIS_SERVER
               value: doc-index-updater-dev.redis.cache.windows.net
@@ -35,3 +35,17 @@ spec:
             requests:
               cpu: 10m
               memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 30

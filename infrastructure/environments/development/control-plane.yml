@@ -5,6 +5,8 @@ spec:
   # More details at: https://istio.io/docs/setup/additional-setup/config-profiles/
   profile: default
   values:
+    sidecarInjectorWebhook:
+      rewriteAppHTTPProbe: true
     global:
       # Ensure that the Istio pods are only scheduled to run on Linux nodes
       defaultNodeSelector:
