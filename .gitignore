@@ -1,2 +1,24 @@
+# Rust ignores
+**/target
+**/*.rs.bk
+
+# VSCode ignores
+**/.vscode/
+
+# Emacs ignores
+**/*~
+**/\#*\#
+**/.\#*
+
+# IntelliJ ignores
 **/.idea
-.env
+
+# Environment ignores
+**/.env*
+
+# Mac OS X ignores
+**/.DS_Store
+
+# Cypress files
+**/cypress/videos/
+**/cypress/screenshots/

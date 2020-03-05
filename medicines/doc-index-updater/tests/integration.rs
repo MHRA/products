@@ -57,6 +57,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
     assert_eq!(response.status, status);
 }
 
+#[ignore]
 #[test]
 fn delete_endpoint_sets_state() {
     let ctx = TestContext::default();
@@ -78,6 +79,7 @@ fn delete_endpoint_sets_state() {
     assert_eq!(response.status, JobStatus::Accepted);
 }
 
+#[ignore]
 #[test]
 fn create_endpoint_sets_state() {
     let ctx = TestContext::default();

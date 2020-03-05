@@ -17,6 +17,26 @@ spec:
           image: doc-index-updater
           imagePullPolicy: IfNotPresent
           env:
+            - name: SERVICE_BUS_NAMESPACE
+              value: doc-index-updater-dev
+            - name: CREATE_QUEUE_NAME
+              value: doc-index-updater-create-queue
+            - name: CREATE_QUEUE_POLICY_NAME
+              value: doc-index-updater-create-auth
+            - name: CREATE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: create-queue-policy-key
+                  key: key
+            - name: DELETE_QUEUE_NAME
+              value: doc-index-updater-delete-queue
+            - name: DELETE_QUEUE_POLICY_NAME
+              value: doc-index-updater-delete-auth
+            - name: DELETE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: delete-queue-policy-key
+                  key: key
             - name: REDIS_SERVER
               value: doc-index-updater-dev.redis.cache.windows.net
             - name: REDIS_PORT
