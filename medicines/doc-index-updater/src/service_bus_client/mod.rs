@@ -1,7 +1,7 @@
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::*;
 
-pub async fn delete_queue_client() -> Result<Client, AzureError> {
+pub async fn delete_factory() -> Result<Client, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
 
@@ -17,7 +17,7 @@ pub async fn delete_queue_client() -> Result<Client, AzureError> {
     Client::new(service_bus_namespace, queue_name, policy_name, policy_key)
 }
 
-pub async fn create_queue_client() -> Result<Client, AzureError> {
+pub async fn create_factory() -> Result<Client, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
 
