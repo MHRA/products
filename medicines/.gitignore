@@ -6,9 +6,9 @@
 .vscode/
 
 # Emacs ignores
-*~
-\#*\#
-.\#
+**/*~
+**/\#*\#
+**/.\#*
 
 # Environment ignores
 .env*
