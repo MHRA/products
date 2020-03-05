@@ -1,5 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react';
-import Cookies from 'universal-cookie';
+import { useState } from 'react';
 
 // useSessionStorage and useLocalStorage adapted from
 // https://usehooks.com/useLocalStorage/
@@ -78,15 +77,4 @@ This is probably because we can't access the browser window object server-side.`
     }
   };
   return [storedValue, setValue];
-};
-
-export const useGACookieToTestInitialization = (): [
-  boolean,
-  Dispatch<SetStateAction<boolean>>,
-] => {
-  return useState(() => {
-    const cookieContext = new Cookies();
-    const gaValue = cookieContext.get('_ga');
-    return !!gaValue;
-  });
 };

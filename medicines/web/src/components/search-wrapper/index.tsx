@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
-import ReactGA from 'react-ga';
 import styled from 'styled-components';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
@@ -76,11 +75,6 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
     if (search.length > 0) {
       rerouteSearchResults(formattedSearchTerm);
     }
-
-    ReactGA.event({
-      category: 'Search',
-      action: `Searched for '${search}'`,
-    });
   };
 
   const rerouteSearchResults = (searchTerm: string) => {
