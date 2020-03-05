@@ -1,3 +1,4 @@
+pub mod create_manager;
 pub mod delete_manager;
 pub mod document_manager;
 pub mod health;
