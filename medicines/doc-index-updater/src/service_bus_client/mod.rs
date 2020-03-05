@@ -1,5 +1,5 @@
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_service_bus::prelude::*;
+use azure_sdk_service_bus::prelude::Client;
 
 pub async fn delete_factory() -> Result<Client, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
