@@ -1,4 +1,4 @@
-use doc_index_updater::{document_manager, health, state_manager};
+use doc_index_updater::{delete_manager, document_manager, health, state_manager};
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr};
 use tracing::Level;
@@ -27,18 +27,21 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
-    let _ = tokio::join!(tokio::spawn(async move {
-        warp::serve(
-            health::get_health()
-                .or(state_manager::get_job_status(state.clone()))
-                .or(state_manager::set_job_status(state.clone()))
-                .or(document_manager::check_in_document(state.clone()))
-                .or(document_manager::del_document(state.clone()))
-                .with(warp::log("doc_index_updater")),
-        )
-        .run(addr.clone())
-        .await;
-    }),);
+    let _ = tokio::join!(
+        tokio::spawn(async move {
+            warp::serve(
+                health::get_health()
+                    .or(state_manager::get_job_status(state.clone()))
+                    .or(state_manager::set_job_status(state.clone()))
+                    .or(document_manager::check_in_document(state.clone()))
+                    .or(document_manager::del_document(state.clone()))
+                    .with(warp::log("doc_index_updater")),
+            )
+            .run(addr.clone())
+            .await;
+        }),
+        tokio::spawn(delete_manager::delete_service_worker())
+    );
 
     Ok(())
 }
