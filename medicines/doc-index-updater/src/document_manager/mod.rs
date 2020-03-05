@@ -12,17 +12,30 @@ use warp::{reply::Json, Filter, Rejection, Reply};
 #[derive(Clone)]
 pub struct ServiceBusCredentials {
     pub namespace: String,
-    pub policy_name: String,
-    pub policy_key: String,
+    pub delete_queue_name: String,
+    pub delete_queue_policy_name: String,
+    pub delete_queue_policy_key: String,
+    pub create_queue_name: String,
+    pub create_queue_policy_name: String,
+    pub create_queue_policy_key: String,
 }
 
 impl ServiceBusCredentials {
-    pub fn build_client(&self, queue_name: String) -> Result<Client, AzureError> {
+    pub fn build_create_client(&self) -> Result<Client, AzureError> {
         Client::new(
             &self.namespace,
-            &queue_name,
-            &self.policy_name,
-            &self.policy_key,
+            &self.create_queue_name,
+            &self.create_queue_policy_name,
+            &self.create_queue_policy_key,
+        )
+    }
+
+    pub fn build_delete_client(&self) -> Result<Client, AzureError> {
+        Client::new(
+            &self.namespace,
+            &self.delete_queue_name,
+            &self.delete_queue_policy_name,
+            &self.delete_queue_policy_key,
         )
     }
 }
@@ -51,7 +64,7 @@ async fn del_document_handler(
     state_manager: StateManager,
     credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = credentials.build_client("delete".to_string()) {
+    if let Ok(mut client) = credentials.build_delete_client() {
         let id = Uuid::new_v4();
         let message = DeleteMessage {
             job_id: id,
@@ -64,7 +77,15 @@ async fn del_document_handler(
                 Ok(_) => Ok(warp::reply::json(
                     &state_manager.set_status(id, JobStatus::Accepted).await?,
                 )),
-                Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
+                Err(err) => {
+                    println!(
+                        "{:?} ;; {} ;; {}",
+                        err,
+                        credentials.delete_queue_policy_name,
+                        credentials.delete_queue_policy_key
+                    );
+                    Err(warp::reject::custom(FailedToDispatchToQueue))
+                }
             },
             Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
         }
@@ -78,7 +99,7 @@ async fn check_in_document_handler(
     state_manager: StateManager,
     credentials: ServiceBusCredentials,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = credentials.build_client("create".to_string()) {
+    if let Ok(mut client) = credentials.build_create_client() {
         let id = Uuid::new_v4();
         let message = CreateMessage {
             job_id: id,

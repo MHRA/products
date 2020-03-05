@@ -32,16 +32,30 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
     let azure_sb_namespace = get_env_or_default("SERVICE_BUS_NAMESPACE", "".to_string());
-    let azure_sb_policy_name = get_env_or_default("SERVICE_BUS_POLICY_NAME", "".to_string());
-    let azure_sb_policy_key = get_env_or_default("SERVICE_BUS_POLICY_KEY", "".to_string());
+    let azure_sb_create_queue_name =
+        get_env_or_default("SERVICE_BUS_CREATE_QUEUE_NAME", "".to_string());
+    let azure_sb_create_queue_policy_name =
+        get_env_or_default("SERVICE_BUS_CREATE_QUEUE_POLICY_NAME", "".to_string());
+    let azure_sb_create_queue_policy_key =
+        get_env_or_default("SERVICE_BUS_CREATE_QUEUE_POLICY_KEY", "".to_string());
+    let azure_sb_delete_queue_name =
+        get_env_or_default("SERVICE_BUS_DELETE_QUEUE_NAME", "".to_string());
+    let azure_sb_delete_queue_policy_name =
+        get_env_or_default("SERVICE_BUS_DELETE_QUEUE_POLICY_NAME", "".to_string());
+    let azure_sb_delete_queue_policy_key =
+        get_env_or_default("SERVICE_BUS_DELETE_QUEUE_POLICY_KEY", "".to_string());
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
 
     let azure_sb_creds = ServiceBusCredentials {
         namespace: azure_sb_namespace,
-        policy_name: azure_sb_policy_name,
-        policy_key: azure_sb_policy_key,
+        create_queue_name: azure_sb_create_queue_name,
+        create_queue_policy_name: azure_sb_create_queue_policy_name,
+        create_queue_policy_key: azure_sb_create_queue_policy_key,
+        delete_queue_name: azure_sb_delete_queue_name,
+        delete_queue_policy_name: azure_sb_delete_queue_policy_name,
+        delete_queue_policy_key: azure_sb_delete_queue_policy_key,
     };
 
     let _ = tokio::join!(

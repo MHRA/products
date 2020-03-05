@@ -8,3 +8,4 @@ spec:
       containers:
         - name: doc-index-updater
           image: mhraproductsdevregistry.azurecr.io/products/doc-index-updater
+          imagePullPolicy: IfNotPresent
