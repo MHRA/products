@@ -25,5 +25,5 @@ pub async fn get_message(delete_client: &mut Client) -> Result<String, AzureErro
         .await
         .map_err(|e| tracing::error!("{:?}", e))?;
 
-    return Ok(message);
+    Ok(message)
 }
