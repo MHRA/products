@@ -1,6 +1,8 @@
 #![allow(dead_code)]
+use core::{fmt::Debug, future::Future};
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
+use tokio_test::block_on;
 
 #[derive(PartialEq)]
 enum ServerType {
@@ -156,4 +158,11 @@ where
         Value::Okay => write!(writer, "+OK\r\n"),
         Value::Status(ref s) => write!(writer, "+{}\r\n", s),
     }
+}
+
+pub fn get_ok<T, U>(spawn: impl Future<Output = Result<T, U>>) -> T
+where
+    U: Debug,
+{
+    block_on(spawn).unwrap()
 }
