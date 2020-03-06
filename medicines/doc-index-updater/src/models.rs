@@ -43,7 +43,7 @@ pub struct JobStatusResponse {
     pub status: JobStatus,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Document {
     pub id: String,
     pub name: String,
@@ -58,7 +58,7 @@ pub struct Document {
     pub file_path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum DocumentType {
     #[serde(rename = "SPC")]
     Spc,
@@ -66,6 +66,18 @@ pub enum DocumentType {
     Pil,
     #[serde(rename = "PAR")]
     Par,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct CreateMessage {
+    pub job_id: Uuid,
+    pub document: Document,
+}
+
+#[derive(Serialize)]
+pub struct DeleteMessage {
+    pub job_id: Uuid,
+    pub document_content_id: String,
 }
 
 #[cfg(test)]

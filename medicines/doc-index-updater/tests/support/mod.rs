@@ -1,8 +1,10 @@
 #![allow(dead_code)]
 use core::{fmt::Debug, future::Future};
+use doc_index_updater::models::{CreateMessage, Document, DocumentType};
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
+use uuid::Uuid;
 
 #[derive(PartialEq)]
 enum ServerType {
@@ -165,4 +167,26 @@ where
     U: Debug,
 {
     block_on(spawn).unwrap()
+}
+
+pub fn get_test_document() -> Document {
+    Document {
+        id: "id".to_string(),
+        name: "name".to_string(),
+        document_type: DocumentType::Pil,
+        author: "author".to_string(),
+        products: vec!["products".to_string()],
+        keywords: Some(vec!["keywords".to_string()]),
+        pl_number: "pl_number".to_string(),
+        active_substances: vec!["active_substances".to_string()],
+        file_source: "file_source".to_string(),
+        file_path: "file_path".to_string(),
+    }
+}
+
+pub fn get_test_create_message(id: Uuid) -> CreateMessage {
+    CreateMessage {
+        job_id: id,
+        document: get_test_document(),
+    }
 }
