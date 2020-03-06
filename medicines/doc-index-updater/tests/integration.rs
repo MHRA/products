@@ -83,7 +83,7 @@ fn delete_endpoint_sets_state() {
     let mut delete_client = get_ok(delete_factory());
 
     let mut received_message = get_ok(delete_client.receive::<DeleteMessage>());
-    let expected = get_test_delete_message(id);
+    let expected = get_test_delete_message(id, "hello-string".to_string());
 
     loop {
         if received_message.job_id == id {

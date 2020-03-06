@@ -191,9 +191,9 @@ pub fn get_test_create_message(id: Uuid) -> CreateMessage {
     }
 }
 
-pub fn get_test_delete_message(id: Uuid) -> DeleteMessage {
+pub fn get_test_delete_message(job_id: Uuid, document_content_id: String) -> DeleteMessage {
     DeleteMessage {
-        job_id: id,
-        document_content_id: "id".to_string(),
+        job_id,
+        document_content_id,
     }
 }

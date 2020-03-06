@@ -53,7 +53,7 @@ impl DocIndexUpdaterQueue {
             .await
             .map_err(|e| tracing::error!("{:?}", e))?;
 
-        Ok(T::from_string(message.to_owned()))
+        Ok(T::from_string(message.to_owned())?)
     }
 
     pub async fn send<T: Message>(
@@ -61,7 +61,7 @@ impl DocIndexUpdaterQueue {
         message: T,
         duration: Duration,
     ) -> Result<(), AzureError> {
-        let evt = message.to_json_string();
+        let evt = message.to_json_string()?;
         Ok(self.service_bus.send_event(evt.as_str(), duration).await?)
     }
 }

@@ -80,30 +80,26 @@ pub struct DeleteMessage {
     pub document_content_id: String,
 }
 
-pub trait Message {
-    fn from_string(message: String) -> Self;
-    fn to_json_string(&self) -> String;
+pub trait Message: Sized {
+    fn from_string(message: String) -> Result<Self, serde_json::Error>;
+    fn to_json_string(&self) -> Result<String, serde_json::Error>;
 }
 
 impl Message for CreateMessage {
-    fn from_string(message: String) -> Self {
-        serde_json::from_slice::<CreateMessage>(message.as_bytes()).unwrap()
-        // TODO: fix these unwraps
+    fn from_string(message: String) -> Result<Self, serde_json::Error> {
+        Ok(serde_json::from_slice::<CreateMessage>(message.as_bytes())?)
     }
-    fn to_json_string(&self) -> String {
-        serde_json::to_string(&self).unwrap()
-        // TODO: fix these unwraps
+    fn to_json_string(&self) -> Result<String, serde_json::Error> {
+        Ok(serde_json::to_string(&self)?)
     }
 }
 
 impl Message for DeleteMessage {
-    fn from_string(message: String) -> Self {
-        serde_json::from_slice::<DeleteMessage>(message.as_bytes()).unwrap()
-        // TODO: fix these unwraps
+    fn from_string(message: String) -> Result<Self, serde_json::Error> {
+        Ok(serde_json::from_slice::<DeleteMessage>(message.as_bytes())?)
     }
-    fn to_json_string(&self) -> String {
-        serde_json::to_string(&self).unwrap()
-        // TODO: fix these unwraps
+    fn to_json_string(&self) -> Result<String, serde_json::Error> {
+        Ok(serde_json::to_string(&self)?)
     }
 }
 
