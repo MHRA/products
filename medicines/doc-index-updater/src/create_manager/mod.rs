@@ -11,6 +11,7 @@ mod sftp_client;
 
 #[tracing::instrument]
 pub async fn create_service_worker(
+    storage_container_name: String,
     time_to_wait: Duration,
     state_manager: StateManager,
 ) -> Result<String, anyhow::Error> {

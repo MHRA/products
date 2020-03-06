@@ -107,6 +107,67 @@ dependencies = [
 ]
 
 [[package]]
+name = "azure_sdk_storage_blob"
+version = "0.40.0"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#602f4b10376a1c4657bf33f18fc2d1ab6fcad866"
+dependencies = [
+ "RustyXML",
+ "azure_sdk_core",
+ "azure_sdk_storage_core",
+ "base64 0.11.0",
+ "bytes 0.5.4",
+ "chrono",
+ "futures",
+ "http 0.2.0",
+ "http-body",
+ "hyper",
+ "hyper-rustls",
+ "log 0.4.8",
+ "md5",
+ "mime 0.3.16",
+ "quick-error",
+ "ring",
+ "serde",
+ "serde-xml-rs",
+ "serde_derive",
+ "serde_json",
+ "smallvec",
+ "time",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "azure_sdk_storage_core"
+version = "0.40.0"
+source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#602f4b10376a1c4657bf33f18fc2d1ab6fcad866"
+dependencies = [
+ "RustyXML",
+ "azure_sdk_core",
+ "base64 0.11.0",
+ "bytes 0.5.4",
+ "chrono",
+ "futures",
+ "http 0.2.0",
+ "http-body",
+ "hyper",
+ "hyper-rustls",
+ "log 0.4.8",
+ "md5",
+ "mime 0.3.16",
+ "quick-error",
+ "ring",
+ "serde",
+ "serde-xml-rs",
+ "serde_derive",
+ "serde_json",
+ "smallvec",
+ "time",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "backtrace"
 version = "0.3.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -309,6 +370,8 @@ dependencies = [
  "anyhow",
  "azure_sdk_core",
  "azure_sdk_service_bus",
+ "azure_sdk_storage_blob",
+ "azure_sdk_storage_core",
  "futures",
  "hyper",
  "net2",
