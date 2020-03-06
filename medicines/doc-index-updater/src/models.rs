@@ -74,7 +74,7 @@ pub struct CreateMessage {
     pub document: Document,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
     pub document_content_id: String,
