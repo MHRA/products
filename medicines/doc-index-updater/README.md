@@ -51,7 +51,7 @@ stunnel stunnel.conf
 - run the service:
 
 ```bash
-./target/debug/doc_index_updater
+cargo run
 ```
 
 ## To run in a local cluster:

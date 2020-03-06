@@ -30,7 +30,7 @@ impl From<RedisError> for MyRedisError {
 
 impl From<MyRedisError> for warp::Rejection {
     fn from(_e: MyRedisError) -> Self {
-        warp::reject::custom(MyRedisError::Other(anyhow!("Server Error")))
+        warp::reject::custom(MyRedisError::Other(anyhow!(_e)))
     }
 }
 
