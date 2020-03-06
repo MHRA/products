@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
+import { SubstanceListStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { ISubstance } from '../../model/substance';
 import Events from '../../services/events';
@@ -49,6 +50,9 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         <DrugIndex title={`${substanceIndex || '...'}`} items={results} />
+        <SubstanceListStructuredData
+          substanceNames={results.map(substance => substance.name)}
+        />
       </SearchWrapper>
     </Page>
   );

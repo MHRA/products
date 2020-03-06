@@ -195,7 +195,7 @@ function toSentenceCase(substance: string): string {
   );
 }
 
-interface iSearchResultsProps {
+interface ISearchResultsProps {
   drugs: IDocument[];
   page: number;
   pageSize: number;
@@ -208,7 +208,7 @@ interface iSearchResultsProps {
   handlePageChange: (num: number) => void;
 }
 
-const SearchResults = (props: iSearchResultsProps) => {
+const SearchResults = (props: ISearchResultsProps) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,

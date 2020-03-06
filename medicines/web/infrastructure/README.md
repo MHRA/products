@@ -23,7 +23,7 @@ Provisioning the website as a docker image, ready for use in Azure Kubernetes cl
    ```sh
    docker-compose build
    ```
-   
+
    This will build the docker image locally, using the `docker-compose.yml`.
    It runs the `Dockerfile`, and tags the built image as `web:latest`.
 
@@ -32,8 +32,8 @@ Provisioning the website as a docker image, ready for use in Azure Kubernetes cl
    ```sh
    az acr login --name mhraproductsdevregistry
    ```
-   
-   This should work, provided you're logged into the right Azure account. 
+
+   This should work, provided you're logged into the right Azure account.
 
 3. Tag and push
 
@@ -41,10 +41,10 @@ Provisioning the website as a docker image, ready for use in Azure Kubernetes cl
    docker tag web mhraproductsdevregistry.azurecr.io/products/web
    docker push mhraproductsdevregistry.azurecr.io/products/web
    ```
-   
+
    The first line here lets docker know that the origin for the pushed image should be your local `web` image.
    The second line does the pushing.
-   
+
 All being well, you'll now be able to run the pushed image, locally. Test it out:
 
 ```sh
