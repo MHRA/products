@@ -2,11 +2,12 @@ extern crate doc_index_updater;
 
 mod support;
 use doc_index_updater::{
-    document_manager,
-    models::{Document, DocumentType, JobStatus, JobStatusResponse},
+    create_manager, document_manager,
+    models::{CreateMessage, JobStatus, JobStatusResponse},
+    service_bus_client::create_factory,
     state_manager,
 };
-use support::TestContext;
+use support::{get_ok, get_test_create_message, get_test_document, TestContext};
 use test_case::test_case;
 use tokio_test::block_on;
 use uuid::Uuid;
@@ -19,11 +20,11 @@ fn set_get_compatibility_on_state_manager(status: JobStatus) {
     let state = state_manager::StateManager::new(ctx.client);
     let id = Uuid::new_v4();
 
-    let response = block_on(state.set_status(id, status.clone())).unwrap();
+    let response = get_ok(state.set_status(id, status.clone()));
 
     assert_eq!(response.status, status.clone());
 
-    let response = block_on(state.get_status(id)).unwrap();
+    let response = get_ok(state.get_status(id));
     assert_eq!(response.status, status);
 }
 
@@ -75,7 +76,7 @@ fn delete_endpoint_sets_state() {
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
     assert_eq!(response.status, JobStatus::Accepted);
     let id = response.id;
-    let response = block_on(state.get_status(id)).unwrap();
+    let response = get_ok(state.get_status(id));
     assert_eq!(response.status, JobStatus::Accepted);
 }
 
@@ -87,24 +88,12 @@ fn create_endpoint_sets_state() {
     let state = state_manager::StateManager::new(ctx.client);
     let create_filter = document_manager::check_in_document(state.clone());
 
-    let document_json = serde_json::to_string(&Document {
-        id: "id".to_string(),
-        name: "name".to_string(),
-        document_type: DocumentType::Pil,
-        author: "author".to_string(),
-        products: vec!["products".to_string()],
-        keywords: Some(vec!["keywords".to_string()]),
-        pl_number: "pl_number".to_string(),
-        active_substances: vec!["active_substances".to_string()],
-        file_source: "file_source".to_string(),
-        file_path: "file_path".to_string(),
-    })
-    .unwrap();
+    let document_json = serde_json::to_string(&get_test_document()).unwrap();
 
     let r = block_on(
         warp::test::request()
             .method("POST")
-            .body(document_json)
+            .body(document_json.clone())
             .path("/documents")
             .reply(&create_filter),
     );
@@ -112,6 +101,21 @@ fn create_endpoint_sets_state() {
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
     assert_eq!(response.status, JobStatus::Accepted);
     let id = response.id;
-    let response = block_on(state.get_status(id)).unwrap();
+    let response = get_ok(state.get_status(id.clone()));
     assert_eq!(response.status, JobStatus::Accepted);
+
+    let mut create_client = get_ok(create_factory());
+
+    let mut received_message = get_ok(create_manager::get_message(&mut create_client));
+    let expected = get_test_create_message(id);
+
+    loop {
+        if let Ok(result) = serde_json::from_slice::<CreateMessage>(received_message.as_bytes()) {
+            if result.job_id == id {
+                assert_eq!(result, expected);
+                return;
+            }
+        }
+        received_message = get_ok(create_manager::get_message(&mut create_client));
+    }
 }

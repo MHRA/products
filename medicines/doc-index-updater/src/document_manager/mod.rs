@@ -1,24 +1,11 @@
 use crate::{
-    models::{Document, JobStatus},
+    models::{CreateMessage, DeleteMessage, Document, JobStatus},
     service_bus_client::{create_factory, delete_factory},
     state_manager::{with_state, StateManager},
 };
-use serde_derive::Serialize;
 use time::Duration;
 use uuid::Uuid;
 use warp::{reply::Json, Filter, Rejection, Reply};
-
-#[derive(Serialize)]
-struct CreateMessage {
-    job_id: Uuid,
-    document: Document,
-}
-
-#[derive(Serialize)]
-struct DeleteMessage {
-    job_id: Uuid,
-    document_content_id: String,
-}
 
 #[derive(Debug)]
 struct FailedToDispatchToQueue;

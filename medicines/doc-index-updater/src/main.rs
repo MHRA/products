@@ -1,4 +1,4 @@
-use doc_index_updater::{delete_manager, document_manager, health, state_manager};
+use doc_index_updater::{create_manager, delete_manager, document_manager, health, state_manager};
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr};
 use tracing::Level;
@@ -41,7 +41,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             .run(addr.clone())
             .await;
         }),
-        tokio::spawn(delete_manager::delete_service_worker())
+        tokio::spawn(delete_manager::delete_service_worker()),
+        tokio::spawn(create_manager::create_service_worker()),
     );
     Ok(())
 }
