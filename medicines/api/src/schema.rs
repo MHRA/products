@@ -2,7 +2,7 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_search::AzureContext,
-    product::{get_product, Products},
+    product::{get_products_by_substance_name, Product},
     substance::{get_substances, Substances},
 };
 
@@ -12,9 +12,18 @@ pub struct QueryRoot;
 impl QueryRoot {
     async fn products(
         context: &AzureContext,
-        search_term: String,
-    ) -> FieldResult<Option<Products>> {
-        Ok(get_product(search_term, &context.client).await)
+        substance_name: Option<String>,
+    ) -> FieldResult<Vec<Product>> {
+        if substance_name.is_some() {
+            return Ok(
+                get_products_by_substance_name(substance_name.unwrap(), &context.client).await,
+            );
+        }
+
+        Err(juniper::FieldError::new(
+            "Getting a list of products without providing a substance name is not currently supported.",
+            juniper::Value::null()
+        ))
     }
 
     async fn substances(first: i32) -> FieldResult<Substances> {
