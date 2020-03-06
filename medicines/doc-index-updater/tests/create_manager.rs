@@ -2,12 +2,14 @@ extern crate doc_index_updater;
 
 mod support;
 use doc_index_updater::{create_manager, service_bus_client::create_factory};
-use support::get_ok;
+use support::{get_ok, get_test_create_message};
+use uuid::Uuid;
 
 #[test]
 #[ignore]
 fn create_manager_works() {
-    let sent_message = "This is the create test message";
+    let id = Uuid::new_v4();
+    let sent_message = get_test_create_message(id);
     let mut create_client = get_ok(create_factory());
     get_ok(create_client.send_event(sent_message, time::Duration::seconds(1)));
 

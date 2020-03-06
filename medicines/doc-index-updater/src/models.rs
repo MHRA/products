@@ -1,4 +1,4 @@
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -74,10 +74,37 @@ pub struct CreateMessage {
     pub document: Document,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
     pub document_content_id: String,
+}
+
+pub trait Message {
+    fn from_string(message: String) -> Self;
+    fn to_json_string(&self) -> String;
+}
+
+impl Message for CreateMessage {
+    fn from_string(message: String) -> Self {
+        serde_json::from_slice::<CreateMessage>(message.as_bytes()).unwrap()
+        // TODO: fix these unwraps
+    }
+    fn to_json_string(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+        // TODO: fix these unwraps
+    }
+}
+
+impl Message for DeleteMessage {
+    fn from_string(message: String) -> Self {
+        serde_json::from_slice::<DeleteMessage>(message.as_bytes()).unwrap()
+        // TODO: fix these unwraps
+    }
+    fn to_json_string(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+        // TODO: fix these unwraps
+    }
 }
 
 #[cfg(test)]
