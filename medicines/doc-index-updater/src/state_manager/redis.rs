@@ -29,7 +29,8 @@ impl From<RedisError> for MyRedisError {
 }
 
 impl From<MyRedisError> for warp::Rejection {
-    fn from(_e: MyRedisError) -> Self {
+    fn from(e: MyRedisError) -> Self {
+        tracing::error!("{:?}", e);
         warp::reject::custom(MyRedisError::Other(anyhow!("Server Error")))
     }
 }
