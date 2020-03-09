@@ -2,6 +2,7 @@ import ReactGA from 'react-ga';
 import TagManager from 'react-gtm-module';
 
 let gaInitialized = false;
+const useDebugScript = process.env.GOOGLE_USE_DEBUG === 'true';
 
 const pushToDataLayer = (dataLayer: any) => {
   if (!gaInitialized) {
@@ -40,7 +41,7 @@ const initializeTrackingScripts = () => {
     dataLayerName: 'dataLayer',
   });
   ReactGA.initialize(process.env.GOOGLE_TRACKING_ID as string, {
-    debug: true,
+    debug: useDebugScript,
   });
 };
 
