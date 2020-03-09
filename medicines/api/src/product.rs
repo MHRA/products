@@ -1,54 +1,140 @@
-use crate::{azure_search::AzureSearchClient, pagination, pagination::PageInfo};
+use crate::azure_search::{AzureResult, AzureSearchClient};
 use juniper::GraphQLObject;
 
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A medical product containing active ingredients")]
 pub struct Product {
-    id: String,
-    name: Option<String>,
-    pdf_url: Option<String>,
-    substances: Option<Vec<String>>,
-    file_name: Option<String>,
-    release_state: Option<String>,
-    doc_type: Option<String>,
-    title: Option<String>,
+    name: String,
+    document_count: i32,
 }
 
-pagination! {Products, ProductEdge, Product}
-
-pub async fn get_product(search_term: String, client: &AzureSearchClient) -> Option<Products> {
-    let azure_result = client.azure_search(search_term).await;
-    let r = match azure_result {
-        Ok(n) => n,
-        Err(e) => {
-            println!("Error occurred retrieving products: {:#}", e);
-            return None;
+pub fn handle_doc(document: &AzureResult, products: &mut Vec<Product>) {
+    match &document.product_name {
+        Some(document_product_name) => {
+            // Try to find an existing product.
+            let existing_product = products
+                .into_iter()
+                .find(|product| product.name == document_product_name.to_string());
+            match existing_product {
+                Some(existing_product) => {
+                    // Product exists! Increment its document count.
+                    existing_product.document_count += 1;
+                }
+                None => {
+                    // Product does not exist! Create it!
+                    products.push(Product {
+                        name: document_product_name.to_string(),
+                        document_count: 1,
+                    });
+                }
+            }
         }
-    };
+        None => {}
+    }
+}
 
-    let products = r.value.into_iter().map(|x| Product {
-        id: x.metadata_storage_name,
-        name: x.product_name,
-        pdf_url: Some(x.metadata_storage_path),
-        substances: Some(x.substance_name),
-        file_name: Some(x.file_name),
-        release_state: None,
-        doc_type: Some(x.doc_type),
-        title: Some(x.title),
-    });
+pub async fn get_products_by_substance_name(
+    substance_name: String,
+    client: &AzureSearchClient,
+) -> Vec<Product> {
+    // Get a list of documents from Azure which are about products containing the
+    // substance name.
+    let azure_result = client
+        .filter_by_collection(
+            "substance_name".to_string(),
+            substance_name,
+            "eq".to_string(),
+        )
+        .await
+        .unwrap();
 
-    let edges = products
-        .map(|y| ProductEdge {
-            node: y,
-            cursor: "cursor".to_owned(),
-        })
-        .collect();
+    // Extract a list of products while keeping track of the number of documents that
+    // product has.
+    let mut products = Vec::<Product>::new();
+    for document in azure_result.value {
+        handle_doc(&document, &mut products);
+    }
 
-    Some(Products {
-        edges,
-        page_info: PageInfo {
-            has_previous_page: false,
-            has_next_page: false,
-        },
-    })
+    products.sort();
+
+    products
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    fn azure_result_factory(product_name: Option<String>) -> AzureResult {
+        AzureResult {
+            product_name: product_name,
+            doc_type: "dummy".to_string(),
+            created: "yes".to_string(),
+            facets: Vec::new(),
+            file_name: "README.markdown".to_string(),
+            highlights: None,
+            keywords: None,
+            metadata_storage_name: "dummy".to_string(),
+            metadata_storage_path: "/".to_string(),
+            metadata_storage_size: 0,
+            release_state: "solid".to_string(),
+            rev_label: None,
+            score: -0.0,
+            substance_name: Vec::new(),
+            suggestions: Vec::new(),
+            title: "dummy's guide to medicines".to_string(),
+        }
+    }
+
+    #[test]
+    fn test_handle_doc_with_new_product() {
+        let doc = azure_result_factory(Some("My Cool Product".to_string()));
+        let mut products = Vec::<Product>::new();
+        handle_doc(&doc, &mut products);
+        assert_eq!(products.len(), 1);
+        assert_eq!(products[0].name, "My Cool Product".to_string());
+        assert_eq!(products[0].document_count, 1);
+    }
+
+    #[test]
+    fn test_handle_doc_with_existing_product() {
+        let doc = azure_result_factory(Some("My Cool Product".to_string()));
+        let mut products = Vec::<Product>::new();
+        products.push(Product {
+            name: "My Cool Product".to_string(),
+            document_count: 5,
+        });
+        handle_doc(&doc, &mut products);
+        assert_eq!(products.len(), 1);
+        assert_eq!(products[0].name, "My Cool Product".to_string());
+        assert_eq!(products[0].document_count, 6);
+    }
+
+    #[test]
+    fn test_handle_doc_with_no_product_name() {
+        let doc = azure_result_factory(None);
+        let mut products = Vec::<Product>::new();
+        handle_doc(&doc, &mut products);
+        assert_eq!(products.len(), 0);
+    }
+
+    #[test]
+    fn test_sort_products() {
+        let mut products = Vec::<Product>::new();
+        products.push(Product {
+            name: "B".to_string(),
+            document_count: 1,
+        });
+        products.push(Product {
+            name: "C".to_string(),
+            document_count: 1,
+        });
+        products.push(Product {
+            name: "A".to_string(),
+            document_count: 1,
+        });
+        products.sort();
+        assert_eq!(products[0].name, "A");
+        assert_eq!(products[1].name, "B");
+        assert_eq!(products[2].name, "C");
+    }
 }

@@ -5,7 +5,7 @@ import Layout from "../components/Layout"
 import SEO from "../components/SEO"
 import { rhythm } from "../utils/typography"
 import styled from "styled-components"
-import { mhraBlue10, anchorColour, mhraBlue } from "../utils/colors"
+import { mhraBlue10, mhraBlue } from "../utils/colors"
 import { GoChevronRight } from "react-icons/go"
 import Link from "../components/Link"
 

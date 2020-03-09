@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
+import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
@@ -140,6 +141,7 @@ const App: NextPage = () => {
           handleDocTypeCheckbox={handleToggleDocType}
           handlePageChange={handlePageChange}
         />
+        <DrugStructuredData drugName={productName} />
       </SearchWrapper>
     </Page>
   );

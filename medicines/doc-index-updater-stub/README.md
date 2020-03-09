@@ -79,6 +79,18 @@ a 401 response.
 
 ## Endpoints
 
+### GET /healthz
+
+Returns the service health.
+
+Sample response:
+
+```xml
+<health>
+    <healthy>true</healthy>
+</health>
+```
+
 ### GET /jobs/:job_id
 
 Returns the status of a job specified by :job_id.
@@ -87,7 +99,7 @@ Sample response:
 
 ```xml
 <job>
-    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</id>
     <status>Done</status>
 </job>
 ```
@@ -96,7 +108,7 @@ Note that a job which has encountered an unrecoverable error will have additiona
 
 ```xml
 <job>
-    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</id>
     <status>Error</status>
     <error_code>15</error_code>
     <error_message>Invalid file source provided.</error_message>
@@ -154,7 +166,7 @@ Sample response:
 
 ```xml
 <job>
-    <job_id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</job_id>
+    <id>c2c0e7db-21e5-46dd-aea8-5c842f195ba2</id>
     <status>Accepted</status>
 </job>
 ```

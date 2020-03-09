@@ -1,4 +1,4 @@
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -8,6 +8,18 @@ pub enum JobStatus {
     Done,
     NotFound,
     Error { message: String, code: String },
+}
+
+impl std::fmt::Display for JobStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        let a = match self {
+            JobStatus::Accepted => "Accepted".to_string(),
+            JobStatus::Done => "Done".to_string(),
+            JobStatus::NotFound => "NotFound".to_string(),
+            JobStatus::Error { message, code } => format!("Error({}: {})", code, message),
+        };
+        write!(f, "{}", a)
+    }
 }
 
 impl FromStr for JobStatus {
@@ -31,7 +43,7 @@ pub struct JobStatusResponse {
     pub status: JobStatus,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Document {
     pub id: String,
     pub name: String,
@@ -46,11 +58,49 @@ pub struct Document {
     pub file_path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum DocumentType {
-    SPC,
-    PIL,
-    PAR,
+    #[serde(rename = "SPC")]
+    Spc,
+    #[serde(rename = "PIL")]
+    Pil,
+    #[serde(rename = "PAR")]
+    Par,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct CreateMessage {
+    pub job_id: Uuid,
+    pub document: Document,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct DeleteMessage {
+    pub job_id: Uuid,
+    pub document_content_id: String,
+}
+
+pub trait Message: Sized {
+    fn from_string(message: String) -> Result<Self, serde_json::Error>;
+    fn to_json_string(&self) -> Result<String, serde_json::Error>;
+}
+
+impl Message for CreateMessage {
+    fn from_string(message: String) -> Result<Self, serde_json::Error> {
+        Ok(serde_json::from_slice::<CreateMessage>(message.as_bytes())?)
+    }
+    fn to_json_string(&self) -> Result<String, serde_json::Error> {
+        Ok(serde_json::to_string(&self)?)
+    }
+}
+
+impl Message for DeleteMessage {
+    fn from_string(message: String) -> Result<Self, serde_json::Error> {
+        Ok(serde_json::from_slice::<DeleteMessage>(message.as_bytes())?)
+    }
+    fn to_json_string(&self) -> Result<String, serde_json::Error> {
+        Ok(serde_json::to_string(&self)?)
+    }
 }
 
 #[cfg(test)]
