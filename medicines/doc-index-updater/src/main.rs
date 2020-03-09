@@ -43,8 +43,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             .run(addr.clone())
             .await;
         }),
-        tokio::spawn(create_manager::create_service_worker(create_state)),
         tokio::spawn(delete_manager::delete_service_worker()),
+        tokio::spawn(create_manager::create_service_worker(create_state)),
     );
     Ok(())
 }
