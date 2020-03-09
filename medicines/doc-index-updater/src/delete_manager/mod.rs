@@ -6,7 +6,6 @@ use crate::{
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_service_bus::prelude::Client;
 use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::prelude::*;
 use std::time::Duration;
 use tokio::time::delay_for;
 

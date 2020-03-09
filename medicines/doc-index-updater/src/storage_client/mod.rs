@@ -1,6 +1,5 @@
-use azure_sdk_core::{errors::AzureError, prelude::*};
-use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::prelude::*;
+use azure_sdk_core::errors::AzureError;
+use azure_sdk_storage_core::prelude::Client;
 
 pub fn factory() -> Result<Client, AzureError> {
     let storage_account =
