@@ -59,6 +59,7 @@ const App: NextPage = props => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (!queryQS) {
       return;
     }
