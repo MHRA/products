@@ -28,6 +28,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
 
+    let create_state = state.clone();
+
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
@@ -41,8 +43,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             .run(addr.clone())
             .await;
         }),
+        tokio::spawn(create_manager::create_service_worker(create_state)),
         tokio::spawn(delete_manager::delete_service_worker()),
-        tokio::spawn(create_manager::create_service_worker()),
     );
     Ok(())
 }
