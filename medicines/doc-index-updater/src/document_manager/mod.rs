@@ -18,7 +18,7 @@ async fn del_document_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = delete_factory().await {
+    if let Ok(mut queue) = delete_factory().await {
         let id = Uuid::new_v4();
         let message = DeleteMessage {
             job_id: id,
@@ -26,14 +26,11 @@ async fn del_document_handler(
         };
         let duration = Duration::days(1);
 
-        match serde_json::to_string(&message) {
-            Ok(evt) => match client.send_event(evt.as_str(), duration).await {
-                Ok(_) => Ok(warp::reply::json(
-                    &state_manager.set_status(id, JobStatus::Accepted).await?,
-                )),
-                Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
-            },
-            Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
+        match queue.send(message, duration).await {
+            Ok(_) => Ok(warp::reply::json(
+                &state_manager.set_status(id, JobStatus::Accepted).await?,
+            )),
+            Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
@@ -44,21 +41,18 @@ async fn check_in_document_handler(
     doc: Document,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    if let Ok(mut client) = create_factory().await {
+    if let Ok(mut queue) = create_factory().await {
         let id = Uuid::new_v4();
         let message = CreateMessage {
             job_id: id,
             document: doc,
         };
         let duration = Duration::days(1);
-        match serde_json::to_string(&message) {
-            Ok(evt) => match client.send_event(evt.as_str(), duration).await {
-                Ok(_) => Ok(warp::reply::json(
-                    &state_manager.set_status(id, JobStatus::Accepted).await?,
-                )),
-                Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
-            },
-            Err(_) => Err(warp::reject::custom(FailedToDeserialize)),
+        match queue.send(message, duration).await {
+            Ok(_) => Ok(warp::reply::json(
+                &state_manager.set_status(id, JobStatus::Accepted).await?,
+            )),
+            Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))

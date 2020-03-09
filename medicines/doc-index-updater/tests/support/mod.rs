@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use core::{fmt::Debug, future::Future};
-use doc_index_updater::models::{CreateMessage, Document, DocumentType};
+use doc_index_updater::models::{CreateMessage, DeleteMessage, Document, DocumentType};
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
@@ -188,5 +188,12 @@ pub fn get_test_create_message(id: Uuid) -> CreateMessage {
     CreateMessage {
         job_id: id,
         document: get_test_document(),
+    }
+}
+
+pub fn get_test_delete_message(job_id: Uuid, document_content_id: String) -> DeleteMessage {
+    DeleteMessage {
+        job_id,
+        document_content_id,
     }
 }

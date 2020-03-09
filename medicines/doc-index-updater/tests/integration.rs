@@ -1,10 +1,11 @@
 extern crate doc_index_updater;
 
 mod support;
+use crate::support::get_test_delete_message;
 use doc_index_updater::{
-    create_manager, document_manager,
-    models::{CreateMessage, JobStatus, JobStatusResponse},
-    service_bus_client::create_factory,
+    document_manager,
+    models::{CreateMessage, DeleteMessage, JobStatus, JobStatusResponse},
+    service_bus_client::{create_factory, delete_factory},
     state_manager,
 };
 use support::{get_ok, get_test_create_message, get_test_document, TestContext};
@@ -78,6 +79,19 @@ fn delete_endpoint_sets_state() {
     let id = response.id;
     let response = get_ok(state.get_status(id));
     assert_eq!(response.status, JobStatus::Accepted);
+
+    let mut delete_client = get_ok(delete_factory());
+
+    let mut received_message = get_ok(delete_client.receive::<DeleteMessage>());
+    let expected = get_test_delete_message(id, "hello-string".to_string());
+
+    loop {
+        if received_message.job_id == id {
+            assert_eq!(received_message, expected);
+            return;
+        }
+        received_message = get_ok(delete_client.receive::<DeleteMessage>());
+    }
 }
 
 #[ignore]
@@ -106,16 +120,14 @@ fn create_endpoint_sets_state() {
 
     let mut create_client = get_ok(create_factory());
 
-    let mut received_message = get_ok(create_manager::get_message(&mut create_client));
+    let mut received_message = get_ok(create_client.receive::<CreateMessage>());
     let expected = get_test_create_message(id);
 
     loop {
-        if let Ok(result) = serde_json::from_slice::<CreateMessage>(received_message.as_bytes()) {
-            if result.job_id == id {
-                assert_eq!(result, expected);
-                return;
-            }
+        if received_message.job_id == id {
+            assert_eq!(received_message, expected);
+            return;
         }
-        received_message = get_ok(create_manager::get_message(&mut create_client));
+        received_message = get_ok(create_client.receive::<CreateMessage>());
     }
 }

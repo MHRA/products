@@ -1,4 +1,4 @@
-use crate::service_bus_client::delete_factory;
+use crate::{models::DeleteMessage, service_bus_client::delete_factory};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::Client;
 use std::time::Duration;
@@ -9,7 +9,8 @@ pub async fn delete_service_worker() -> Result<String, AzureError> {
     let mut delete_client = delete_factory().await?;
 
     loop {
-        if let Ok(message) = get_message(&mut delete_client).await {
+        let message_result: Result<DeleteMessage, AzureError> = delete_client.receive().await;
+        if let Ok(message) = message_result {
             tracing::info!("{:?} message receive!", message);
         }
         delay_for(Duration::from_secs(10)).await;
