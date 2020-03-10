@@ -4,29 +4,20 @@ use crate::{
     service_bus_client::{delete_factory, RetrieveFromQueueError},
     storage_client,
 };
+use anyhow::anyhow;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
-use azure_sdk_service_bus::prelude::Client;
 use azure_sdk_storage_blob::prelude::*;
 use std::time::Duration;
 use tokio::time::delay_for;
 
-pub enum DeleteManagerError {
-    AzureError(AzureError),
-    ReqwestError(reqwest::Error),
-    DeleteManagerError(String),
-}
-
-impl From<AzureError> for DeleteManagerError {
-    fn from(e: AzureError) -> Self {
-        Self::AzureError(e)
-    }
-}
-
 #[tracing::instrument]
 pub async fn delete_service_worker(
     storage_container_name: String,
-) -> Result<String, DeleteManagerError> {
-    let mut delete_client = delete_factory().await?;
+) -> Result<String, anyhow::Error> {
+    let mut delete_client = delete_factory().await.map_err(|e| {
+        tracing::error!("{:?}", e);
+        anyhow!("Couldn't create the delete queue client")
+    })?;
 
     loop {
         let message_result: Result<DeleteMessage, RetrieveFromQueueError> =
@@ -35,8 +26,13 @@ pub async fn delete_service_worker(
             Ok(message) => {
                 tracing::info!("{:?} message receive!", message);
 
-                let blob_name = get_blob_name_from_message(message).await?;
-                delete_blob(&storage_container_name, &blob_name).await?;
+                let blob_name = get_blob_name_from_content_id(&message.document_content_id).await?;
+                delete_blob(&storage_container_name, &blob_name)
+                    .await
+                    .map_err(|e| {
+                        tracing::error!("{:?}", e);
+                        anyhow!("Couldn't delete blob {}", &blob_name)
+                    })?;
                 // TODO: Update index
                 // TODO: Notify state manager
             }
@@ -47,28 +43,17 @@ pub async fn delete_service_worker(
     }
 }
 
-pub async fn get_blob_name_from_message(
-    message: DeleteMessage,
-) -> Result<String, DeleteManagerError> {
+pub async fn get_blob_name_from_content_id(content_id: &String) -> Result<String, anyhow::Error> {
     let search_client = search::factory();
-    let search_results = search_client
-        .azure_search(&message.document_content_id)
-        .await;
-    match search_results {
-        Ok(results) => {
-            for result in results.search_results {
-                if result.file_name == message.document_content_id {
-                    return Ok(message.document_content_id);
-                }
-            }
-            let error_message = format!(
-                "Cannot find document with content ID {}",
-                message.document_content_id
-            );
-            Err(DeleteManagerError::DeleteManagerError(error_message))
+    let search_results = search_client.azure_search(&content_id).await?;
+    for result in search_results.search_results {
+        if &result.file_name == content_id {
+            return Ok(result.metadata_storage_name);
         }
-        Err(reqwest_error) => Err(DeleteManagerError::ReqwestError(reqwest_error)),
     }
+
+    let error_message = format!("Cannot find document with content ID {}", content_id);
+    Err(anyhow!(error_message))
 }
 
 pub async fn delete_blob(container_name: &str, blob_name: &str) -> Result<(), AzureError> {

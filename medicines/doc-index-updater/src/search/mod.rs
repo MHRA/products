@@ -30,6 +30,7 @@ pub struct AzureResult {
 
 #[derive(Debug, Deserialize)]
 pub struct AzureSearchResults {
+    #[serde(rename = "value")]
     pub search_results: Vec<AzureResult>,
     #[serde(rename = "@odata.context")]
     context: String,
