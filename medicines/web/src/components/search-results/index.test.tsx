@@ -41,6 +41,7 @@ describe(SearchResults, () => {
         docTypes={[]}
         handleDocTypeCheckbox={noFeedback}
         handlePageChange={noFeedback}
+        isLoading={false}
       />,
     );
     expect(component).toMatchSnapshot();

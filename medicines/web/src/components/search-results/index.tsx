@@ -206,6 +206,7 @@ interface ISearchResultsProps {
   docTypes: DocType[];
   handleDocTypeCheckbox: (d: DocType) => void;
   handlePageChange: (num: number) => void;
+  isLoading: boolean;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -246,7 +247,13 @@ const SearchResults = (props: ISearchResultsProps) => {
     setShowDisclaimerWarning(false);
   };
 
-  return (
+  return props.isLoading ? (
+    <StyledDrugList>
+      <h1 className="title">
+        {`Loading results for ${showingResultsForTerm}...`}
+      </h1>
+    </StyledDrugList>
+  ) : (
     <>
       <StyledDrugList>
         <div>

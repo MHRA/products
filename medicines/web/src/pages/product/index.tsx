@@ -26,11 +26,12 @@ const App: NextPage = () => {
     false,
   );
   const [results, setResults] = React.useState<IDocument[]>([]);
-  const [productName, setProductName] = React.useState();
+  const [productName, setProductName] = React.useState('');
   const [count, setCount] = React.useState();
   const [pageNumber, setPageNumber] = React.useState();
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState();
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const router = useRouter();
   const {
@@ -74,6 +75,7 @@ const App: NextPage = () => {
       const results = await getResults(product, page, docTypes);
       setResults(results.results.map(convertResults));
       setCount(results.resultCount);
+      setIsLoading(false);
       Events.viewResultsForProduct({
         productName: product,
         pageNo: page,
@@ -140,6 +142,7 @@ const App: NextPage = () => {
           docTypes={docTypes}
           handleDocTypeCheckbox={handleToggleDocType}
           handlePageChange={handlePageChange}
+          isLoading={isLoading}
         />
         <DrugStructuredData drugName={productName} />
       </SearchWrapper>

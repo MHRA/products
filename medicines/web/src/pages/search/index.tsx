@@ -30,6 +30,7 @@ const App: NextPage = props => {
   const [pageNumber, setPageNumber] = React.useState();
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState();
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const router = useRouter();
   const {
@@ -58,6 +59,7 @@ const App: NextPage = props => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (!queryQS) {
       return;
     }
@@ -72,6 +74,7 @@ const App: NextPage = props => {
       const results = await getResults(query, page, docTypes);
       setResults(results.results.map(convertResults));
       setCount(results.resultCount);
+      setIsLoading(false);
       Events.searchForProductsMatchingKeywords({
         searchTerm: query,
         pageNo: page,
@@ -136,6 +139,7 @@ const App: NextPage = props => {
           docTypes={docTypes}
           handleDocTypeCheckbox={handleToggleDocType}
           handlePageChange={handlePageChange}
+          isLoading={isLoading}
         />
       </SearchWrapper>
     </Page>
