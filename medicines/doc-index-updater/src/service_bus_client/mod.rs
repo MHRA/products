@@ -49,9 +49,12 @@ impl DocIndexUpdaterQueue {
     pub async fn receive<T: Message>(&mut self) -> Result<T, AzureError> {
         let message = self
             .service_bus
-            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(1)))
+            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
-            .map_err(|e| tracing::error!("{:?}", e))?;
+            .map_err(|e| match e {
+                AzureError::UnexpectedHTTPResult(a) => tracing::info!("{:?}", a),
+                _ => tracing::error!("{:?}", e),
+            })?;
 
         Ok(T::from_string(message.to_owned())?)
     }

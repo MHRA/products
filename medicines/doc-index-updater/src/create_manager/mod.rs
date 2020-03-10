@@ -19,7 +19,7 @@ pub async fn create_service_worker(state_manager: StateManager) -> Result<String
     })?;
 
     loop {
-        match process_file(&mut create_client).await {
+        match try_process_from_queue(&mut create_client).await {
             Ok(status) => match status {
                 FileProcessStatus::Success(job_id) => {
                     let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
@@ -42,7 +42,7 @@ async fn update_index(blob: String) {
     dbg!("update the index for {}", blob);
 }
 
-async fn process_file(
+async fn try_process_from_queue(
     create_client: &mut DocIndexUpdaterQueue,
 ) -> Result<FileProcessStatus, anyhow::Error> {
     tracing::info!("Checking for create messages");
