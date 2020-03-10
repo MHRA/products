@@ -40,7 +40,7 @@ async fn create_file_in_blob(file: Vec<u8>) -> String {
     format!("create file in blob: {:?}", file)
 }
 
-async fn create_index_entry(blob: String) {
+async fn add_to_search_index(blob: String) {
     tracing::debug!("update the index for {}", blob);
 }
 
@@ -55,7 +55,7 @@ async fn try_process_from_queue(
         let file =
             sftp_client::retrieve(message.document.file_source, message.document.file_path).await?;
         let blob = create_file_in_blob(file).await;
-        create_index_entry(blob).await;
+        add_to_search_index(blob).await;
 
         Ok(FileProcessStatus::Success(message.job_id))
     } else {
