@@ -15,6 +15,7 @@ azure_sdk_storage_core = { git = "https://github.com/redbadger/AzureSDKForRust",
 futures = "0.3.4"
 hyper = "0.13"
 redis = { version = "0.15.1", features = ["tokio-rt-core"] }
+reqwest = { version = "0.10.4", features = ["json"] }
 serde = "1.0.104"
 serde_derive = "1.0.104"
 serde_json = "1.0"
