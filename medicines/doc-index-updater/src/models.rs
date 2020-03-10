@@ -54,8 +54,13 @@ pub struct Document {
     pub keywords: Option<Vec<String>>,
     pub pl_number: String,
     pub active_substances: Vec<String>,
-    pub file_source: String,
+    pub file_source: FileSource,
     pub file_path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub enum FileSource {
+    Sentinel,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -80,24 +85,33 @@ pub struct DeleteMessage {
     pub document_content_id: String,
 }
 
-pub trait Message: Sized {
-    fn from_string(message: String) -> Result<Self, serde_json::Error>;
+pub trait Message: Sized + FromStr {
     fn to_json_string(&self) -> Result<String, serde_json::Error>;
 }
 
-impl Message for CreateMessage {
-    fn from_string(message: String) -> Result<Self, serde_json::Error> {
-        Ok(serde_json::from_slice::<CreateMessage>(message.as_bytes())?)
+impl FromStr for CreateMessage {
+    type Err = serde_json::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(serde_json::from_slice::<CreateMessage>(s.as_bytes())?)
     }
+}
+
+impl FromStr for DeleteMessage {
+    type Err = serde_json::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(serde_json::from_slice::<DeleteMessage>(s.as_bytes())?)
+    }
+}
+
+impl Message for CreateMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
 }
 
 impl Message for DeleteMessage {
-    fn from_string(message: String) -> Result<Self, serde_json::Error> {
-        Ok(serde_json::from_slice::<DeleteMessage>(message.as_bytes())?)
-    }
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }

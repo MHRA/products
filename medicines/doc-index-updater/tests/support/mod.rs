@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use core::{fmt::Debug, future::Future};
-use doc_index_updater::models::{CreateMessage, DeleteMessage, Document, DocumentType};
+use doc_index_updater::models::{CreateMessage, DeleteMessage, Document, DocumentType, FileSource};
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
@@ -179,7 +179,7 @@ pub fn get_test_document() -> Document {
         keywords: Some(vec!["keywords".to_string()]),
         pl_number: "pl_number".to_string(),
         active_substances: vec!["active_substances".to_string()],
-        file_source: "file_source".to_string(),
+        file_source: FileSource::Sentinel,
         file_path: "file_path".to_string(),
     }
 }

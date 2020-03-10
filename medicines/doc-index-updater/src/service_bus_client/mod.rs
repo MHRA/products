@@ -1,7 +1,10 @@
 use crate::models::Message;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::Client;
+use hyper::StatusCode;
+use std::error::Error;
 use time::Duration;
+use AzureError::UnexpectedHTTPResult;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
@@ -41,19 +44,50 @@ pub struct DocIndexUpdaterQueue {
     service_bus: Client,
 }
 
+#[derive(Debug)]
+pub enum RetrieveFromQueueError {
+    AzureError(AzureError),
+    ParseError(String),
+    NotFoundError,
+}
+
+impl std::fmt::Display for RetrieveFromQueueError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "A")
+    }
+}
+
+impl Error for RetrieveFromQueueError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
 impl DocIndexUpdaterQueue {
     fn new(service_bus: Client) -> Self {
         Self { service_bus }
     }
 
-    pub async fn receive<T: Message>(&mut self) -> Result<T, AzureError> {
+    pub async fn receive<T: Message>(&mut self) -> Result<T, RetrieveFromQueueError> {
         let message = self
             .service_bus
-            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(1)))
+            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
-            .map_err(|e| tracing::error!("{:?}", e))?;
+            .map_err(|e| match e {
+                UnexpectedHTTPResult(a) if a.status_code() == StatusCode::NO_CONTENT => {
+                    tracing::info!("No new messages found. ({:?})", a);
+                    RetrieveFromQueueError::NotFoundError
+                }
+                _ => {
+                    tracing::error!("{:?}", e);
+                    RetrieveFromQueueError::AzureError(e)
+                }
+            })?;
 
-        Ok(T::from_string(message.to_owned())?)
+        Ok(message.parse::<T>().map_err(|_| {
+            tracing::warn!("Message found could not be parsed ({:?})", message);
+            RetrieveFromQueueError::ParseError(message)
+        })?)
     }
 
     pub async fn send<T: Message>(

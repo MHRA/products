@@ -1,25 +1,69 @@
-use crate::{models::CreateMessage, service_bus_client::create_factory};
-use azure_sdk_core::errors::AzureError;
+use crate::{
+    models::{CreateMessage, JobStatus},
+    service_bus_client::{create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError},
+    state_manager::StateManager,
+};
+use anyhow::anyhow;
 use std::time::Duration;
 use tokio::time::delay_for;
 
+mod sftp_client;
+
 #[tracing::instrument]
-pub async fn create_service_worker() -> Result<String, AzureError> {
-    let mut create_client = create_factory().await?;
+pub async fn create_service_worker(
+    time_to_wait: Duration,
+    state_manager: StateManager,
+) -> Result<String, anyhow::Error> {
+    tracing::info!("Starting create service worker");
+    let mut create_client = create_factory().await.map_err(|e| {
+        tracing::error!("{:?}", e);
+        anyhow!("Couldn't create the Create Queue")
+    })?;
 
     loop {
-        let message_result: Result<CreateMessage, AzureError> = create_client.receive().await;
-        if let Ok(message) = message_result {
-            tracing::info!("{:?} message receive!", message);
-            retrieve_file_from_sftp(message.document.file_path).await;
-            // TODO: create file in blob storage
-            // TODO: Update index
-            // TODO: Notify state manager
+        match try_process_from_queue(&mut create_client).await {
+            Ok(status) => match status {
+                FileProcessStatus::Success(job_id) => {
+                    let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
+                }
+                FileProcessStatus::NothingToProcess => {}
+            },
+            Err(e) => {
+                tracing::error!("{:?}", e);
+            }
         }
-        delay_for(Duration::from_secs(10)).await;
+        delay_for(time_to_wait).await;
     }
 }
 
-async fn retrieve_file_from_sftp(filepath: String) -> String {
-    filepath
+async fn create_file_in_blob(file: Vec<u8>) -> String {
+    format!("create file in blob: {:?}", file)
+}
+
+async fn add_to_search_index(blob: String) {
+    tracing::debug!("update the index for {}", blob);
+}
+
+async fn try_process_from_queue(
+    create_client: &mut DocIndexUpdaterQueue,
+) -> Result<FileProcessStatus, anyhow::Error> {
+    tracing::info!("Checking for create messages");
+    let message_result: Result<CreateMessage, RetrieveFromQueueError> =
+        create_client.receive().await;
+    if let Ok(message) = message_result {
+        tracing::info!("{:?} message receive!", message);
+        let file =
+            sftp_client::retrieve(message.document.file_source, message.document.file_path).await?;
+        let blob = create_file_in_blob(file).await;
+        add_to_search_index(blob).await;
+
+        Ok(FileProcessStatus::Success(message.job_id))
+    } else {
+        Ok(FileProcessStatus::NothingToProcess)
+    }
+}
+
+enum FileProcessStatus {
+    Success(uuid::Uuid),
+    NothingToProcess,
 }
