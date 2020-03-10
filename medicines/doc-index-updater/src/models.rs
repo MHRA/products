@@ -54,8 +54,13 @@ pub struct Document {
     pub keywords: Option<Vec<String>>,
     pub pl_number: String,
     pub active_substances: Vec<String>,
-    pub file_source: String,
+    pub file_source: FileSource,
     pub file_path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub enum FileSource {
+    Sentinel,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

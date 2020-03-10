@@ -52,7 +52,8 @@ async fn try_process_from_queue(
     let message_result: Result<CreateMessage, AzureError> = create_client.receive().await;
     if let Ok(message) = message_result {
         tracing::info!("{:?} message receive!", message);
-        let file = sftp_client::retrieve(message.document.file_path).await?;
+        let file =
+            sftp_client::retrieve(message.document.file_source, message.document.file_path).await?;
         let blob = create_file_in_blob(file).await;
         create_index_entry(blob).await;
 
