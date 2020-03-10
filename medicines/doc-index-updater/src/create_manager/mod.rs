@@ -30,7 +30,7 @@ pub async fn create_service_worker(state_manager: StateManager) -> Result<String
                 tracing::error!("{:?}", e);
             }
         }
-        delay_for(Duration::from_secs(10)).await;
+        delay_for(Duration::from_secs(5)).await;
     }
 }
 
@@ -39,7 +39,7 @@ async fn create_file_in_blob(file: Vec<u8>) -> String {
 }
 
 async fn update_index(blob: String) {
-    dbg!("update the index for {}", blob);
+    tracing::debug!("update the index for {}", blob);
 }
 
 async fn try_process_from_queue(

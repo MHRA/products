@@ -16,7 +16,7 @@ fn create_queue_works() {
     let id = Uuid::new_v4();
     let sent_message = get_test_create_message(id);
     let mut queue = get_ok(create_factory());
-    get_ok(queue.send(sent_message.clone(), time::Duration::seconds(1)));
+    get_ok(queue.send(sent_message.clone(), time::Duration::seconds(30)));
 
     let mut received_message = block_on(get_message_safely(&mut queue));
     while received_message != sent_message {
