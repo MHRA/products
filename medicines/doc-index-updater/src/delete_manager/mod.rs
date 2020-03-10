@@ -77,7 +77,7 @@ pub async fn delete_blob(container_name: &str, blob_name: &str) -> Result<(), Az
         .delete_blob()
         .with_container_name(&container_name)
         .with_blob_name(&blob_name)
-        .with_delete_snapshots_method(DeleteSnapshotsMethod::Include) // could also be Only; not 100% sure what this means
+        .with_delete_snapshots_method(DeleteSnapshotsMethod::Include)
         .finalize()
         .await?;
     Ok(())
