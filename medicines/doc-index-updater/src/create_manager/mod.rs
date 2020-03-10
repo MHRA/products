@@ -34,8 +34,8 @@ pub async fn create_service_worker(state_manager: StateManager) -> Result<String
     }
 }
 
-async fn create_file_in_blob(file: String) -> String {
-    format!("create file in blob: {}", file)
+async fn create_file_in_blob(file: Vec<u8>) -> String {
+    format!("create file in blob: {:?}", file)
 }
 
 async fn update_index(blob: String) {

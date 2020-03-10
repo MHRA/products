@@ -39,11 +39,11 @@ async fn retrieve_file_from_sftp(
     })?)
 }
 
-pub async fn retrieve(filepath: String) -> Result<String, anyhow::Error> {
+pub async fn retrieve(filepath: String) -> Result<Vec<u8>, anyhow::Error> {
     let mut sftp_client = sftp_factory().await?;
-    let mut file = retrieve_file_from_sftp(&mut sftp_client, filepath).await?;
-    let mut some_string = "".to_owned();
-    let _ = file.read_to_string(&mut some_string);
-    tracing::info!("{:?}", some_string);
-    Ok(some_string)
+    let mut file = retrieve_file_from_sftp(&mut sftp_client, filepath.clone()).await?;
+    let mut bytes = Vec::<u8>::new();
+    let size = file.read_to_end(&mut bytes)?;
+    tracing::info!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
+    Ok(bytes)
 }
