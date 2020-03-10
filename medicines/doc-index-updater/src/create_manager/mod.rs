@@ -1,10 +1,9 @@
 use crate::{
     models::{CreateMessage, JobStatus},
-    service_bus_client::{create_factory, DocIndexUpdaterQueue},
+    service_bus_client::{create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError},
     state_manager::StateManager,
 };
 use anyhow::anyhow;
-use azure_sdk_core::errors::AzureError;
 use std::time::Duration;
 use tokio::time::delay_for;
 
@@ -49,7 +48,8 @@ async fn try_process_from_queue(
     create_client: &mut DocIndexUpdaterQueue,
 ) -> Result<FileProcessStatus, anyhow::Error> {
     tracing::info!("Checking for create messages");
-    let message_result: Result<CreateMessage, AzureError> = create_client.receive().await;
+    let message_result: Result<CreateMessage, RetrieveFromQueueError> =
+        create_client.receive().await;
     if let Ok(message) = message_result {
         tracing::info!("{:?} message receive!", message);
         let file =
