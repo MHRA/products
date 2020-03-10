@@ -11,7 +11,10 @@ use tokio::time::delay_for;
 mod sftp_client;
 
 #[tracing::instrument]
-pub async fn create_service_worker(state_manager: StateManager) -> Result<String, anyhow::Error> {
+pub async fn create_service_worker(
+    time_to_wait: Duration,
+    state_manager: StateManager,
+) -> Result<String, anyhow::Error> {
     tracing::info!("Starting create service worker");
     let mut create_client = create_factory().await.map_err(|e| {
         tracing::error!("{:?}", e);
@@ -30,7 +33,7 @@ pub async fn create_service_worker(state_manager: StateManager) -> Result<String
                 tracing::error!("{:?}", e);
             }
         }
-        delay_for(Duration::from_secs(5)).await;
+        delay_for(time_to_wait).await;
     }
 }
 
