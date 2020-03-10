@@ -1,7 +1,9 @@
 use crate::models::Message;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::prelude::Client;
+use hyper::StatusCode;
 use time::Duration;
+use AzureError::UnexpectedHTTPResult;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
@@ -52,7 +54,9 @@ impl DocIndexUpdaterQueue {
             .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
             .map_err(|e| match e {
-                AzureError::UnexpectedHTTPResult(a) => tracing::info!("{:?}", a),
+                UnexpectedHTTPResult(a) if a.status_code() == StatusCode::NO_CONTENT => {
+                    tracing::info!("No new messages found. ({:?})", a)
+                }
                 _ => tracing::error!("{:?}", e),
             })?;
 

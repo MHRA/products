@@ -310,6 +310,7 @@ dependencies = [
  "azure_sdk_core",
  "azure_sdk_service_bus",
  "futures",
+ "hyper",
  "net2",
  "redis",
  "serde",
