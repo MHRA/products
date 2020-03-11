@@ -1,6 +1,8 @@
 use anyhow::anyhow;
 use core::fmt::Display;
-use doc_index_updater::{create_manager, delete_manager, document_manager, health, state_manager, search_client};
+use doc_index_updater::{
+    create_manager, delete_manager, document_manager, health, search_client, state_manager,
+};
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr, time::Duration};
 use tracing::Level;
@@ -14,27 +16,27 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         .with_max_level(Level::INFO)
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();
-    
+
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     tracing_log::LogTracer::init()
         .expect("error redirecting normal log messages to the tracing subscriber");
-    
+
     let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
         .parse::<SocketAddr>()?;
-    
+
     let redis_server = get_env_or_default("REDIS_SERVER", "127.0.0.1".to_string());
     let redis_port = get_env_or_default("REDIS_PORT", "6379".to_string());
     let redis_key = get_env_or_default("REDIS_KEY", "".to_string());
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
-    
+
     let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
     let storage_container_name = get_env::<String>("STORAGE_CONTAINER").unwrap();
-    
+
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
-    
+
     let create_state = state.clone();
-    
+
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
@@ -57,7 +59,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             create_state
         )),
     );
-
     Ok(())
 }
 

@@ -42,7 +42,7 @@ pub struct AzureSearchResults {
 pub struct AzureIndexChangedResults {
     pub value: Vec<AzureIndexChangedResult>,
     #[serde(rename = "@odata.context")]
-    context: String
+    context: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -52,7 +52,7 @@ pub struct AzureIndexChangedResult {
     #[serde(rename = "errorMessage")]
     pub error_message: Option<String>,
     #[serde(rename = "statusCode")]
-    pub status_code: u16
+    pub status_code: u16,
 }
 
 #[derive(Clone)]
@@ -60,7 +60,7 @@ struct AzureConfig {
     search_service: String,
     search_index: String,
     api_key: String,
-    api_version: String
+    api_version: String,
 }
 
 pub struct AzureSearchClient {
