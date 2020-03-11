@@ -1,3 +1,12 @@
+---
+name: User Story
+about: Create a user story
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 ## User want
 
 As a _user_
