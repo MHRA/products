@@ -1,6 +1,6 @@
 use crate::models::Message;
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_service_bus::prelude::Client;
+use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
 use std::error::Error;
 use time::Duration;
@@ -63,15 +63,22 @@ impl Error for RetrieveFromQueueError {
     }
 }
 
+pub struct RetrievedMessage<T> {
+    pub message: T,
+    pub peek_lock: PeekLockResponse,
+}
+
 impl DocIndexUpdaterQueue {
     fn new(service_bus: Client) -> Self {
         Self { service_bus }
     }
 
-    pub async fn receive<T: Message>(&mut self) -> Result<T, RetrieveFromQueueError> {
-        let message = self
+    pub async fn receive<T: Message>(
+        &mut self,
+    ) -> Result<RetrievedMessage<T>, RetrieveFromQueueError> {
+        let peek_lock = self
             .service_bus
-            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(10)))
+            .peek_lock_full(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
             .map_err(|e| match e {
                 UnexpectedHTTPResult(a) if a.status_code() == StatusCode::NO_CONTENT => {
@@ -84,10 +91,14 @@ impl DocIndexUpdaterQueue {
                 }
             })?;
 
-        Ok(message.parse::<T>().map_err(|_| {
+        let message = peek_lock.body();
+
+        let message = message.parse::<T>().map_err(|_| {
             tracing::warn!("Message found could not be parsed ({:?})", message);
             RetrieveFromQueueError::ParseError(message)
-        })?)
+        })?;
+
+        Ok(RetrievedMessage { message, peek_lock })
     }
 
     pub async fn send<T: Message>(
