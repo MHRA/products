@@ -69,15 +69,27 @@ pub fn factory() -> AzureSearchClient {
 }
 
 impl AzureSearchClient {
-    pub async fn azure_search(
+    pub async fn search(&self, search_term: &String) -> Result<AzureSearchResults, reqwest::Error> {
+        search(&search_term, &self.client, &self.config).await
+    }
+
+    pub async fn delete(
         &self,
-        search_term: &String,
+        key: &String,
+        value: &String,
     ) -> Result<AzureSearchResults, reqwest::Error> {
-        azure_search(&search_term, &self.client, &self.config).await
+        update_index(
+            &"delete".to_string(),
+            &key,
+            &value,
+            &self.client,
+            &self.config,
+        )
+        .await
     }
 }
 
-async fn azure_search(
+async fn search(
     search_term: &String,
     client: &reqwest::Client,
     config: &AzureConfig,
@@ -101,6 +113,43 @@ async fn azure_search(
             ("search", &search_term),
             ("scoringProfile", "preferKeywords"),
         ])
+        .build()?;
+
+    println!("Requesting from URL: {}", &req.url());
+
+    client
+        .execute(req)
+        .await?
+        .json::<AzureSearchResults>()
+        .await
+}
+
+async fn update_index(
+    action: &String,
+    key: &String,
+    value: &String,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<AzureSearchResults, reqwest::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    let mut azure_value = std::collections::HashMap::new();
+    azure_value.insert("@search.action", action);
+    azure_value.insert(key, value);
+    let mut body = std::collections::HashMap::new();
+    body.insert("value", [azure_value]);
+
+    let req = client
+        .post(&base_url)
+        .query(&[("api-version", "2017-11-11")])
+        // .header(&[
+        //     ("api-key", &config.api_key),
+        // ])
+        .json(&body)
         .build()?;
 
     println!("Requesting from URL: {}", &req.url());
