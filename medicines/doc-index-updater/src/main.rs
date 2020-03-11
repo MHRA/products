@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use core::fmt::Display;
 use doc_index_updater::{
-    create_manager, delete_manager, document_manager, health, search_client, state_manager,
+    create_manager, delete_manager, document_manager, health, state_manager,
 };
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr, time::Duration};
