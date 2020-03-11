@@ -1,27 +1,12 @@
 use lazy_static;
 use regex::Regex;
 use std::str;
-use tantivy::tokenizer::*;
 
 pub fn sanitize(s: &str) -> String {
     s.replace(|c: char| !c.is_ascii(), "")
         .replace("\n", " ")
         .trim()
         .to_string()
-}
-
-pub fn to_array(s: &str) -> Vec<String> {
-    lazy_static! {
-        static ref RE_SPLIT: Regex = Regex::new(r"(,|\s+AND\s+)").unwrap();
-        static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+)").unwrap();
-    }
-    RE_SPLIT
-        .split(s)
-        .map(|s| s.trim())
-        .map(|s| RE_WHITESPACE.replace_all(s, " "))
-        .map(|s| s.replace("\n", " "))
-        .map(|s| s.replace(|c: char| !c.is_ascii(), ""))
-        .collect()
 }
 
 pub fn to_json(words: Vec<String>) -> String {

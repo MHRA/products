@@ -1,6 +1,6 @@
 use crate::{
     hash::compute_sha_hash,
-    models::{CreateMessage, JobStatus, Document, DocumentType, FileSource},
+    models::{CreateMessage, JobStatus, Document},
     service_bus_client::{create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError},
     state_manager::StateManager,
     storage_client
@@ -115,7 +115,7 @@ pub async fn create_blob(
     metadata: &HashMap<String, String>
 ) -> Result<(), anyhow::Error> {
     let storage_client = storage_client::factory()?;
-    let blob_name = compute_sha_hash(&file_data);
+    let _blob_name = compute_sha_hash(&file_data);
     let file_digest = md5::compute(&file_data[..]);
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
     for (key, val) in metadata {
@@ -143,11 +143,10 @@ pub async fn create_blob(
 mod test {
     use super::*;
     use test_case::test_case;
+    use crate::{
+        models::{DocumentType, FileSource}
+    };
 
-    // #[test_case(&Value::Status("Accepted".to_string()), Ok(JobStatus::Accepted))]
-    // fn extract_metadata(input: &Value, output: Result<JobStatus, RedisError>) {
-    //     assert_eq!(sanitize("newline\ntest"), "newline test");
-    // }
     #[test]
     fn derive_metadata() {
         let doc = Document {
