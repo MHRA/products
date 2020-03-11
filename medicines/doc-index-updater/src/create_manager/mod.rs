@@ -148,42 +148,20 @@ mod test {
     // fn extract_metadata(input: &Value, output: Result<JobStatus, RedisError>) {
     //     assert_eq!(sanitize("newline\ntest"), "newline test");
     // }
-    fn create_doc(
-        id: str,
-        name: str,
-        document_type: DocumentType,
-        author: str,
-        products: Vec<String>,
-        keywords: Option<Vec<String>>,
-        pl_number: str,
-        active_substances: Vec<String>,
-    ) -> Document {
-        Document {
-            id: id.to_string(),
-            name: name.to_string(),
-            document_type,
-            author: author.to_string(),
-            products: products,
-            keywords: keywords,
-            pl_number: pl_number.to_string(),
-            active_substances,
-            file_path: "location/on/disk".to_string(),
-            file_source: FileSource::Sentinel
-        }
-    }
-        
     #[test]
     fn derive_metadata() {
-        doc = create_doc(
-            "CON123456",
-            "Paracetamol Plus",
-            DocumentType::Spc,
-            "JRR Tolkien",
-            vec!["Effective product 1".to_string(), "Effective product 2".to_string()],
-            Some(vec!["Very good for you".to_string(), "Cures headaches".to_string(), "PL 12345678".to_string()]),
-            "PL 1234/5678",
-            vec!["Paracetamol".to_string(), "Caffeine".to_string()],
-        )
+        let doc = Document {
+            id: "CON123456".to_string(),
+            name: "Paracetamol Plus".to_string(),
+            document_type: DocumentType::Spc,
+            author: "JRR Tolkien".to_string(),
+            products: vec!["Effective product 1".to_string(), "Effective product 2".to_string()],
+            keywords: Some(vec!["Very good for you".to_string(), "Cures headaches".to_string(), "PL 12345678".to_string()]),
+            pl_number: "PL 1234/5678".to_string(),
+            active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
+            file_path: "location/on/disk".to_string(),
+            file_source: FileSource::Sentinel
+        };
 
         let expected_metadata : HashMap<String, String> = [
         ("file_name".to_string(), "CON123456".to_string()),
@@ -206,5 +184,4 @@ mod test {
         assert_eq!(output_metadata["keywords"], output_metadata["keywords"]);
         assert_eq!(output_metadata["pl_number"], output_metadata["pl_number"]);
     }
-
 }
