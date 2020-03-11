@@ -32,7 +32,7 @@ impl Default for RedisServer {
 
         let addr = redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), server_port);
 
-        RedisServer::new_with_addr(addr, |cmd| cmd.spawn().unwrap())
+        RedisServer::new_with_addr(addr, |cmd| cmd.spawn().expect("Could not find redis, try installing redis server."))
     }
 }
 
