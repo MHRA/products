@@ -10,10 +10,6 @@ pub fn sanitize(s: &str) -> String {
         .to_string()
 }
 
-pub fn vec_to_spaced_string(products: &Vec<String>) -> String {
-    products.join(" ")
-}
-
 pub fn to_array(s: &str) -> Vec<String> {
     lazy_static! {
         static ref RE_SPLIT: Regex = Regex::new(r"(,|\s+AND\s+)").unwrap();
@@ -28,7 +24,7 @@ pub fn to_array(s: &str) -> Vec<String> {
         .collect()
 }
 
-pub fn to_json(words: &Vec<String>) -> String {
+pub fn to_json(words: Vec<String>) -> String {
     serde_json::to_string(&words).expect("Couldn't create JSON array.")
 }
 
@@ -75,7 +71,7 @@ pub fn extract_product_licences(input: &str) -> String {
         })
         .collect();
 
-    to_json(&product_licences)
+    to_json(product_licences)
 }
 
 #[cfg(test)]
@@ -93,20 +89,6 @@ mod test {
     #[test]
     fn sanitize_trim() {
         assert_eq!(sanitize(" test "), "test");
-    }
-    #[test]
-    fn tokenize_remove_newline() {
-        assert_eq!(tokenize("newline\ntest"), "newline test");
-    }
-    #[test]
-    fn tokenize_remove_unicode() {
-        assert_eq!(tokenize("emoji🙂 ∫test"), "emoji test");
-    }
-    #[test]
-    fn tokenize_sample_keywords1() {
-        let s1 = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride, Ibuprofen and Phenylephrine Hydrochloride 200 mg/6.1 mg Tablets, 200 mg, 6.1 mg, cold, flu, congestion, aches, pains, headache, fever, sore throat, blocked nose, sinuses";
-        let s2 = "ukpar public assessment report par national procedure ibuprofen phenylephrine hydrochloride ibuprofen phenylephrine hydrochloride 200 mg 6 1 mg tablets 200 mg 6 1 mg cold flu congestion aches pains headache fever sore throat blocked nose sinuses";
-        assert_eq!(tokenize(s1), s2);
     }
     #[test]
     fn jsonify_keywords() {

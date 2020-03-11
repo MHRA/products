@@ -1,6 +1,6 @@
 use crate::{
     hash::compute_sha_hash,
-    models::{CreateMessage, JobStatus, Document},
+    models::{CreateMessage, JobStatus, Document, DocumentType, FileSource},
     service_bus_client::{create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError},
     state_manager::StateManager,
     storage_client
@@ -80,20 +80,16 @@ pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, Stri
     metadata.insert("title".to_string(), title);
     metadata.insert("pl_number".to_string(), pl_numbers);
 
-    let product_names = metadata::to_json(&document.products);
-    let first_product_name = if document.products.len() > 0 {
-        document.products[0].to_string()
-    } else {
-        "".to_string()
-    };
+    let product_names = metadata::to_json(document.products.clone());
+    let product_names_csv = document.products.join(", ");
     metadata.insert("product_name".to_string(), product_names);
 
-    let active_substances = metadata::to_json(&document.active_substances);
+    let active_substances = metadata::to_json(document.active_substances.clone());
     metadata.insert("substance_name".to_string(), active_substances);
     // What should facets be when there are possibly multiple products and multiple active substances?
 
-    let facets = metadata::to_json(&metadata::create_facets_by_active_substance(
-        &first_product_name,
+    let facets = metadata::to_json(metadata::create_facets_by_active_substance(
+        &product_names_csv,
         document.active_substances.clone(),
     ));
     metadata.insert("facets".to_string(), facets);
@@ -102,8 +98,7 @@ pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, Stri
     metadata.insert("author".to_string(), author);
 
     if let Some(keywords) = &document.keywords {
-        let keywords_joined = metadata::vec_to_spaced_string(&keywords);
-        metadata.insert("keywords".to_string(), keywords_joined);
+        metadata.insert("keywords".to_string(), keywords.join(" "));
     }
 
     return metadata;
@@ -142,4 +137,74 @@ pub async fn create_blob(
             anyhow!("Couldn't create blob")
         })?;
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use test_case::test_case;
+
+    // #[test_case(&Value::Status("Accepted".to_string()), Ok(JobStatus::Accepted))]
+    // fn extract_metadata(input: &Value, output: Result<JobStatus, RedisError>) {
+    //     assert_eq!(sanitize("newline\ntest"), "newline test");
+    // }
+    fn create_doc(
+        id: str,
+        name: str,
+        document_type: DocumentType,
+        author: str,
+        products: Vec<String>,
+        keywords: Option<Vec<String>>,
+        pl_number: str,
+        active_substances: Vec<String>,
+    ) -> Document {
+        Document {
+            id: id.to_string(),
+            name: name.to_string(),
+            document_type,
+            author: author.to_string(),
+            products: products,
+            keywords: keywords,
+            pl_number: pl_number.to_string(),
+            active_substances,
+            file_path: "location/on/disk".to_string(),
+            file_source: FileSource::Sentinel
+        }
+    }
+        
+    #[test]
+    fn derive_metadata() {
+        doc = create_doc(
+            "CON123456",
+            "Paracetamol Plus",
+            DocumentType::Spc,
+            "JRR Tolkien",
+            vec!["Effective product 1".to_string(), "Effective product 2".to_string()],
+            Some(vec!["Very good for you".to_string(), "Cures headaches".to_string(), "PL 12345678".to_string()]),
+            "PL 1234/5678",
+            vec!["Paracetamol".to_string(), "Caffeine".to_string()],
+        )
+
+        let expected_metadata : HashMap<String, String> = [
+        ("file_name".to_string(), "CON123456".to_string()),
+        ("doc_type".to_string(), "Spc".to_string()),
+        ("title".to_string(), "Paracetamol Plus".to_string()),
+        ("author".to_string(), "JRR Tolkien".to_string()),
+        ("product_name".to_string(), "Effective product 1, Effective product 2".to_string()),
+        ("substance_name".to_string(), "Paracetamol, Caffeine".to_string()),
+        ("keywords".to_string(), "Very good for you Cures headaches PL 1234/5678".to_string()),
+        ("pl_number".to_string(), "PL 1234/5678".to_string())]
+        .iter().cloned().collect(); 
+
+        let output_metadata = derive_metadata_from_message(&doc);
+        assert_eq!(output_metadata["file_name"], output_metadata["file_name"]);
+        assert_eq!(output_metadata["doc_type"], output_metadata["doc_type"]);
+        assert_eq!(output_metadata["title"], output_metadata["title"]);
+        assert_eq!(output_metadata["author"], output_metadata["author"]);
+        assert_eq!(output_metadata["product_name"], output_metadata["product_name"]);
+        assert_eq!(output_metadata["substance_name"], output_metadata["substance_name"]);
+        assert_eq!(output_metadata["keywords"], output_metadata["keywords"]);
+        assert_eq!(output_metadata["pl_number"], output_metadata["pl_number"]);
+    }
+
 }
