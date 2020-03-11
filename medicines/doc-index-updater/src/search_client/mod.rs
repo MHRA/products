@@ -166,14 +166,14 @@ async fn update_index(
 
     let req = client
         .post(&base_url)
-        .query(&[("api-version", "2017-11-11")])
+        .query(&[("api-version", &config.api_version)])
         .header("api-key", &config.api_key)
         .json(&body)
         .build()?;
 
-    println!("\nBody: {:?}", &body);
-    println!("\nRequest: {:?}", &req);
-    println!("\nRequesting from URL: {}", &req.url());
+    tracing::debug!("\nBody: {:?}", &body);
+    tracing::debug!("\nRequest: {:?}", &req);
+    tracing::debug!("\nRequesting from URL: {}", &req.url());
 
     client
         .execute(req)
