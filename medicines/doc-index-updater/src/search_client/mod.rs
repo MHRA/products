@@ -38,10 +38,29 @@ pub struct AzureSearchResults {
     count: Option<i32>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct AzureIndexChangedResults {
+    pub value: Vec<AzureIndexChangedResult>,
+    #[serde(rename = "@odata.context")]
+    context: String
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AzureIndexChangedResult {
+    pub key: String,
+    pub status: bool,
+    #[serde(rename = "errorMessage")]
+    pub error_message: Option<String>,
+    #[serde(rename = "statusCode")]
+    pub status_code: u16
+}
+
+#[derive(Clone)]
 struct AzureConfig {
     search_service: String,
     search_index: String,
     api_key: String,
+    api_version: String
 }
 
 pub struct AzureSearchClient {
@@ -54,9 +73,10 @@ pub fn get_env(key: &str) -> String {
 }
 
 pub fn factory() -> AzureSearchClient {
-    let api_key = get_env("SEARCH_API_KEY");
-    let search_index = get_env("SEARCH_INDEX");
+    let api_key = get_env("API_ADMIN_KEY");
+    let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
+    let api_version = get_env("AZURE_SEARCH_API_VERSION");
 
     AzureSearchClient {
         client: reqwest::Client::new(),
@@ -64,23 +84,24 @@ pub fn factory() -> AzureSearchClient {
             api_key,
             search_index,
             search_service,
+            api_version,
         },
     }
 }
 
 impl AzureSearchClient {
-    pub async fn search(&self, search_term: &String) -> Result<AzureSearchResults, reqwest::Error> {
-        search(&search_term, &self.client, &self.config).await
+    pub async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
+        search(search_term, &self.client, self.config.clone()).await
     }
 
     pub async fn delete(
         &self,
-        key: &String,
+        key_name: &String,
         value: &String,
-    ) -> Result<AzureSearchResults, reqwest::Error> {
+    ) -> Result<AzureIndexChangedResults, reqwest::Error> {
         update_index(
             &"delete".to_string(),
-            &key,
+            &key_name,
             &value,
             &self.client,
             &self.config,
@@ -90,9 +111,9 @@ impl AzureSearchClient {
 }
 
 async fn search(
-    search_term: &String,
+    search_term: String,
     client: &reqwest::Client,
-    config: &AzureConfig,
+    config: AzureConfig,
 ) -> Result<AzureSearchResults, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
@@ -103,15 +124,15 @@ async fn search(
     let req = client
         .get(&base_url)
         .query(&[
-            ("api-version", "2017-11-11"),
-            ("api-key", &config.api_key),
-            ("highlight", "content"),
-            ("queryType", "full"),
-            ("@count", "true"),
-            ("@top", "10"),
-            ("@skip", "0"),
-            ("search", &search_term),
-            ("scoringProfile", "preferKeywords"),
+            ("api-version", config.api_version),
+            ("api-key", config.api_key),
+            ("highlight", "content".to_string()),
+            ("queryType", "full".to_string()),
+            ("@count", "true".to_string()),
+            ("@top", "10".to_string()),
+            ("@skip", "0".to_string()),
+            ("search", search_term),
+            ("scoringProfile", "preferKeywords".to_string()),
         ])
         .build()?;
 
@@ -130,9 +151,9 @@ async fn update_index(
     value: &String,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<AzureSearchResults, reqwest::Error> {
+) -> Result<AzureIndexChangedResults, reqwest::Error> {
     let base_url = format!(
-        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs/index",
         search_service = config.search_service,
         search_index = config.search_index
     );
@@ -146,17 +167,17 @@ async fn update_index(
     let req = client
         .post(&base_url)
         .query(&[("api-version", "2017-11-11")])
-        // .header(&[
-        //     ("api-key", &config.api_key),
-        // ])
+        .header("api-key", &config.api_key)
         .json(&body)
         .build()?;
 
-    println!("Requesting from URL: {}", &req.url());
+    println!("\nBody: {:?}", &body);
+    println!("\nRequest: {:?}", &req);
+    println!("\nRequesting from URL: {}", &req.url());
 
     client
         .execute(req)
         .await?
-        .json::<AzureSearchResults>()
+        .json::<AzureIndexChangedResults>()
         .await
 }

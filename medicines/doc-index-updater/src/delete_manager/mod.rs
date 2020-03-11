@@ -31,7 +31,7 @@ pub async fn delete_service_worker(
             Ok(message) => {
                 tracing::info!("{:?} message receive!", message);
                 let blob_name =
-                    get_blob_name_from_content_id(&search_client, &message.document_content_id)
+                    get_blob_name_from_content_id(&search_client, message.document_content_id)
                         .await?;
                 delete_blob(&storage_client, &storage_container_name, &blob_name)
                     .await
@@ -51,11 +51,11 @@ pub async fn delete_service_worker(
 
 pub async fn get_blob_name_from_content_id(
     search_client: &search_client::AzureSearchClient,
-    content_id: &String,
+    content_id: String,
 ) -> Result<String, anyhow::Error> {
-    let search_results = search_client.search(&content_id).await?;
+    let search_results = search_client.search(content_id.to_owned()).await?;
     for result in search_results.search_results {
-        if &result.file_name == content_id {
+        if result.file_name == content_id {
             return Ok(result.metadata_storage_name);
         }
     }
