@@ -91,14 +91,26 @@ impl DocIndexUpdaterQueue {
                 }
             })?;
 
-        let message = peek_lock.body();
+        let body = peek_lock.body();
 
-        let message = message.parse::<T>().map_err(|_| {
-            tracing::warn!("Message found could not be parsed ({:?})", message);
-            RetrieveFromQueueError::ParseError(message)
-        })?;
-
-        Ok(RetrievedMessage { message, peek_lock })
+        match body.parse::<T>() {
+            Ok(message) => {
+                tracing::info!(
+                    "Message found perfectly parseable ({:?}).\n{:?}",
+                    body,
+                    message.to_json_string()
+                );
+                Ok(RetrievedMessage { message, peek_lock })
+            }
+            Err(_) => {
+                tracing::warn!(
+                    "Message found could not be parsed ({:?}). Gonna go ahead and delete it.",
+                    body
+                );
+                // let _ = peek_lock.delete_message().await;
+                Err(RetrieveFromQueueError::ParseError(body))
+            }
+        }
     }
 
     pub async fn send<T: Message>(
