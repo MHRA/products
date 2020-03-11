@@ -33,13 +33,13 @@ pub async fn delete_service_worker(
                 let blob_name =
                     get_blob_name_from_content_id(&search_client, message.document_content_id)
                         .await?;
+                delete_from_index(&search_client, &blob_name).await?;
                 delete_blob(&storage_client, &storage_container_name, &blob_name)
                     .await
                     .map_err(|e| {
                         tracing::error!("{:?}", e);
                         anyhow!("Couldn't delete blob {}", &blob_name)
                     })?;
-                delete_from_index(&search_client, &blob_name).await?;
                 // TODO: Notify state manager
             }
             Err(azure_error) => tracing::warn!("Azure error! {:?}", azure_error),
