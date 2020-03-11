@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
+use core::fmt;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum JobStatus {
@@ -71,6 +72,16 @@ pub enum DocumentType {
     Pil,
     #[serde(rename = "PAR")]
     Par,
+}
+
+impl fmt::Display for DocumentType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match &self {
+            DocumentType::Spc => "Spc",
+            DocumentType::Pil => "Pil",
+            DocumentType::Par => "Par"
+        })
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
