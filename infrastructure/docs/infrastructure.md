@@ -51,7 +51,21 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
 ## Provisioning infrastructure in an existing environment
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values, ask a colleague._
+
+2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values.
+
+   To get the values:
+
+   1. Make sure you have logged in to the Azure CLI: `az login`. The `id` field returned by this command is your `ARM_SUBSCRIPTION_ID`.
+
+   2. Create a service principal: `az ad sp create-for-rbac --name "MakeUpSomeName"`. Use the output values from this command as your environment variables:
+
+      | Environment variable | Field      |
+      | -------------------- | ---------- |
+      | `ARM_CLIENT_ID`      | `appId`    |
+      | `ARM_CLIENT_SECRET`  | `password` |
+      | `ARM_TENANT_ID`      | `tenant`   |
+
 3. Source the environment variables
 
    ```sh
