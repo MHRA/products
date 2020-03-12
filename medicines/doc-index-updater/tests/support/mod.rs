@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 use core::{fmt::Debug, future::Future};
-use doc_index_updater::models::{CreateMessage, DeleteMessage, Document, DocumentType, FileSource};
+use doc_index_updater::{
+    models::{CreateMessage, DeleteMessage, Document, DocumentType, FileSource, Message},
+    service_bus_client::{DocIndexUpdaterQueue, RetrieveFromQueueError},
+};
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
@@ -32,7 +35,10 @@ impl Default for RedisServer {
 
         let addr = redis::ConnectionAddr::Tcp("127.0.0.1".to_string(), server_port);
 
-        RedisServer::new_with_addr(addr, |cmd| cmd.spawn().expect("Could not find redis, try installing redis server."))
+        RedisServer::new_with_addr(addr, |cmd| {
+            cmd.spawn()
+                .expect("Could not find redis, try installing redis server.")
+        })
     }
 }
 
@@ -195,5 +201,21 @@ pub fn get_test_delete_message(job_id: Uuid, document_content_id: String) -> Del
     DeleteMessage {
         job_id,
         document_content_id,
+    }
+}
+
+pub async fn get_message_safely<T: Message>(queue: &mut DocIndexUpdaterQueue) -> T {
+    // This ensures test messages
+    // which aren't deserializable
+    // don't panic the entire test
+    loop {
+        match queue.receive::<T>().await {
+            Ok(a) => return a.message,
+            Err(RetrieveFromQueueError::ParseError(_)) => continue,
+            Err(RetrieveFromQueueError::NotFoundError) => continue,
+            Err(e) => {
+                panic!("bad error: {:?}", e);
+            }
+        }
     }
 }

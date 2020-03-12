@@ -82,7 +82,7 @@ fn delete_endpoint_sets_state() {
 
     let mut delete_client = get_ok(delete_factory());
 
-    let mut received_message = get_ok(delete_client.receive::<DeleteMessage>());
+    let mut received_message = get_ok(delete_client.receive::<DeleteMessage>()).message;
     let expected = get_test_delete_message(id, "hello-string".to_string());
 
     loop {
@@ -90,7 +90,7 @@ fn delete_endpoint_sets_state() {
             assert_eq!(received_message, expected);
             return;
         }
-        received_message = get_ok(delete_client.receive::<DeleteMessage>());
+        received_message = get_ok(delete_client.receive::<DeleteMessage>()).message;
     }
 }
 
@@ -120,7 +120,7 @@ fn create_endpoint_sets_state() {
 
     let mut create_client = get_ok(create_factory());
 
-    let mut received_message = get_ok(create_client.receive::<CreateMessage>());
+    let mut received_message = get_ok(create_client.receive::<CreateMessage>()).message;
     let expected = get_test_create_message(id);
 
     loop {
@@ -128,6 +128,6 @@ fn create_endpoint_sets_state() {
             assert_eq!(received_message, expected);
             return;
         }
-        received_message = get_ok(create_client.receive::<CreateMessage>());
+        received_message = get_ok(create_client.receive::<CreateMessage>()).message;
     }
 }
