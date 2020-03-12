@@ -21,7 +21,7 @@ fn delete_queue_works() {
 
     assert_eq!(retrieval.message, sent_message);
 
-    let queue_removal_response = block_on(retrieval.peek_lock.delete_message());
+    let queue_removal_response = block_on(retrieval.remove());
     assert!(queue_removal_response.is_ok());
     assert_eq!(queue_removal_response.unwrap(), "");
 }
