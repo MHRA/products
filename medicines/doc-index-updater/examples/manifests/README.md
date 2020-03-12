@@ -28,20 +28,16 @@ curl -vvv http://doc-index-updater.localhost/non-existent-route # should be 404
 
 ### Encrypt the redis key as a Sealed Secret
 
-- retrieve the keys for the redis cache from the Azure Portal or the cli:
-
-```bash
-az redis list-keys --resource-group MHRA-dev --name doc-index-updater-dev --output tsv
-```
-
-- create the sealed secret with one of the above keys (replace `<insert key here>` with the key):
+- retrieve the keys for the redis cache from the Azure Portal or the cli, and create the sealed secret with one of the above keys:
 
 ```bash
 kubectl create secret generic redis-key \
  -n doc-index-updater \
  -o json \
  --dry-run \
- --from-literal key=<insert key here> \
+ --from-literal key=$(
+   az redis list-keys --resource-group MHRA-dev --name doc-index-updater-dev --output tsv --query 'primaryKey'
+ ) \
 | kubeseal \
  --format yaml > SealedSecret-redis-key.yaml
 ```
@@ -50,52 +46,44 @@ kubectl create secret generic redis-key \
 
 #### Create Queue Key
 
-- retrieve the keys for the service bus access policy from the Azure Portal or the CLI:
-
-```bash
-az servicebus queue authorization-rule keys list \
-  --resource-group MHRA-dev \
-  --namespace-name doc-index-updater-dev \
-  --queue-name doc-index-updater-create-queue \
-  --name doc-index-updater-create-auth \
-  --query primaryKey \
-  --output tsv
-```
-
-- create the sealed secret with one of the above keys (replace `<insert key here>` with the key):
+- retrieve the keys for the service bus access policy from the Azure Portal or the CLI, and create the sealed secret with one of the above keys:
 
 ```bash
 kubectl create secret generic create-queue-policy-key \
  -n doc-index-updater \
  -o json \
  --dry-run \
- --from-literal key=<insert key here> \
+ --from-literal key=$(
+   az servicebus queue authorization-rule keys list \
+  --resource-group MHRA-dev \
+  --namespace-name doc-index-updater-dev \
+  --queue-name doc-index-updater-create-queue \
+  --name doc-index-updater-create-auth \
+  --query primaryKey \
+  --output tsv
+ ) \
 | kubeseal \
  --format yaml > SealedSecret-create-queue-key.yaml
 ```
 
 #### Delete Queue Key
 
-- retrieve the keys for the service bus access policy from the Azure Portal or the CLI:
-
-```bash
-az servicebus queue authorization-rule keys list \
-  --resource-group MHRA-dev \
-  --namespace-name doc-index-updater-dev \
-  --queue-name doc-index-updater-delete-queue -\
-  -name doc-index-updater-delete-auth \
-  --query primaryKey \
-  --output tsv
-```
-
-- create the sealed secret with one of the above keys (replace `<insert key here>` with the key):
+- retrieve the keys for the service bus access policy from the Azure Portal or the CLI, and create the sealed secret with one of the above keys:
 
 ```bash
 kubectl create secret generic delete-queue-policy-key \
  -n doc-index-updater \
  -o json \
  --dry-run \
- --from-literal key=<insert key here> \
+ --from-literal key=$(
+   az servicebus queue authorization-rule keys list \
+  --resource-group MHRA-dev \
+  --namespace-name doc-index-updater-dev \
+  --queue-name doc-index-updater-delete-queue \
+  --name doc-index-updater-delete-auth \
+  --query primaryKey \
+  --output tsv
+ ) \
 | kubeseal \
  --format yaml > SealedSecret-delete-queue-key.yaml
 ```

@@ -13,16 +13,16 @@ Never commit `.env`.
 ```bash
 docker build \
   --tag doc-index-updater \
-  --tag mhraproductsdevregistry.azurecr.io/products/doc-index-updater \
+  --tag mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater \
   .
 ```
 
 ## To push image to Azure container registry (ACR):
 
 ```bash
-az acr login --name mhraproductsdevregistry
+az acr login --name mhraproductsdevelopmentregistry
 
-docker push mhraproductsdevregistry.azurecr.io/products/doc-index-updater
+docker push mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
 ```
 
 ## To run locally (by tunneling redis connection to Azure over TLS):
