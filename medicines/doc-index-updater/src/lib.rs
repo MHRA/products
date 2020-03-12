@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 pub mod create_manager;
 pub mod delete_manager;
 pub mod document_manager;
