@@ -11,11 +11,11 @@ COPY Cargo.lock .
 # Layer hack: Build an empty program to compile dependencies and place on their own layer.
 # This cuts down build time
 
-# it was borrowed from here: 
-# https://github.com/deislabs/krustlet/blob/master/Dockerfile#L7 
+# it was borrowed from here:
+# https://github.com/deislabs/krustlet/blob/master/Dockerfile#L7
 RUN mkdir -p ./src/ && \
-  echo 'fn main() {}' > ./src/main.rs && \
-  echo '' > ./src/lib.rs
+  echo 'fn main() {}' >./src/main.rs && \
+  echo '' >./src/lib.rs
 
 RUN cargo fetch
 
@@ -26,6 +26,7 @@ RUN cargo build --release && \
 FROM debian:buster-slim AS release-context
 
 RUN apt-get update && apt-get install -y \
+  openssl \
   tini \
   ;
 
