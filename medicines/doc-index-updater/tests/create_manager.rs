@@ -14,10 +14,14 @@ fn create_queue_works() {
     let mut queue = get_ok(create_factory());
     get_ok(queue.send(sent_message.clone(), time::Duration::seconds(30)));
 
-    let mut received_message = block_on(get_message_safely::<CreateMessage>(&mut queue));
-    while received_message != sent_message {
-        received_message = block_on(get_message_safely::<CreateMessage>(&mut queue));
+    let mut retrieval = block_on(get_message_safely::<CreateMessage>(&mut queue));
+    while retrieval.message != sent_message {
+        retrieval = block_on(get_message_safely::<CreateMessage>(&mut queue));
     }
 
-    assert_eq!(received_message, sent_message);
+    assert_eq!(retrieval.message, sent_message);
+
+    let queue_removal_response = block_on(retrieval.peek_lock.delete_message());
+    assert!(queue_removal_response.is_ok());
+    assert_eq!(queue_removal_response.unwrap(), "");
 }

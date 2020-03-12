@@ -2,7 +2,7 @@
 use core::{fmt::Debug, future::Future};
 use doc_index_updater::{
     models::{CreateMessage, DeleteMessage, Document, DocumentType, FileSource, Message},
-    service_bus_client::{DocIndexUpdaterQueue, RetrieveFromQueueError},
+    service_bus_client::{DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage},
 };
 use redis::{self, Value};
 use std::{fs, io, process, thread::sleep, time::Duration};
@@ -204,13 +204,15 @@ pub fn get_test_delete_message(job_id: Uuid, document_content_id: String) -> Del
     }
 }
 
-pub async fn get_message_safely<T: Message>(queue: &mut DocIndexUpdaterQueue) -> T {
+pub async fn get_message_safely<T: Message>(
+    queue: &mut DocIndexUpdaterQueue,
+) -> RetrievedMessage<T> {
     // This ensures test messages
     // which aren't deserializable
     // don't panic the entire test
     loop {
         match queue.receive::<T>().await {
-            Ok(a) => return a.message,
+            Ok(a) => return a,
             Err(RetrieveFromQueueError::ParseError(_)) => continue,
             Err(RetrieveFromQueueError::NotFoundError) => continue,
             Err(e) => {
