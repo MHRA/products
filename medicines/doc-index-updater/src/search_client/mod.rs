@@ -96,8 +96,8 @@ impl AzureSearchClient {
 
     pub async fn delete(
         &self,
-        key_name: &String,
-        value: &String,
+        key_name: &str,
+        value: &str,
     ) -> Result<AzureIndexChangedResults, reqwest::Error> {
         update_index(
             &"delete".to_string(),
@@ -146,9 +146,9 @@ async fn search(
 }
 
 async fn update_index(
-    action: &String,
-    key: &String,
-    value: &String,
+    action: &str,
+    key: &str,
+    value: &str,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<AzureIndexChangedResults, reqwest::Error> {
