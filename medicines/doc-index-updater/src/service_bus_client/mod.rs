@@ -115,11 +115,11 @@ impl DocIndexUpdaterQueue {
                 Ok(RetrievedMessage { message, peek_lock })
             }
             Err(_) => {
-                tracing::warn!(
+                tracing::error!(
                     "Message found could not be parsed ({:?}). Gonna go ahead and delete it.",
                     body
                 );
-                // let _ = peek_lock.delete_message().await;
+                let _ = peek_lock.delete_message().await;
                 Err(RetrieveFromQueueError::ParseError(body))
             }
         }
