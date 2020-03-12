@@ -36,6 +36,13 @@ pub async fn delete_service_worker(
                         anyhow!("Couldn't delete blob {}", &blob_name)
                     })?;
                 // TODO: Update index
+                let queue_removal_result =
+                    retrieval.peek_lock.delete_message().await.map_err(|e| {
+                        tracing::error!("{:?}", e);
+                        anyhow!("Queue Removal Error")
+                    });
+                tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+
                 // TODO: Notify state manager
             }
             Err(azure_error) => tracing::warn!("Azure error! {:?}", azure_error),
