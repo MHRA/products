@@ -76,37 +76,6 @@ mod test {
         assert_eq!(sanitize(" test "), "test");
     }
     #[test]
-    fn jsonify_keywords() {
-        let s = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride";
-        let json = "[\"ukpar\",\"public assessment report\",\"par\",\"national procedure\",\"Ibuprofen\",\"Phenylephrine Hydrochloride\"]";
-        assert_eq!(to_json(to_array(s)), json);
-    }
-    #[test]
-    fn jsonify_single_term() {
-        let s = "Phenylephrine Hydrochloride";
-        let json = "[\"Phenylephrine Hydrochloride\"]";
-        assert_eq!(to_json(to_array(s)), json);
-    }
-    #[test]
-    fn jsonify_terms_joined_with_and() {
-        let s = "THIOPENTAL SODIUM AND SODIUM CARBONATE";
-        let json = "[\"THIOPENTAL SODIUM\",\"SODIUM CARBONATE\"]";
-        assert_eq!(to_json(to_array(s)), json);
-    }
-    #[test]
-    fn jsonify_terms_with_multiple_spaces() {
-        let s = "THIOPENTAL   SODIUM AND SODIUM  CARBONATE";
-        let json = "[\"THIOPENTAL SODIUM\",\"SODIUM CARBONATE\"]";
-        assert_eq!(to_json(to_array(s)), json);
-    }
-    #[test]
-    fn jsonify_terms_joined_with_and_2() {
-        let s = "THIOPENTAL SODIUMANDSODIUM CARBONATE";
-        let json = "[\"THIOPENTAL SODIUMANDSODIUM CARBONATE\"]";
-        assert_eq!(to_json(to_array(s)), json);
-    }
-
-    #[test]
     fn test_create_facets_by_active_substance() {
         let active_substances = vec![
             "LOSARTAN POTASSIUM".to_string(),

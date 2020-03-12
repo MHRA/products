@@ -115,7 +115,7 @@ pub async fn create_blob(
     metadata: &HashMap<String, String>
 ) -> Result<(), anyhow::Error> {
     let storage_client = storage_client::factory()?;
-    let _blob_name = compute_sha_hash(&file_data);
+    let blob_name = compute_sha_hash(&file_data);
     let file_digest = md5::compute(&file_data[..]);
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
     for (key, val) in metadata {
@@ -174,13 +174,13 @@ mod test {
         .iter().cloned().collect(); 
 
         let output_metadata = derive_metadata_from_message(&doc);
-        assert_eq!(output_metadata["file_name"], output_metadata["file_name"]);
-        assert_eq!(output_metadata["doc_type"], output_metadata["doc_type"]);
-        assert_eq!(output_metadata["title"], output_metadata["title"]);
-        assert_eq!(output_metadata["author"], output_metadata["author"]);
-        assert_eq!(output_metadata["product_name"], output_metadata["product_name"]);
-        assert_eq!(output_metadata["substance_name"], output_metadata["substance_name"]);
-        assert_eq!(output_metadata["keywords"], output_metadata["keywords"]);
-        assert_eq!(output_metadata["pl_number"], output_metadata["pl_number"]);
+        assert_eq!(output_metadata["file_name"], expected_metadata["file_name"]);
+        assert_eq!(output_metadata["doc_type"], expected_metadata["doc_type"]);
+        assert_eq!(output_metadata["title"], expected_metadata["title"]);
+        assert_eq!(output_metadata["author"], expected_metadata["author"]);
+        assert_eq!(output_metadata["product_name"], expected_metadata["product_name"]);
+        assert_eq!(output_metadata["substance_name"], expected_metadata["substance_name"]);
+        assert_eq!(output_metadata["keywords"], expected_metadata["keywords"]);
+        assert_eq!(output_metadata["pl_number"], expected_metadata["pl_number"]);
     }
 }
