@@ -4,9 +4,9 @@ provider "azurerm" {
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = "MHRA-dev"
+    resource_group_name  = "tfstate"
     container_name       = "tfstate"
-    storage_account_name = "tfstate2337"
+    storage_account_name = "tfstate25382"
     key                  = "dev.terraform.tfstate"
   }
 }
