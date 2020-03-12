@@ -17,7 +17,7 @@ To run the following steps, first you should:
    az login
    ```
 
-4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
+4. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from previous command:
 
    ```sh
    az account set --subscription="SUBSCRIPTION_ID"
