@@ -1,6 +1,8 @@
 use crate::{
     models::{CreateMessage, JobStatus, Document},
-    service_bus_client::{create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError},
+    service_bus_client::{
+        create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
+    },
     state_manager::StateManager,
 };
 use anyhow::anyhow;
@@ -51,15 +53,18 @@ async fn try_process_from_queue(
     create_client: &mut DocIndexUpdaterQueue,
 ) -> Result<FileProcessStatus, anyhow::Error> {
     tracing::info!("Checking for create messages");
-    let message_result: Result<CreateMessage, RetrieveFromQueueError> =
+    let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
         create_client.receive().await;
-    if let Ok(message) = message_result {
+
+    if let Ok(retrieval) = retrieved_result {
+        let message = retrieval.message.clone();
         tracing::info!("{:?} message receive!", message);
         let file =
             sftp_client::retrieve(message.document.file_source.clone(), message.document.file_path.clone()).await?;
         let _metadata = derive_metadata_from_message(&message.document);
         let blob = create_file_in_blob(file).await;
         add_to_search_index(blob).await;
+        retrieval.remove().await?;
 
         Ok(FileProcessStatus::Success(message.job_id))
     } else {
