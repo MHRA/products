@@ -1,6 +1,7 @@
 use crate::models::Message;
+use anyhow::anyhow;
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_service_bus::prelude::Client;
+use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
 use std::error::Error;
 use time::Duration;
@@ -63,15 +64,33 @@ impl Error for RetrieveFromQueueError {
     }
 }
 
+pub struct RetrievedMessage<T> {
+    pub message: T,
+    peek_lock: PeekLockResponse,
+}
+
+impl<T> RetrievedMessage<T> {
+    pub async fn remove(&self) -> Result<String, anyhow::Error> {
+        let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
+            tracing::error!("{:?}", e);
+            anyhow!("Queue Removal Error")
+        });
+        tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+        queue_removal_result
+    }
+}
+
 impl DocIndexUpdaterQueue {
     fn new(service_bus: Client) -> Self {
         Self { service_bus }
     }
 
-    pub async fn receive<T: Message>(&mut self) -> Result<T, RetrieveFromQueueError> {
-        let message = self
+    pub async fn receive<T: Message>(
+        &mut self,
+    ) -> Result<RetrievedMessage<T>, RetrieveFromQueueError> {
+        let peek_lock = self
             .service_bus
-            .peek_lock(time::Duration::days(1), Some(time::Duration::seconds(10)))
+            .peek_lock_full(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
             .map_err(|e| match e {
                 UnexpectedHTTPResult(a) if a.status_code() == StatusCode::NO_CONTENT => {
@@ -84,10 +103,26 @@ impl DocIndexUpdaterQueue {
                 }
             })?;
 
-        Ok(message.parse::<T>().map_err(|_| {
-            tracing::warn!("Message found could not be parsed ({:?})", message);
-            RetrieveFromQueueError::ParseError(message)
-        })?)
+        let body = peek_lock.body();
+
+        match body.parse::<T>() {
+            Ok(message) => {
+                tracing::info!(
+                    "Message found perfectly parseable ({:?}).\n{:?}",
+                    body,
+                    message.to_json_string()
+                );
+                Ok(RetrievedMessage { message, peek_lock })
+            }
+            Err(_) => {
+                tracing::error!(
+                    "Message found could not be parsed ({:?}). Gonna go ahead and delete it.",
+                    body
+                );
+                let _ = peek_lock.delete_message().await;
+                Err(RetrieveFromQueueError::ParseError(body))
+            }
+        }
     }
 
     pub async fn send<T: Message>(

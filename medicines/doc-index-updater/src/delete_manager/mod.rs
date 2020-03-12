@@ -1,7 +1,7 @@
 use crate::{
     models::DeleteMessage,
-    search_client,
-    service_bus_client::{delete_factory, RetrieveFromQueueError},
+    search_client, 
+    service_bus_client::{delete_factory, RetrieveFromQueueError, RetrievedMessage},
     storage_client,
 };
 use anyhow::anyhow;
@@ -25,10 +25,12 @@ pub async fn delete_service_worker(
     })?;
 
     loop {
-        let message_result: Result<DeleteMessage, RetrieveFromQueueError> =
+        let retrieved_result: Result<RetrievedMessage<DeleteMessage>, RetrieveFromQueueError> =
             delete_client.receive().await;
-        match message_result {
-            Ok(message) => {
+
+        match retrieved_result {
+            Ok(retrieval) => {
+                let message = retrieval.message.clone();
                 tracing::info!("{:?} message receive!", message);
                 let blob_name =
                     get_blob_name_from_content_id(&search_client, message.document_content_id)
@@ -40,6 +42,8 @@ pub async fn delete_service_worker(
                         tracing::error!("{:?}", e);
                         anyhow!("Couldn't delete blob {}", &blob_name)
                     })?;
+
+                retrieval.remove().await?;
                 // TODO: Notify state manager
             }
             Err(azure_error) => tracing::warn!("Azure error! {:?}", azure_error),
