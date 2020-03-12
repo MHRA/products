@@ -1,4 +1,5 @@
 use crate::models::Message;
+use anyhow::anyhow;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
@@ -65,7 +66,18 @@ impl Error for RetrieveFromQueueError {
 
 pub struct RetrievedMessage<T> {
     pub message: T,
-    pub peek_lock: PeekLockResponse,
+    peek_lock: PeekLockResponse,
+}
+
+impl<T> RetrievedMessage<T> {
+    pub async fn remove(&self) -> Result<String, anyhow::Error> {
+        let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
+            tracing::error!("{:?}", e);
+            anyhow!("Queue Removal Error")
+        });
+        tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+        queue_removal_result
+    }
 }
 
 impl DocIndexUpdaterQueue {

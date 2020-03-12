@@ -25,7 +25,7 @@ pub async fn delete_service_worker(
 
         match retrieved_result {
             Ok(retrieval) => {
-                let message = retrieval.message;
+                let message = retrieval.message.clone();
                 tracing::info!("{:?} message receive!", message);
 
                 let blob_name = get_blob_name_from_content_id(&message.document_content_id).await?;
@@ -35,13 +35,7 @@ pub async fn delete_service_worker(
                         tracing::error!("{:?}", e);
                         anyhow!("Couldn't delete blob {}", &blob_name)
                     })?;
-                // TODO: Update index
-                let queue_removal_result =
-                    retrieval.peek_lock.delete_message().await.map_err(|e| {
-                        tracing::error!("{:?}", e);
-                        anyhow!("Queue Removal Error")
-                    });
-                tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+                retrieval.remove().await?;
 
                 // TODO: Notify state manager
             }

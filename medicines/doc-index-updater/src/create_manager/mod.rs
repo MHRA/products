@@ -55,17 +55,13 @@ async fn try_process_from_queue(
         create_client.receive().await;
 
     if let Ok(retrieval) = retrieved_result {
-        let message = retrieval.message;
+        let message = retrieval.message.clone();
         tracing::info!("{:?} message receive!", message);
         let file =
             sftp_client::retrieve(message.document.file_source, message.document.file_path).await?;
         let blob = create_file_in_blob(file).await;
         add_to_search_index(blob).await;
-        let queue_removal_result = retrieval.peek_lock.delete_message().await.map_err(|e| {
-            tracing::error!("{:?}", e);
-            anyhow!("Queue Removal Error")
-        });
-        tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+        retrieval.remove().await?;
 
         Ok(FileProcessStatus::Success(message.job_id))
     } else {
