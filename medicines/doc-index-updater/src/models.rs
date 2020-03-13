@@ -1,3 +1,4 @@
+use core::fmt;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -37,7 +38,7 @@ impl FromStr for JobStatus {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct JobStatusResponse {
     pub id: Uuid,
     pub status: JobStatus,
@@ -60,7 +61,89 @@ pub struct Document {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum FileSource {
+    #[serde(alias = "sentinel")]
     Sentinel,
+}
+
+impl Document {
+    pub fn from(doc: XMLDocument) -> Self {
+        Self {
+            id: doc.id,
+            name: doc.name,
+            document_type: doc.document_type,
+            author: doc.author,
+            products: doc
+                .products
+                .iter()
+                .map(move |active_substance| active_substance.name.clone())
+                .collect::<Vec<String>>(),
+            keywords: match doc.keywords {
+                Some(kw) => Some(
+                    kw.iter()
+                        .map(move |keyword| keyword.name.clone())
+                        .collect::<Vec<String>>(),
+                ),
+                None => None,
+            },
+            pl_number: doc.pl_number,
+            active_substances: doc
+                .active_substances
+                .iter()
+                .map(move |active_substance| active_substance.name.clone())
+                .collect::<Vec<String>>(),
+            file_source: doc.file_source,
+            file_path: doc.file_path,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Product {
+    #[serde(default)]
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Keyword {
+    #[serde(default)]
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ActiveSubstance {
+    #[serde(default)]
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct XMLDocument {
+    pub id: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub document_type: DocumentType,
+    pub author: String,
+    pub products: Vec<Product>,
+    pub keywords: Option<Vec<Keyword>>,
+    pub pl_number: String,
+    pub active_substances: Vec<ActiveSubstance>,
+    pub file_source: FileSource,
+    pub file_path: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename = "job")]
+pub struct XMLJobStatusResponse {
+    id: String,
+    status: String,
+}
+
+impl Into<XMLJobStatusResponse> for JobStatusResponse {
+    fn into(self) -> XMLJobStatusResponse {
+        XMLJobStatusResponse {
+            id: self.id.to_string(),
+            status: self.status.to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -71,6 +154,20 @@ pub enum DocumentType {
     Pil,
     #[serde(rename = "PAR")]
     Par,
+}
+
+impl fmt::Display for DocumentType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match &self {
+                DocumentType::Spc => "Spc",
+                DocumentType::Pil => "Pil",
+                DocumentType::Par => "Par",
+            }
+        )
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
