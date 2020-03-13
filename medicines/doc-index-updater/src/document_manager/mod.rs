@@ -20,7 +20,7 @@ struct FailedToDeserialize;
 impl warp::reject::Reject for FailedToDispatchToQueue {}
 impl warp::reject::Reject for FailedToDeserialize {}
 
-async fn del_document_handler(
+async fn delete_document_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<JobStatusResponse, Rejection> {
@@ -41,21 +41,21 @@ async fn del_document_handler(
     }
 }
 
-async fn del_document_xml_handler(
+async fn delete_document_xml_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = del_document_handler(document_content_id, state_manager)
+    let r: XMLJobStatusResponse = delete_document_handler(document_content_id, state_manager)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
 }
 
-async fn del_document_json_handler(
+async fn delete_document_json_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = del_document_handler(document_content_id, state_manager).await?;
+    let r = delete_document_handler(document_content_id, state_manager).await?;
     Ok(warp::reply::json(&r))
 }
 
@@ -95,23 +95,23 @@ async fn check_in_document_json_handler(
     Ok(warp::reply::json(&r))
 }
 
-pub fn del_document(
+pub fn delete_document(
     state_manager: StateManager,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
         .and(with_state(state_manager))
-        .and_then(del_document_json_handler)
+        .and_then(delete_document_json_handler)
 }
 
-pub fn del_document_xml(
+pub fn delete_document_xml(
     state_manager: StateManager,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(with_state(state_manager))
-        .and_then(del_document_xml_handler)
+        .and_then(delete_document_xml_handler)
 }
 
 pub fn check_in_document(
