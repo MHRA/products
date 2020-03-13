@@ -1,21 +1,19 @@
 use crate::{
-    models::{CreateMessage, JobStatus, Document},
+    models::{CreateMessage, Document, FileProcessStatus, JobStatus},
     service_bus_client::{
         create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
     },
     state_manager::StateManager,
 };
 use anyhow::anyhow;
-use std::collections::HashMap;
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
-mod sftp_client;
 mod metadata;
+mod sftp_client;
 
 #[tracing::instrument]
 pub async fn create_service_worker(
-    storage_container_name: String,
     time_to_wait: Duration,
     state_manager: StateManager,
 ) -> Result<String, anyhow::Error> {
@@ -59,8 +57,11 @@ async fn try_process_from_queue(
     if let Ok(retrieval) = retrieved_result {
         let message = retrieval.message.clone();
         tracing::info!("{:?} message receive!", message);
-        let file =
-            sftp_client::retrieve(message.document.file_source.clone(), message.document.file_path.clone()).await?;
+        let file = sftp_client::retrieve(
+            message.document.file_source.clone(),
+            message.document.file_path.clone(),
+        )
+        .await?;
         let _metadata = derive_metadata_from_message(&message.document);
         let blob = create_file_in_blob(file).await;
         add_to_search_index(blob).await;
@@ -108,17 +109,10 @@ pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, Stri
     return metadata;
 }
 
-enum FileProcessStatus {
-    Success(uuid::Uuid),
-    NothingToProcess,
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{
-        models::{DocumentType, FileSource}
-    };
+    use crate::models::{DocumentType, FileSource};
 
     #[test]
     fn derive_metadata() {
@@ -127,12 +121,19 @@ mod test {
             name: "Paracetamol Plus PL 12345/6789".to_string(),
             document_type: DocumentType::Spc,
             author: "JRR Tolkien".to_string(),
-            products: vec!["Effective product 1".to_string(), "Effective product 2".to_string()],
-            keywords: Some(vec!["Very good for you".to_string(), "Cures headaches".to_string(), "PL 12345/6789".to_string()]),
+            products: vec![
+                "Effective product 1".to_string(),
+                "Effective product 2".to_string(),
+            ],
+            keywords: Some(vec![
+                "Very good for you".to_string(),
+                "Cures headaches".to_string(),
+                "PL 12345/6789".to_string(),
+            ]),
             pl_number: "PL 12345/6789".to_string(),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
-            file_source: FileSource::Sentinel
+            file_source: FileSource::Sentinel,
         };
 
         let expected_file_name = "CON123456".to_string();

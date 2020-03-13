@@ -28,12 +28,12 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
     let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
-    let storage_container_name = get_env::<String>("STORAGE_CONTAINER").unwrap();
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
     tracing::info!("StateManager config: {:?}", state);
 
     let create_state = state.clone();
+    let delete_state = state.clone();
 
     let _ = tokio::join!(
         tokio::spawn(async move {
@@ -51,10 +51,10 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             .await;
         }),
         tokio::spawn(delete_manager::delete_service_worker(
-            storage_container_name.clone()
+            time_to_wait,
+            delete_state
         )),
         tokio::spawn(create_manager::create_service_worker(
-            storage_container_name.clone(),
             time_to_wait,
             create_state
         )),
