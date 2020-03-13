@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - medicines/doc-index-updater/**
+      - .github/workflows/doc-index-updater.yaml
+
 env:
   IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
 
