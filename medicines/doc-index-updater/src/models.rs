@@ -61,6 +61,7 @@ pub struct Document {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum FileSource {
+    #[serde(alias = "sentinel")]
     Sentinel,
 }
 
