@@ -92,16 +92,15 @@ impl DocIndexUpdaterQueue {
             .service_bus
             .peek_lock_full(time::Duration::days(1), Some(time::Duration::seconds(10)))
             .await
-            .map_err(|e| match e {
-                UnexpectedHTTPResult(a) if a.status_code() == StatusCode::NO_CONTENT => {
-                    tracing::info!("No new messages found. ({:?})", a);
-                    RetrieveFromQueueError::NotFoundError
-                }
-                _ => {
-                    tracing::error!("{:?}", e);
-                    RetrieveFromQueueError::AzureError(e)
-                }
+            .map_err(|e| {
+                tracing::error!("{:?}", e);
+                RetrieveFromQueueError::AzureError(e)
             })?;
+
+        if peek_lock.status() == StatusCode::NO_CONTENT {
+            tracing::info!("No new messages found.");
+            return Err(RetrieveFromQueueError::NotFoundError);
+        }
 
         let body = peek_lock.body();
 
