@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - medicines/doc-index-updater/**
+env:
+  IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
 
 jobs:
   build-and-test:
@@ -11,12 +13,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Pull Docker image
-        working-directory: ./medicines/doc-index-updater
-        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-pull
       - name: Build Docker image
         working-directory: ./medicines/doc-index-updater
         run: make docker
       - name: Push Docker image
         working-directory: ./medicines/doc-index-updater
         run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-push
+      - uses: imranismail/setup-kustomize@master
+        with:
+          kustomize-version: "3.1.0"
+      - run: git clone https://${REPO_TOKEN}@github.com/MHRA/deployments.git
+        working-directory: ${{env.HOME}}
+        env:
+          REPO_TOKEN: ${{secrets.DEPLOYMENTS_REPO_TOKEN}}
+      - run: |
+          export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
+          cd doc-index-updater/overlays/non-prod
+          kustomize edit set image ${TAG}
+          git add .
+          git commit -m "CI: Update image tag"
+          git push
+        working-directory: ${{env.HOME}}/deployments
