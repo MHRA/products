@@ -76,11 +76,15 @@ pub enum DocumentType {
 
 impl fmt::Display for DocumentType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match &self {
-            DocumentType::Spc => "Spc",
-            DocumentType::Pil => "Pil",
-            DocumentType::Par => "Par"
-        })
+        write!(
+            f,
+            "{}",
+            match &self {
+                DocumentType::Spc => "Spc",
+                DocumentType::Pil => "Pil",
+                DocumentType::Par => "Par",
+            }
+        )
     }
 }
 
