@@ -104,7 +104,7 @@ pub fn del_document_xml(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
-        .and(warp::header::exact("accept", "application/xml"))
+        .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(with_state(state_manager))
         .and_then(del_document_xml_handler)
 }
@@ -124,7 +124,7 @@ pub fn check_in_xml_document(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents")
         .and(warp::post())
-        .and(warp::header::exact("accept", "application/xml"))
+        .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(warp::body::xml_enforce_strict_content_type())
         .map(|doc: XMLDocument| Document::from(doc))
         .and(with_state(state_manager))
