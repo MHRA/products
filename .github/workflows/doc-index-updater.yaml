@@ -23,6 +23,9 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: make docker
 
+      - name: Get image digest
+        run: echo "::set-env name=TAG::$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
+
       - uses: azure/docker-login@v1
         with:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
@@ -46,7 +49,6 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
             cd deployments/doc-index-updater/overlays/non-prod
             kustomize edit set image ${TAG}
             git add .
