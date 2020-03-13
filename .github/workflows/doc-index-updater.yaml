@@ -23,9 +23,15 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: make docker
 
+      - uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsdevelopmentregistry.azurecr.io
+          username: mhraproductsdevelopmentregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - name: Push Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-push
+        run: make docker-push
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@master
