@@ -48,6 +48,7 @@ jobs:
       - name: Update image tag
         working-directory: ./deployments
         run: |
+          set -x
           export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
           cd doc-index-updater/overlays/non-prod
           kustomize edit set image ${TAG}
