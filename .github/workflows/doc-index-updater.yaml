@@ -34,7 +34,7 @@ jobs:
 
       - name: Push Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: make docker-push
+        run: echo $TAG && make docker-push
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
