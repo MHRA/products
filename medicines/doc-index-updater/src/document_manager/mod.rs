@@ -45,11 +45,10 @@ async fn del_document_xml_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r = del_document_handler(document_content_id, state_manager).await?;
-
-    Ok(warp::reply::xml(&XMLJobStatusResponse::from_job_response(
-        r,
-    )))
+    let r: XMLJobStatusResponse = del_document_handler(document_content_id, state_manager)
+        .await?
+        .into();
+    Ok(warp::reply::xml(&r))
 }
 
 async fn del_document_json_handler(
@@ -84,11 +83,8 @@ async fn check_in_document_xml_handler(
     doc: Document,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r = check_in_document_handler(doc, state_manager).await?;
-
-    Ok(warp::reply::xml(&XMLJobStatusResponse::from_job_response(
-        r,
-    )))
+    let r: XMLJobStatusResponse = check_in_document_handler(doc, state_manager).await?.into();
+    Ok(warp::reply::xml(&r))
 }
 
 async fn check_in_document_json_handler(

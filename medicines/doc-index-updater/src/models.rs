@@ -136,11 +136,11 @@ pub struct XMLJobStatusResponse {
     status: String,
 }
 
-impl XMLJobStatusResponse {
-    pub fn from_job_response(j: JobStatusResponse) -> Self {
-        Self {
-            id: j.id.to_string(),
-            status: j.status.to_string(),
+impl Into<XMLJobStatusResponse> for JobStatusResponse {
+    fn into(self) -> XMLJobStatusResponse {
+        XMLJobStatusResponse {
+            id: self.id.to_string(),
+            status: self.status.to_string(),
         }
     }
 }
