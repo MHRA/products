@@ -33,11 +33,6 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: make docker-push
 
-      - name: Setup Kustomize
-        uses: imranismail/setup-kustomize@master
-        with:
-          kustomize-version: "3.1.0"
-
       - name: Clone Deployments repo
         uses: actions/checkout@v2
         with:
@@ -46,12 +41,14 @@ jobs:
           path: deployments
 
       - name: Update image tag
-        working-directory: ./deployments
-        run: |
-          set -x
-          export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
-          cd doc-index-updater/overlays/non-prod
-          kustomize edit set image ${TAG}
-          git add .
-          git commit -m "CI: Update image tag"
-          git push
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kustomize: 3.4.0
+          command: |
+            set -eux
+            export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
+            cd deployments/doc-index-updater/overlays/non-prod
+            kustomize edit set image ${TAG}
+            git add .
+            git commit -m "CI: Update image tag"
+            git push
