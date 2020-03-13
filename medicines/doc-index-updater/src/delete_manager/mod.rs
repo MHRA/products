@@ -1,7 +1,10 @@
 use crate::{
-    models::DeleteMessage,
-    search_client, 
-    service_bus_client::{delete_factory, RetrieveFromQueueError, RetrievedMessage},
+    models::{DeleteMessage, FileProcessStatus, JobStatus},
+    search_client,
+    service_bus_client::{
+        delete_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
+    },
+    state_manager::StateManager,
     storage_client,
 };
 use anyhow::anyhow;
@@ -12,11 +15,13 @@ use tokio::time::delay_for;
 
 #[tracing::instrument]
 pub async fn delete_service_worker(
-    storage_container_name: String,
+    time_to_wait: Duration,
+    state_manager: StateManager,
 ) -> Result<String, anyhow::Error> {
+    tracing::info!("Starting delete service worker");
     let mut delete_client = delete_factory().await.map_err(|e| {
         tracing::error!("{:?}", e);
-        anyhow!("Couldn't create the delete queue client")
+        anyhow!("Couldn't create the delete client")
     })?;
     let search_client = search_client::factory();
     let storage_client = storage_client::factory().map_err(|e| {
@@ -25,37 +30,55 @@ pub async fn delete_service_worker(
     })?;
 
     loop {
-        let retrieved_result: Result<RetrievedMessage<DeleteMessage>, RetrieveFromQueueError> =
-            delete_client.receive().await;
-
-        match retrieved_result {
-            Ok(retrieval) => {
-                let message = retrieval.message.clone();
-                tracing::info!("{:?} message receive!", message);
-                let blob_name =
-                    get_blob_name_from_content_id(&search_client, message.document_content_id)
-                        .await?;
-                delete_from_index(&search_client, &blob_name).await?;
-                delete_blob(&storage_client, &storage_container_name, &blob_name)
-                    .await
-                    .map_err(|e| {
-                        tracing::error!("{:?}", e);
-                        anyhow!("Couldn't delete blob {}", &blob_name)
-                    })?;
-
-                retrieval.remove().await?;
-                // TODO: Notify state manager
+        match try_process_from_queue(&mut delete_client, &search_client, &storage_client).await {
+            Ok(status) => match status {
+                FileProcessStatus::Success(job_id) => {
+                    let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
+                }
+                FileProcessStatus::NothingToProcess => {}
+            },
+            Err(e) => {
+                tracing::error!("{:?}", e);
             }
-            Err(azure_error) => tracing::warn!("Azure error! {:?}", azure_error),
-        };
+        }
+        delay_for(time_to_wait).await;
+    }
+}
 
-        delay_for(Duration::from_secs(10)).await;
+async fn try_process_from_queue(
+    delete_client: &mut DocIndexUpdaterQueue,
+    search_client: &search_client::AzureSearchClient,
+    storage_client: &azure_sdk_storage_core::prelude::Client,
+) -> Result<FileProcessStatus, anyhow::Error> {
+    tracing::info!("Checking for delete messages");
+    let retrieved_result: Result<RetrievedMessage<DeleteMessage>, RetrieveFromQueueError> =
+        delete_client.receive().await;
+
+    if let Ok(retrieval) = retrieved_result {
+        let message = retrieval.message.clone();
+        tracing::info!("{:?} message receive!", message);
+        let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
+        let blob_name =
+            get_blob_name_from_content_id(message.document_content_id.clone(), &search_client)
+                .await?;
+        delete_from_index(&search_client, &blob_name).await?;
+        delete_blob(&storage_client, &storage_container_name, &blob_name)
+            .await
+            .map_err(|e| {
+                tracing::error!("{:?}", e);
+                anyhow!("Couldn't delete blob {}", &blob_name)
+            })?;
+
+        retrieval.remove().await?;
+        Ok(FileProcessStatus::Success(message.job_id))
+    } else {
+        Ok(FileProcessStatus::NothingToProcess)
     }
 }
 
 pub async fn get_blob_name_from_content_id(
-    search_client: &search_client::AzureSearchClient,
     content_id: String,
+    search_client: &search_client::AzureSearchClient,
 ) -> Result<String, anyhow::Error> {
     let search_results = search_client.search(content_id.to_owned()).await?;
     for result in search_results.search_results {
