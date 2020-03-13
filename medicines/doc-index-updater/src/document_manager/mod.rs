@@ -131,7 +131,7 @@ pub fn check_in_xml_document(
         .and(warp::post())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(warp::body::xml_enforce_strict_content_type())
-        .map(|doc: XMLDocument| Document::from(doc))
+        .map(|doc: XMLDocument| doc.into())
         .and(with_state(state_manager))
         .and_then(check_in_document_xml_handler)
 }
