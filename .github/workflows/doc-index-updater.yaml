@@ -4,9 +4,6 @@ on:
   push:
     paths:
       - medicines/doc-index-updater/**
-  pull_request:
-    paths:
-      - medicines/doc-index-updater/**
 
 jobs:
   build-and-test:
