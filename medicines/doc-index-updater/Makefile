@@ -13,15 +13,15 @@ docker:
 docker-run:
 	docker run -it --env-file=.env mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
 
-.PHONY: pull
-pull:
+.PHONY: docker-pull
+docker-pull:
 	docker login mhraproductsdevelopmentregistry.azurecr.io \
 		-u 00000000-0000-0000-0000-000000000000 \
 		-p $${ACR_ACCESS_TOKEN} && \
 	docker pull mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
 
-.PHONY: push
-push:
+.PHONY: docker-push
+docker-push:
 	docker login mhraproductsdevelopmentregistry.azurecr.io \
 		-u 00000000-0000-0000-0000-000000000000 \
 		-p $${ACR_ACCESS_TOKEN} && \

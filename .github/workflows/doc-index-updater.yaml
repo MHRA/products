@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Pull Docker image
-        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make pull
+        working-directory: ./medicines/doc-index-updater
+        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-pull
       - name: Build Docker image
         working-directory: ./medicines/doc-index-updater
         run: make docker
       - name: Push Docker image
-        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make push
+        working-directory: ./medicines/doc-index-updater
+        run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-push
