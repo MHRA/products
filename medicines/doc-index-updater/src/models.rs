@@ -38,7 +38,7 @@ impl FromStr for JobStatus {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct JobStatusResponse {
     pub id: Uuid,
     pub status: JobStatus,
@@ -131,6 +131,22 @@ pub struct XMLDocument {
     pub active_substances: Vec<ActiveSubstance>,
     pub file_source: String,
     pub file_path: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename = "job")]
+pub struct XMLJobStatusResponse {
+    id: String,
+    status: String,
+}
+
+impl XMLJobStatusResponse {
+    pub fn from_job_response(j: JobStatusResponse) -> Self {
+        Self {
+            id: j.id.to_string(),
+            status: j.status.to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

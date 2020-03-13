@@ -1,5 +1,8 @@
 use crate::{
-    models::{CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLDocument},
+    models::{
+        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLDocument,
+        XMLJobStatusResponse,
+    },
     service_bus_client::{create_factory, delete_factory},
     state_manager::{with_state, StateManager},
 };
@@ -43,7 +46,10 @@ async fn del_document_xml_handler(
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
     let r = del_document_handler(document_content_id, state_manager).await?;
-    Ok(warp::reply::xml(&r))
+
+    Ok(warp::reply::xml(&XMLJobStatusResponse::from_job_response(
+        r,
+    )))
 }
 
 async fn del_document_json_handler(
@@ -79,7 +85,10 @@ async fn check_in_document_xml_handler(
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
     let r = check_in_document_handler(doc, state_manager).await?;
-    Ok(warp::reply::xml(&r))
+
+    Ok(warp::reply::xml(&XMLJobStatusResponse::from_job_response(
+        r,
+    )))
 }
 
 async fn check_in_document_json_handler(
