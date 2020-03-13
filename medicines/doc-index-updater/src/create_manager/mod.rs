@@ -1,5 +1,5 @@
 use crate::{
-    models::{CreateMessage, Document, JobStatus},
+    models::{CreateMessage, Document, FileProcessStatus, JobStatus},
     service_bus_client::{
         create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
     },
@@ -107,11 +107,6 @@ pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, Stri
     }
 
     return metadata;
-}
-
-enum FileProcessStatus {
-    Success(uuid::Uuid),
-    NothingToProcess,
 }
 
 #[cfg(test)]

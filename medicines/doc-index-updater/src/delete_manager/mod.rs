@@ -1,5 +1,5 @@
 use crate::{
-    models::{DeleteMessage, JobStatus},
+    models::{DeleteMessage, FileProcessStatus, JobStatus},
     search_client,
     service_bus_client::{
         delete_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
@@ -59,7 +59,8 @@ async fn try_process_from_queue(
         tracing::info!("{:?} message receive!", message);
         let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
         let blob_name =
-            get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
+            get_blob_name_from_content_id(message.document_content_id.clone(), &search_client)
+                .await?;
         delete_from_index(&search_client, &blob_name).await?;
         delete_blob(&storage_client, &storage_container_name, &blob_name)
             .await
@@ -75,12 +76,10 @@ async fn try_process_from_queue(
     }
 }
 
-enum FileProcessStatus {
-    Success(uuid::Uuid),
-    NothingToProcess,
-}
-
-pub async fn get_blob_name_from_content_id(content_id: String, search_client: &search_client::AzureSearchClient) -> Result<String, anyhow::Error> {
+pub async fn get_blob_name_from_content_id(
+    content_id: String,
+    search_client: &search_client::AzureSearchClient,
+) -> Result<String, anyhow::Error> {
     let search_results = search_client.search(content_id.to_owned()).await?;
     for result in search_results.search_results {
         if result.file_name == content_id {
