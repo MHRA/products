@@ -21,7 +21,7 @@ pub async fn delete_service_worker(
     tracing::info!("Starting delete service worker");
     let mut delete_client = delete_factory().await.map_err(|e| {
         tracing::error!("{:?}", e);
-        anyhow!("Couldn't delete the Delete Queue")
+        anyhow!("Couldn't create the delete client")
     })?;
     let search_client = search_client::factory();
     let storage_client = storage_client::factory().map_err(|e| {
