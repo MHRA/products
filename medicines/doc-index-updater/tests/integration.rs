@@ -65,7 +65,7 @@ fn delete_endpoint_sets_state() {
     let ctx = TestContext::default();
 
     let state = state_manager::StateManager::new(ctx.client);
-    let delete_filter = document_manager::del_document(state.clone());
+    let delete_filter = document_manager::delete_document(state.clone());
 
     let r = block_on(
         warp::test::request()
