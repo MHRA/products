@@ -32,7 +32,7 @@ jobs:
       - name: Clone Deployments repo
         run: |
           export TOKEN_TRIMMED=$(echo $REPO_TOKEN | xargs) # trim whitespace with xargs
-          git clone https://${TOKEN_TRIMMED}@github.com/MHRA/deployments.git
+          git clone "https://${TOKEN_TRIMMED}@github.com/MHRA/deployments.git"
         working-directory: ${{env.HOME}}
         env:
           REPO_TOKEN: ${{secrets.DEPLOYMENTS_REPO_TOKEN}}
