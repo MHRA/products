@@ -62,7 +62,6 @@ pub struct Document {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum FileSource {
     Sentinel,
-    Unknown,
 }
 
 impl Document {
@@ -91,10 +90,7 @@ impl Document {
                 .iter()
                 .map(move |active_substance| active_substance.name.clone())
                 .collect::<Vec<String>>(),
-            file_source: match doc.file_source {
-                "sentinel" => FileSource::Sentinel,
-                _ => FileSource::Unknown,
-            },
+            file_source: doc.file_source,
             file_path: doc.file_path,
         }
     }
@@ -129,7 +125,7 @@ pub struct XMLDocument {
     pub keywords: Option<Vec<Keyword>>,
     pub pl_number: String,
     pub active_substances: Vec<ActiveSubstance>,
-    pub file_source: String,
+    pub file_source: FileSource,
     pub file_path: String,
 }
 
