@@ -73,7 +73,7 @@ pub fn get_env(key: &str) -> String {
 }
 
 pub fn factory() -> AzureSearchClient {
-    let api_key = get_env("API_ADMIN_KEY");
+    let api_key = get_env("AZURE_API_ADMIN_KEY");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
     let api_version = get_env("AZURE_SEARCH_API_VERSION");
