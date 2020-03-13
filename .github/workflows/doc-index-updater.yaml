@@ -14,14 +14,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
 
       - name: Build Docker image
-        working-directory: ./medicines/doc-index-updater
+        working-directory: ./products/medicines/doc-index-updater
         run: make docker
 
       - name: Push Docker image
-        working-directory: ./medicines/doc-index-updater
+        working-directory: ./products/medicines/doc-index-updater
         run: ACR_ACCESS_TOKEN=${{ secrets.ACR_ACCESS_TOKEN }} make docker-push
 
       - name: Setup Kustomize
@@ -30,14 +33,14 @@ jobs:
           kustomize-version: "3.1.0"
 
       - name: Clone Deployments repo
-        run: |
-          export TOKEN_TRIMMED=$(echo $REPO_TOKEN | xargs) # trim whitespace with xargs
-          git clone "https://${TOKEN_TRIMMED}@github.com/MHRA/deployments.git"
-        working-directory: ${{env.HOME}}
-        env:
-          REPO_TOKEN: ${{secrets.DEPLOYMENTS_REPO_TOKEN}}
+        uses: actions/checkout@v2
+        with:
+          repository: MHRA/deployments
+          ssh-key: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+          path: deployments
 
       - name: Update image tag
+        working-directory: ./deployments
         run: |
           export TAG=$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})
           cd doc-index-updater/overlays/non-prod
@@ -45,4 +48,3 @@ jobs:
           git add .
           git commit -m "CI: Update image tag"
           git push
-        working-directory: ${{env.HOME}}/deployments
