@@ -11,10 +11,7 @@ Never commit `.env`.
 ## To build a docker image:
 
 ```bash
-docker build \
-  --tag doc-index-updater \
-  --tag mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater \
-  .
+  make docker
 ```
 
 ## To push image to Azure container registry (ACR):

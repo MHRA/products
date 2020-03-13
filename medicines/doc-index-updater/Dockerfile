@@ -1,6 +1,10 @@
 # Setup rust build environment
 FROM rust:1.41.0 AS build-context
 
+RUN apt-get update && apt-get install -y \
+  redis \
+  ;
+
 RUN rustup component add rustfmt
 
 WORKDIR /usr/src/doc-index-updater
@@ -39,7 +43,8 @@ FROM build-context AS build
 
 COPY ./src ./src
 
-RUN cargo build --release
+RUN cargo test --release && \
+  cargo build --release
 
 # Create the release
 FROM release-context AS release
