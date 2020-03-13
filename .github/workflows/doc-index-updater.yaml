@@ -23,9 +23,6 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: make docker
 
-      - name: Get image digest
-        run: echo "::set-env name=TAG::$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
-
       - uses: azure/docker-login@v1
         with:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
@@ -35,6 +32,9 @@ jobs:
       - name: Push Docker image
         working-directory: ./products/medicines/doc-index-updater
         run: echo $TAG && make docker-push
+
+      - name: Get image digest
+        run: echo "::set-env name=TAG::$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
