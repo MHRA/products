@@ -4,13 +4,21 @@ use crate::{
         create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
     },
     state_manager::StateManager,
+    storage_client
 };
 use anyhow::anyhow;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
-mod metadata;
+use azure_sdk_core::prelude::*;
+use azure_sdk_storage_blob::prelude::*;
+use std::collections::HashMap;
+use std::time::Duration;
+use tokio::time::delay_for;
+
+mod hash;
 mod sftp_client;
+mod metadata;
 
 #[tracing::instrument]
 pub async fn create_service_worker(
@@ -24,7 +32,7 @@ pub async fn create_service_worker(
     })?;
 
     loop {
-        match try_process_from_queue(&mut create_client).await {
+        match try_process_from_queue(&mut create_client, storage_container_name.to_owned()).await {
             Ok(status) => match status {
                 FileProcessStatus::Success(job_id) => {
                     let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
@@ -39,16 +47,13 @@ pub async fn create_service_worker(
     }
 }
 
-async fn create_file_in_blob(file: Vec<u8>) -> String {
-    format!("create file in blob: {:?}", file)
-}
-
 async fn add_to_search_index(blob: String) {
     tracing::debug!("update the index for {}", blob);
 }
 
 async fn try_process_from_queue(
     create_client: &mut DocIndexUpdaterQueue,
+    storage_container_name: String
 ) -> Result<FileProcessStatus, anyhow::Error> {
     tracing::info!("Checking for create messages");
     let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
@@ -71,6 +76,36 @@ async fn try_process_from_queue(
     } else {
         Ok(FileProcessStatus::NothingToProcess)
     }
+}
+
+pub async fn create_blob(
+    container_name: String, 
+    file_data: &[u8],
+    metadata: &HashMap<String, String>
+) -> Result<(), anyhow::Error> {
+    let storage_client = storage_client::factory()?;
+    let blob_name = hash::compute_sha_hash(&file_data);
+    let file_digest = md5::compute(&file_data[..]);
+    let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
+    for (key, val) in metadata {
+        metadata_ref.insert(&key, &val);
+    }
+
+    storage_client
+        .put_block_blob()
+        .with_container_name(&container_name)
+        .with_blob_name(&blob_name)
+        .with_content_type("application/pdf")
+        .with_metadata(&metadata_ref)
+        .with_body(&file_data[..])
+        .with_content_md5(&file_digest[..])
+        .finalize()
+        .await
+        .map_err(|e| {
+            tracing::error!("{:?}", e);
+            anyhow!("Couldn't create blob")
+        })?;
+    Ok(())
 }
 
 pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, String> {

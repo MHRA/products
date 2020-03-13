@@ -8,7 +8,7 @@ use crate::{
     storage_client,
 };
 use anyhow::anyhow;
-use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
+use azure_sdk_core::{prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
 use std::time::Duration;
 use tokio::time::delay_for;
@@ -101,7 +101,11 @@ async fn delete_blob(
         .with_blob_name(&blob_name)
         .with_delete_snapshots_method(DeleteSnapshotsMethod::Include)
         .finalize()
-        .await?;
+        .await
+        .map_err(|e| {
+            tracing::error!("{:?}", e);
+            anyhow!("Couldn't delete blob")
+        })?;
     Ok(())
 }
 
