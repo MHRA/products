@@ -41,7 +41,9 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                 health::get_health()
                     .or(state_manager::get_job_status(state.clone()))
                     .or(state_manager::set_job_status(state.clone()))
+                    .or(document_manager::check_in_xml_document(state.clone()))
                     .or(document_manager::check_in_document(state.clone()))
+                    .or(document_manager::del_document_xml(state.clone()))
                     .or(document_manager::del_document(state.clone()))
                     .with(warp::log("doc_index_updater")),
             )
