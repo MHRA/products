@@ -28,10 +28,12 @@ jobs:
 
       - name: Build, test and push Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: make ci tag="$(git rev-parse --short=7 ${{ github.sha }})"
-
-      - name: Get image digest
-        run: echo ::set-env name=DIGEST::"$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
+          echo ::set-env name=TAG::$TAG
+          echo ::set-env name=DIGEST::$DIGEST
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
@@ -52,5 +54,12 @@ jobs:
 
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
-            git commit -a -m "CI: Update image tag"
-            git push
+            git diff-index --quiet HEAD || git commit -am "CI: Update image tag"
+            declare -i n
+            n=0
+            until [ $n -ge 5 ]
+            do
+              git push && break
+              n+=1
+              git pull --rebase
+            done
