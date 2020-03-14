@@ -5,7 +5,6 @@ use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
 use std::error::Error;
 use time::Duration;
-use AzureError::UnexpectedHTTPResult;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
