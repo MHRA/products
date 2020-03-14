@@ -55,6 +55,9 @@ jobs:
 
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
-            git add .
-            git commit -m "CI: Update image tag"
-            git push
+            git commit -a -m "CI: Update image tag"
+
+      - name: Push to Deployments repo
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
