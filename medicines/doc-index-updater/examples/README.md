@@ -6,4 +6,6 @@
 
 - install SealedSecrets controller: [`sealed-secrets`](./sealed-secrets/README.md)
 
-- install the `doc-index-updater` service: [`manifests`](./manifests/README.md)
+## Deploy `doc-index-updater`
+
+- see https://github.com/MHRA/deployments/tree/master/doc-index-updater

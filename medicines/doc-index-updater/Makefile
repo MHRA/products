@@ -17,9 +17,8 @@ docker-build: ## Build and tag Docker image
 	docker build \
 		--progress plain \
 		--tag $(app) \
-		--tag $(image):latest \
-		--tag $(image):$(tag) \
 		--tag $(image) \
+		--tag $(image):$(tag) \
 		.
 
 .PHONY: docker-run
@@ -32,7 +31,7 @@ docker-pull: ## Pull Docker image
 
 .PHONY: docker-push
 docker-push: ## Push Docker image
-	docker push $(image):latest
+	docker push $(image)
 	docker push $(image):$(tag)
 
 .PHONY: help
