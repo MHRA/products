@@ -7,8 +7,12 @@ describe(buildFuzzyQuery, () => {
   });
 
   it('ignores special characters', () => {
-    const fuzzyQuery = buildFuzzyQuery('hello*');
-    expect(fuzzyQuery).toBe('hello~1 hello^4');
+    const fuzzyQuery = buildFuzzyQuery(
+      'bacteriostatic solvent (0.3%w/v metacresol in wfi)',
+    );
+    expect(fuzzyQuery).toBe(
+      'bacteriostatic~1 bacteriostatic^4 solvent~1 solvent^4 0.3~1 0.3^4 w~1 w^4 v~1 v^4 metacresol~1 metacresol^4 in~1 in^4 wfi~1 wfi^4',
+    );
   });
 
   it('builds fuzzy words from product name', () => {
