@@ -1,5 +1,9 @@
 use crate::{
+<<<<<<< HEAD
     models::{CreateMessage, Document, FileProcessStatus, JobStatus},
+=======
+    models::{CreateMessage, JobStatus},
+>>>>>>> Extract metadata method to metadata file
     service_bus_client::{
         create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
     },
@@ -12,7 +16,6 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 use azure_sdk_core::prelude::*;
-use azure_sdk_service_bus::{event_hub::PeekLockResponse};
 use azure_sdk_storage_blob::prelude::*;
 use std::collections::HashMap;
 use std::time::Duration;
@@ -71,14 +74,21 @@ async fn try_process_from_queue(
         let file = match file_result {
             Ok(file) => file,
             Err(e) => {
-                let _ = retrieval.remove();
+                tracing::error!("{:?}", e);
+                let _ = retrieval.remove().await?;
                 return Err(e);
             }
         };
         
-        let metadata = derive_metadata_from_message(&message.document);
-        let _blob = create_blob(storage_container_name, &file, &metadata).await?;
+        let metadata = metadata::derive_metadata_from_message(&message.document);
+        let file_digest = md5::compute(&file[..]);
+        let file_data_hash = hash::sha1(&file);
+        let _blob = create_blob(storage_container_name, &file_data_hash, &file, &metadata, &file_digest).await?;
+        tracing::info!("Uploaded blob {} for job {}", &metadata["file_data_hash"], &message.job_id);
+
         add_to_search_index("blob_data".to_string()).await;
+        tracing::info!("Added to index {} for job {}", &metadata["file_data_hash"], &message.job_id);
+
         retrieval.remove().await?;
 
         Ok(FileProcessStatus::Success(message.job_id))
@@ -89,13 +99,12 @@ async fn try_process_from_queue(
 
 pub async fn create_blob(
     container_name: String, 
+    blob_name: &str,
     file_data: &[u8],
-    metadata: &HashMap<String, String>
+    metadata: &HashMap<String, String>,
+    file_digest: &md5::Digest
 ) -> Result<(), anyhow::Error> {
-    tracing::info!("Uploading to blob for file: {}", &metadata["file_name"]);
     let storage_client = storage_client::factory()?;
-    let blob_name = hash::compute_sha_hash(&file_data);
-    let file_digest = md5::compute(&file_data[..]);
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
     for (key, val) in metadata {
         metadata_ref.insert(&key, &val);
@@ -104,7 +113,7 @@ pub async fn create_blob(
     storage_client
         .put_block_blob()
         .with_container_name(&container_name)
-        .with_blob_name(&blob_name)
+        .with_blob_name(blob_name)
         .with_content_type("application/pdf")
         .with_metadata(&metadata_ref)
         .with_body(&file_data[..])
@@ -115,7 +124,6 @@ pub async fn create_blob(
             tracing::error!("{:?}", e);
             anyhow!("Couldn't create blob")
         })?;
-    tracing::info!("Uploaded blob with file name: {}", &blob_name);
     Ok(())
 }
 
@@ -203,3 +211,8 @@ mod test {
         assert_eq!(output_metadata["pl_number"], expected_pl_number);
     }
 }
+enum FileProcessStatus {
+    Success(uuid::Uuid),
+    NothingToProcess,
+}
+
