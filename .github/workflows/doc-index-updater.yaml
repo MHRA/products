@@ -50,7 +50,12 @@ jobs:
           command: |
             set -eux
             cd deployments/doc-index-updater/overlays/non-prod
+
+            git config user.email "CD.no.reply@mhra.gov.uk"
+            git config user.name "MHRA CI/CD"
+
             kustomize edit set image ${TAG}
+
             git add .
             git commit -m "CI: Update image tag"
             git push
