@@ -6,11 +6,13 @@ use crate::{
     state_manager::StateManager,
     storage_client
 };
+
 use anyhow::anyhow;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 use azure_sdk_core::prelude::*;
+use azure_sdk_service_bus::{event_hub::PeekLockResponse};
 use azure_sdk_storage_blob::prelude::*;
 use std::collections::HashMap;
 use std::time::Duration;
@@ -61,15 +63,22 @@ async fn try_process_from_queue(
 
     if let Ok(retrieval) = retrieved_result {
         let message = retrieval.message.clone();
-        tracing::info!("{:?} message receive!", message);
-        let file = sftp_client::retrieve(
-            message.document.file_source.clone(),
-            message.document.file_path.clone(),
-        )
-        .await?;
-        let _metadata = derive_metadata_from_message(&message.document);
-        let blob = create_file_in_blob(file).await;
-        add_to_search_index(blob).await;
+        tracing::info!("Message received: {:?} ", message);
+        let file_result =
+            sftp_client::retrieve(message.document.file_source.clone(), message.document.file_path.clone())
+            .await;
+        
+        let file = match file_result {
+            Ok(file) => file,
+            Err(e) => {
+                let _ = retrieval.remove();
+                return Err(e);
+            }
+        };
+        
+        let metadata = derive_metadata_from_message(&message.document);
+        let _blob = create_blob(storage_container_name, &file, &metadata).await?;
+        add_to_search_index("blob_data".to_string()).await;
         retrieval.remove().await?;
 
         Ok(FileProcessStatus::Success(message.job_id))
@@ -83,6 +92,7 @@ pub async fn create_blob(
     file_data: &[u8],
     metadata: &HashMap<String, String>
 ) -> Result<(), anyhow::Error> {
+    tracing::info!("Uploading to blob for file: {}", &metadata["file_name"]);
     let storage_client = storage_client::factory()?;
     let blob_name = hash::compute_sha_hash(&file_data);
     let file_digest = md5::compute(&file_data[..]);
@@ -90,7 +100,7 @@ pub async fn create_blob(
     for (key, val) in metadata {
         metadata_ref.insert(&key, &val);
     }
-
+    
     storage_client
         .put_block_blob()
         .with_container_name(&container_name)
@@ -105,6 +115,7 @@ pub async fn create_blob(
             tracing::error!("{:?}", e);
             anyhow!("Couldn't create blob")
         })?;
+    tracing::info!("Uploaded blob with file name: {}", &blob_name);
     Ok(())
 }
 
