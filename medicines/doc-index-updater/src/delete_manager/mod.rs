@@ -94,7 +94,7 @@ async fn delete_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     container_name: &str,
     blob_name: &str,
-) -> Result<(), AzureError> {
+) -> Result<(), anyhow::Error> {
     storage_client
         .delete_blob()
         .with_container_name(&container_name)
