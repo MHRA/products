@@ -26,17 +26,25 @@ jobs:
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build, test and push Docker image
+      - name: Build and test Docker image (on BRANCH)
+        if: github.ref != 'refs/heads/master'
         working-directory: ./products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci tag=$TAG
+          make ci-branch tag=$TAG
+
+      - name: Build, test and push Docker image (on MASTER)
+        if: github.ref == 'refs/heads/master'
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-master tag=$TAG
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo ::set-env name=TAG::$TAG
           echo ::set-env name=DIGEST::$DIGEST
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
+        if: github.ref == 'refs/heads/master'
         with:
           repository: MHRA/deployments
           path: deployments
@@ -44,6 +52,7 @@ jobs:
 
       - name: Update image tag
         uses: stefanprodan/kube-tools@v1
+        if: github.ref == 'refs/heads/master'
         with:
           kustomize: 3.4.0
           command: |

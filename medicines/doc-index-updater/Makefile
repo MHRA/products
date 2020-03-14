@@ -6,8 +6,11 @@ tag := latest
 default: ## run locally
 	export $$(cat .env | xargs) && cargo run
 
-.PHONY: ci
-ci: docker-build docker-push ## Build in CI
+.PHONY: ci-branch
+ci-branch: docker-build ## Build branch in CI
+
+.PHONY: ci-master
+ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
 docker-build: ## Build and tag Docker image
