@@ -19,9 +19,9 @@ jobs:
         with:
           path: products
 
-      - name: Build Docker image
-        working-directory: ./products/medicines/doc-index-updater
-        run: make docker
+      # - name: Build Docker image
+      #   working-directory: ./products/medicines/doc-index-updater
+      #   run: make docker
 
       - name: Docker login
         uses: azure/docker-login@v1
@@ -30,9 +30,12 @@ jobs:
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Push Docker image
+      # - name: Push Docker image
+      #   working-directory: ./products/medicines/doc-index-updater
+      #   run: make docker-push
+      - name: Pull Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: echo $TAG && make docker-push
+        run: make docker-pull
 
       - name: Get image digest
         run: echo "::set-env name=TAG::$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
@@ -42,6 +45,7 @@ jobs:
         with:
           repository: MHRA/deployments
           path: deployments
+          token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
 
       - name: Update image tag
         uses: stefanprodan/kube-tools@v1
@@ -56,8 +60,9 @@ jobs:
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
             git commit -a -m "CI: Update image tag"
-
-      - name: Push to Deployments repo
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+            git push
+      # - name: Push to Deployments repo
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+      #     directory: deployments
