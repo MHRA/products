@@ -19,9 +19,9 @@ jobs:
         with:
           path: products
 
-      - name: Build Docker image
-        working-directory: ./products/medicines/doc-index-updater
-        run: make docker
+      - name: Get tag
+        run: |
+          echo ::set-env name=TAG::"$(git rev-parse --short=7 ${{ github.sha }})"
 
       - name: Docker login
         uses: azure/docker-login@v1
@@ -30,12 +30,12 @@ jobs:
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Push Docker image
+      - name: Build, test and push Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: make docker-push
+        run: make ci tag=$TAG
 
       - name: Get image digest
-        run: echo "::set-env name=TAG::$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
+        run: echo ::set-env name=DIGEST::"$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
@@ -52,7 +52,7 @@ jobs:
             set -eux
             cd deployments/doc-index-updater/overlays/non-prod
 
-            kustomize edit set image ${TAG}            
+            kustomize edit set image $DIGEST
 
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"

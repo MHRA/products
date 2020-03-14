@@ -1,22 +1,37 @@
+app := doc-index-updater
+image := mhraproductsdevelopmentregistry.azurecr.io/products/$(app)
+tag := latest
+
 .PHONY: default
-default:
+default: ## run locally
 	export $$(cat .env | xargs) && cargo run
 
-.PHONY: docker
-docker:
+.PHONY: ci
+ci: docker-build docker-push ## Build in CI
+
+.PHONY: docker-build
+docker-build: ## Build and tag Docker image
 	docker build \
-		--tag doc-index-updater \
-		--tag mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater \
+		--progress plain \
+		--tag $(app) \
+		--tag $(image):latest \
+		--tag $(image):$(tag)
+		--tag $(image) \
 		.
 
 .PHONY: docker-run
-docker-run:
-	docker run -it --env-file=.env mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+docker-run: ## Run Docker image
+	docker run -it --env-file=.env $(image)
 
 .PHONY: docker-pull
-docker-pull:
-	docker pull mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+docker-pull: ## Pull Docker image
+	docker pull $(image)
 
 .PHONY: docker-push
-docker-push:
-	docker push mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+docker-push: ## Push Docker image
+	docker push $(image):latest
+	docker push $(image):$(tag)
+
+.PHONY: help
+help: ## Display this help screen
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
