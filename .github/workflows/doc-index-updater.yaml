@@ -23,7 +23,8 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: make docker
 
-      - uses: azure/docker-login@v1
+      - name: Docker login
+        uses: azure/docker-login@v1
         with:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
           username: mhraproductsdevelopmentregistry
@@ -40,7 +41,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: MHRA/deployments
-          ssh-key: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
           path: deployments
 
       - name: Update image tag
@@ -51,11 +51,10 @@ jobs:
             set -eux
             cd deployments/doc-index-updater/overlays/non-prod
 
-            git config user.email "CD.no.reply@mhra.gov.uk"
-            git config user.name "MHRA CI/CD"
+            kustomize edit set image ${TAG}            
 
-            kustomize edit set image ${TAG}
-
+            git config --local user.email "CD.no.reply@mhra.gov.uk"
+            git config --local user.name "MHRA CI/CD"
             git add .
             git commit -m "CI: Update image tag"
             git push
