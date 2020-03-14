@@ -1,7 +1,6 @@
 use crate::{
     models::{
-        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLDocument,
-        XMLJobStatusResponse,
+        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory},
     state_manager::{with_state, StateManager},
@@ -131,7 +130,7 @@ pub fn check_in_xml_document(
         .and(warp::post())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(warp::body::xml_enforce_strict_content_type())
-        .map(|doc: XMLDocument| Document::from(doc))
+        .map(Document::from)
         .and(with_state(state_manager))
         .and_then(check_in_document_xml_handler)
 }

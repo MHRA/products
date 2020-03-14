@@ -15,7 +15,7 @@ fn main() -> Result<(), AzureError> {
     match matches.occurrences_of("verbose") {
         0 => verbosity = 0,
         1 => verbosity = 1,
-        2 | _ => verbosity = 2,
+        _ => verbosity = 2,
     };
     let dryrun = matches.is_present("dryrun");
     match matches.subcommand() {
