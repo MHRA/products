@@ -15,7 +15,7 @@ docker-build: ## Build and tag Docker image
 		--progress plain \
 		--tag $(app) \
 		--tag $(image):latest \
-		--tag $(image):$(tag)
+		--tag $(image):$(tag) \
 		--tag $(image) \
 		.
 
