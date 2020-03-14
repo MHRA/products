@@ -19,10 +19,6 @@ jobs:
         with:
           path: products
 
-      - name: Get tag
-        run: |
-          echo ::set-env name=TAG::"$(git rev-parse --short=7 ${{ github.sha }})"
-
       - name: Docker login
         uses: azure/docker-login@v1
         with:
@@ -32,7 +28,7 @@ jobs:
 
       - name: Build, test and push Docker image
         working-directory: ./products/medicines/doc-index-updater
-        run: make ci tag=$TAG
+        run: make ci tag="$(git rev-parse --short=7 ${{ github.sha }})"
 
       - name: Get image digest
         run: echo ::set-env name=DIGEST::"$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE})"
