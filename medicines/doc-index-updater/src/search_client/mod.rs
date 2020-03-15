@@ -177,7 +177,10 @@ async fn update_index(
     
     let mut body = HashMap::new();
     body.insert("value", [azure_value]);
-
+    tracing::info!("BASE URL: {}", base_url);
+    tracing::info!("BODY: {:?}", body);
+    tracing::info!("API VERSION: {}", config.api_version);
+    tracing::info!("API KEY: {}", config.api_key);
     let req = client
         .post(&base_url)
         .query(&[("api-version", &config.api_version)])
@@ -189,9 +192,21 @@ async fn update_index(
     tracing::debug!("\nRequest: {:?}", &req);
     tracing::debug!("\nRequesting from URL: {}", &req.url());
 
-    client
+    let response = client
         .execute(req)
-        .await?
-        .json::<AzureIndexChangedResults>()
-        .await
+        .await;
+    
+    let r = match response {
+        Ok(response) => {
+            tracing::info!("{:?}", response);
+            response
+        }
+        Err(e) => {
+            tracing::error!("{:?}", e);
+            return Err(e);
+        }
+    };
+
+    r.json::<AzureIndexChangedResults>()
+    .await
 }
