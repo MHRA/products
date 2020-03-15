@@ -20,19 +20,12 @@ mod metadata;
 
 #[derive(Error, Debug)]
 pub enum CreateDocError {
-    #[error("Couldn't retrieve file {file:?} for job {job_id:?}: {error_msg:?}")]
-    CouldntRetrieveFile {
-        job_id: uuid::Uuid,
-        file: String,
-        error_msg: String
-    },
+    #[error("Couldn't retrieve file: {0}")]
+    RetrieveFile(String),
     #[error("Couldn't create blob: {0}")]
-    CouldntCreateBlob(String),
-    #[error("Couldn't remove message for job {job_id:?}: {error_msg:?}")]
-    CouldntRemoveMessageFromQueue {
-        job_id: uuid::Uuid,
-        error_msg: String
-    },
+    CreateBlob(String),
+    #[error("Couldn't remove message from queue: {0}")]
+    RemoveMessageFromQueue(String)
 }
 
 #[tracing::instrument]
@@ -47,91 +40,71 @@ pub async fn create_service_worker(
     })?;
 
     loop {
-        match try_process_from_queue(&mut create_client).await {
-            Ok(status) => match status {
-                FileProcessStatus::Success(job_id) => {
-                    let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
-                }
-                FileProcessStatus::NothingToProcess => {}
-            },
-            Err(e) => {
-                tracing::error!("{:?}", e);
-                match e {
-                    CreateDocError::CouldntRetrieveFile { job_id, file: _, error_msg} => {
-                        match error_msg {
-                            "[-31] Failed opening remote file" => {
-                                let _ = state_manager.set_status(job_id, JobStatus::Error{
-                                    message: error_msg, 
-                                    code:"404".to_owned()})
-                                .await?;
-                            }
-                            _ => {}
-                        }
-                    }
-                    _ => {}
-                };
-            }
+        match try_process_from_queue(&mut create_client, &state_manager).await {
+            Ok(()) => {}
+            Err(e) => tracing::error!("{:?}", e)
         }
         delay_for(time_to_wait).await;
     }
 }
 
-async fn add_to_search_index(blob: String) {
-    tracing::debug!("update the index for {}", blob);
-}
-
 async fn try_process_from_queue(
-    create_client: &mut DocIndexUpdaterQueue
-) -> Result<FileProcessStatus, CreateDocError> {
+    service_bus_client: &mut DocIndexUpdaterQueue,
+    state_manager: &StateManager,
+) -> Result<(), anyhow::Error> {
     tracing::info!("Checking for create messages");
     let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
-        create_client.receive().await;
-
+        service_bus_client.receive().await;
+    
     if let Ok(retrieval) = retrieved_result {
-        let message = retrieval.message.clone();
-        tracing::info!("Message received: {:?} ", message);
-        let file_result = sftp_client::retrieve(
-                message.document.file_source.clone(), 
-                message.document.file_path.clone()
-            )
-            .await;
-
-        let file = match file_result {
-            Ok(file) => file,
-            Err(e) => {
-                tracing::error!("{:?}", e);
-                // TODO: Uncomment out before release
-                // or when we switch to centralised SFTP server
-                // let _ = retrieval.remove().await?;
-                return Err(CreateDocError::CouldntRetrieveFile { 
-                    job_id: message.job_id.clone(),
-                    file: message.document.file_path.clone(),
-                    error_msg: e.to_string()
-                });
-            }
-        };
-        
-        let metadata = metadata::derive_metadata_from_message(&message.document);
-        let file_digest = md5::compute(&file[..]);
-        let file_data_hash = hash::sha1(&file);
-        let _blob = create_blob(&file_data_hash, &file, &metadata, &file_digest).await?;
-        tracing::info!("Uploaded blob {} for job {}", &file_data_hash, &message.job_id);
-
-        add_to_search_index("blob_data".to_string()).await;
-        tracing::info!("Added to index {} for job {}", &file_data_hash, &message.job_id);
-
-        retrieval.remove().await
-            .map_err(|e| {
-                CreateDocError::CouldntRemoveMessageFromQueue { 
-                    job_id: message.job_id.clone(),
-                    error_msg: e.to_string()
+        let processing_result = process_message(retrieval.message.clone()).await;
+        match processing_result {
+            Ok(FileProcessStatus::Success(job_id)) => {
+                let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
+            },
+            Ok(FileProcessStatus::NothingToProcess) => {},
+            Err(CreateDocError::RetrieveFile(err_message)) => {
+                if err_message == "[-31] Failed opening remote file".to_string() {
+                    let _ = state_manager.set_status(
+                        retrieval.message.job_id, 
+                        JobStatus::Error {
+                            message: "Couldn't find file".to_string(), 
+                            code:"404".to_string()
+                        });
+                    // TODO: Uncomment before releasing
+                    // or when we have a centralised SFTP server for dev
+                    // let _ = retrieval.remove().await?;
                 }
-            })?;
-
-        Ok(FileProcessStatus::Success(message.job_id))
-    } else {
-        Ok(FileProcessStatus::NothingToProcess)
+                return Err(anyhow!(err_message));
+            },
+            Err(e) => return Err(anyhow!(format!("{:?}", e)))
+        };
     }
+    Ok(())
+}
+
+async fn process_message(
+    message: CreateMessage
+) -> Result<FileProcessStatus, CreateDocError> {
+    tracing::info!("Message received: {:?} ", message);
+
+    let file = sftp_client::retrieve(
+        message.document.file_source.clone(), 
+        message.document.file_path.clone()
+    )
+    .await
+    .map_err(|e| CreateDocError::RetrieveFile(format!("{:?}", e)))?;
+
+    let metadata = metadata::derive_metadata_from_message(&message.document);
+    let file_digest = md5::compute(&file[..]);
+    let file_data_hash = hash::sha1(&file);
+    let _blob = create_blob(&file_data_hash, &file, &metadata, &file_digest).await?;
+    tracing::info!("Uploaded blob {} for job {}", &file_data_hash, &message.job_id);
+
+    add_to_search_index("blob_data".to_string()).await;
+    tracing::info!("Added to index {} for job {}", &file_data_hash, &message.job_id);
+
+    Ok(FileProcessStatus::Success(message.job_id))
 }
 
 pub async fn create_blob(
@@ -141,9 +114,7 @@ pub async fn create_blob(
     file_digest: &md5::Digest
 ) -> Result<(), CreateDocError> {
     let storage_client = storage_client::factory()
-        .map_err(|e| {
-            CreateDocError::CouldntCreateBlob(e.to_string())
-        })?;
+        .map_err(|e| CreateDocError::CreateBlob(format!("{:?}", e)))?;
     let container_name = std::env::var("STORAGE_CONTAINER")
         .expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
@@ -161,8 +132,10 @@ pub async fn create_blob(
         .with_content_md5(&file_digest[..])
         .finalize()
         .await
-        .map_err(|e| {
-            CreateDocError::CouldntCreateBlob(e.to_string())
-        })?;
+        .map_err(|e| CreateDocError::CreateBlob(format!("{:?}", e)))?;
     Ok(())
+}
+
+async fn add_to_search_index(blob: String) {
+    tracing::debug!("update the index for {}", blob);
 }
