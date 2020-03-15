@@ -11,33 +11,21 @@ use anyhow::anyhow;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use std::{collections::HashMap, time::Duration};
-use thiserror::Error;
 use tokio::time::delay_for;
 
 mod hash;
 mod sftp_client;
 mod metadata;
 
-#[derive(Error, Debug)]
-pub enum CreateDocError {
-    #[error("Couldn't retrieve file: {0}")]
-    RetrieveFile(String),
-    #[error("Couldn't create blob: {0}")]
-    CreateBlob(String),
-    #[error("Couldn't remove message from queue: {0}")]
-    RemoveMessageFromQueue(String)
-}
-
 #[tracing::instrument]
 pub async fn create_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
-) -> Result<String, anyhow::Error> {
+) -> Result<(), anyhow::Error> {
     tracing::info!("Starting create service worker");
-    let mut create_client = create_factory().await.map_err(|e| {
-        tracing::error!("{:?}", e);
-        anyhow!("Couldn't create the Create Queue")
-    })?;
+    let mut create_client = create_factory()
+        .await
+        .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
 
     loop {
         match try_process_from_queue(&mut create_client, &state_manager).await {
@@ -63,8 +51,9 @@ async fn try_process_from_queue(
                 let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
             },
             Ok(FileProcessStatus::NothingToProcess) => {},
-            Err(CreateDocError::RetrieveFile(err_message)) => {
-                if err_message == "[-31] Failed opening remote file".to_string() {
+            Err(e) => {
+                if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
+                    tracing::info!("Updating state to errored and removing message");
                     let _ = state_manager.set_status(
                         retrieval.message.job_id, 
                         JobStatus::Error {
@@ -75,9 +64,8 @@ async fn try_process_from_queue(
                     // or when we have a centralised SFTP server for dev
                     // let _ = retrieval.remove().await?;
                 }
-                return Err(anyhow!(err_message));
+                return Err(e);
             },
-            Err(e) => return Err(anyhow!(format!("{:?}", e)))
         };
     }
     Ok(())
@@ -85,7 +73,7 @@ async fn try_process_from_queue(
 
 async fn process_message(
     message: CreateMessage
-) -> Result<FileProcessStatus, CreateDocError> {
+) -> Result<FileProcessStatus, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
     let file = sftp_client::retrieve(
@@ -93,7 +81,7 @@ async fn process_message(
         message.document.file_path.clone()
     )
     .await
-    .map_err(|e| CreateDocError::RetrieveFile(format!("{:?}", e)))?;
+    .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
 
     let metadata = metadata::derive_metadata_from_message(&message.document);
     let file_digest = md5::compute(&file[..]);
@@ -112,9 +100,12 @@ pub async fn create_blob(
     file_data: &[u8],
     metadata: &HashMap<String, String>,
     file_digest: &md5::Digest
-) -> Result<(), CreateDocError> {
+) -> Result<(), anyhow::Error> {
     let storage_client = storage_client::factory()
-        .map_err(|e| CreateDocError::CreateBlob(format!("{:?}", e)))?;
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+
+        // Try downcasting instead of converting anyhow -> CreateDocError -> anyhow
+        // Or change the error returned by sftp client to be a CreateDocError or somehow maintain the ssh2 type
     let container_name = std::env::var("STORAGE_CONTAINER")
         .expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
@@ -132,7 +123,7 @@ pub async fn create_blob(
         .with_content_md5(&file_digest[..])
         .finalize()
         .await
-        .map_err(|e| CreateDocError::CreateBlob(format!("{:?}", e)))?;
+        .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
     Ok(())
 }
 
