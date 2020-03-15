@@ -1,4 +1,5 @@
 use serde_derive::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 pub struct AzureHighlight {
@@ -99,15 +100,18 @@ impl AzureSearchClient {
         key_name: &str,
         value: &str,
     ) -> Result<AzureIndexChangedResults, reqwest::Error> {
+        let mut key_value = HashMap::new();
+        key_value.insert(key_name, value);
         update_index(
             &"delete".to_string(),
-            &key_name,
-            &value,
+            key_value,
             &self.client,
             &self.config,
         )
         .await
     }
+
+
 }
 
 async fn search(
@@ -147,8 +151,7 @@ async fn search(
 
 async fn update_index(
     action: &str,
-    key: &str,
-    value: &str,
+    key_values: HashMap<&str, &str>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<AzureIndexChangedResults, reqwest::Error> {
@@ -158,10 +161,10 @@ async fn update_index(
         search_index = config.search_index
     );
 
-    let mut azure_value = std::collections::HashMap::new();
+    let mut azure_value = key_values;
     azure_value.insert("@search.action", action);
-    azure_value.insert(key, value);
-    let mut body = std::collections::HashMap::new();
+    
+    let mut body = HashMap::new();
     body.insert("value", [azure_value]);
 
     let req = client
