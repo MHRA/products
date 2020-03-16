@@ -17,4 +17,16 @@ describe(buildFuzzyQuery, () => {
       'K~1 K^4 L~1 L^4 POULTICE~1 POULTICE^4 KAOLIN~1 KAOLIN^4 POULTICE~1 POULTICE^4 BP~1 BP^4',
     );
   });
+
+  it('normalizes product licence', () => {
+    const fuzzyQuery = buildFuzzyQuery('pl 30464/0140');
+    expect(fuzzyQuery).toBe('PL304640140~1 PL304640140^4');
+  });
+
+  it('extracts and normalizes product licence', () => {
+    const fuzzyQuery = buildFuzzyQuery('amlodipine pl 30464/0140');
+    expect(fuzzyQuery).toBe(
+      'amlodipine~1 amlodipine^4 PL304640140~1 PL304640140^4',
+    );
+  });
 });

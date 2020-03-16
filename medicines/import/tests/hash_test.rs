@@ -1,5 +1,3 @@
-use import;
-
 #[test]
 fn test_hash() {
     let bytes = include_bytes!("fixtures/test-file.txt");

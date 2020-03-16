@@ -24,7 +24,7 @@ Before either destroying or provisioning a kubernetes cluster, take these setup 
 2. Source the environment variables
 
    ```sh
-     source .env
+     set -a && source .env && set +a
    ```
 
 3. Initialize terraform (ensure providers/modules are installed and backend is initialized)
@@ -39,10 +39,10 @@ First, follow the [setup steps above](#setting-up).
 
 Destroying the cluster is now just one step:
 
-   ```sh
-     terraform destroy --target=module.cluster.azurerm_kubernetes_cluster.cluster
-   ```
-   
+```sh
+  terraform destroy --target=module.cluster.azurerm_kubernetes_cluster.cluster
+```
+
 This should give a nice message saying well done on a good destruction job: `Destruction complete.`
 
 ## Provision cluster ⎈
@@ -55,27 +55,16 @@ First, follow the [setup steps above](#setting-up).
    terraform apply --target=module.cluster.azurerm_kubernetes_cluster.cluster
    ```
 
-2. Create the credentials file by running this script.
+2. Update your `~/.kube/config` with credentials for the new cluster, by running this script.
 
    ```sh
    ../../scripts/create-kubernetes-config.sh
    ```
 
-3. Install Istio with a load balancer.
-
-   ```sh
-   istioctl manifest apply -f control-plane.yaml
-   ```
+3. Install Istio, Sealed Secrets and ArgoCD (https://github.com/MHRA/deployments)
 
 The cluster is now ready.
 
 ### Deploying services
 
-You can now deploy microservices, for example if you want to deploy `/medicines/api`,
-you can go to `/medicines/api/infrastructure/development` and deploy the services using the scripts there.
-
-   ```sh
-   kubectl apply -f deployment.yml
-   kubectl apply -f service.yml
-   kubectl apply -f virtual-service.yml
-   ```
+We are storing the configuration (manifests) for all the services in the cluster in the deployments repo (https://github.com/MHRA/deployments) so that they are provisioned using GitOps by ArgoCD.

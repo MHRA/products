@@ -110,7 +110,7 @@ pub async fn create_blob(
     for (key, val) in metadata {
         metadata_ref.insert(&key, &val);
     }
-    
+
     storage_client
         .put_block_blob()
         .with_container_name(&container_name)
