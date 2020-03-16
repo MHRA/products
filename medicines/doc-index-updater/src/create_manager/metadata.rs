@@ -1,6 +1,5 @@
-use crate::{
-    models::{Document},
-};
+use crate::models::Document;
+
 use lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
@@ -102,9 +101,7 @@ pub fn extract_product_licences(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{
-        models::{DocumentType, FileSource}
-    };
+    use crate::models::{DocumentType, FileSource};
 
     #[test]
     fn derive_metadata() {
@@ -113,12 +110,19 @@ mod test {
             name: "Paracetamol Plus PL 12345/6789".to_string(),
             document_type: DocumentType::Spc,
             author: "JRR Tolkien".to_string(),
-            products: vec!["Effective product 1".to_string(), "Effective product 2".to_string()],
-            keywords: Some(vec!["Very good for you".to_string(), "Cures headaches".to_string(), "PL 12345/6789".to_string()]),
+            products: vec![
+                "Effective product 1".to_string(),
+                "Effective product 2".to_string(),
+            ],
+            keywords: Some(vec![
+                "Very good for you".to_string(),
+                "Cures headaches".to_string(),
+                "PL 12345/6789".to_string(),
+            ]),
             pl_number: "PL 12345/6789".to_string(),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
-            file_source: FileSource::Sentinel
+            file_source: FileSource::Sentinel,
         };
 
         let expected_file_name = "CON123456".to_string();
