@@ -177,10 +177,7 @@ async fn update_index(
     
     let mut body = HashMap::new();
     body.insert("value", [azure_value]);
-    tracing::info!("BASE URL: {}", base_url);
-    tracing::info!("BODY: {:?}", body);
-    tracing::info!("API VERSION: {}", config.api_version);
-    tracing::info!("API KEY: {}", config.api_key);
+
     let req = client
         .post(&base_url)
         .query(&[("api-version", &config.api_version)])
