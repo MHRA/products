@@ -104,8 +104,6 @@ pub async fn create_blob(
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
-        // Try downcasting instead of converting anyhow -> CreateDocError -> anyhow
-        // Or change the error returned by sftp client to be a CreateDocError or somehow maintain the ssh2 type
     let container_name = std::env::var("STORAGE_CONTAINER")
         .expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref : HashMap<&str, &str> = HashMap::new();
