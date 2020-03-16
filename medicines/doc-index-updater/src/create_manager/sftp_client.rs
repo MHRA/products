@@ -12,7 +12,7 @@ async fn sentinel_sftp_factory() -> Result<Sftp, Error> {
     ssh_session.set_tcp_stream(tcp);
     ssh_session.handshake()?;
 
-    let _ = ssh_session.userauth_password(&user, &password)?;
+    ssh_session.userauth_password(&user, &password)?;
     assert!(ssh_session.authenticated());
 
     let sftp = ssh_session.sftp()?;
@@ -21,7 +21,7 @@ async fn sentinel_sftp_factory() -> Result<Sftp, Error> {
 }
 
 pub async fn get_env_fail_fast(name: &str) -> String {
-    std::env::var(name).expect(&format!("Set env variable {} first!", name))
+    std::env::var(name).unwrap_or_else(|_| panic!("Set env variable {} first!", name))
 }
 
 async fn retrieve_file_from_sftp(

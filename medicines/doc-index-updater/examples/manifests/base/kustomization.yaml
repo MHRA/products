@@ -1,9 +1,0 @@
-namespace: doc-index-updater
-
-resources:
-  - namespace.yaml
-  - deployment.yaml
-  - service.yaml
-  - ingress.yaml
-  - egress.yaml
-  - destination-rule.yaml

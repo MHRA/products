@@ -68,7 +68,7 @@ where
 {
     get_env(key).unwrap_or_else(|e| {
         tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
-        return default;
+        default
     })
 }
 

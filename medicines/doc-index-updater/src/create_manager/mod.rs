@@ -106,7 +106,7 @@ pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, Stri
         metadata.insert("keywords".to_string(), keywords.join(" "));
     }
 
-    return metadata;
+    metadata
 }
 
 #[cfg(test)]
