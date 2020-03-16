@@ -9,10 +9,21 @@ const pushToDataLayer = (dataLayer: any) => {
     return null;
   }
 
+  dataLayer.date = getCurrentDateString();
+
   TagManager.dataLayer({
     dataLayer,
   });
   recordHistoryForNextEvent(dataLayer.event);
+};
+
+const getCurrentDateString = () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
+
+  return yyyy + '-' + mm + '-' + dd;
 };
 
 const recordHistoryForNextEvent = (event: string) => {
