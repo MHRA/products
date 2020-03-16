@@ -1,9 +1,0 @@
-resources:
-  - ../../base
-  - SealedSecret-redis-key.yaml
-  - SealedSecret-create-queue-key.yaml
-  - SealedSecret-delete-queue-key.yaml
-
-patchesStrategicMerge:
-  - deployment.yaml
-  - ingress.yaml

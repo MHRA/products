@@ -5,61 +5,53 @@ provider "azurerm" {
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"
+    storage_account_name = "mhranonprodtfstate"
     container_name       = "tfstate"
-    storage_account_name = "tfstate4338"
     key                  = "non-prod.terraform.tfstate"
   }
 }
 
 locals {
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  products_namespace  = "mhraproductsdev"
-  cpd_name_space      = "mhracpddev"
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  namespace = "mhraproductsnonprod"
 }
 
 # website
 module "products" {
   source = "../../modules/products"
 
-  environment         = local.environment
-  location            = local.location
-  namespace           = local.products_namespace
-  resource_group_name = local.resource_group_name
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # AKS
 module cluster {
   source = "../../modules/cluster"
 
-  client_id           = local.client_id
-  client_secret       = local.client_secret
-  environment         = local.environment
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  client_id           = var.CLIENT_ID
+  client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # CPD
 module cpd {
   source = "../../modules/cpd"
 
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
-  namespace           = local.cpd_name_space
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # Service Bus
 module service_bus {
   source = "../../modules/service-bus"
 
-  client_id           = local.client_id
-  client_secret       = local.client_secret
-  environment         = local.environment
-  location            = local.location
-  name                = "doc-index-updater"
-  resource_group_name = local.resource_group_name
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  name                = "doc-index-updater-non-prod"
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }

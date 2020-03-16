@@ -1,7 +1,0 @@
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: doc-index-updater
-spec:
-  hosts:
-    - doc-index-updater.mhra.gov.uk

@@ -70,7 +70,7 @@ pub struct AzureSearchClient {
 }
 
 pub fn get_env(key: &str) -> String {
-    std::env::var(key).expect(&format!("Set env variable {} first!", key))
+    std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
 }
 
 pub fn factory() -> AzureSearchClient {
