@@ -48,7 +48,7 @@ stages:
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
               export GOOGLE_USE_DEBUG=true
-              export ROOT_URL_DOMAIN=localhost
+              export ROOT_URL_DOMAIN=.windows.net
               yarn install --frozen-lockfile
               yarn build
               yarn export
