@@ -57,7 +57,7 @@ const StyledContentWrapper = styled.main`
   }
 `;
 
-const domain = '.windows.net';
+const cookieDomain = process.env.ROOT_URL_DOMAIN as string;
 
 interface ICookieForm {
   storageAllowed: boolean;
@@ -86,7 +86,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
       const cookies = new Cookies();
       for (const cookieName of Object.keys(cookies.getAll())) {
         cookies.set(cookieName, {}, { path: '/', expires: new Date() });
-        cookies.remove(cookieName, { path: '/', domain });
+        cookies.remove(cookieName, { path: '/', domain: cookieDomain });
       }
     }
 

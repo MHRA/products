@@ -48,6 +48,7 @@ stages:
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
               export GOOGLE_USE_DEBUG=true
+              export ROOT_URL_DOMAIN=localhost
               yarn install --frozen-lockfile
               yarn build
               yarn export
@@ -64,6 +65,7 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
+              export ROOT_URL_DOMAIN=localhost
               mkdir -p cypress/screenshots
               yarn test-e2e
             displayName: Run end-to-end tests
@@ -89,6 +91,7 @@ stages:
               export AZURE_SEARCH_WORD_FUZZINESS=1
               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
               export GOOGLE_TRACKING_ID=UA-6838115-11
+              export ROOT_URL_DOMAIN=localhost
               yarn a11y
             displayName: Check accessibility
             workingDirectory: $(Build.SourcesDirectory)/medicines/web
