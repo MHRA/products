@@ -107,7 +107,7 @@ fn create_endpoint_sets_state() {
     let r = block_on(
         warp::test::request()
             .method("POST")
-            .body(document_json.clone())
+            .body(document_json)
             .path("/documents")
             .reply(&create_filter),
     );

@@ -1,4 +1,3 @@
-use lazy_static;
 use regex::Regex;
 use std::str;
 
