@@ -192,12 +192,12 @@ async fn add_to_search_index(
         "A fun title of an example document".to_string(),
     );
     file_data.insert("file_name".to_string(), "CON971821".to_string());
-    file_data.insert("metadata_storage_size".to_string(), "3131211".to_string());
+    // file_data.insert("metadata_storage_size".to_string(), "3131211".to_string());
     file_data.insert("metadata_storage_name".to_string(), blob_name.to_string());
     file_data.insert("doc_type".to_string(), "Par".to_string());
-    file_data.insert("suggestions".to_string(), "[]".to_string());
-    file_data.insert("substance_name".to_string(), "substance".to_string());
-    file_data.insert("facets".to_string(), "[]".to_string());
+    // file_data.insert("suggestions".to_string(), "[]".to_string());
+    // file_data.insert("substance_name".to_string(), "substance".to_string());
+    // file_data.insert("facets".to_string(), "[]".to_string());
 
     search_client.create(file_data).await?;
     Ok(())

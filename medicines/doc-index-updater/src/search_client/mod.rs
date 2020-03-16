@@ -192,21 +192,9 @@ async fn update_index(
     tracing::debug!("\nRequest: {:?}", &req);
     tracing::debug!("\nRequesting from URL: {}", &req.url());
 
-    let response = client
+    client
         .execute(req)
-        .await;
-    
-    let r = match response {
-        Ok(response) => {
-            tracing::info!("{:?}", response);
-            response
-        }
-        Err(e) => {
-            tracing::error!("{:?}", e);
-            return Err(e);
-        }
-    };
-
-    r.json::<AzureIndexChangedResults>()
-    .await
+        .await?
+        .json::<AzureIndexChangedResults>()
+        .await
 }
