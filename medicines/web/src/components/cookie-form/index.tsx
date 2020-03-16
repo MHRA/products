@@ -57,7 +57,7 @@ const StyledContentWrapper = styled.main`
   }
 `;
 
-const cookieDomain = process.env.ROOT_URL_DOMAIN as string;
+const cookieDomain = (process.env.ROOT_URL_DOMAIN as string) || 'localhost';
 
 interface ICookieForm {
   storageAllowed: boolean;
