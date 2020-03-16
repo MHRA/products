@@ -57,10 +57,9 @@ pub struct AzureIndexChangedResult {
 
 #[derive(Clone)]
 struct AzureConfig {
-    admin_api_key: String,
-    query_api_key: String,
     search_service: String,
     search_index: String,
+    api_key: String,
     api_version: String,
 }
 
@@ -74,8 +73,7 @@ pub fn get_env(key: &str) -> String {
 }
 
 pub fn factory() -> AzureSearchClient {
-    let admin_api_key = get_env("AZURE_SEARCH_ADMIN_API_KEY");
-    let query_api_key = get_env("AZURE_SEARCH_QUERY_API_KEY");
+    let api_key = get_env("AZURE_API_ADMIN_KEY");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
     let api_version = get_env("AZURE_SEARCH_API_VERSION");
@@ -83,8 +81,7 @@ pub fn factory() -> AzureSearchClient {
     AzureSearchClient {
         client: reqwest::Client::new(),
         config: AzureConfig {
-            admin_api_key,
-            query_api_key,
+            api_key,
             search_index,
             search_service,
             api_version,
@@ -128,7 +125,6 @@ async fn search(
         .get(&base_url)
         .query(&[
             ("api-version", config.api_version),
-            ("api-key", config.query_api_key),
             ("highlight", "content".to_string()),
             ("queryType", "full".to_string()),
             ("@count", "true".to_string()),
@@ -137,6 +133,7 @@ async fn search(
             ("search", search_term),
             ("scoringProfile", "preferKeywords".to_string()),
         ])
+        .header("api-key", &config.api_key)
         .build()?;
 
     println!("Requesting from URL: {}", &req.url());
@@ -170,7 +167,7 @@ async fn update_index(
     let req = client
         .post(&base_url)
         .query(&[("api-version", &config.api_version)])
-        .header("api-key", &config.admin_api_key)
+        .header("api-key", &config.api_key)
         .json(&body)
         .build()?;
 
