@@ -1,4 +1,5 @@
 use crate::{
+    create_manager::metadata::BlobMetadata,
     models::{CreateMessage, FileProcessStatus, JobStatus},
     search_client,
     service_bus_client::{
@@ -106,9 +107,15 @@ async fn process_message(
     .await
     .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
 
-    let metadata = metadata::derive_metadata_from_message(&message.document);
+    let metadata = metadata::derive_metadata_from_message(message.document);
     let file_digest = md5::compute(&file[..]);
-    let blob_name = create_blob(&storage_client, &file, &metadata, &file_digest).await?;
+    let blob_name = create_blob(
+        &storage_client,
+        &file,
+        metadata.clone().into(),
+        &file_digest,
+    )
+    .await?;
     tracing::info!("Uploaded blob {} for job {}", &blob_name, &message.job_id);
 
     add_to_search_index(&search_client, &blob_name, metadata).await?;
@@ -120,14 +127,14 @@ async fn process_message(
 async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
-    metadata: &HashMap<String, String>,
+    metadata: HashMap<String, String>,
     file_digest: &md5::Digest,
 ) -> Result<String, anyhow::Error> {
     let blob_name = hash::sha1(&file_data);
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
-    for (key, val) in metadata {
+    for (key, val) in &metadata {
         metadata_ref.insert(&key, &val);
     }
 
@@ -149,9 +156,8 @@ async fn create_blob(
 async fn add_to_search_index(
     search_client: &search_client::AzureSearchClient,
     blob_name: &str,
-    mut file_metadata: HashMap<String, String>,
+    file_metadata: BlobMetadata,
 ) -> Result<(), anyhow::Error> {
-    file_metadata.insert("rev_label".to_string(), "1".to_string());
     let storage_account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let container_name =
@@ -167,7 +173,7 @@ async fn add_to_search_index(
     file_data.insert("metadata_storage_path".to_string(), storage_path);
     file_data.insert(
         "product_name".to_string(),
-        file_metadata["product_name"].to_string(),
+        file_metadata.product_names_json(),
     );
     file_data.insert("created".to_string(), format!("{:?}", Instant::now()));
     file_data.insert("release_state".to_string(), "Y".to_string());
