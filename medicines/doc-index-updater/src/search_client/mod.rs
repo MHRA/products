@@ -125,7 +125,6 @@ async fn search(
         .get(&base_url)
         .query(&[
             ("api-version", config.api_version),
-            ("api-key", config.api_key),
             ("highlight", "content".to_string()),
             ("queryType", "full".to_string()),
             ("@count", "true".to_string()),
@@ -134,6 +133,7 @@ async fn search(
             ("search", search_term),
             ("scoringProfile", "preferKeywords".to_string()),
         ])
+        .header("api-key", &config.api_key)
         .build()?;
 
     println!("Requesting from URL: {}", &req.url());
