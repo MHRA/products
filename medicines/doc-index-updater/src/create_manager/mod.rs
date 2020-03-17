@@ -108,38 +108,22 @@ async fn process_message(
 
     let metadata = metadata::derive_metadata_from_message(&message.document);
     let file_digest = md5::compute(&file[..]);
-    let file_data_hash = hash::sha1(&file);
-    create_blob(
-        &storage_client,
-        &file_data_hash,
-        &file,
-        &metadata,
-        &file_digest,
-    )
-    .await?;
-    tracing::info!(
-        "Uploaded blob {} for job {}",
-        &file_data_hash,
-        &message.job_id
-    );
+    let blob_name = create_blob(&storage_client, &file, &metadata, &file_digest).await?;
+    tracing::info!("Uploaded blob {} for job {}", &blob_name, &message.job_id);
 
-    add_to_search_index(&search_client, &file_data_hash, metadata).await?;
-    tracing::info!(
-        "Added to index {} for job {}",
-        &file_data_hash,
-        &message.job_id
-    );
+    add_to_search_index(&search_client, &blob_name, metadata).await?;
+    tracing::info!("Added to index {} for job {}", blob_name, &message.job_id);
 
     Ok(FileProcessStatus::Success(message.job_id))
 }
 
 async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
-    blob_name: &str,
     file_data: &[u8],
     metadata: &HashMap<String, String>,
     file_digest: &md5::Digest,
-) -> Result<(), anyhow::Error> {
+) -> Result<String, anyhow::Error> {
+    let blob_name = hash::sha1(&file_data);
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
@@ -150,7 +134,7 @@ async fn create_blob(
     storage_client
         .put_block_blob()
         .with_container_name(&container_name)
-        .with_blob_name(blob_name)
+        .with_blob_name(&blob_name)
         .with_content_type("application/pdf")
         .with_metadata(&metadata_ref)
         .with_body(&file_data[..])
@@ -158,7 +142,8 @@ async fn create_blob(
         .finalize()
         .await
         .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
-    Ok(())
+
+    Ok(blob_name)
 }
 
 async fn add_to_search_index(

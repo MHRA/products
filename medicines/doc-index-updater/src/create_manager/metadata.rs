@@ -2,8 +2,7 @@ use crate::models::Document;
 
 use lazy_static;
 use regex::Regex;
-use std::collections::HashMap;
-use std::str;
+use std::{collections::HashMap, str};
 
 pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, String> {
     let mut metadata: HashMap<String, String> = HashMap::new();
