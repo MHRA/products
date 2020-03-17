@@ -161,7 +161,7 @@ async fn add_to_search_index(
         &storage_account, &container_name, &blob_name
     );
 
-    let mut file_data = blob.core_fields_hashmap();
+    let mut file_data = blob.index_fields_hashmap();
 
     file_data.insert("suggestions".to_string(), "[]".to_string());
     file_data.insert("created".to_string(), format!("{:?}", Instant::now()));
