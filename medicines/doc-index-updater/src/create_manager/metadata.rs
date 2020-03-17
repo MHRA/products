@@ -17,15 +17,33 @@ pub struct BlobMetadata {
 }
 
 impl BlobMetadata {
-    fn facets(&self) -> String {
+    pub fn facets(&self) -> String {
         to_json(create_facets_by_active_substance(
             self.product_names.join(", "),
             self.active_substances.clone(),
         ))
     }
 
-    pub fn product_names_json(&self) -> String {
-        to_json(self.product_names.clone())
+    pub fn core_fields_hashmap(&self) -> HashMap<String, String> {
+        let mut metadata: HashMap<String, String> = HashMap::new();
+
+        metadata.insert("file_name".to_string(), self.file_name.clone());
+        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
+        metadata.insert("title".to_string(), self.title.clone());
+        metadata.insert("pl_number".to_string(), self.pl_number.clone());
+        metadata.insert(
+            "product_name".to_string(),
+            to_json(self.product_names.clone()),
+        );
+        metadata.insert(
+            "substance_name".to_string(),
+            to_json(self.active_substances.clone()),
+        );
+        metadata.insert("facets".to_string(), self.facets());
+        if let Some(keywords) = self.keywords.clone() {
+            metadata.insert("keywords".to_string(), keywords.join(" "));
+        }
+        metadata
     }
 }
 
@@ -49,25 +67,9 @@ impl Into<BlobMetadata> for Document {
 
 impl Into<HashMap<String, String>> for BlobMetadata {
     fn into(self) -> HashMap<String, String> {
-        let mut metadata: HashMap<String, String> = HashMap::new();
-
-        metadata.insert("file_name".to_string(), self.file_name.clone());
-        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
-        metadata.insert("title".to_string(), self.title.clone());
-        metadata.insert("pl_number".to_string(), self.pl_number.clone());
-        metadata.insert(
-            "product_name".to_string(),
-            to_json(self.product_names.clone()),
-        );
-        metadata.insert(
-            "substance_name".to_string(),
-            to_json(self.active_substances.clone()),
-        );
+        let mut metadata = self.core_fields_hashmap();
+        // Seems weird that 'author' is in the blob metadata but not the index
         metadata.insert("author".to_string(), self.author.clone());
-        metadata.insert("facets".to_string(), self.facets());
-        if let Some(keywords) = self.keywords.clone() {
-            metadata.insert("keywords".to_string(), keywords.join(" "));
-        }
 
         metadata
     }

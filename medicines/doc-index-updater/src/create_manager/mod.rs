@@ -111,7 +111,7 @@ async fn process_message(
     let blob_name = create_blob(&storage_client, &file, metadata.clone().into()).await?;
     tracing::info!("Uploaded blob {} for job {}", &blob_name, &message.job_id);
 
-    add_to_search_index(&search_client, &blob_name, metadata).await?;
+    add_to_search_index(&search_client, &blob_name, metadata, file.len()).await?;
     tracing::info!("Added to index {} for job {}", blob_name, &message.job_id);
 
     Ok(FileProcessStatus::Success(message.job_id))
@@ -149,7 +149,8 @@ async fn create_blob(
 async fn add_to_search_index(
     search_client: &search_client::AzureSearchClient,
     blob_name: &str,
-    file_metadata: BlobMetadata,
+    blob: BlobMetadata,
+    file_size: usize,
 ) -> Result<(), anyhow::Error> {
     let storage_account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
@@ -160,28 +161,16 @@ async fn add_to_search_index(
         &storage_account, &container_name, &blob_name
     );
 
-    let mut file_data = HashMap::new();
-    file_data.insert("rev_label".to_string(), "1".to_string());
-    file_data.insert("@odata.context".to_string(), "https://mhraproductsdev.search.windows.net/indexes('products-index')/$metadata#docs(*)/$entity".to_string());
-    file_data.insert("metadata_storage_path".to_string(), storage_path);
-    file_data.insert(
-        "product_name".to_string(),
-        file_metadata.product_names_json(),
-    );
+    let mut file_data = blob.core_fields_hashmap();
+
+    file_data.insert("suggestions".to_string(), "[]".to_string());
     file_data.insert("created".to_string(), format!("{:?}", Instant::now()));
     file_data.insert("release_state".to_string(), "Y".to_string());
-    file_data.insert("keywords".to_string(), "".to_string());
-    file_data.insert(
-        "title".to_string(),
-        "A fun title of an example document".to_string(),
-    );
-    file_data.insert("file_name".to_string(), "CON971821".to_string());
-    // file_data.insert("metadata_storage_size".to_string(), "3131211".to_string());
+    file_data.insert("rev_label".to_string(), "1".to_string());
+    file_data.insert("@odata.context".to_string(), "https://mhraproductsdev.search.windows.net/indexes('products-index')/$metadata#docs(*)/$entity".to_string());
+    file_data.insert("metadata_storage_size".to_string(), file_size.to_string());
     file_data.insert("metadata_storage_name".to_string(), blob_name.to_string());
-    file_data.insert("doc_type".to_string(), "Par".to_string());
-    // file_data.insert("suggestions".to_string(), "[]".to_string());
-    // file_data.insert("substance_name".to_string(), "substance".to_string());
-    // file_data.insert("facets".to_string(), "[]".to_string());
+    file_data.insert("metadata_storage_path".to_string(), storage_path);
 
     search_client.create(file_data).await?;
     Ok(())
