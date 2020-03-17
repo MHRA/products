@@ -1,43 +1,74 @@
-use crate::models::Document;
+use crate::models::{Document, DocumentType};
 
 use lazy_static;
 use regex::Regex;
 use std::{collections::HashMap, str};
 
-pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, String> {
-    let mut metadata: HashMap<String, String> = HashMap::new();
+#[derive(Clone)]
+pub struct BlobMetadata {
+    file_name: String,
+    doc_type: DocumentType,
+    title: String,
+    pl_number: String,
+    product_names: Vec<String>,
+    active_substances: Vec<String>,
+    author: String,
+    keywords: Option<Vec<String>>,
+}
 
-    let file_name = sanitize(&document.id);
-    metadata.insert("file_name".to_string(), file_name);
-    metadata.insert("doc_type".to_string(), document.document_type.to_string());
-
-    let title = sanitize(&document.name);
-    let pl_numbers = extract_product_licences(&title);
-
-    metadata.insert("title".to_string(), title);
-    metadata.insert("pl_number".to_string(), pl_numbers);
-
-    let product_names = to_json(document.products.clone());
-    let product_names_csv = document.products.join(", ");
-    metadata.insert("product_name".to_string(), product_names);
-
-    let active_substances = to_json(document.active_substances.clone());
-    metadata.insert("substance_name".to_string(), active_substances);
-
-    let facets = to_json(create_facets_by_active_substance(
-        &product_names_csv,
-        document.active_substances.clone(),
-    ));
-    metadata.insert("facets".to_string(), facets);
-
-    let author = sanitize(&document.author);
-    metadata.insert("author".to_string(), author);
-
-    if let Some(keywords) = &document.keywords {
-        metadata.insert("keywords".to_string(), keywords.join(" "));
+impl BlobMetadata {
+    fn facets(&self) -> String {
+        to_json(create_facets_by_active_substance(
+            self.product_names.join(", "),
+            self.active_substances.clone(),
+        ))
     }
 
-    return metadata;
+    pub fn product_names_json(&self) -> String {
+        to_json(self.product_names.clone())
+    }
+}
+
+pub fn derive_metadata_from_message(document: Document) -> BlobMetadata {
+    let title = sanitize(&document.name);
+    let pl_number = extract_product_licences(&title);
+
+    BlobMetadata {
+        file_name: sanitize(&document.id),
+        doc_type: document.document_type,
+        title,
+        pl_number,
+        product_names: document.products,
+        active_substances: document.active_substances,
+        author: sanitize(&document.author),
+        keywords: document.keywords,
+    }
+}
+
+impl Into<HashMap<String, String>> for BlobMetadata {
+    fn into(self) -> HashMap<String, String> {
+        let mut metadata: HashMap<String, String> = HashMap::new();
+
+        metadata.insert("file_name".to_string(), self.file_name.clone());
+        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
+        metadata.insert("title".to_string(), self.title.clone());
+        metadata.insert("pl_number".to_string(), self.pl_number.clone());
+        metadata.insert(
+            "product_name".to_string(),
+            to_json(self.product_names.clone()),
+        );
+        metadata.insert(
+            "substance_name".to_string(),
+            to_json(self.active_substances.clone()),
+        );
+        metadata.insert("author".to_string(), self.author.clone());
+        metadata.insert("facets".to_string(), self.facets());
+        if let Some(keywords) = self.keywords.clone() {
+            metadata.insert("keywords".to_string(), keywords.join(" "));
+        }
+
+        metadata
+    }
 }
 
 pub fn sanitize(s: &str) -> String {
@@ -52,7 +83,7 @@ pub fn to_json(words: Vec<String>) -> String {
 }
 
 pub fn create_facets_by_active_substance(
-    product: &str,
+    product: String,
     active_substances: Vec<String>,
 ) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
@@ -133,7 +164,7 @@ mod test {
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
 
-        let output_metadata = derive_metadata_from_message(&doc);
+        let output_metadata: HashMap<String, String> = derive_metadata_from_message(doc).into();
 
         assert_eq!(output_metadata["file_name"], expected_file_name);
         assert_eq!(output_metadata["doc_type"], expected_doc_type);
@@ -164,7 +195,8 @@ mod test {
             "HYDROCHLOROTHIAZIDE".to_string(),
             "L-TEST".to_string(),
         ];
-        let product = "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS";
+        let product =
+            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned();
         let expected = vec![
             "H", 
             "H, HYDROCHLOROTHIAZIDE", 
