@@ -19,21 +19,22 @@ jobs:
         with:
           path: products
 
-      - name: Docker login
-        uses: azure/docker-login@v1
-        with:
-          login-server: mhraproductsnonprodregistry.azurecr.io
-          username: mhraproductsnonprodregistry
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Build and test Docker image (on BRANCH)
+      - name: Build and test Docker image (BRANCH only)
         if: github.ref != 'refs/heads/master'
         working-directory: ./products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-branch tag=$TAG
 
-      - name: Build, test and push Docker image (on MASTER)
+      - name: Docker login (MASTER only)
+        if: github.ref == 'refs/heads/master'
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsnonprodregistry.azurecr.io
+          username: mhraproductsnonprodregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build, test and push Docker image (MASTER only)
         if: github.ref == 'refs/heads/master'
         working-directory: ./products/medicines/doc-index-updater
         run: |
@@ -43,7 +44,7 @@ jobs:
           echo ::set-env name=TAG::$TAG
           echo ::set-env name=DIGEST::$DIGEST
 
-      - name: Clone Deployments repo
+      - name: Clone Deployments repo (MASTER only)
         uses: actions/checkout@v2
         if: github.ref == 'refs/heads/master'
         with:
@@ -51,7 +52,7 @@ jobs:
           path: deployments
           token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
 
-      - name: Update image tag
+      - name: Update image tag (MASTER only)
         uses: stefanprodan/kube-tools@v1
         if: github.ref == 'refs/heads/master'
         with:
