@@ -15,6 +15,15 @@ locals {
   namespace = "mhraproductsnonprod"
 }
 
+resource "azurerm_resource_group" "products" {
+  name     = var.RESOURCE_GROUP_PRODUCTS
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
+}
+
 # website
 module "products" {
   source = "../../modules/products"
@@ -22,7 +31,7 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # AKS
@@ -33,7 +42,7 @@ module cluster {
   client_secret       = var.CLIENT_SECRET
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # CPD
@@ -43,7 +52,7 @@ module cpd {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # Service Bus
@@ -53,5 +62,5 @@ module service_bus {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   name                = "doc-index-updater-non-prod"
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = azurerm_resource_group.products.name
 }

@@ -17,9 +17,9 @@ Never commit `.env`.
 ## To push image to Azure container registry (ACR):
 
 ```bash
-az acr login --name mhraproductsdevelopmentregistry
+az acr login --name mhraproductsnonprodregistry
 
-docker push mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+docker push mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 ```
 
 ## To run locally (by tunneling redis connection to Azure over TLS):

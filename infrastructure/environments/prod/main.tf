@@ -9,51 +9,52 @@ terraform {
   }
 }
 
-locals {
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
-  location            = var.REGION
-  environment         = var.ENVIRONMENT
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
+resource "azurerm_resource_group" "products" {
+  name     = var.RESOURCE_GROUP_PRODUCTS
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
 }
 
 # website
 module "products" {
   source = "../../modules/products"
 
-  environment         = local.environment
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # AKS
 module cluster {
   source = "../../modules/cluster"
 
-  client_id           = local.client_id
-  client_secret       = local.client_secret
-  environment         = local.environment
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  client_id           = var.CLIENT_ID
+  client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # CPD
 module cpd {
   source = "../../modules/cpd"
 
-  environment         = local.environment
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # Service Bus
 module service_bus {
   source = "../../modules/service-bus"
 
-  client_id           = local.client_id
-  client_secret       = local.client_secret
-  environment         = local.environment
-  location            = local.location
-  resource_group_name = local.resource_group_name
+  client_id           = var.CLIENT_ID
+  client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
   name                = "doc-index-updater-prod"
 }

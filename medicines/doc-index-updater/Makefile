@@ -1,5 +1,5 @@
 app := doc-index-updater
-image := mhraproductsdevelopmentregistry.azurecr.io/products/$(app)
+image := mhraproductsnonprodregistry.azurecr.io/products/$(app)
 tag := latest
 
 .PHONY: default
