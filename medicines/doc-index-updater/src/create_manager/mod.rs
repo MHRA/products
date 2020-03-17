@@ -107,15 +107,8 @@ async fn process_message(
     .await
     .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
 
-    let metadata = metadata::derive_metadata_from_message(message.document);
-    let file_digest = md5::compute(&file[..]);
-    let blob_name = create_blob(
-        &storage_client,
-        &file,
-        metadata.clone().into(),
-        &file_digest,
-    )
-    .await?;
+    let metadata: BlobMetadata = message.document.into();
+    let blob_name = create_blob(&storage_client, &file, metadata.clone().into()).await?;
     tracing::info!("Uploaded blob {} for job {}", &blob_name, &message.job_id);
 
     add_to_search_index(&search_client, &blob_name, metadata).await?;
@@ -128,9 +121,9 @@ async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
     metadata: HashMap<String, String>,
-    file_digest: &md5::Digest,
 ) -> Result<String, anyhow::Error> {
     let blob_name = hash::sha1(&file_data);
+    let file_digest = md5::compute(&file_data[..]);
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
