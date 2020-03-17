@@ -1,14 +1,3 @@
-
-resource "azurerm_resource_group" "products" {
-  name     = var.resource_group_name
-  location = var.location
-
-  tags = {
-    environment = var.environment
-  }
-}
-
-
 resource "azurerm_storage_account" "products" {
   name                     = var.namespace
   resource_group_name      = var.resource_group_name

@@ -33,11 +33,11 @@ resource "azurerm_servicebus_queue_authorization_rule" "doc_index_updater_servic
 
   count               = length(local.queue_names)
   namespace_name      = azurerm_servicebus_namespace.doc_index_updater_service_bus.name
-  queue_name          = "${local.name}-${local.queue_names[count.index]}-queue"
+  queue_name          = azurerm_servicebus_queue.doc_index_updater_service_bus_queue[count.index].name
   resource_group_name = var.resource_group_name
 
   listen = true
-  manage = true
+  manage = true # TODO: before going to prod we might want to check whether we actually need this privilege?
   send   = true
 }
 
