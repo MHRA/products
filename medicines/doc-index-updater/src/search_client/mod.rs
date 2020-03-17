@@ -102,26 +102,14 @@ impl AzureSearchClient {
     ) -> Result<AzureIndexChangedResults, reqwest::Error> {
         let mut key_value = HashMap::new();
         key_value.insert(key_name.to_string(), value.to_string());
-        update_index(
-            "delete".to_string(),
-            key_value,
-            &self.client,
-            &self.config,
-        )
-        .await
+        update_index("delete".to_string(), key_value, &self.client, &self.config).await
     }
 
     pub async fn create(
         &self,
-        key_values: HashMap<String, String>
+        key_values: HashMap<String, String>,
     ) -> Result<AzureIndexChangedResults, reqwest::Error> {
-        update_index(
-            "upload".to_string(),
-            key_values,
-            &self.client,
-            &self.config,
-        )
-        .await
+        update_index("upload".to_string(), key_values, &self.client, &self.config).await
     }
 }
 
@@ -174,7 +162,7 @@ async fn update_index(
 
     let mut azure_value = key_values;
     azure_value.insert("@search.action".to_string(), action);
-    
+
     let mut body = HashMap::new();
     body.insert("value", [azure_value]);
 
