@@ -29,19 +29,21 @@ impl BlobMetadata {
     }
 }
 
-pub fn derive_metadata_from_message(document: Document) -> BlobMetadata {
-    let title = sanitize(&document.name);
-    let pl_number = extract_product_licences(&title);
+impl Into<BlobMetadata> for Document {
+    fn into(self) -> BlobMetadata {
+        let title = sanitize(&self.name);
+        let pl_number = extract_product_licences(&title);
 
-    BlobMetadata {
-        file_name: sanitize(&document.id),
-        doc_type: document.document_type,
-        title,
-        pl_number,
-        product_names: document.products,
-        active_substances: document.active_substances,
-        author: sanitize(&document.author),
-        keywords: document.keywords,
+        BlobMetadata {
+            file_name: sanitize(&self.id),
+            doc_type: self.document_type,
+            title,
+            pl_number,
+            product_names: self.products,
+            active_substances: self.active_substances,
+            author: sanitize(&self.author),
+            keywords: self.keywords,
+        }
     }
 }
 
@@ -164,7 +166,7 @@ mod test {
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
 
-        let output_metadata: HashMap<String, String> = derive_metadata_from_message(doc).into();
+        let output_metadata: HashMap<String, String> = Into::<BlobMetadata>::into(doc).into();
 
         assert_eq!(output_metadata["file_name"], expected_file_name);
         assert_eq!(output_metadata["doc_type"], expected_doc_type);
