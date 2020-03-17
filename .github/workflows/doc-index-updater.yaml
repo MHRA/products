@@ -23,7 +23,7 @@ jobs:
         uses: azure/docker-login@v1
         with:
           login-server: mhraproductsnonprodregistry.azurecr.io
-          username: mhraproductsdevelopmentregistry
+          username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build and test Docker image (on BRANCH)
