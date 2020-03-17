@@ -1,11 +1,11 @@
 variable "REGION" {
   description = "Azure region"
-  default     = "uksouth"
+  default     = "westeurope"
 }
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products-dev"
+  default     = "adazr-rg-1001"
 }
 
 variable "CLIENT_ID" {
