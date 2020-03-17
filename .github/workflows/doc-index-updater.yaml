@@ -7,7 +7,7 @@ on:
       - .github/workflows/doc-index-updater.yaml
 
 env:
-  IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 
 jobs:
   build-and-test:
@@ -22,7 +22,7 @@ jobs:
       - name: Docker login
         uses: azure/docker-login@v1
         with:
-          login-server: mhraproductsdevelopmentregistry.azurecr.io
+          login-server: mhraproductsnonprodregistry.azurecr.io
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
