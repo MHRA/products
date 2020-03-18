@@ -43,6 +43,8 @@ module cluster {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
+  vnet_name           = "aparz-spoke-np-products"
+  subnet_name         = "adarz-spoke-products-sn-01"
 }
 
 # CPD

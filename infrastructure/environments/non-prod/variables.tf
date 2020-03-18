@@ -1,6 +1,6 @@
 variable "REGION" {
   description = "Azure region"
-  default     = "westeurope"
+  default     = "uksouth"
 }
 
 variable "RESOURCE_GROUP_PRODUCTS" {
