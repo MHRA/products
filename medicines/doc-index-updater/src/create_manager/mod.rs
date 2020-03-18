@@ -172,6 +172,10 @@ async fn add_to_search_index(
     file_data.insert("metadata_storage_name".to_string(), blob_name.to_string());
     file_data.insert("metadata_storage_path".to_string(), storage_path);
 
-    search_client.create(file_data).await?;
+    tracing::info!("Creating index entry ({:?})", file_data);
+    search_client.create(file_data).await.map_err(|e| {
+        tracing::error!("Error creating index entry ({:?})", e);
+        e
+    })?;
     Ok(())
 }
