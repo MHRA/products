@@ -10,11 +10,15 @@ variable "vnet_name" {
   description = "Virtual Network name"
 }
 
+variable "vnet_cidr" {
+  description = "CIDR block for cluster vnet"
+}
+
 variable "subnet_name" {
   description = "Subnet name"
 }
 
-variable "address_space" {
+variable "subnet_cidr" {
   description = "CIDR block for cluster subnet"
 }
 

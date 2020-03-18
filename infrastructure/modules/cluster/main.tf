@@ -18,13 +18,13 @@ resource "azurerm_virtual_network" "cluster" {
   name                = var.vnet_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  address_space       = [var.address_space]
+  address_space       = [var.vnet_cidr]
 }
 
 resource "azurerm_subnet" "cluster" {
   name                 = var.subnet_name
   resource_group_name  = var.resource_group_name
-  address_prefix       = var.address_space
+  address_prefix       = var.subnet_cidr
   virtual_network_name = azurerm_virtual_network.cluster.name
 }
 
@@ -52,7 +52,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 
   network_profile {
-    network_plugin = "kubenet"
+    network_plugin = "azure"
   }
 
   tags = {
