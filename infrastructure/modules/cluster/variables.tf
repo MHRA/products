@@ -14,6 +14,18 @@ variable "subnet_name" {
   description = "Subnet name"
 }
 
+variable "address_space" {
+  description = "CIDR block for cluster subnet"
+}
+
+variable "route_table_name" {
+  description = "Route Table name"
+}
+
+variable "route_table_resource_group_name" {
+  description = "Resource Group that hosts the Route Table"
+}
+
 variable "environment" {
   description = "Environment name to use as a tag"
 }
