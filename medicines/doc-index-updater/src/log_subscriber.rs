@@ -1,7 +1,9 @@
+use chrono::offset::Utc;
+use chrono::DateTime;
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::collections::{HashMap};
-use std::time::{SystemTime};
 use std::thread::sleep;
+use std::time::SystemTime;
 
 use tracing::debug;
 use tracing_core::{
@@ -11,7 +13,7 @@ use tracing_core::{
     subscriber::Subscriber,
 };
 
-use tracing::{Level};
+use tracing::Level;
 
 use tracing_serde::AsSerde;
 
@@ -73,14 +75,28 @@ impl Subscriber for JsonSubscriber {
         if event.metadata().level() != &Level::INFO {
             return;
         }
-    
+
+        let system_time = SystemTime::now();
+        let datetime: DateTime<Utc> = system_time.into();
+
         let json = json!({
-            "level": event.metadata().level().to_string(),
-            "timestamp": SystemTime::now()
+            "timestamp": datetime.to_rfc3339(),
+            "level": event.metadata().level().to_string() ,
+            "service_name": event.metadata().module_path(),
+            "correlation_id": "92bb6eb5-b8c8-4ad3-8e5a-65bb71e34729", // TODO
+            // "event": {
+            //   "label": "DOCUMENT_MANAGER_CREATE",
+            //   "payload": {
+
+
+            //   }
+            // },
+
+            "event_raw": event.as_serde()
         });
+
         println!("{}", json);
     }
-    
 
     fn enter(&self, span: &Id) {
         let json = json!({
@@ -95,5 +111,4 @@ impl Subscriber for JsonSubscriber {
         });
         //println!("{}", json);
     }
-
 }

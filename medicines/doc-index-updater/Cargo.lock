@@ -375,6 +375,7 @@ dependencies = [
  "azure_sdk_service_bus",
  "azure_sdk_storage_blob",
  "azure_sdk_storage_core",
+ "chrono",
  "futures",
  "hyper",
  "lazy_static",
