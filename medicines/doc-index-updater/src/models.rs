@@ -36,12 +36,15 @@ impl FromStr for JobStatus {
                     let colon_index = status.find(":").unwrap();
                     let string_length = status.chars().count();
                     return Ok(JobStatus::Error {
-                        message: status.get(colon_index+2..string_length-1).unwrap().to_string(),
+                        message: status
+                            .get(colon_index + 2..string_length - 1)
+                            .unwrap()
+                            .to_string(),
                         code: status.get(6..colon_index).unwrap().to_string(),
                     });
                 }
                 Err(format!("Status unknown: {}", status))
-            },
+            }
         }
     }
 }
