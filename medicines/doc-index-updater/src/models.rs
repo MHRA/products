@@ -29,11 +29,19 @@ impl FromStr for JobStatus {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
             "Done" => Ok(JobStatus::Done),
-            "Error" => Ok(JobStatus::Error {
-                message: "Error status".to_owned(),
-                code: "0x0".to_owned(),
-            }),
-            e => Err(format!("Status unknown: {}", e)),
+            status => {
+                // If this message is in the format "Error(error code: error message)",
+                // reconstruct it into JobStatus::Error.
+                if status.starts_with("Error(") && status.contains(":") {
+                    let colon_index = status.find(":").unwrap();
+                    let string_length = status.chars().count();
+                    return Ok(JobStatus::Error {
+                        message: status.get(colon_index+2..string_length-1).unwrap().to_string(),
+                        code: status.get(6..colon_index).unwrap().to_string(),
+                    });
+                }
+                Err(format!("Status unknown: {}", status))
+            },
         }
     }
 }
@@ -226,7 +234,10 @@ mod test {
 
     #[test_case("Accepted", Ok(JobStatus::Accepted))]
     #[test_case("Done", Ok(JobStatus::Done))]
-    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: )", Ok(JobStatus::Error {message: "".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code: "".to_owned()}))]
+    #[test_case("Error(: )", Ok(JobStatus::Error {message: "".to_owned(), code: "".to_owned()}))]
     #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
     fn test_parse_job_status(input: &str, output: Result<JobStatus, String>) {
         assert_eq!(input.parse::<JobStatus>(), output);
