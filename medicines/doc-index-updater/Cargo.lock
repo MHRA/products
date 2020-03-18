@@ -393,6 +393,7 @@ dependencies = [
  "time",
  "tokio",
  "tokio-test",
+ "tokio-trace",
  "tracing",
  "tracing-futures",
  "tracing-log",
@@ -1903,6 +1904,25 @@ checksum = "7bde02a3a5291395f59b06ec6945a3077602fac2b07eeeaf0dee2122f3619828"
 dependencies = [
  "native-tls",
  "tokio",
+]
+
+[[package]]
+name = "tokio-trace"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0660d8a4599af2d56ee3e4dde82835a6f26c80e4d60a35d639f97d2729658b31"
+dependencies = [
+ "cfg-if",
+ "tokio-trace-core",
+]
+
+[[package]]
+name = "tokio-trace-core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a9c8a256d6956f7cb5e2bdfe8b1e8022f1a09206c6c2b1ba00f3b746b260c613"
+dependencies = [
+ "lazy_static",
 ]
 
 [[package]]

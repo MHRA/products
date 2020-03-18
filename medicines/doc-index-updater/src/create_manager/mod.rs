@@ -7,11 +7,16 @@ use crate::{
     storage_client,
 };
 
+extern crate tokio_trace;
+
+use tokio_trace::Level;
+
 use anyhow::anyhow;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
+use tokio_trace::*;
 
 mod hash;
 mod metadata;
@@ -28,11 +33,13 @@ pub async fn create_service_worker(
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
 
     loop {
+        let my_span = span!(Level::INFO, "my_span", foo = 42, bar = false, baz);
         match try_process_from_queue(&mut create_client, &state_manager).await {
             Ok(()) => {}
-            Err(e) => tracing::error!("{:?}", e),
+            Err(e) => event!(Level::DEBUG, "{:?}", e),
         }
         delay_for(time_to_wait).await;
+        my_span.record("baz", &"hello world");
     }
 }
 
