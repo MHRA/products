@@ -219,6 +219,65 @@ pub enum FileProcessStatus {
     NothingToProcess,
 }
 
+#[derive(Debug, Serialize)]
+pub struct IndexEntry {
+    content: String,
+    rev_label: String,
+    metadata_storage_path: String,
+    metadata_content_type: String,
+    product_name: String,
+    metadata_language: String,
+    created: String,
+    release_state: String,
+    keywords: String,
+    title: String,
+    pl_number: Vec<String>,
+    file_name: String,
+    metadata_storage_content_type: String,
+    metadata_storage_size: u64,
+    metadata_storage_last_modified: String,
+    metadata_storage_content_md5: String,
+    metadata_storage_name: String,
+    doc_type: String,
+    suggestions: Vec<String>,
+    substance_name: Vec<String>,
+    facets: Vec<String>,
+    is_deleted: bool,
+}
+
+impl IndexEntry {
+    pub fn for_blob(metadata_storage_name: String) -> Self {
+        Self {
+            content: "Kerrison".to_owned(),
+            rev_label: "123".to_owned(),
+            product_name: "Kerrison Tablets".to_owned(),
+            created: "On Tuesday 31st February".to_owned(),
+            release_state: "Y".to_owned(),
+            keywords: "Robin James Kerrrison".to_owned(),
+            title: "Kerrison Tablets".to_owned(),
+            pl_number: vec!["PL 12345/6789".to_owned()],
+            file_name: "Kerrison.pdf".to_owned(),
+            doc_type: "PIL".to_owned(),
+            suggestions: vec![
+                "Robin".to_owned(),
+                "James".to_owned(),
+                "Kerrison".to_owned(),
+            ],
+            substance_name: vec!["Robin".to_owned()],
+            facets: vec!["R, Robin, Kerrison".to_owned()],
+            is_deleted: false,
+            metadata_storage_content_type: String::default(),
+            metadata_storage_size: 1234u64,
+            metadata_storage_last_modified: "2002-10-10T17:00:00Z".to_owned(),
+            metadata_storage_content_md5: String::default(),
+            metadata_storage_name,
+            metadata_storage_path: String::default(),
+            metadata_content_type: String::default(),
+            metadata_language: String::default(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

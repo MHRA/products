@@ -42,6 +42,7 @@ impl BlobMetadata {
         if let Some(keywords) = self.keywords.clone() {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
+        metadata.insert("pl_number".to_string(), self.pl_number.clone());
         metadata
     }
 }
@@ -69,7 +70,6 @@ impl Into<HashMap<String, String>> for BlobMetadata {
         let mut metadata = self.index_fields_hashmap();
         // The following fields are in the blob metadata but not the index
         metadata.insert("author".to_string(), self.author.clone());
-        metadata.insert("pl_number".to_string(), self.pl_number.clone());
 
         metadata
     }

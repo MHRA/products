@@ -1,3 +1,4 @@
+use crate::models::IndexEntry;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 
@@ -107,9 +108,9 @@ impl AzureSearchClient {
 
     pub async fn create(
         &self,
-        key_values: HashMap<String, String>,
-    ) -> Result<AzureIndexChangedResults, reqwest::Error> {
-        update_index("upload".to_string(), key_values, &self.client, &self.config).await
+        key_values: IndexEntry,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+        update_index_create(key_values, &self.client, &self.config).await
     }
 }
 
@@ -182,4 +183,45 @@ async fn update_index(
         .await?
         .json::<AzureIndexChangedResults>()
         .await
+}
+
+async fn update_index_create(
+    key_values: IndexEntry,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<AzureIndexChangedResults, anyhow::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs/index",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    //let mut azure_value = key_values;
+    //azure_value.insert("@search.action".to_string(), action);
+
+    let mut body = HashMap::new();
+    body.insert("value", [key_values]);
+    let body = serde_json::to_string(&body).unwrap();
+
+    let req = client
+        .post(&base_url)
+        .query(&[("api-version", &config.api_version)])
+        .header("api-key", &config.api_key)
+        .json(&body)
+        .build()?;
+
+    tracing::debug!("\nBody: {}", &body);
+    tracing::debug!("\nRequest: {:?}", &req);
+    tracing::debug!("\nRequesting from URL: {}", &req.url());
+
+    let h = client.execute(req).await?;
+
+    if h.status() == reqwest::StatusCode::OK {
+        h.json::<AzureIndexChangedResults>()
+            .await
+            .map_err(|e| anyhow::anyhow!(e))
+    } else {
+        let error_message = h.text().await?;
+        Err(anyhow::anyhow!(error_message))
+    }
 }

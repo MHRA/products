@@ -12,14 +12,13 @@ use crate::{
 use anyhow::anyhow;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-use std::{
-    collections::HashMap,
-    time::{Duration, Instant},
-};
+use search_index::add_to_search_index;
+use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 mod hash;
-mod metadata;
+pub mod metadata;
+mod search_index;
 mod sftp_client;
 
 #[tracing::instrument]
@@ -144,38 +143,4 @@ async fn create_blob(
         .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
 
     Ok(blob_name)
-}
-
-async fn add_to_search_index(
-    search_client: &search_client::AzureSearchClient,
-    blob_name: &str,
-    blob: BlobMetadata,
-    file_size: usize,
-) -> Result<(), anyhow::Error> {
-    let storage_account =
-        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-    let container_name =
-        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
-    let storage_path = format!(
-        "https://{}.blob.core.windows.net/{}/{}",
-        &storage_account, &container_name, &blob_name
-    );
-
-    let mut file_data = blob.index_fields_hashmap();
-
-    file_data.insert("suggestions".to_string(), "[]".to_string());
-    file_data.insert("created".to_string(), format!("{:?}", Instant::now()));
-    file_data.insert("release_state".to_string(), "Y".to_string());
-    file_data.insert("rev_label".to_string(), "1".to_string());
-    file_data.insert("@odata.context".to_string(), "https://mhraproductsdev.search.windows.net/indexes('products-index')/$metadata#docs(*)/$entity".to_string());
-    file_data.insert("metadata_storage_size".to_string(), file_size.to_string());
-    file_data.insert("metadata_storage_name".to_string(), blob_name.to_string());
-    file_data.insert("metadata_storage_path".to_string(), storage_path);
-
-    tracing::info!("Creating index entry ({:?})", file_data);
-    search_client.create(file_data).await.map_err(|e| {
-        tracing::error!("Error creating index entry ({:?})", e);
-        e
-    })?;
-    Ok(())
 }
