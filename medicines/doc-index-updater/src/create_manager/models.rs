@@ -1,5 +1,6 @@
 use crate::models::{Document, DocumentType};
 
+use chrono::{SecondsFormat, Utc};
 use lazy_static;
 use regex::Regex;
 use serde::Serialize;
@@ -102,7 +103,7 @@ impl IndexEntry {
             content: "Content not yet available".to_owned(),
             rev_label: "1".to_owned(),
             product_name: blob.product_names.join(", "),
-            created: String::default(),
+            created: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             release_state: "Y".to_owned(),
             keywords: blob.keywords.to_owned().unwrap_or_default().join(", "),
             title: blob.title.to_owned(),
@@ -115,7 +116,7 @@ impl IndexEntry {
             is_deleted: false,
             metadata_storage_content_type: String::default(),
             metadata_storage_size: file_size,
-            metadata_storage_last_modified: "2002-10-10T17:00:00Z".to_owned(),
+            metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             metadata_storage_content_md5: String::default(),
             metadata_storage_name,
             metadata_storage_path: String::default(),
