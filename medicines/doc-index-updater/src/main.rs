@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use core::fmt::Display;
-use doc_index_updater::{create_manager, delete_manager, document_manager, health, state_manager, log_subscriber::JsonSubscriber};
+use doc_index_updater::{create_manager, delete_manager, document_manager, health, state_manager};
 use state_manager::get_client;
 use std::{env, error, net::SocketAddr, time::Duration};
 use tracing::Level;
@@ -10,14 +10,14 @@ const PORT: u16 = 8000;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
-    let _subscriber = tracing_subscriber::fmt::Subscriber::builder()
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .json()
+        .flatten_event(true)
         .with_max_level(Level::INFO)
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();
 
-    let json_subscriber = JsonSubscriber::new();
-
-    tracing::subscriber::set_global_default(json_subscriber).expect("setting default subscriber failed");
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     tracing_log::LogTracer::init()
         .expect("error redirecting normal log messages to the tracing subscriber");
 
