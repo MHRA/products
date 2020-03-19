@@ -3,8 +3,6 @@ use crate::{
     search_client,
 };
 
-//use std::time::{Duration, Instant};
-
 pub async fn add_to_search_index(
     search_client: &search_client::AzureSearchClient,
     blob_name: &str,
