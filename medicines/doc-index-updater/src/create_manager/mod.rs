@@ -74,13 +74,15 @@ async fn try_process_from_queue(
                     == "Couldn't retrieve file: [-31] Failed opening remote file".to_string()
                 {
                     tracing::info!("Updating state to errored and removing message");
-                    let _ = state_manager.set_status(
-                        retrieval.message.job_id,
-                        JobStatus::Error {
-                            message: "Couldn't find file".to_string(),
-                            code: "404".to_string(),
-                        },
-                    );
+                    let _ = state_manager
+                        .set_status(
+                            retrieval.message.job_id,
+                            JobStatus::Error {
+                                message: "Couldn't find file".to_string(),
+                                code: "404".to_string(),
+                            },
+                        )
+                        .await?;
                     // TODO: Uncomment before releasing
                     // or when we have a centralised SFTP server for dev
                     // let _ = retrieval.remove().await?;

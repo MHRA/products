@@ -32,7 +32,7 @@ interface ISearchWrapperProps {
 
 const formatInitialSearchTerm = (searchTerm: string | string[]) => {
   if (searchTerm) {
-    return decodeURIComponent(searchTerm.toString());
+    return searchTerm.toString();
   }
   return '';
 };

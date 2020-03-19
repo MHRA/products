@@ -11,6 +11,8 @@ const PORT: u16 = 8000;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
     let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .json()
+        .flatten_event(true)
         .with_max_level(Level::INFO)
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();

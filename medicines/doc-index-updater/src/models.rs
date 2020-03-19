@@ -1,4 +1,5 @@
 use core::fmt;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -29,11 +30,18 @@ impl FromStr for JobStatus {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
             "Done" => Ok(JobStatus::Done),
-            "Error" => Ok(JobStatus::Error {
-                message: "Error status".to_owned(),
-                code: "0x0".to_owned(),
-            }),
-            e => Err(format!("Status unknown: {}", e)),
+            status => {
+                // If this message is in the format "Error(error code: error message)",
+                // reconstruct it into JobStatus::Error.
+                let error_re = Regex::new(r"^Error\((?P<code>[^:]*): (?P<message>.*)\)$").unwrap();
+                match error_re.captures(status) {
+                    Some(capture) => Ok(JobStatus::Error {
+                        message: capture.name("message").unwrap().as_str().to_string(),
+                        code: capture.name("code").unwrap().as_str().to_string(),
+                    }),
+                    None => Err(format!("Status unknown: {}", status)),
+                }
+            }
         }
     }
 }
@@ -65,19 +73,19 @@ pub enum FileSource {
     Sentinel,
 }
 
-impl Document {
-    pub fn from(doc: XMLDocument) -> Self {
-        Self {
-            id: doc.id,
-            name: doc.name,
-            document_type: doc.document_type,
-            author: doc.author,
-            products: doc
+impl Into<Document> for XMLDocument {
+    fn into(self) -> Document {
+        Document {
+            id: self.id,
+            name: self.name,
+            document_type: self.document_type,
+            author: self.author,
+            products: self
                 .products
                 .iter()
                 .map(move |active_substance| active_substance.name.clone())
                 .collect::<Vec<String>>(),
-            keywords: match doc.keywords {
+            keywords: match self.keywords {
                 Some(kw) => Some(
                     kw.iter()
                         .map(move |keyword| keyword.name.clone())
@@ -85,14 +93,14 @@ impl Document {
                 ),
                 None => None,
             },
-            pl_number: doc.pl_number,
-            active_substances: doc
+            pl_number: self.pl_number,
+            active_substances: self
                 .active_substances
                 .iter()
                 .map(move |active_substance| active_substance.name.clone())
                 .collect::<Vec<String>>(),
-            file_source: doc.file_source,
-            file_path: doc.file_path,
+            file_source: self.file_source,
+            file_path: self.file_path,
         }
     }
 }
@@ -226,7 +234,10 @@ mod test {
 
     #[test_case("Accepted", Ok(JobStatus::Accepted))]
     #[test_case("Done", Ok(JobStatus::Done))]
-    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: )", Ok(JobStatus::Error {message: "".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code: "".to_owned()}))]
+    #[test_case("Error(: )", Ok(JobStatus::Error {message: "".to_owned(), code: "".to_owned()}))]
     #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
     fn test_parse_job_status(input: &str, output: Result<JobStatus, String>) {
         assert_eq!(input.parse::<JobStatus>(), output);
