@@ -83,9 +83,7 @@ async fn try_process_from_queue(
                             },
                         )
                         .await?;
-                    // TODO: Uncomment before releasing
-                    // or when we have a centralised SFTP server for dev
-                    // let _ = retrieval.remove().await?;
+                    let _ = retrieval.remove().await?;
                 }
                 return Err(e);
             }
