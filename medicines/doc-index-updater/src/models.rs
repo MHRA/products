@@ -73,19 +73,19 @@ pub enum FileSource {
     Sentinel,
 }
 
-impl Document {
-    pub fn from(doc: XMLDocument) -> Self {
-        Self {
-            id: doc.id,
-            name: doc.name,
-            document_type: doc.document_type,
-            author: doc.author,
-            products: doc
+impl Into<Document> for XMLDocument {
+    fn into(self) -> Document {
+        Document {
+            id: self.id,
+            name: self.name,
+            document_type: self.document_type,
+            author: self.author,
+            products: self
                 .products
                 .iter()
                 .map(move |active_substance| active_substance.name.clone())
                 .collect::<Vec<String>>(),
-            keywords: match doc.keywords {
+            keywords: match self.keywords {
                 Some(kw) => Some(
                     kw.iter()
                         .map(move |keyword| keyword.name.clone())
@@ -93,14 +93,14 @@ impl Document {
                 ),
                 None => None,
             },
-            pl_number: doc.pl_number,
-            active_substances: doc
+            pl_number: self.pl_number,
+            active_substances: self
                 .active_substances
                 .iter()
                 .map(move |active_substance| active_substance.name.clone())
                 .collect::<Vec<String>>(),
-            file_source: doc.file_source,
-            file_path: doc.file_path,
+            file_source: self.file_source,
+            file_path: self.file_path,
         }
     }
 }
