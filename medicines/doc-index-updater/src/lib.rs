@@ -10,4 +10,3 @@ pub mod search_client;
 pub mod service_bus_client;
 pub mod state_manager;
 pub mod storage_client;
-pub mod log_subscriber;

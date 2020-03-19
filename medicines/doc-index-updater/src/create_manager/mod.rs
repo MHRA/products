@@ -12,7 +12,6 @@ use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
-use tracing::{event, span, Level};
 
 mod hash;
 mod metadata;
@@ -28,16 +27,14 @@ pub async fn create_service_worker(
         .await
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
     loop {
-
         match try_process_from_queue(&mut create_client, &state_manager).await {
             Ok(()) => {}
-            Err(e) => event!(Level::ERROR, "{:?}", e),
+            Err(e) => tracing::error!("{:?}", e),
         }
         delay_for(time_to_wait).await;
     }
 }
 
-#[tracing::instrument(skip(service_bus_client))]
 async fn try_process_from_queue(
     service_bus_client: &mut DocIndexUpdaterQueue,
     state_manager: &StateManager,
