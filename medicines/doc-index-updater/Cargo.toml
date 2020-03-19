@@ -13,6 +13,7 @@ azure_sdk_service_bus = { git = "https://github.com/redbadger/AzureSDKForRust", 
 azure_sdk_storage_blob = { git = "https://github.com/redbadger/AzureSDKForRust", branch = "service-bus-peek-lock-timeout" }
 azure_sdk_storage_core = { git = "https://github.com/redbadger/AzureSDKForRust", branch = "service-bus-peek-lock-timeout" }
 chrono = "0.4.11"
+base64 = "0.12.0"
 futures = "0.3.4"
 hyper = "0.13"
 lazy_static = "1.4.0"
