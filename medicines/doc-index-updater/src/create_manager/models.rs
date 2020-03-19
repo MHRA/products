@@ -37,8 +37,12 @@ impl Into<BlobMetadata> for Document {
             doc_type: self.document_type,
             title,
             pl_number,
-            product_names: self.products,
-            active_substances: self.active_substances,
+            product_names: self.products.iter().map(|a| a.to_uppercase()).collect(),
+            active_substances: self
+                .active_substances
+                .iter()
+                .map(|a| a.to_uppercase())
+                .collect(),
             author: sanitize(&self.author),
             keywords: self.keywords,
         }
@@ -149,17 +153,11 @@ pub fn create_facets_by_active_substance(
     let mut facets: Vec<String> = active_substances
         .iter()
         .map(|a| {
-            let a = a.to_uppercase();
             let first = a.chars().next().unwrap();
             vec![
                 first.to_string(),
                 [first.to_string(), a.to_string()].join(", "),
-                [
-                    first.to_string(),
-                    a.to_string(),
-                    product.to_uppercase().to_string(),
-                ]
-                .join(", "),
+                [first.to_string(), a.to_string(), product.to_string()].join(", "),
             ]
         })
         .flatten()
@@ -225,8 +223,8 @@ mod test {
         let expected_doc_type = "Spc".to_string();
         let expected_title = "Paracetamol Plus PL 12345/6789".to_string();
         let expected_author = "JRR Tolkien".to_string();
-        let expected_product_name = "[\"Effective product 1\",\"Effective product 2\"]".to_string();
-        let expected_substance_name = "[\"Paracetamol\",\"Caffeine\"]".to_string();
+        let expected_product_name = "[\"EFFECTIVE PRODUCT 1\",\"EFFECTIVE PRODUCT 2\"]".to_string();
+        let expected_substance_name = "[\"PARACETAMOL\",\"CAFFEINE\"]".to_string();
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
 
