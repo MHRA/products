@@ -1,7 +1,6 @@
 extern crate base64;
 
 use regex::Regex;
-use warp::{Filter, Rejection};
 
 #[derive(Clone, Debug)]
 pub struct AuthenticationFailed;
@@ -52,6 +51,18 @@ fn extract_credentials_from_base64_string(encoded_credentials: String) -> Option
     }
 }
 
+pub fn attempt_basic_auth(auth_header: String) -> bool {
+    if let Some(base64) = extract_auth_from_header(auth_header) {
+        if let Some((username, password)) = extract_credentials_from_base64_string(base64) {
+            auth_is_correct(username, password)
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -61,14 +72,12 @@ mod test {
     fn get_basic_username_works() {
         std::env::set_var("BASIC_AUTH_USERNAME", "username");
         assert_eq!(get_basic_username(), "username".to_string());
-        std::env::remove_var("BASIC_AUTH_USERNAME");
     }
 
     #[test]
     fn get_basic_password_works() {
         std::env::set_var("BASIC_AUTH_PASSWORD", "password");
         assert_eq!(get_basic_password(), "password".to_string());
-        std::env::remove_var("BASIC_AUTH_PASSWORD");
     }
 
     #[test]
@@ -87,8 +96,6 @@ mod test {
             auth_is_correct("username".to_owned(), "not_password".to_owned()),
             false
         );
-        std::env::remove_var("BASIC_AUTH_USERNAME");
-        std::env::remove_var("BASIC_AUTH_PASSWORD");
     }
 
     #[test_case("Weird String", None)]
@@ -105,5 +112,14 @@ mod test {
     #[test_case("Not an auth string", None)]
     fn extracting_base64_creds_works(input: &str, output: Option<String>) {
         assert_eq!(extract_auth_from_header(input.to_string()), output);
+    }
+
+    #[test_case("Basic dXNlcm5hbWU6cGFzc3dvcmQ=".to_string(), true)]
+    #[test_case("Bearer dXNlcm5hbWU6cGFzc3dvcmQ=".to_string(), false)]
+    #[test_case("".to_string(), false)]
+    fn attempt_basic_auth_works(input: String, output: bool) {
+        std::env::set_var("BASIC_AUTH_USERNAME", "username");
+        std::env::set_var("BASIC_AUTH_PASSWORD", "password");
+        assert_eq!(attempt_basic_auth(input), output);
     }
 }
