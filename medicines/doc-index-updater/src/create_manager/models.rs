@@ -24,28 +24,6 @@ impl BlobMetadata {
             self.active_substances.clone(),
         )
     }
-
-    pub fn index_fields_hashmap(&self) -> HashMap<String, String> {
-        let mut metadata: HashMap<String, String> = HashMap::new();
-
-        metadata.insert("file_name".to_string(), self.file_name.clone());
-        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
-        metadata.insert("title".to_string(), self.title.clone());
-        metadata.insert(
-            "product_name".to_string(),
-            to_json(self.product_names.clone()),
-        );
-        metadata.insert(
-            "substance_name".to_string(),
-            to_json(self.active_substances.clone()),
-        );
-        metadata.insert("facets".to_string(), to_json(self.facets()));
-        if let Some(keywords) = self.keywords.clone() {
-            metadata.insert("keywords".to_string(), keywords.join(" "));
-        }
-        metadata.insert("pl_number".to_string(), self.pl_number.clone());
-        metadata
-    }
 }
 
 impl Into<BlobMetadata> for Document {
@@ -68,8 +46,24 @@ impl Into<BlobMetadata> for Document {
 
 impl Into<HashMap<String, String>> for BlobMetadata {
     fn into(self) -> HashMap<String, String> {
-        let mut metadata = self.index_fields_hashmap();
-        // The following fields are in the blob metadata but not the index
+        let mut metadata: HashMap<String, String> = HashMap::new();
+
+        metadata.insert("file_name".to_string(), self.file_name.clone());
+        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
+        metadata.insert("title".to_string(), self.title.clone());
+        metadata.insert(
+            "product_name".to_string(),
+            to_json(self.product_names.clone()),
+        );
+        metadata.insert(
+            "substance_name".to_string(),
+            to_json(self.active_substances.clone()),
+        );
+        metadata.insert("facets".to_string(), to_json(self.facets()));
+        if let Some(keywords) = self.keywords.clone() {
+            metadata.insert("keywords".to_string(), keywords.join(" "));
+        }
+        metadata.insert("pl_number".to_string(), self.pl_number.clone());
         metadata.insert("author".to_string(), self.author.clone());
 
         metadata
