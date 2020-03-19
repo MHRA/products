@@ -201,16 +201,17 @@ async fn update_index_create(
 
     let mut body = HashMap::new();
     body.insert("value", [key_values]);
-    let body = serde_json::to_string(&body).unwrap();
+    //let body = serde_json::to_string(&body).unwrap();
 
     let req = client
         .post(&base_url)
         .query(&[("api-version", &config.api_version)])
         .header("api-key", &config.api_key)
+        .header("Content-Type", "application/json")
         .json(&body)
         .build()?;
 
-    tracing::debug!("\nBody: {}", &body);
+    tracing::debug!("\nBody: {:?}", &body);
     tracing::debug!("\nRequest: {:?}", &req);
     tracing::debug!("\nRequesting from URL: {}", &req.url());
 
