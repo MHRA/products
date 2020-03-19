@@ -1,6 +1,8 @@
 extern crate base64;
 
+use futures::future;
 use regex::Regex;
+use warp::{Filter, Rejection};
 
 #[derive(Clone, Debug)]
 pub struct AuthenticationFailed;
@@ -51,7 +53,7 @@ fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
     }
 }
 
-pub fn attempt_basic_auth(auth_header: String) -> bool {
+fn attempt_basic_auth(auth_header: String) -> bool {
     if let Some(encoded_creds) = extract_encoded_credentials(auth_header) {
         if let Some((username, password)) = decode_credentials(encoded_creds) {
             auth_is_correct(username, password)
@@ -61,6 +63,18 @@ pub fn attempt_basic_auth(auth_header: String) -> bool {
     } else {
         false
     }
+}
+
+pub fn with_basic_auth() -> impl Filter<Extract = (), Error = Rejection> + Copy {
+    warp::header::optional::<String>("Authorization")
+        .and_then(|header: Option<String>| match header {
+            Some(auth_header) => match attempt_basic_auth(auth_header) {
+                true => future::ok(()),
+                false => future::err(warp::reject::custom(AuthenticationFailed)),
+            },
+            None => future::err(warp::reject::custom(AuthenticationFailed)),
+        })
+        .untuple_one()
 }
 
 #[cfg(test)]
