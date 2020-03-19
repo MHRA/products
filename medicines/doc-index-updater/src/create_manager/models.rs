@@ -1,4 +1,7 @@
-use crate::models::{Document, DocumentType};
+use crate::{
+    create_manager::Blob,
+    models::{Document, DocumentType},
+};
 
 use chrono::{SecondsFormat, Utc};
 use lazy_static;
@@ -102,33 +105,33 @@ pub struct IndexEntry {
 }
 
 impl IndexEntry {
-    pub fn for_blob(
-        metadata_storage_name: String,
-        blob: BlobMetadata,
-        file_size: usize,
-        storage_path: String,
-    ) -> Self {
+    pub fn for_blob(blob: Blob) -> Self {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: "1".to_owned(),
-            product_name: blob.product_names.join(", "),
+            product_name: blob.metadata.product_names.join(", "),
             created: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             release_state: "Y".to_owned(),
-            keywords: blob.keywords.to_owned().unwrap_or_default().join(", "),
-            title: blob.title.to_owned(),
-            pl_number: vec![blob.pl_number.to_owned()],
-            file_name: blob.file_name.to_owned(),
-            doc_type: blob.doc_type.to_string(),
+            keywords: blob
+                .metadata
+                .keywords
+                .to_owned()
+                .unwrap_or_default()
+                .join(", "),
+            title: blob.metadata.title.to_owned(),
+            pl_number: vec![blob.metadata.pl_number.to_owned()],
+            file_name: blob.metadata.file_name.to_owned(),
+            doc_type: blob.metadata.doc_type.to_string(),
             suggestions: vec![],
-            substance_name: blob.active_substances.clone(),
-            facets: blob.facets(),
+            substance_name: blob.metadata.active_substances.clone(),
+            facets: blob.metadata.facets(),
             is_deleted: false,
             metadata_storage_content_type: String::default(),
-            metadata_storage_size: file_size,
+            metadata_storage_size: blob.size,
             metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             metadata_storage_content_md5: String::default(),
-            metadata_storage_name,
-            metadata_storage_path: storage_path,
+            metadata_storage_name: blob.name.to_owned(),
+            metadata_storage_path: blob.path.to_owned(),
             metadata_content_type: String::default(),
             metadata_language: String::default(),
         }
