@@ -1,4 +1,5 @@
 use core::fmt;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -29,11 +30,18 @@ impl FromStr for JobStatus {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
             "Done" => Ok(JobStatus::Done),
-            "Error" => Ok(JobStatus::Error {
-                message: "Error status".to_owned(),
-                code: "0x0".to_owned(),
-            }),
-            e => Err(format!("Status unknown: {}", e)),
+            status => {
+                // If this message is in the format "Error(error code: error message)",
+                // reconstruct it into JobStatus::Error.
+                let error_re = Regex::new(r"^Error\((?P<code>[^:]*): (?P<message>.*)\)$").unwrap();
+                match error_re.captures(status) {
+                    Some(capture) => Ok(JobStatus::Error {
+                        message: capture.name("message").unwrap().as_str().to_string(),
+                        code: capture.name("code").unwrap().as_str().to_string(),
+                    }),
+                    None => Err(format!("Status unknown: {}", status)),
+                }
+            }
         }
     }
 }
@@ -226,7 +234,10 @@ mod test {
 
     #[test_case("Accepted", Ok(JobStatus::Accepted))]
     #[test_case("Done", Ok(JobStatus::Done))]
-    #[test_case("Error", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(0x0: )", Ok(JobStatus::Error {message: "".to_owned(), code:"0x0".to_owned()}))]
+    #[test_case("Error(: Error status)", Ok(JobStatus::Error {message:"Error status".to_owned(), code: "".to_owned()}))]
+    #[test_case("Error(: )", Ok(JobStatus::Error {message: "".to_owned(), code: "".to_owned()}))]
     #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
     fn test_parse_job_status(input: &str, output: Result<JobStatus, String>) {
         assert_eq!(input.parse::<JobStatus>(), output);
