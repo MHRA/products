@@ -1,4 +1,4 @@
-use crate::{create_manager::metadata::BlobMetadata, models::IndexEntry, search_client};
+use crate::{create_manager::models::BlobMetadata, models::IndexEntry, search_client};
 
 //use std::time::{Duration, Instant};
 

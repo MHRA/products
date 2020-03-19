@@ -1,4 +1,6 @@
 use crate::models::IndexEntry;
+use core::fmt::Debug;
+use serde::ser::Serialize;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 
@@ -100,17 +102,19 @@ impl AzureSearchClient {
         &self,
         key_name: &str,
         value: &str,
-    ) -> Result<AzureIndexChangedResults, reqwest::Error> {
-        let mut key_value = HashMap::new();
-        key_value.insert(key_name.to_string(), value.to_string());
-        update_index("delete".to_string(), key_value, &self.client, &self.config).await
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+        let mut key_values = HashMap::new();
+        key_values.insert(key_name.to_string(), value.to_string());
+        key_values.insert("@search.action".to_string(), "delete".to_string());
+
+        update_index(key_values, &self.client, &self.config).await
     }
 
     pub async fn create(
         &self,
         key_values: IndexEntry,
     ) -> Result<AzureIndexChangedResults, anyhow::Error> {
-        update_index_create(key_values, &self.client, &self.config).await
+        update_index(key_values, &self.client, &self.config).await
     }
 }
 
@@ -149,59 +153,22 @@ async fn search(
         .await
 }
 
-async fn update_index(
-    action: String,
-    key_values: HashMap<String, String>,
+async fn update_index<T>(
+    key_values: T,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<AzureIndexChangedResults, reqwest::Error> {
+) -> Result<AzureIndexChangedResults, anyhow::Error>
+where
+    T: Serialize + Sized + Debug,
+{
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs/index",
         search_service = config.search_service,
         search_index = config.search_index
     );
-
-    let mut azure_value = key_values;
-    azure_value.insert("@search.action".to_string(), action);
-
-    let mut body = HashMap::new();
-    body.insert("value", [azure_value]);
-
-    let req = client
-        .post(&base_url)
-        .query(&[("api-version", &config.api_version)])
-        .header("api-key", &config.api_key)
-        .json(&body)
-        .build()?;
-
-    tracing::debug!("\nBody: {:?}", &body);
-    tracing::debug!("\nRequest: {:?}", &req);
-    tracing::debug!("\nRequesting from URL: {}", &req.url());
-
-    client
-        .execute(req)
-        .await?
-        .json::<AzureIndexChangedResults>()
-        .await
-}
-
-async fn update_index_create(
-    key_values: IndexEntry,
-    client: &reqwest::Client,
-    config: &AzureConfig,
-) -> Result<AzureIndexChangedResults, anyhow::Error> {
-    let base_url = format!(
-        "https://{search_service}.search.windows.net/indexes/{search_index}/docs/index",
-        search_service = config.search_service,
-        search_index = config.search_index
-    );
-
-    //let mut azure_value = key_values;
-    //azure_value.insert("@search.action".to_string(), action);
 
     let mut body = HashMap::new();
     body.insert("value", [key_values]);
-    //let body = serde_json::to_string(&body).unwrap();
 
     let req = client
         .post(&base_url)

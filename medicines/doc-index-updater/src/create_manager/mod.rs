@@ -1,5 +1,5 @@
 use crate::{
-    create_manager::metadata::BlobMetadata,
+    create_manager::models::BlobMetadata,
     models::{CreateMessage, FileProcessStatus, JobStatus},
     search_client,
     service_bus_client::{
@@ -17,7 +17,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 mod hash;
-pub mod metadata;
+mod models;
 mod search_index;
 mod sftp_client;
 
