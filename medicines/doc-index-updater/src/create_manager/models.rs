@@ -98,7 +98,12 @@ pub struct IndexEntry {
 }
 
 impl IndexEntry {
-    pub fn for_blob(metadata_storage_name: String, blob: BlobMetadata, file_size: usize) -> Self {
+    pub fn for_blob(
+        metadata_storage_name: String,
+        blob: BlobMetadata,
+        file_size: usize,
+        storage_path: String,
+    ) -> Self {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: "1".to_owned(),
@@ -119,7 +124,7 @@ impl IndexEntry {
             metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             metadata_storage_content_md5: String::default(),
             metadata_storage_name,
-            metadata_storage_path: String::default(),
+            metadata_storage_path: storage_path,
             metadata_content_type: String::default(),
             metadata_language: String::default(),
         }
