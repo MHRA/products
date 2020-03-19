@@ -26,7 +26,6 @@ pub async fn create_service_worker(
     let mut create_client = create_factory()
         .await
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
-
     loop {
         match try_process_from_queue(&mut create_client, &state_manager).await {
             Ok(()) => {}
