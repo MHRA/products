@@ -143,11 +143,17 @@ pub fn create_facets_by_active_substance(
     let mut facets: Vec<String> = active_substances
         .iter()
         .map(|a| {
+            let a = a.to_uppercase();
             let first = a.chars().next().unwrap();
             vec![
                 first.to_string(),
                 [first.to_string(), a.to_string()].join(", "),
-                [first.to_string(), a.to_string(), product.to_string()].join(", "),
+                [
+                    first.to_string(),
+                    a.to_string(),
+                    product.to_uppercase().to_string(),
+                ]
+                .join(", "),
             ]
         })
         .flatten()
