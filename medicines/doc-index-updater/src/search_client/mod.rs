@@ -1,4 +1,4 @@
-use crate::models::IndexEntry;
+use crate::create_manager::models::IndexEntry;
 use core::fmt::Debug;
 use serde::ser::Serialize;
 use serde_derive::Deserialize;

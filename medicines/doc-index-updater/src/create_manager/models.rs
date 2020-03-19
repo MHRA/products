@@ -2,6 +2,7 @@ use crate::models::{Document, DocumentType};
 
 use lazy_static;
 use regex::Regex;
+use serde::Serialize;
 use std::{collections::HashMap, str};
 
 #[derive(Clone)]
@@ -17,11 +18,11 @@ pub struct BlobMetadata {
 }
 
 impl BlobMetadata {
-    fn facets(&self) -> String {
-        to_json(create_facets_by_active_substance(
+    fn facets(&self) -> Vec<String> {
+        create_facets_by_active_substance(
             self.product_names.join(", "),
             self.active_substances.clone(),
-        ))
+        )
     }
 
     pub fn index_fields_hashmap(&self) -> HashMap<String, String> {
@@ -38,7 +39,7 @@ impl BlobMetadata {
             "substance_name".to_string(),
             to_json(self.active_substances.clone()),
         );
-        metadata.insert("facets".to_string(), self.facets());
+        metadata.insert("facets".to_string(), to_json(self.facets()));
         if let Some(keywords) = self.keywords.clone() {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
@@ -72,6 +73,61 @@ impl Into<HashMap<String, String>> for BlobMetadata {
         metadata.insert("author".to_string(), self.author.clone());
 
         metadata
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct IndexEntry {
+    content: String,
+    rev_label: String,
+    metadata_storage_path: String,
+    metadata_content_type: String,
+    product_name: String,
+    metadata_language: String,
+    created: String,
+    release_state: String,
+    keywords: String,
+    title: String,
+    pl_number: Vec<String>,
+    file_name: String,
+    metadata_storage_content_type: String,
+    metadata_storage_size: usize,
+    metadata_storage_last_modified: String,
+    metadata_storage_content_md5: String,
+    metadata_storage_name: String,
+    doc_type: String,
+    suggestions: Vec<String>,
+    substance_name: Vec<String>,
+    facets: Vec<String>,
+    is_deleted: bool,
+}
+
+impl IndexEntry {
+    pub fn for_blob(metadata_storage_name: String, blob: BlobMetadata, file_size: usize) -> Self {
+        Self {
+            content: "Content not yet available".to_owned(),
+            rev_label: "1".to_owned(),
+            product_name: blob.product_names.join(", "),
+            created: String::default(),
+            release_state: "Y".to_owned(),
+            keywords: blob.keywords.to_owned().unwrap_or_default().join(", "),
+            title: blob.title.to_owned(),
+            pl_number: vec![blob.pl_number.to_owned()],
+            file_name: blob.file_name.to_owned(),
+            doc_type: blob.doc_type.to_string(),
+            suggestions: vec![],
+            substance_name: blob.active_substances.clone(),
+            facets: blob.facets(),
+            is_deleted: false,
+            metadata_storage_content_type: String::default(),
+            metadata_storage_size: file_size,
+            metadata_storage_last_modified: "2002-10-10T17:00:00Z".to_owned(),
+            metadata_storage_content_md5: String::default(),
+            metadata_storage_name,
+            metadata_storage_path: String::default(),
+            metadata_content_type: String::default(),
+            metadata_language: String::default(),
+        }
     }
 }
 

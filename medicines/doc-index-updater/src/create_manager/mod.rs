@@ -17,7 +17,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 mod hash;
-mod models;
+pub mod models;
 mod search_index;
 mod sftp_client;
 
