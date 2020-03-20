@@ -1,4 +1,3 @@
-use crate::auth_manager;
 use warp::{
     reply::{Json, Xml},
     Filter, Rejection, Reply,
