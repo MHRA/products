@@ -46,6 +46,7 @@ async fn try_process_from_queue(
         match processing_result {
             Ok(job_id) => {
                 let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
+                let _ = retrieval.remove().await?;
             }
             Err(e) => {
                 tracing::error!(
@@ -66,9 +67,9 @@ async fn try_process_from_queue(
                         },
                     )
                     .await?;
+                let _ = retrieval.remove().await?;
             }
         };
-        let _ = retrieval.remove().await?;
     }
     Ok(())
 }
