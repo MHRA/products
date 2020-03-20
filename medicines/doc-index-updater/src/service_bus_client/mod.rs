@@ -1,5 +1,9 @@
-use crate::models::Message;
+use crate::{
+    models::{JobStatus, Message},
+    state_manager::StateManager,
+};
 use anyhow::anyhow;
+use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
@@ -63,12 +67,12 @@ impl Error for RetrieveFromQueueError {
     }
 }
 
-pub struct RetrievedMessage<T> {
+pub struct RetrievedMessage<T: Message> {
     pub message: T,
     peek_lock: PeekLockResponse,
 }
 
-impl<T> RetrievedMessage<T> {
+impl<T: Message> RetrievedMessage<T> {
     pub async fn remove(&self) -> Result<String, anyhow::Error> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
@@ -77,6 +81,15 @@ impl<T> RetrievedMessage<T> {
         tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
         Ok(queue_removal_result)
     }
+}
+
+#[async_trait]
+pub trait ProcessRetrievalError {
+    async fn handle_processing_error(
+        self,
+        e: anyhow::Error,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<()>;
 }
 
 impl DocIndexUpdaterQueue {
@@ -130,5 +143,37 @@ impl DocIndexUpdaterQueue {
     ) -> Result<(), AzureError> {
         let evt = message.to_json_string()?;
         Ok(self.service_bus.send_event(evt.as_str(), duration).await?)
+    }
+
+    pub async fn try_process_from_queue<T>(
+        &mut self,
+        state_manager: &StateManager,
+    ) -> Result<(), anyhow::Error>
+    where
+        T: Message,
+        RetrievedMessage<T>: ProcessRetrievalError,
+    {
+        tracing::info!("Checking for messages");
+        let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
+            self.receive().await;
+
+        if let Ok(retrieval) = retrieved_result {
+            let processing_result = retrieval.message.clone().process().await;
+            match processing_result {
+                Ok(job_id) => {
+                    state_manager.set_status(job_id, JobStatus::Done).await?;
+                    retrieval.remove().await?;
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Error {:?} while processing message {}",
+                        e,
+                        retrieval.message.get_id()
+                    );
+                    retrieval.handle_processing_error(e, &state_manager).await?;
+                }
+            };
+        }
+        Ok(())
     }
 }

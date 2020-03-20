@@ -2,15 +2,14 @@ use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus, Message},
     search_client,
-    service_bus_client::{
-        create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
-    },
+    service_bus_client::{create_factory, ProcessRetrievalError, RetrievedMessage},
     state_manager::StateManager,
     storage_client,
 };
 use uuid::Uuid;
 
 use anyhow::anyhow;
+use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use search_index::add_blob_to_search_index;
@@ -33,7 +32,10 @@ pub async fn create_service_worker(
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
 
     loop {
-        match try_process_from_queue(&mut create_client, &state_manager).await {
+        match create_client
+            .try_process_from_queue::<CreateMessage>(&state_manager)
+            .await
+        {
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
@@ -41,44 +43,30 @@ pub async fn create_service_worker(
     }
 }
 
-async fn try_process_from_queue(
-    service_bus_client: &mut DocIndexUpdaterQueue,
-    state_manager: &StateManager,
-) -> Result<(), anyhow::Error> {
-    tracing::info!("Checking for create messages");
-    let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
-        service_bus_client.receive().await;
-
-    if let Ok(retrieval) = retrieved_result {
-        let processing_result = retrieval.message.clone().process().await;
-        match processing_result {
-            Ok(job_id) => {
-                state_manager.set_status(job_id, JobStatus::Done).await?;
-                retrieval.remove().await?;
-            }
-            Err(e) => {
-                tracing::error!(
-                    "Error {:?} while processing message {}",
-                    e,
-                    retrieval.message.job_id
-                );
-                handle_processing_error(e, &state_manager, retrieval).await?;
-            }
-        };
+#[async_trait]
+impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
+    async fn handle_processing_error(
+        self,
+        e: anyhow::Error,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<()> {
+        handle_processing_error(e, state_manager, self).await
     }
-    Ok(())
 }
 
-async fn handle_processing_error(
+async fn handle_processing_error<T>(
     e: anyhow::Error,
     state_manager: &StateManager,
-    retrieval: RetrievedMessage<CreateMessage>,
-) -> anyhow::Result<()> {
+    retrieval: RetrievedMessage<T>,
+) -> anyhow::Result<()>
+where
+    T: Message,
+{
     if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
         tracing::info!("Updating state to errored and removing message");
         let _ = state_manager
             .set_status(
-                retrieval.message.job_id,
+                retrieval.message.get_id(),
                 JobStatus::Error {
                     message: "Couldn't find file".to_string(),
                     code: "404".to_string(),

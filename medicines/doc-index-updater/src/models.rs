@@ -192,7 +192,8 @@ pub struct DeleteMessage {
 }
 
 #[async_trait]
-pub trait Message: Sized + FromStr {
+pub trait Message: Sized + FromStr + Clone {
+    fn get_id(&self) -> Uuid;
     fn to_json_string(&self) -> Result<String, serde_json::Error>;
     async fn process(self) -> Result<Uuid, anyhow::Error>;
 }
@@ -215,6 +216,10 @@ impl FromStr for DeleteMessage {
 
 #[async_trait]
 impl Message for CreateMessage {
+    fn get_id(&self) -> Uuid {
+        self.job_id
+    }
+
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
@@ -225,6 +230,10 @@ impl Message for CreateMessage {
 
 #[async_trait]
 impl Message for DeleteMessage {
+    fn get_id(&self) -> Uuid {
+        self.job_id
+    }
+
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
