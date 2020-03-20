@@ -1,4 +1,5 @@
 use crate::{
+    auth_manager,
     models::{
         CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLDocument,
         XMLJobStatusResponse,
@@ -14,9 +15,9 @@ use warp::{
 };
 
 #[derive(Debug)]
-struct FailedToDispatchToQueue;
+pub struct FailedToDispatchToQueue;
 #[derive(Debug)]
-struct FailedToDeserialize;
+pub struct FailedToDeserialize;
 impl warp::reject::Reject for FailedToDispatchToQueue {}
 impl warp::reject::Reject for FailedToDeserialize {}
 
@@ -100,6 +101,7 @@ pub fn delete_document(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
+        .and(auth_manager::with_basic_auth())
         .and(with_state(state_manager))
         .and_then(delete_document_json_handler)
 }
@@ -109,6 +111,7 @@ pub fn delete_document_xml(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents" / String)
         .and(warp::delete())
+        .and(auth_manager::with_basic_auth())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(with_state(state_manager))
         .and_then(delete_document_xml_handler)
@@ -119,6 +122,7 @@ pub fn check_in_document(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents")
         .and(warp::post())
+        .and(auth_manager::with_basic_auth())
         .and(warp::body::json())
         .and(with_state(state_manager))
         .and_then(check_in_document_json_handler)
@@ -129,6 +133,7 @@ pub fn check_in_xml_document(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("documents")
         .and(warp::post())
+        .and(auth_manager::with_basic_auth())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
         .and(warp::body::xml_enforce_strict_content_type::<XMLDocument>())
         .map(Into::<Document>::into)

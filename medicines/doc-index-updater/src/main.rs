@@ -41,7 +41,8 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
-                health::get_health()
+                health::get_health_xml()
+                    .or(health::get_health())
                     .or(state_manager::get_job_status(state.clone()))
                     .or(state_manager::set_job_status(state.clone()))
                     .or(document_manager::check_in_xml_document(state.clone()))
