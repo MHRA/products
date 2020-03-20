@@ -1,5 +1,5 @@
 use crate::{
-    models::{DeleteMessage, JobStatus},
+    models::{DeleteMessage, JobStatus, Message},
     search_client,
     service_bus_client::{
         delete_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
@@ -42,7 +42,7 @@ async fn try_process_from_queue(
         service_bus_client.receive().await;
 
     if let Ok(retrieval) = retrieved_result {
-        let processing_result = process_message(retrieval.message.clone()).await;
+        let processing_result = retrieval.message.clone().process().await;
         match processing_result {
             Ok(job_id) => {
                 state_manager.set_status(job_id, JobStatus::Done).await?;
@@ -74,7 +74,7 @@ async fn try_process_from_queue(
     Ok(())
 }
 
-async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
+pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();

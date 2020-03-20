@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use core::fmt;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -190,8 +191,10 @@ pub struct DeleteMessage {
     pub document_content_id: String,
 }
 
+#[async_trait]
 pub trait Message: Sized + FromStr {
     fn to_json_string(&self) -> Result<String, serde_json::Error>;
+    async fn process(self) -> Result<Uuid, anyhow::Error>;
 }
 
 impl FromStr for CreateMessage {
@@ -210,15 +213,23 @@ impl FromStr for DeleteMessage {
     }
 }
 
+#[async_trait]
 impl Message for CreateMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
+    async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
+        crate::create_manager::process_message(self).await
+    }
 }
 
+#[async_trait]
 impl Message for DeleteMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
+    }
+    async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
+        crate::delete_manager::process_message(self).await
     }
 }
 

@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.26"
+async-trait = "0.1.24"
 azure_sdk_core = { git = "https://github.com/redbadger/AzureSDKForRust", branch = "service-bus-peek-lock-timeout" }
 azure_sdk_service_bus = { git = "https://github.com/redbadger/AzureSDKForRust", branch = "service-bus-peek-lock-timeout" }
 azure_sdk_storage_blob = { git = "https://github.com/redbadger/AzureSDKForRust", branch = "service-bus-peek-lock-timeout" }
