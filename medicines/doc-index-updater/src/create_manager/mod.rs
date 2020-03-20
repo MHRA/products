@@ -57,6 +57,11 @@ async fn try_process_from_queue(
                 retrieval.remove().await?;
             }
             Err(e) => {
+                tracing::error!(
+                    "Error {:?} while processing message {}",
+                    e,
+                    retrieval.message.job_id
+                );
                 if e.to_string()
                     == "Couldn't retrieve file: [-31] Failed opening remote file".to_string()
                 {
@@ -72,7 +77,6 @@ async fn try_process_from_queue(
                         .await?;
                     let _ = retrieval.remove().await?;
                 }
-                return Err(e);
             }
         };
     }
