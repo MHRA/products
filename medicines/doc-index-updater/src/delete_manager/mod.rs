@@ -46,7 +46,6 @@ async fn try_process_from_queue(
             Ok(FileProcessStatus::Success(job_id)) => {
                 let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
             }
-            Ok(FileProcessStatus::NothingToProcess) => {}
             Err(e) => {
                 tracing::error!(
                     "Error {:?} while processing message {}",
