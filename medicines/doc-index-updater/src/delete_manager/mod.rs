@@ -42,30 +42,22 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        handle_processing_error(e, state_manager, self).await
+        tracing::info!(
+            "Setting error state in state manager for job {}",
+            self.message.job_id
+        );
+        state_manager
+            .set_status(
+                self.message.job_id,
+                JobStatus::Error {
+                    message: e.to_string(),
+                    code: "".to_string(),
+                },
+            )
+            .await?;
+        let _ = self.remove().await?;
+        Ok(())
     }
-}
-
-async fn handle_processing_error(
-    e: anyhow::Error,
-    state_manager: &StateManager,
-    retrieval: RetrievedMessage<DeleteMessage>,
-) -> anyhow::Result<()> {
-    tracing::info!(
-        "Setting error state in state manager for job {}",
-        retrieval.message.job_id
-    );
-    state_manager
-        .set_status(
-            retrieval.message.job_id,
-            JobStatus::Error {
-                message: e.to_string(),
-                code: "".to_string(),
-            },
-        )
-        .await?;
-    let _ = retrieval.remove().await?;
-    Ok(())
 }
 
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
