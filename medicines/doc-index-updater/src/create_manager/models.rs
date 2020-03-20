@@ -1,43 +1,141 @@
-use crate::models::Document;
+use crate::{
+    create_manager::Blob,
+    models::{Document, DocumentType},
+};
 
+use chrono::{SecondsFormat, Utc};
 use lazy_static;
 use regex::Regex;
+use serde::Serialize;
 use std::{collections::HashMap, str};
 
-pub fn derive_metadata_from_message(document: &Document) -> HashMap<String, String> {
-    let mut metadata: HashMap<String, String> = HashMap::new();
+#[derive(Clone)]
+pub struct BlobMetadata {
+    file_name: String,
+    doc_type: DocumentType,
+    title: String,
+    pl_number: String,
+    product_names: Vec<String>,
+    active_substances: Vec<String>,
+    author: String,
+    keywords: Option<Vec<String>>,
+}
 
-    let file_name = sanitize(&document.id);
-    metadata.insert("file_name".to_string(), file_name);
-    metadata.insert("doc_type".to_string(), document.document_type.to_string());
-
-    let title = sanitize(&document.name);
-    let pl_numbers = extract_product_licences(&title);
-
-    metadata.insert("title".to_string(), title);
-    metadata.insert("pl_number".to_string(), pl_numbers);
-
-    let product_names = to_json(document.products.clone());
-    let product_names_csv = document.products.join(", ");
-    metadata.insert("product_name".to_string(), product_names);
-
-    let active_substances = to_json(document.active_substances.clone());
-    metadata.insert("substance_name".to_string(), active_substances);
-
-    let facets = to_json(create_facets_by_active_substance(
-        &product_names_csv,
-        document.active_substances.clone(),
-    ));
-    metadata.insert("facets".to_string(), facets);
-
-    let author = sanitize(&document.author);
-    metadata.insert("author".to_string(), author);
-
-    if let Some(keywords) = &document.keywords {
-        metadata.insert("keywords".to_string(), keywords.join(" "));
+impl BlobMetadata {
+    fn facets(&self) -> Vec<String> {
+        create_facets_by_active_substance(
+            self.product_names.join(", "),
+            self.active_substances.clone(),
+        )
     }
+}
 
-    return metadata;
+impl Into<BlobMetadata> for Document {
+    fn into(self) -> BlobMetadata {
+        let title = sanitize(&self.name);
+        let pl_number = extract_product_licences(&title);
+
+        BlobMetadata {
+            file_name: sanitize(&self.id),
+            doc_type: self.document_type,
+            title,
+            pl_number,
+            product_names: self.products.iter().map(|a| a.to_uppercase()).collect(),
+            active_substances: self
+                .active_substances
+                .iter()
+                .map(|a| a.to_uppercase())
+                .collect(),
+            author: sanitize(&self.author),
+            keywords: self.keywords,
+        }
+    }
+}
+
+impl Into<HashMap<String, String>> for BlobMetadata {
+    fn into(self) -> HashMap<String, String> {
+        let mut metadata: HashMap<String, String> = HashMap::new();
+
+        metadata.insert("file_name".to_string(), self.file_name.clone());
+        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
+        metadata.insert("title".to_string(), self.title.clone());
+        metadata.insert(
+            "product_name".to_string(),
+            to_json(self.product_names.clone()),
+        );
+        metadata.insert(
+            "substance_name".to_string(),
+            to_json(self.active_substances.clone()),
+        );
+        metadata.insert("facets".to_string(), to_json(self.facets()));
+        if let Some(keywords) = self.keywords.clone() {
+            metadata.insert("keywords".to_string(), keywords.join(" "));
+        }
+        metadata.insert("pl_number".to_string(), self.pl_number.clone());
+        metadata.insert("author".to_string(), self.author.clone());
+
+        metadata
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct IndexEntry {
+    content: String,
+    rev_label: String,
+    metadata_storage_path: String,
+    metadata_content_type: String,
+    product_name: String,
+    metadata_language: String,
+    created: String,
+    release_state: String,
+    keywords: String,
+    title: String,
+    pl_number: Vec<String>,
+    file_name: String,
+    metadata_storage_content_type: String,
+    metadata_storage_size: usize,
+    metadata_storage_last_modified: String,
+    metadata_storage_content_md5: String,
+    metadata_storage_name: String,
+    doc_type: String,
+    suggestions: Vec<String>,
+    substance_name: Vec<String>,
+    facets: Vec<String>,
+    is_deleted: bool,
+}
+
+impl IndexEntry {
+    pub fn for_blob(blob: Blob) -> Self {
+        Self {
+            content: "Content not yet available".to_owned(),
+            rev_label: "1".to_owned(),
+            product_name: blob.metadata.product_names.join(", "),
+            created: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+            release_state: "Y".to_owned(),
+            keywords: blob
+                .metadata
+                .keywords
+                .to_owned()
+                .unwrap_or_default()
+                .join(", "),
+            title: blob.metadata.title.to_owned(),
+            pl_number: vec![blob.metadata.pl_number.to_owned()],
+            file_name: blob.metadata.file_name.to_owned(),
+            doc_type: blob.metadata.doc_type.to_string(),
+            suggestions: vec![],
+            substance_name: blob.metadata.active_substances.clone(),
+            facets: blob.metadata.facets(),
+            is_deleted: false,
+            metadata_storage_content_type: String::default(),
+            metadata_storage_size: blob.size,
+            metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+            metadata_storage_content_md5: String::default(),
+            metadata_storage_name: blob.name.to_owned(),
+            metadata_storage_path: blob.path.to_owned(),
+            metadata_content_type: String::default(),
+            metadata_language: String::default(),
+        }
+    }
 }
 
 pub fn sanitize(s: &str) -> String {
@@ -52,7 +150,7 @@ pub fn to_json(words: Vec<String>) -> String {
 }
 
 pub fn create_facets_by_active_substance(
-    product: &str,
+    product: String,
     active_substances: Vec<String>,
 ) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
@@ -128,12 +226,12 @@ mod test {
         let expected_doc_type = "Spc".to_string();
         let expected_title = "Paracetamol Plus PL 12345/6789".to_string();
         let expected_author = "JRR Tolkien".to_string();
-        let expected_product_name = "[\"Effective product 1\",\"Effective product 2\"]".to_string();
-        let expected_substance_name = "[\"Paracetamol\",\"Caffeine\"]".to_string();
+        let expected_product_name = "[\"EFFECTIVE PRODUCT 1\",\"EFFECTIVE PRODUCT 2\"]".to_string();
+        let expected_substance_name = "[\"PARACETAMOL\",\"CAFFEINE\"]".to_string();
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
 
-        let output_metadata = derive_metadata_from_message(&doc);
+        let output_metadata: HashMap<String, String> = Into::<BlobMetadata>::into(doc).into();
 
         assert_eq!(output_metadata["file_name"], expected_file_name);
         assert_eq!(output_metadata["doc_type"], expected_doc_type);
@@ -164,7 +262,8 @@ mod test {
             "HYDROCHLOROTHIAZIDE".to_string(),
             "L-TEST".to_string(),
         ];
-        let product = "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS";
+        let product =
+            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned();
         let expected = vec![
             "H", 
             "H, HYDROCHLOROTHIAZIDE", 

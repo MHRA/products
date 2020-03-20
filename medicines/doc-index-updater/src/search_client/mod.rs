@@ -1,4 +1,8 @@
+use crate::create_manager::models::IndexEntry;
+use core::fmt::Debug;
+use serde::ser::Serialize;
 use serde_derive::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 pub struct AzureHighlight {
@@ -98,15 +102,19 @@ impl AzureSearchClient {
         &self,
         key_name: &str,
         value: &str,
-    ) -> Result<AzureIndexChangedResults, reqwest::Error> {
-        update_index(
-            &"delete".to_string(),
-            &key_name,
-            &value,
-            &self.client,
-            &self.config,
-        )
-        .await
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+        let mut key_values = HashMap::new();
+        key_values.insert(key_name.to_string(), value.to_string());
+        key_values.insert("@search.action".to_string(), "delete".to_string());
+
+        update_index(key_values, &self.client, &self.config).await
+    }
+
+    pub async fn create(
+        &self,
+        key_values: IndexEntry,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+        update_index(key_values, &self.client, &self.config).await
     }
 }
 
@@ -145,29 +153,28 @@ async fn search(
         .await
 }
 
-async fn update_index(
-    action: &str,
-    key: &str,
-    value: &str,
+async fn update_index<T>(
+    key_values: T,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<AzureIndexChangedResults, reqwest::Error> {
+) -> Result<AzureIndexChangedResults, anyhow::Error>
+where
+    T: Serialize + Sized + Debug,
+{
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs/index",
         search_service = config.search_service,
         search_index = config.search_index
     );
 
-    let mut azure_value = std::collections::HashMap::new();
-    azure_value.insert("@search.action", action);
-    azure_value.insert(key, value);
-    let mut body = std::collections::HashMap::new();
-    body.insert("value", [azure_value]);
+    let mut body = HashMap::new();
+    body.insert("value", [key_values]);
 
     let req = client
         .post(&base_url)
         .query(&[("api-version", &config.api_version)])
         .header("api-key", &config.api_key)
+        .header("Content-Type", "application/json")
         .json(&body)
         .build()?;
 
@@ -175,9 +182,14 @@ async fn update_index(
     tracing::debug!("\nRequest: {:?}", &req);
     tracing::debug!("\nRequesting from URL: {}", &req.url());
 
-    client
-        .execute(req)
-        .await?
-        .json::<AzureIndexChangedResults>()
-        .await
+    let h = client.execute(req).await?;
+
+    if h.status() == reqwest::StatusCode::OK {
+        h.json::<AzureIndexChangedResults>()
+            .await
+            .map_err(|e| anyhow::anyhow!(e))
+    } else {
+        let error_message = h.text().await?;
+        Err(anyhow::anyhow!(error_message))
+    }
 }

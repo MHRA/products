@@ -143,7 +143,7 @@ async fn delete_blob(
 pub async fn delete_from_index(
     search_client: &search_client::AzureSearchClient,
     blob_name: &str,
-) -> Result<(), reqwest::Error> {
+) -> Result<(), anyhow::Error> {
     search_client
         .delete(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
