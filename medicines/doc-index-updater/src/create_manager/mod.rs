@@ -67,8 +67,8 @@ async fn try_process_from_queue(
             process_message(retrieval.message.clone(), &search_client, &storage_client).await;
         match processing_result {
             Ok(job_id) => {
-                let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
-                let _ = retrieval.remove().await?;
+                state_manager.set_status(job_id, JobStatus::Done).await?;
+                retrieval.remove().await?;
             }
             Err(e) => {
                 if e.to_string()

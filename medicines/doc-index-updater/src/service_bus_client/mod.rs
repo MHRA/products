@@ -73,9 +73,9 @@ impl<T> RetrievedMessage<T> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
-        });
+        })?;
         tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
-        queue_removal_result
+        Ok(queue_removal_result)
     }
 }
 
