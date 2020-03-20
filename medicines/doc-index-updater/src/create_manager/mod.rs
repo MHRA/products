@@ -31,20 +31,9 @@ pub async fn create_service_worker(
     let mut create_client = create_factory()
         .await
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
-    let search_client = search_client::factory();
-    let storage_client = storage_client::factory().map_err(|e| {
-        tracing::error!("{:?}", e);
-        anyhow!("Couldn't create storage client")
-    })?;
+
     loop {
-        match try_process_from_queue(
-            &mut create_client,
-            &state_manager,
-            &search_client,
-            &storage_client,
-        )
-        .await
-        {
+        match try_process_from_queue(&mut create_client, &state_manager).await {
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
@@ -55,16 +44,13 @@ pub async fn create_service_worker(
 async fn try_process_from_queue(
     service_bus_client: &mut DocIndexUpdaterQueue,
     state_manager: &StateManager,
-    search_client: &search_client::AzureSearchClient,
-    storage_client: &azure_sdk_storage_core::prelude::Client,
 ) -> Result<(), anyhow::Error> {
     tracing::info!("Checking for create messages");
     let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
         service_bus_client.receive().await;
 
     if let Ok(retrieval) = retrieved_result {
-        let processing_result =
-            process_message(retrieval.message.clone(), &search_client, &storage_client).await;
+        let processing_result = process_message(retrieval.message.clone()).await;
         match processing_result {
             Ok(job_id) => {
                 state_manager.set_status(job_id, JobStatus::Done).await?;
@@ -93,12 +79,12 @@ async fn try_process_from_queue(
     Ok(())
 }
 
-async fn process_message(
-    message: CreateMessage,
-    search_client: &search_client::AzureSearchClient,
-    storage_client: &azure_sdk_storage_core::prelude::Client,
-) -> Result<Uuid, anyhow::Error> {
+async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
+
+    let search_client = search_client::factory();
+    let storage_client = storage_client::factory()
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
