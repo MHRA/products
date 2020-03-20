@@ -24,7 +24,6 @@ async fn get_health_handler_xml() -> Result<Xml, Rejection> {
 pub fn get_health() -> impl Filter<Extract = impl Reply, Error = Rejection> + Copy {
     warp::path!("healthz")
         .and(warp::get())
-        .and(auth_manager::with_basic_auth())
         .and_then(get_health_handler_json)
 }
 
@@ -32,6 +31,5 @@ pub fn get_health_xml() -> impl Filter<Extract = impl Reply, Error = Rejection> 
     warp::path!("healthz")
         .and(warp::get())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
-        .and(auth_manager::with_basic_auth())
         .and_then(get_health_handler_xml)
 }
