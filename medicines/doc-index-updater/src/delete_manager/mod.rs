@@ -54,23 +54,32 @@ async fn try_process_from_queue(
                     e,
                     retrieval.message.job_id
                 );
-                tracing::info!(
-                    "Setting error state in state manager for job {}",
-                    retrieval.message.job_id
-                );
-                state_manager
-                    .set_status(
-                        retrieval.message.job_id,
-                        JobStatus::Error {
-                            message: e.to_string(),
-                            code: "".to_string(),
-                        },
-                    )
-                    .await?;
-                let _ = retrieval.remove().await?;
+                handle_processing_error(e, &state_manager, retrieval).await?;
             }
         };
     }
+    Ok(())
+}
+
+async fn handle_processing_error(
+    e: anyhow::Error,
+    state_manager: &StateManager,
+    retrieval: RetrievedMessage<DeleteMessage>,
+) -> anyhow::Result<()> {
+    tracing::info!(
+        "Setting error state in state manager for job {}",
+        retrieval.message.job_id
+    );
+    state_manager
+        .set_status(
+            retrieval.message.job_id,
+            JobStatus::Error {
+                message: e.to_string(),
+                code: "".to_string(),
+            },
+        )
+        .await?;
+    let _ = retrieval.remove().await?;
     Ok(())
 }
 
