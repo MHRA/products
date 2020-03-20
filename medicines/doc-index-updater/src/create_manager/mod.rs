@@ -1,6 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
-    models::{CreateMessage, FileProcessStatus, JobStatus},
+    models::{CreateMessage, JobStatus},
     search_client,
     service_bus_client::{
         create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
@@ -8,6 +8,7 @@ use crate::{
     state_manager::StateManager,
     storage_client,
 };
+use uuid::Uuid;
 
 use anyhow::anyhow;
 use azure_sdk_core::prelude::*;
@@ -65,7 +66,7 @@ async fn try_process_from_queue(
         let processing_result =
             process_message(retrieval.message.clone(), &search_client, &storage_client).await;
         match processing_result {
-            Ok(FileProcessStatus::Success(job_id)) => {
+            Ok(job_id) => {
                 let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
             }
             Err(e) => {
@@ -95,7 +96,7 @@ async fn process_message(
     message: CreateMessage,
     search_client: &search_client::AzureSearchClient,
     storage_client: &azure_sdk_storage_core::prelude::Client,
-) -> Result<FileProcessStatus, anyhow::Error> {
+) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
     let file = sftp_client::retrieve(
@@ -113,7 +114,7 @@ async fn process_message(
     add_blob_to_search_index(&search_client, blob).await?;
     tracing::info!("Added to index {} for job {}", &name, &message.job_id);
 
-    Ok(FileProcessStatus::Success(message.job_id))
+    Ok(message.job_id)
 }
 
 async fn create_blob(

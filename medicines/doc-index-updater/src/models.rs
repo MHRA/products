@@ -222,10 +222,6 @@ impl Message for DeleteMessage {
     }
 }
 
-pub enum FileProcessStatus {
-    Success(uuid::Uuid),
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
