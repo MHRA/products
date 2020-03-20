@@ -1,6 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
-    models::{CreateMessage, JobStatus, Message},
+    models::{CreateMessage, JobStatus},
     search_client,
     service_bus_client::{create_factory, ProcessRetrievalError, RetrievedMessage},
     state_manager::StateManager,
@@ -54,19 +54,16 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     }
 }
 
-async fn handle_processing_error<T>(
+async fn handle_processing_error(
     e: anyhow::Error,
     state_manager: &StateManager,
-    retrieval: RetrievedMessage<T>,
-) -> anyhow::Result<()>
-where
-    T: Message,
-{
+    retrieval: RetrievedMessage<CreateMessage>,
+) -> anyhow::Result<()> {
     if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
         tracing::info!("Updating state to errored and removing message");
         let _ = state_manager
             .set_status(
-                retrieval.message.get_id(),
+                retrieval.message.job_id,
                 JobStatus::Error {
                     message: "Couldn't find file".to_string(),
                     code: "404".to_string(),
