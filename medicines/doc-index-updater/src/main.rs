@@ -10,15 +10,12 @@ const PORT: u16 = 8000;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn error::Error>> {
-    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
-        .json()
-        .flatten_event(true)
-        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
-        .with_max_level(Level::INFO)
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .finish();
+    if get_env_or_default("JSON_LOGS", true) {
+        use_json_log_subscriber()
+    } else {
+        use_unstructured_log_subscriber()
+    }
 
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     tracing_log::LogTracer::init()
         .expect("error redirecting normal log messages to the tracing subscriber");
 
@@ -63,6 +60,27 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         )),
     );
     Ok(())
+}
+
+fn use_json_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .json()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::INFO)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
+
+fn use_unstructured_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::INFO)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 }
 
 pub fn get_env_or_default<T>(key: &str, default: T) -> T
