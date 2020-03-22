@@ -39,7 +39,7 @@ To be able to connect to the cluster, we need to set the Kubernetes credentials 
 3. Create the credentials file running this script
 
    ```sh
-   ../../scripts/create-kubernetes-config.sh
+   ../../scripts/update-kubernetes-config.sh
    ```
 
 Now you can run `kubectl` commands, e.g.
@@ -59,7 +59,7 @@ kubectl get nodes
 2. Specify the [Istio version](https://github.com/istio/istio/releases/)
 
    ```sh
-   ISTIO_VERSION=1.4.0
+   export ISTIO_VERSION=1.4.3
    ```
 
 3. Download and install
@@ -87,10 +87,10 @@ kubectl get nodes
    kubectl create namespace istio-system --save-config
    ```
 
-8. Apply manifest to the cluster
+8. Apply manifest to the cluster - to do this, clone the [deployments](https://github.com/MHRA/deployments) repo, go to `cluster-init` dir and run
 
    ```sh
-   istioctl manifest apply -f control-plane.yml --logtostderr
+   make
    ```
 
 9. Validate the Istio installation
@@ -100,6 +100,13 @@ kubectl get nodes
    ```
 
 10. Confirm that the required pods have been created
+
     ```sh
     kubectl get pods --namespace istio-system
+    ```
+
+11. Still in the `deployments` repo, install certificates in the cluster by running:
+
+    ```sh
+    istio/certs.sh
     ```

@@ -44,6 +44,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     node_count     = "2"
     vm_size        = "Standard_D2_v2"
     vnet_subnet_id = azurerm_subnet.cluster.id
+    max_pods       = 15
   }
 
   service_principal {

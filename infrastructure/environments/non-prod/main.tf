@@ -44,9 +44,9 @@ module cluster {
   location                        = var.REGION
   resource_group_name             = azurerm_resource_group.products.name
   vnet_name                       = "aparz-spoke-np-products"
-  vnet_cidr                       = "10.5.0.0/16"
+  vnet_cidr                       = "10.5.65.0/24"
   subnet_name                     = "adarz-spoke-products-sn-01"
-  subnet_cidr                     = "10.5.65.0/24"
+  subnet_cidr                     = "10.5.65.0/26"
   route_table_name                = "adarz-spoke-rt-products-internal-only"
   route_table_resource_group_name = "asazr-rg-1001"
 }
