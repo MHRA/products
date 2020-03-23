@@ -56,6 +56,12 @@ interface ICookieBanner {
 const CookieBanner: React.FC<ICookieBanner> = props => {
   const buttonOnClick = () => {
     props.setStorageAllowed(true, true);
+
+    // Window reload required to trigger cookies in Safari.
+    // Strip trailing slash from URL path so routing works in dev.
+    window.location.href = window.location.href
+      .replace(/\/$/, '')
+      .replace(/\/\?/, '?');
   };
 
   // Set up state so that the banner is hidden by default.

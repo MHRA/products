@@ -5,6 +5,7 @@ output "kube_config" {
 output "public_ip" {
   value = module.cluster.public_ip
 }
+
 output "host" {
   value = module.cluster.host
 }
@@ -35,4 +36,12 @@ output "cpd_primary_access_key" {
 
 output "cpd_static_web_url" {
   value = module.cpd.cpd_static_web_url
+}
+
+output "products-hostname-cdn" {
+  value = azurerm_cdn_endpoint.products.host_name
+}
+
+output "cpd-hostname-cdn" {
+  value = azurerm_cdn_endpoint.cpd.host_name
 }

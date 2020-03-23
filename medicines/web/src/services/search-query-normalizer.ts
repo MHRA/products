@@ -29,7 +29,7 @@ const extractNormalizedProductLicenses = (q: string): string => {
 };
 
 const splitByNonSearchableCharacters = (query: string) =>
-  query.split(/(?:[,+\-!(){}\[\]^~*?:\/]|\s+)/gi);
+  query.split(/(?:[,+\-!(){}\[\]^~*?:%\/]|\s+)/gi);
 
 export const buildFuzzyQuery = (query: string): string => {
   return splitByNonSearchableCharacters(extractNormalizedProductLicenses(query))

@@ -1,20 +1,24 @@
 use crate::{
-    models::{CreateMessage, FileProcessStatus, JobStatus},
-    service_bus_client::{
-        create_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
-    },
+    create_manager::models::BlobMetadata,
+    models::{CreateMessage, JobStatus},
+    search_client,
+    service_bus_client::{create_factory, ProcessRetrievalError, RetrievedMessage},
     state_manager::StateManager,
     storage_client,
 };
+use uuid::Uuid;
 
 use anyhow::anyhow;
+use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+use search_index::add_blob_to_search_index;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 
 mod hash;
-mod metadata;
+pub mod models;
+mod search_index;
 mod sftp_client;
 
 #[tracing::instrument]
@@ -28,7 +32,10 @@ pub async fn create_service_worker(
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
 
     loop {
-        match try_process_from_queue(&mut create_client, &state_manager).await {
+        match create_client
+            .try_process_from_queue::<CreateMessage>(&state_manager)
+            .await
+        {
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
@@ -36,46 +43,36 @@ pub async fn create_service_worker(
     }
 }
 
-async fn try_process_from_queue(
-    service_bus_client: &mut DocIndexUpdaterQueue,
-    state_manager: &StateManager,
-) -> Result<(), anyhow::Error> {
-    tracing::info!("Checking for create messages");
-    let retrieved_result: Result<RetrievedMessage<CreateMessage>, RetrieveFromQueueError> =
-        service_bus_client.receive().await;
-
-    if let Ok(retrieval) = retrieved_result {
-        let processing_result = process_message(retrieval.message.clone()).await;
-        match processing_result {
-            Ok(FileProcessStatus::Success(job_id)) => {
-                let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
-            }
-            Ok(FileProcessStatus::NothingToProcess) => {}
-            Err(e) => {
-                if e.to_string()
-                    == "Couldn't retrieve file: [-31] Failed opening remote file".to_string()
-                {
-                    tracing::info!("Updating state to errored and removing message");
-                    let _ = state_manager.set_status(
-                        retrieval.message.job_id,
-                        JobStatus::Error {
-                            message: "Couldn't find file".to_string(),
-                            code: "404".to_string(),
-                        },
-                    );
-                    // TODO: Uncomment before releasing
-                    // or when we have a centralised SFTP server for dev
-                    // let _ = retrieval.remove().await?;
-                }
-                return Err(e);
-            }
-        };
+#[async_trait]
+impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
+    async fn handle_processing_error(
+        self,
+        e: anyhow::Error,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<()> {
+        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
+            tracing::info!("Updating state to errored and removing message");
+            let _ = state_manager
+                .set_status(
+                    self.message.job_id,
+                    JobStatus::Error {
+                        message: "Couldn't find file".to_string(),
+                        code: "404".to_string(),
+                    },
+                )
+                .await?;
+            let _ = self.remove().await?;
+        }
+        Ok(())
     }
-    Ok(())
 }
 
-async fn process_message(message: CreateMessage) -> Result<FileProcessStatus, anyhow::Error> {
+pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
+
+    let search_client = search_client::factory();
+    let storage_client = storage_client::factory()
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
@@ -84,46 +81,36 @@ async fn process_message(message: CreateMessage) -> Result<FileProcessStatus, an
     .await
     .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
 
-    let metadata = metadata::derive_metadata_from_message(&message.document);
-    let file_digest = md5::compute(&file[..]);
-    let file_data_hash = hash::sha1(&file);
-    let _blob = create_blob(&file_data_hash, &file, &metadata, &file_digest).await?;
-    tracing::info!(
-        "Uploaded blob {} for job {}",
-        &file_data_hash,
-        &message.job_id
-    );
+    let metadata: BlobMetadata = message.document.into();
+    let blob = create_blob(&storage_client, &file, metadata.clone().into()).await?;
+    let name = blob.name.clone();
+    tracing::info!("Uploaded blob {} for job {}", &name, &message.job_id);
 
-    add_to_search_index("blob_data".to_string()).await;
-    tracing::info!(
-        "Added to index {} for job {}",
-        &file_data_hash,
-        &message.job_id
-    );
+    add_blob_to_search_index(&search_client, blob).await?;
+    tracing::info!("Added to index {} for job {}", &name, &message.job_id);
 
-    Ok(FileProcessStatus::Success(message.job_id))
+    Ok(message.job_id)
 }
 
-pub async fn create_blob(
-    blob_name: &str,
+async fn create_blob(
+    storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
-    metadata: &HashMap<String, String>,
-    file_digest: &md5::Digest,
-) -> Result<(), anyhow::Error> {
-    let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
-
+    metadata: BlobMetadata,
+) -> Result<Blob, anyhow::Error> {
+    let name = hash::sha1(&file_data);
+    let file_digest = md5::compute(&file_data[..]);
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
-    for (key, val) in metadata {
+    let hashmap: HashMap<String, String> = metadata.clone().into();
+    for (key, val) in &hashmap {
         metadata_ref.insert(&key, &val);
     }
-    
+
     storage_client
         .put_block_blob()
         .with_container_name(&container_name)
-        .with_blob_name(blob_name)
+        .with_blob_name(&name)
         .with_content_type("application/pdf")
         .with_metadata(&metadata_ref)
         .with_body(&file_data[..])
@@ -131,9 +118,25 @@ pub async fn create_blob(
         .finalize()
         .await
         .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
-    Ok(())
+
+    let storage_account =
+        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
+    let path = format!(
+        "https://{}.blob.core.windows.net/{}/{}",
+        &storage_account, &container_name, &name
+    );
+
+    Ok(Blob {
+        metadata,
+        name,
+        size: file_data.len(),
+        path,
+    })
 }
 
-async fn add_to_search_index(blob: String) {
-    tracing::debug!("update the index for {}", blob);
+pub struct Blob {
+    metadata: BlobMetadata,
+    name: String,
+    size: usize,
+    path: String,
 }
