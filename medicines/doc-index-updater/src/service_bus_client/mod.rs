@@ -127,7 +127,7 @@ impl DocIndexUpdaterQueue {
             }
             Err(_) => {
                 tracing::error!(
-                    "Message found could not be parsed ({:?}). Gonna go ahead and delete it.",
+                    "Message found could not be parsed ({:?}). Deleting it.",
                     body
                 );
                 let _ = peek_lock.delete_message().await;
@@ -153,7 +153,7 @@ impl DocIndexUpdaterQueue {
         T: Message,
         RetrievedMessage<T>: ProcessRetrievalError,
     {
-        tracing::info!("Checking for messages");
+        tracing::info!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
             self.receive().await;
 
@@ -166,9 +166,8 @@ impl DocIndexUpdaterQueue {
                 }
                 Err(e) => {
                     tracing::error!(
-                        "Error {:?} while processing message {}",
-                        e,
-                        retrieval.message.get_id()
+                        message = format!("Error {:?}", e).as_str(),
+                        correlation_id = retrieval.message.get_id().to_string().as_str()
                     );
                     retrieval.handle_processing_error(e, &state_manager).await?;
                 }
