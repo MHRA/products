@@ -78,7 +78,7 @@ impl<T: Message> RetrievedMessage<T> {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
         })?;
-        tracing::info!("Removed job from ServiceBus ({:?})", queue_removal_result);
+        tracing::debug!("Removed job from ServiceBus ({:?})", queue_removal_result);
         Ok(queue_removal_result)
     }
 }
@@ -110,7 +110,7 @@ impl DocIndexUpdaterQueue {
             })?;
 
         if peek_lock.status() == StatusCode::NO_CONTENT {
-            tracing::info!("No new messages found.");
+            tracing::debug!("No new messages found.");
             return Err(RetrieveFromQueueError::NotFoundError);
         }
 
@@ -118,7 +118,7 @@ impl DocIndexUpdaterQueue {
 
         match body.parse::<T>() {
             Ok(message) => {
-                tracing::info!(
+                tracing::debug!(
                     "Message found perfectly parseable ({:?}).\n{:?}",
                     body,
                     message.to_json_string()
@@ -153,7 +153,7 @@ impl DocIndexUpdaterQueue {
         T: Message,
         RetrievedMessage<T>: ProcessRetrievalError,
     {
-        tracing::info!("Checking for messages.");
+        tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
             self.receive().await;
 
