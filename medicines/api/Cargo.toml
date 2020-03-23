@@ -1,9 +1,19 @@
 [package]
 name = "api"
 version = "0.1.0"
-authors = ["Stuart Harris <stuart.harris@red-badger.com>"]
+authors = ["Stuart Harris <stuart.harris@red-badger.com>", "Robin James Kerrison <robinjames.kerrison@red-badger.com>", "Craig Anderson <craig.anderson@red-badger.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-rt = "1.0.0"
+actix-web = "2.0.0"
+env_logger = "0.7.1"
+futures = "0.3.1"
+juniper = { git = "https://github.com/graphql-rust/juniper", features = ["async"], rev="211737cee0c6b79ad86246d69ed39e2725fc2110" }
+listenfd = "0.3.3"
+reqwest = { version = "0.10.1", features = ["json"] }
+serde = "1.0.103"
+serde_derive = "1.0.103"
+serde_json = "1.0.44"

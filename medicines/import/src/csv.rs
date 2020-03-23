@@ -1,5 +1,4 @@
 use crate::model::Record;
-use csv;
 use std::{
     collections::HashMap,
     fs,

@@ -4,6 +4,7 @@ module.exports = {
     title: `Learning Modules for Continuous Professional Development`,
     author: `MHRA`,
     description: `Medicines and Healthcare products Regulatory Agency Continuous Professional Development`,
+    siteUrl: `https://cpd.mhra.gov.uk`,
   },
   plugins: [
     {
@@ -30,23 +31,6 @@ module.exports = {
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    {
-      resolve: `gatsby-plugin-google-analytics`,
-      options: {
-        ...(process.env.GOOGLE_ANALYTICS_TRACKING_ID && {
-          trackingId: process.env.GOOGLE_ANALYTICS_TRACKING_ID,
-        }),
-        head: true,
-      },
-    },
-    {
-      resolve: "gatsby-plugin-google-tagmanager",
-      options: {
-        ...(process.env.GOOGLE_TAG_MANAGER_ID && {
-          id: process.env.GOOGLE_TAG_MANAGER_ID,
-        }),
-      },
-    },
     `gatsby-plugin-offline`,
     `gatsby-plugin-react-helmet`,
     {
@@ -72,5 +56,13 @@ module.exports = {
         ],
       },
     },
+    {
+      resolve: `gatsby-plugin-csp`,
+      options: {
+        disableOnDev: false,
+        reportOnly: true,
+      },
+    },
+    `gatsby-plugin-sitemap`,
   ],
 }

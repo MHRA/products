@@ -1,6 +1,6 @@
 ## Security considerations
 
-Our aim is to apply the architecture described above in a way that is secure by default. This means that workloads that are deployed to the platform will automatically operate with the most secure options enabled.
+We aim to design systems in a way that they are secure by default. This means that workloads that are deployed to a platform will automatically operate with the most secure options enabled.
 
 ### TLS
 
@@ -16,21 +16,19 @@ Using encrypted secrets works well with the “Everything as code” principle t
 
 ## Authentication
 
-This MVP phase does not require origin authentication (e.g. a JWT bearer token that the user has obtained from an identity provider).
+Origin authentication can be ensured by using e.g. a JWT bearer token that the user has obtained from an identity provider.
 
-However, service-to-service traffic (including from the ingress controller) will have transport authentication provided by enforcing mTLS and leveraging [Istio Secure Naming](https://istio.io/docs/concepts/security/).
+Service-to-service traffic (including from the ingress controller) should have transport authentication provided by enforcing mTLS and leveraging [Istio Secure Naming](https://istio.io/docs/concepts/security/).
 
 ## Authorisation
 
-Kubernetes Role-based Access Control (RBAC) will be used to ensure services have the relevant access to the Kubernetes API.
-There is no need in this phase to use [Istio RBAC](https://istio.io/docs/reference/config/authorization/istio.rbac.v1alpha1/) as authentication is not currently required in order to search for and view the SPC/PIL/PAR data.
+Kubernetes Role-based Access Control (RBAC) is used to ensure services have the relevant access to the Kubernetes API.
+[Istio RBAC](https://istio.io/docs/reference/config/authorization/istio.rbac.v1alpha1/) can be used, where necessary.
 
 ## Data security
 
-There is no Personally Identifiable Information (PII) of any kind involved in this phase of the solution design. All data is freely available to anyone and therefore does not need encryption in transit or at rest (although in-transit protection will be provided by enforcing TLS throughout).
+Any Personally Identifiable Information (PII) should be encrypted in transit (by enforcing TLS throughout) and at rest.
 
 ## Vulnerabilities and attack vectors
 
-Software versions will be kept up to date in order to ensure that security fixes for Common Vulnerabilities and Exposures (CVE) are consumed as soon as possible after becoming available. This includes Istio, Kubernetes and Linux versions (both within containers and on nodes). Nodes in the cluster will be refreshed regularly, and new nodes will be created from up to date images. Containers will be built from up to date base images as they pass through the CI/CD pipeline. We will need to evolve policies for ensuring that this happens and is auditable (again the “everything as code” principle helps us with audit and traceability).
-
-As we build web applications, services and APIs that run on the cluster, we will need to ensure that (at least) the [OWASP top ten](https://blog.sucuri.net/2018/10/owasp-top-10-security-risks-part-i.html) security risks are considered. Many do not apply to this design (e.g. SQL injection attacks because there is no SQL or direct database access, broken authentication as there is no authentication, broken access control as authorisation is not required, XML external entities as there is no XML), whilst others do (e.g. security misconfigurations, cross-site scripting, insufficient logging etc). Where relevant, we will use appropriate techniques (e.g. by using React with [additional mitigations](https://stackoverflow.com/questions/33644499/what-does-it-mean-when-they-say-react-is-xss-protected) for XSS, and [CSRF tokens](https://portswigger.net/web-security/csrf/tokens) in forms, exhaustive access logging, etc) to mitigate these attack vectors.
+Software versions should be kept up to date in order to ensure that security fixes for Common Vulnerabilities and Exposures (CVE) are consumed as soon as possible after becoming available. Nodes in clusters should be refreshed regularly, and new nodes created from up to date images. Containers should be built from up-to-date base images as they pass through the CI/CD pipeline. We will need to evolve policies for ensuring that this happens and is auditable (again the “everything as code” principle helps us with audit and traceability).

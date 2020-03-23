@@ -27,3 +27,5 @@ yarn dev
 ```shell
 yarn build
 ```
+
+This writes the site to the `public` directory.

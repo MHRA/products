@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Disclaimer should render 1`] = `
+<styled.section>
+  <p>
+    Please read the following information and tick the box to proceed to view the product information in pdf format.
+  </p>
+  <styled.div>
+    <h3>
+      Disclaimer:
+    </h3>
+    <p>
+      I understand that this information is a copy of the Summary of Product Characteristics and patient information leaflet for a medicine, which outline the conditions under which the medicine should be used and information on its known safety.
+    </p>
+    <p>
+      I understand that this information may be updated several times during the product’s lifecycle, and that there could be differences between the information shown here and other information in the public domain.
+    </p>
+    <p>
+      I understand that the MHRA is unable to offer medical advice and that if a patient has any questions about a medicine they are taking they should contact their doctor or pharmacist. Patients should not stop taking any prescribed medicines without first speaking to a healthcare professional. Suspected adverse reactions to a medicine can be reported to us on a
+       
+      <a
+        href="https://yellowcard.mhra.gov.uk/"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        Yellow Card.
+      </a>
+    </p>
+    <p>
+      I understand that the MHRA has used its best endeavours in publishing this information, but accept that the information may not be the most up to date version for this product.
+    </p>
+    <p>
+      To view details for 
+      <em>
+        Perinola
+      </em>
+      , please read and accept the disclaimer.
+    </p>
+    <form>
+      <div>
+        <input
+          id="agree-checkbox"
+          name="agree"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <label
+          htmlFor="agree-checkbox"
+        >
+          I have read and understand the disclaimer.
+        </label>
+      </div>
+      <button
+        disabled={true}
+        onClick={[MockFunction]}
+        type="submit"
+      >
+        Agree
+      </button>
+    </form>
+  </styled.div>
+</styled.section>
+`;

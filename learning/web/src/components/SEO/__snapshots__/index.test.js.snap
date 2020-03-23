@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SEO should render 1`] = `
+<HelmetWrapper
+  defer={true}
+  encodeSpecialCharacters={true}
+  htmlAttributes={
+    Object {
+      "lang": "en",
+    }
+  }
+  meta={
+    Array [
+      Object {
+        "content": "Amazing",
+        "name": "description",
+      },
+      Object {
+        "content": "Bob Kane",
+        "name": "author",
+      },
+      Object {
+        "content": "😀",
+        "property": "og:title",
+      },
+      Object {
+        "content": "Amazing",
+        "property": "og:description",
+      },
+      Object {
+        "content": "website",
+        "property": "og:type",
+      },
+    ]
+  }
+  title="😀"
+  titleTemplate="%s | Detective Comics #27"
+/>
+`;

@@ -1,21 +1,20 @@
-output "products-primary-access-key" {
-  value = azurerm_storage_account.products.primary_access_key
+output "kube_config" {
+  value = module.cluster.kube_config
 }
 
-output "products-static-web-url" {
-  value = azurerm_storage_account.products.primary_web_endpoint
+output "public_ip" {
+  value = module.cluster.public_ip
+}
+output "host" {
+  value = module.cluster.host
 }
 
-output "cpd-primary-access-key" {
-  value = azurerm_storage_account.cpd.primary_access_key
+output "client_certificate" {
+  value = module.cluster.client_certificate
 }
 
-output "cpd-static-web-url" {
-  value = azurerm_storage_account.cpd.primary_web_endpoint
-}
-
-output "search_admin_key" {
-  value = azurerm_search_service.search.primary_key
+output "resource_group_name" {
+  value = module.cluster.resource_group_name
 }
 
 output "products-hostname-cdn" {

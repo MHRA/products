@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: document
+  labels:
+    app: document
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: document
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: document
+        tier: frontend
+    spec:
+      containers:
+        - image: $STUB_IMAGE
+          name: document
+          env:
+            - name: STUB_USERNAME
+              value: $STUB_USERNAME
+            - name: STUB_PASSWORD
+              value: $STUB_PASSWORD
+          ports:
+            - containerPort: 8080
+              name: web

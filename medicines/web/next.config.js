@@ -11,6 +11,8 @@ module.exports = {
     AZURE_SEARCH_EXACTNESS_BOOST: process.env.AZURE_SEARCH_EXACTNESS_BOOST,
     GOOGLE_GTM_CONTAINER_ID: process.env.GOOGLE_GTM_CONTAINER_ID,
     GOOGLE_TRACKING_ID: process.env.GOOGLE_TRACKING_ID,
+    GOOGLE_USE_DEBUG: process.env.GOOGLE_USE_DEBUG,
+    ROOT_URL_DOMAIN: process.env.ROOT_URL_DOMAIN,
   },
   webpack: config => {
     config.module.rules.push({

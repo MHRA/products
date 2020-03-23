@@ -1,11 +1,9 @@
 provider "azurerm" {
-  version                    = "=1.38.0"
   skip_provider_registration = true
+  version                    = "~>1.38.0"
 }
 
 terraform {
-  required_version = "0.12.18"
-
   backend "azurerm" {
     resource_group_name = "tfstate"
     key                 = "prod.terraform.tfstate"
@@ -17,77 +15,49 @@ resource "azurerm_resource_group" "products" {
   location = var.REGION
 
   tags = {
-    environment = "prod"
+    environment = var.ENVIRONMENT
   }
 }
 
-resource "azurerm_storage_account" "products" {
-  name                     = "mhraproductsprod"
-  resource_group_name      = azurerm_resource_group.products.name
-  location                 = azurerm_resource_group.products.location
-  account_kind             = "StorageV2"
-  account_tier             = "Standard"
-  account_replication_type = "RAGRS"
+# website
+module "products" {
+  source = "../../modules/products"
 
-  tags = {
-    environment = "prod"
-  }
-}
-
-resource "azurerm_storage_container" "products_website" {
-  name                  = "$web"
-  storage_account_name  = azurerm_storage_account.products.name
-  container_access_type = "container"
-}
-
-resource "azurerm_storage_container" "docs" {
-  name                  = "docs"
-  storage_account_name  = azurerm_storage_account.products.name
-  container_access_type = "blob"
-}
-
-# waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
-# (which is imminent), but in the meantime ...
-module "products_staticweb" {
-  source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
-  storage_account_name = azurerm_storage_account.products.name
-}
-
-resource "azurerm_search_service" "search" {
-  name                = "mhraproductsprod"
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
-  location            = azurerm_resource_group.products.location
-  sku                 = "basic"
-
-  tags = {
-    environment = "prod"
-  }
 }
 
-resource "azurerm_storage_account" "cpd" {
-  name                     = "mhracpdprod"
-  resource_group_name      = azurerm_resource_group.products.name
-  location                 = azurerm_resource_group.products.location
-  account_kind             = "StorageV2"
-  account_tier             = "Standard"
-  account_replication_type = "RAGRS"
+# AKS
+module cluster {
+  source = "../../modules/cluster"
 
-  tags = {
-    environment = "prod"
-  }
+  client_id           = var.CLIENT_ID
+  client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
 }
 
-resource "azurerm_storage_container" "cpd_website" {
-  name                  = "$web"
-  storage_account_name  = azurerm_storage_account.cpd.name
-  container_access_type = "container"
+# CPD
+module cpd {
+  source = "../../modules/cpd"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
 }
 
-# waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
-# (which is imminent), but in the meantime ...
-module "cpd_staticweb" {
-  source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
-  storage_account_name = azurerm_storage_account.cpd.name
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
+
+  client_id           = var.CLIENT_ID
+  client_secret       = var.CLIENT_SECRET
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
+  name                = "doc-index-updater-prod"
 }
 
 resource "azurerm_cdn_profile" "products" {
