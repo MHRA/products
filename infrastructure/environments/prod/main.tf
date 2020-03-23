@@ -1,6 +1,5 @@
 provider "azurerm" {
-  skip_provider_registration = true
-  version                    = "~>1.38.0"
+  version = "~>1.38.0"
 }
 
 terraform {
