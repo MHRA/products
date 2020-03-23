@@ -50,8 +50,11 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
-            tracing::info!("Updating state to errored and removing message");
+        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
+            tracing::info!(
+                message = "Couldn't find file. Updating state to errored and removing message.", 
+                correlation_id = self.message.job_id.to_string().as_str()
+            );
             let _ = state_manager
                 .set_status(
                     self.message.job_id,
@@ -68,7 +71,10 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 }
 
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
-    tracing::info!("Message received: {:?} ", message);
+    tracing::info!(
+        message = format!("Message received: {:?} ", message).as_str(),
+        correlation_id = message.job_id.to_string().as_str()
+    );
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
@@ -84,11 +90,15 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
-    tracing::info!("Uploaded blob {} for job {}", &name, &message.job_id);
-
+    tracing::info!(
+        message = format!("Uploaded blob {}", &name).as_str(), 
+        correlation_id = &message.job_id.to_string().as_str()
+    );
     add_blob_to_search_index(&search_client, blob).await?;
-    tracing::info!("Added to index {} for job {}", &name, &message.job_id);
-
+    tracing::info!(
+        message = format!("Added to index {}", &name).as_str(), 
+        correlation_id = &message.job_id.to_string().as_str()
+    );
     Ok(message.job_id)
 }
 
