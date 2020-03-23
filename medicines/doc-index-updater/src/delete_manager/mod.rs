@@ -1,17 +1,17 @@
 use crate::{
-    models::{DeleteMessage, FileProcessStatus, JobStatus},
+    models::{DeleteMessage, JobStatus},
     search_client,
-    service_bus_client::{
-        delete_factory, DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage,
-    },
+    service_bus_client::{delete_factory, ProcessRetrievalError, RetrievedMessage},
     state_manager::StateManager,
     storage_client,
 };
 use anyhow::anyhow;
+use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
 use std::time::Duration;
 use tokio::time::delay_for;
+use uuid::Uuid;
 
 #[tracing::instrument]
 pub async fn delete_service_worker(
@@ -24,7 +24,10 @@ pub async fn delete_service_worker(
         .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
 
     loop {
-        match try_process_from_queue(&mut delete_client, &state_manager).await {
+        match delete_client
+            .try_process_from_queue::<DeleteMessage>(&state_manager)
+            .await
+        {
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
@@ -32,48 +35,32 @@ pub async fn delete_service_worker(
     }
 }
 
-async fn try_process_from_queue(
-    service_bus_client: &mut DocIndexUpdaterQueue,
-    state_manager: &StateManager,
-) -> Result<(), anyhow::Error> {
-    tracing::info!("Checking for delete messages");
-    let retrieved_result: Result<RetrievedMessage<DeleteMessage>, RetrieveFromQueueError> =
-        service_bus_client.receive().await;
-
-    if let Ok(retrieval) = retrieved_result {
-        let processing_result = process_message(retrieval.message.clone()).await;
-        match processing_result {
-            Ok(FileProcessStatus::Success(job_id)) => {
-                let _ = state_manager.set_status(job_id, JobStatus::Done).await?;
-            }
-            Ok(FileProcessStatus::NothingToProcess) => {}
-            Err(e) => {
-                tracing::error!(
-                    "Error {:?} while processing message {}",
-                    e,
-                    retrieval.message.job_id
-                );
-                tracing::info!(
-                    "Setting error state in state manager for job {}",
-                    retrieval.message.job_id
-                );
-                state_manager
-                    .set_status(
-                        retrieval.message.job_id,
-                        JobStatus::Error {
-                            message: e.to_string(),
-                            code: "".to_string(),
-                        },
-                    )
-                    .await?;
-            }
-        };
-        let _ = retrieval.remove().await?;
+#[async_trait]
+impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
+    async fn handle_processing_error(
+        self,
+        e: anyhow::Error,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<()> {
+        tracing::info!(
+            "Setting error state in state manager for job {}",
+            self.message.job_id
+        );
+        state_manager
+            .set_status(
+                self.message.job_id,
+                JobStatus::Error {
+                    message: e.to_string(),
+                    code: "".to_string(),
+                },
+            )
+            .await?;
+        let _ = self.remove().await?;
+        Ok(())
     }
-    Ok(())
 }
 
-async fn process_message(message: DeleteMessage) -> Result<FileProcessStatus, anyhow::Error> {
+pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
@@ -108,7 +95,7 @@ async fn process_message(message: DeleteMessage) -> Result<FileProcessStatus, an
         &message.job_id
     );
 
-    Ok(FileProcessStatus::Success(message.job_id))
+    Ok(message.job_id)
 }
 
 pub async fn get_blob_name_from_content_id(
