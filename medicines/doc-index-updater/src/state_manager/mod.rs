@@ -1,6 +1,9 @@
 pub use self::redis::get_client;
 use self::redis::{get_from_redis, set_in_redis, MyRedisError};
-use crate::models::{JobStatus, JobStatusResponse};
+use crate::{
+    auth_manager,
+    models::{JobStatus, JobStatusResponse},
+};
 use ::redis::Client;
 use uuid::Uuid;
 use warp::{http::StatusCode, reply::Json, Filter, Rejection, Reply};
@@ -38,6 +41,7 @@ pub fn get_job_status(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("jobs" / Uuid)
         .and(warp::get())
+        .and(auth_manager::with_basic_auth())
         .and(with_state(state_manager))
         .and_then(get_status_handler)
 }
@@ -76,6 +80,7 @@ pub fn set_job_status(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("jobs" / Uuid / JobStatus)
         .and(warp::post())
+        .and(auth_manager::with_basic_auth())
         .and(with_state(state_manager))
         .and_then(set_status_handler)
 }

@@ -16,3 +16,11 @@ output "client_certificate" {
 output "resource_group_name" {
   value = module.cluster.resource_group_name
 }
+
+output "products-hostname-cdn" {
+  value = azurerm_cdn_endpoint.products.host_name
+}
+
+output "cpd-hostname-cdn" {
+  value = azurerm_cdn_endpoint.cpd.host_name
+}

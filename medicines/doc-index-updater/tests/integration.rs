@@ -40,6 +40,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
     let r = block_on(
         warp::test::request()
             .method("POST")
+            .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .path(&format!("/jobs/{}/{}", id, status))
             .reply(&state_manager::set_job_status(state.clone())),
     );
@@ -51,6 +52,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
     let r = block_on(
         warp::test::request()
             .method("GET")
+            .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .path(&format!("/jobs/{}", id))
             .reply(&state_manager::get_job_status(state)),
     );
@@ -70,6 +72,7 @@ fn delete_endpoint_sets_state() {
     let r = block_on(
         warp::test::request()
             .method("DELETE")
+            .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .path("/documents/hello-string")
             .reply(&delete_filter),
     );
@@ -107,6 +110,7 @@ fn create_endpoint_sets_state() {
     let r = block_on(
         warp::test::request()
             .method("POST")
+            .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .body(document_json)
             .path("/documents")
             .reply(&create_filter),

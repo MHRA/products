@@ -58,3 +58,4 @@ module service_bus {
   resource_group_name = azurerm_resource_group.products.name
   name                = "doc-index-updater-prod"
 }
+
