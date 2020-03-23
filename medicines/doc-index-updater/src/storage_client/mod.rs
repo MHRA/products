@@ -8,5 +8,8 @@ pub fn factory() -> Result<Client, AzureError> {
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    Client::new(&storage_account, &master_key)
+    match base64::decode(&master_key) {
+        Ok(_) => Client::new(&storage_account, &master_key),
+        Err(e) => Err(AzureError::Base64DecodeError(e)),
+    }
 }
