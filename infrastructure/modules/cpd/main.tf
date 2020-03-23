@@ -26,7 +26,7 @@ module "cpd_staticweb" {
 
 resource "azurerm_cdn_profile" "cpd" {
   name                = "mhracpd${var.environment}"
-  location            = var.REGION
+  location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "Standard_Microsoft"
 }

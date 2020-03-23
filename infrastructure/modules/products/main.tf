@@ -55,7 +55,7 @@ resource "azurerm_container_registry" "products" {
 
 resource "azurerm_cdn_profile" "products" {
   name                = "mhraproducts${var.environment}"
-  location            = var.REGION
+  location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "Standard_Microsoft"
 }
