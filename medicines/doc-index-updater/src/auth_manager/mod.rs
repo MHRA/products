@@ -33,7 +33,7 @@ fn extract_encoded_credentials(auth_header: String) -> Option<String> {
 }
 
 fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
-    if let Ok(credentials) = base64::decode(encoded_credentials) {
+    if let Ok(credentials) = base64::decode(&encoded_credentials) {
         let re = Regex::new(r"^(?P<username>\w+):(?P<password>\w+)$").unwrap();
         match re.captures(std::str::from_utf8(&credentials).unwrap_or("")) {
             Some(caps) => {
