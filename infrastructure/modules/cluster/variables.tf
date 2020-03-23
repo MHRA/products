@@ -14,12 +14,20 @@ variable "vnet_cidr" {
   description = "CIDR block for cluster vnet"
 }
 
-variable "subnet_name" {
-  description = "Subnet name"
+variable "lb_subnet_name" {
+  description = "Load Balancer Subnet name"
 }
 
-variable "subnet_cidr" {
-  description = "CIDR block for cluster subnet"
+variable "lb_subnet_cidr" {
+  description = "Load Balancer CIDR block"
+}
+
+variable "cluster_subnet_name" {
+  description = "Cluster Subnet name"
+}
+
+variable "cluster_subnet_cidr" {
+  description = "Cluster CIDR block"
 }
 
 variable "route_table_name" {

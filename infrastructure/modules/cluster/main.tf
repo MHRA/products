@@ -9,7 +9,7 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
-data "azurerm_route_table" "cluster" {
+data "azurerm_route_table" "load_balancer" {
   name                = var.route_table_name
   resource_group_name = var.route_table_resource_group_name
 }
@@ -21,16 +21,23 @@ resource "azurerm_virtual_network" "cluster" {
   address_space       = [var.vnet_cidr]
 }
 
-resource "azurerm_subnet" "cluster" {
-  name                 = var.subnet_name
+resource "azurerm_subnet" "load_balancer" {
+  name                 = var.lb_subnet_name
   resource_group_name  = var.resource_group_name
-  address_prefix       = var.subnet_cidr
+  address_prefix       = var.lb_subnet_cidr
   virtual_network_name = azurerm_virtual_network.cluster.name
 }
 
-resource "azurerm_subnet_route_table_association" "cluster" {
-  subnet_id      = azurerm_subnet.cluster.id
-  route_table_id = data.azurerm_route_table.cluster.id
+resource "azurerm_subnet" "cluster" {
+  name                 = var.cluster_subnet_name
+  resource_group_name  = var.resource_group_name
+  address_prefix       = var.cluster_subnet_cidr
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
+
+resource "azurerm_subnet_route_table_association" "load_balancer" {
+  subnet_id      = azurerm_subnet.load_balancer.id
+  route_table_id = data.azurerm_route_table.load_balancer.id
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
@@ -40,11 +47,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   resource_group_name = var.resource_group_name
 
   default_node_pool {
-    name           = "products"
+    name           = "default"
     node_count     = "2"
     vm_size        = "Standard_D2_v2"
     vnet_subnet_id = azurerm_subnet.cluster.id
-    max_pods       = 15
   }
 
   service_principal {
@@ -53,7 +59,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 
   network_profile {
-    network_plugin = "azure"
+    network_plugin = "kubenet"
   }
 
   tags = {
