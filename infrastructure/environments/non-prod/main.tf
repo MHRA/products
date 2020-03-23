@@ -67,6 +67,6 @@ module service_bus {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  name                = "doc-index-updater-non-prod"
+  name                = "doc-index-updater-${var.ENVIRONMENT}"
   resource_group_name = azurerm_resource_group.products.name
 }
