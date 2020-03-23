@@ -52,3 +52,22 @@ resource "azurerm_container_registry" "products" {
     environment = var.environment
   }
 }
+
+resource "azurerm_cdn_profile" "products" {
+  name                = "mhraproductsprod"
+  location            = var.REGION
+  resource_group_name = var.resource_group_name
+  sku                 = "Standard_Microsoft"
+}
+
+resource "azurerm_cdn_endpoint" "products" {
+  name                = "mhraproductsprod"
+  profile_name        = azurerm_cdn_profile.products.name
+  location            = azurerm_cdn_profile.products.location
+  resource_group_name = var.resource_group_name
+  origin_host_header  = azurerm_storage_account.products.primary_web_host
+  origin {
+    name      = "mhraproductsprod"
+    host_name = azurerm_storage_account.products.primary_web_host
+  }
+}
