@@ -71,9 +71,12 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 }
 
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
+    let correlation_id = message.job_id.to_string();
+    let correlation_id = correlation_id.as_str();
+    
     tracing::info!(
         message = format!("Message received: {:?} ", message).as_str(),
-        correlation_id = message.job_id.to_string().as_str()
+        correlation_id
     );
 
     let search_client = search_client::factory();
@@ -90,15 +93,19 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
+    
     tracing::info!(
         message = format!("Uploaded blob {}", &name).as_str(), 
-        correlation_id = &message.job_id.to_string().as_str()
+        correlation_id
     );
+    
     add_blob_to_search_index(&search_client, blob).await?;
+    
     tracing::info!(
         message = format!("Added to index {}", &name).as_str(), 
-        correlation_id = &message.job_id.to_string().as_str()
+        correlation_id
     );
+    
     Ok(message.job_id)
 }
 
