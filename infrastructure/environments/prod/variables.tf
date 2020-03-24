@@ -10,5 +10,5 @@ variable "RESOURCE_GROUP_PRODUCTS" {
 
 variable "ENVIRONMENT" {
   description = "Environment name"
-  default     = "non-prod"
+  default     = "prod"
 }
