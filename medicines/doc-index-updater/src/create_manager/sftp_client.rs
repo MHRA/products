@@ -58,7 +58,8 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
 }
 
 pub async fn get_env_fail_fast(name: &str) -> String {
-    std::env::var(name).expect(&format!("Set env variable {} first!", name))
+    let failure_message = format!("Set env variable {} first!", name);
+    std::env::var(name).expect(&failure_message)
 }
 
 async fn retrieve_file_from_sftp(
