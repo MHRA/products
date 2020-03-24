@@ -15,6 +15,7 @@
 
 # Environment ignores
 **/.env*
+!**/.env.example
 
 # Mac OS X ignores
 **/.DS_Store
