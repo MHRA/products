@@ -74,7 +74,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let correlation_id = message.job_id.to_string();
     let correlation_id = correlation_id.as_str();
     
-    tracing::info!(
+    tracing::debug!(
         message = format!("Message received: {:?} ", message).as_str(),
         correlation_id
     );
@@ -94,15 +94,15 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
     
-    tracing::info!(
-        message = format!("Uploaded blob {}", &name).as_str(), 
+    tracing::debug!(
+        message = format!("Uploaded blob {}.", &name).as_str(), 
         correlation_id
     );
     
     add_blob_to_search_index(&search_client, blob).await?;
     
     tracing::info!(
-        message = format!("Added to index {}", &name).as_str(), 
+        message = format!("Successfully added {} to index.", &name).as_str(), 
         correlation_id
     );
     
