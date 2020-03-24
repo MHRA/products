@@ -62,6 +62,9 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
+    let correlation_id = message.job_id.to_string();
+    let correlation_id = correlation_id.as_str();
+
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
@@ -69,26 +72,28 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Err
     let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
     let blob_name =
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
+        
     tracing::info!(
         message = format!("Found blob name {} for document content ID {} from index", &blob_name, &message.document_content_id).as_str(),
-        correlation_id = &message.job_id.to_string().as_str()
+        correlation_id
     );
     delete_from_index(&search_client, &blob_name).await?;
     tracing::info!(
         message = format!("Deleted blob {} from index", &blob_name).as_str(),
-        correlation_id = &message.job_id.to_string().as_str()
+        correlation_id
     );
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
         .map_err(|e| {
             tracing::error!(
                 message = format!("Error deleting blob: {:?}", e).as_str(), 
-                correlation_id = &message.job_id.to_string().as_str());
+                correlation_id
+            );
             anyhow!("Couldn't delete blob {}", &blob_name)
         })?;
     tracing::info!(
         message = format!("Deleted blob {} from storage container {}", &blob_name, &storage_container_name).as_str(),
-        correlation_id = &message.job_id.to_string().as_str()
+        correlation_id
     );
 
     Ok(message.job_id)
