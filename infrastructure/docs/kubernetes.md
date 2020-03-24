@@ -1,11 +1,8 @@
 # MHRA Medicines microservice
 
-The following instructions are divided in:
+## [Connecting to a Kubernetes cluster](#connecting-to-a-kubernetes-cluster) using `kubectl`
 
-- [Connecting to a Kubernetes cluster](#connecting-to-a-kubernetes-cluster) using `kubectl`
-- [Installing Istio](#installing-istio)
-
-## Setup
+### Setup
 
 To run the following steps, first you should:
 
@@ -17,7 +14,7 @@ To run the following steps, first you should:
    az login
    ```
 
-4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
+4. If you have access to more than one subscription, you can set the current subscription by using the relevant `SUBSCRIPTION_ID` from the output of the above login command:
 
    ```sh
    az account set --subscription="SUBSCRIPTION_ID"
@@ -39,7 +36,7 @@ To be able to connect to the cluster, we need to set the Kubernetes credentials 
 3. Create the credentials file running this script
 
    ```sh
-   ../../scripts/create-kubernetes-config.sh
+   ../../scripts/update-kubernetes-config.sh
    ```
 
 Now you can run `kubectl` commands, e.g.
@@ -48,58 +45,28 @@ Now you can run `kubectl` commands, e.g.
 kubectl get nodes
 ```
 
-## Installing Istio
+## Installing Istio, Sealed Secrets, Argo and service workloads:
 
-1. Change to the root directory
-
-   ```sh
-   cd ~
-   ```
-
-2. Specify the [Istio version](https://github.com/istio/istio/releases/)
+1. Apply manifest to the cluster - to do this, clone the [deployments](https://github.com/MHRA/deployments) repo, go to `cluster-init` dir and run
 
    ```sh
-   ISTIO_VERSION=1.4.0
+   make overlay=non-prod
    ```
 
-3. Download and install
-
-   ```sh
-     curl -L https://istio.io/downloadIstio | sh -
-   ```
-
-4. To configure the `istioctl` client tool
-
-   ```sh
-   export PATH="${PATH}:${HOME}/istio-1.4.3/bin"
-   ```
-
-5. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-6. Source the environment variables
-
-   ```sh
-     source .env
-   ```
-
-7. Create a kubernetes namespace called `istio-system`
-
-   ```sh
-   kubectl create namespace istio-system --save-config
-   ```
-
-8. Apply manifest to the cluster
-
-   ```sh
-   istioctl manifest apply -f control-plane.yml --logtostderr
-   ```
-
-9. Validate the Istio installation
+1. Validate the Istio installation
 
    ```sh
    kubectl get svc --namespace istio-system --output wide
    ```
 
-10. Confirm that the required pods have been created
-    ```sh
-    kubectl get pods --namespace istio-system
-    ```
+1. Confirm that the required pods have been created
+
+   ```sh
+   kubectl get pods --namespace istio-system
+   ```
+
+1. Note you will need to install an SSL certificate and private key. There is a `./certs.sh` for a self-sign, or you can obtain a vaid cert from Let's Encrypt (e.g. using [`acme.sh`](https://acme.sh/)). Note that you may need to restart the ingress gateway pod to pick up the new certs.
+
+   ```bash
+   kubectl create -n istio-system secret tls istio-ingressgateway-certs --key key.txt --cert crt.txt
+   ```

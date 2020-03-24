@@ -90,9 +90,9 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
    ```
    Outputs:
 
-   cpd-primary-access-key = APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
-   cpd-static-web-url = https://mhracpdnonprod.z33.web.core.windows.net/
-   products-primary-access-key = ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
-   products-static-web-url = https://mhraproductsnonprod.z33.web.core.windows.net/
+   cpd_primary_access_key = APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
+   cpd_static_web_url = https://mhracpdnonprod.z33.web.core.windows.net/
+   products_primary_access_key = ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
+   products_static_web_url = https://mhraproductsnonprod.z33.web.core.windows.net/
    search_admin_key = CB28B1A47E29FF4620184BD27B89945E
    ```

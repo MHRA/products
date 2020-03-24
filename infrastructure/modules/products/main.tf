@@ -26,7 +26,7 @@ resource "azurerm_storage_container" "docs" {
 # waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
 # (which is imminent), but in the meantime ...
 module "products_staticweb" {
-  source               = "git@github.com:StefanSchoof/terraform-azurerm-static-website.git"
+  source               = "github.com/StefanSchoof/terraform-azurerm-static-website.git"
   storage_account_name = azurerm_storage_account.products.name
 }
 

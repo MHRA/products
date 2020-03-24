@@ -38,11 +38,19 @@ module "products" {
 module cluster {
   source = "../../modules/cluster"
 
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  resource_group_name = azurerm_resource_group.products.name
+  client_id                       = var.CLIENT_ID
+  client_secret                   = var.CLIENT_SECRET
+  environment                     = var.ENVIRONMENT
+  location                        = var.REGION
+  resource_group_name             = azurerm_resource_group.products.name
+  vnet_name                       = "aparz-spoke-np-products"
+  vnet_cidr                       = "10.5.65.0/24"
+  lb_subnet_name                  = "adarz-spoke-products-sn-01"
+  lb_subnet_cidr                  = "10.5.65.0/26"
+  cluster_subnet_name             = "adarz-spoke-products-sn-02"
+  cluster_subnet_cidr             = "10.5.65.64/26"
+  route_table_name                = "adarz-spoke-rt-products-internal-only"
+  route_table_resource_group_name = "asazr-rg-1001"
 }
 
 # CPD
@@ -61,6 +69,6 @@ module service_bus {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  name                = "doc-index-updater-non-prod"
+  name                = "doc-index-updater-${var.ENVIRONMENT}"
   resource_group_name = azurerm_resource_group.products.name
 }
