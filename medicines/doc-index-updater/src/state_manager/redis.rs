@@ -51,7 +51,7 @@ impl ToRedisArgs for JobStatus {
         W: ?Sized + RedisWrite,
     {
         let s = self.to_string();
-        tracing::info!("{:#}", s);
+        tracing::debug!("{:#}", s);
         out.write_arg(s.as_bytes());
     }
 }
