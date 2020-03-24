@@ -16,27 +16,16 @@ resource "azurerm_virtual_network" "cluster" {
   address_space       = [var.vnet_cidr]
 }
 
-data "azurerm_route_table" "load_balancer" {
-  name                = var.route_table_name
-  resource_group_name = var.route_table_resource_group_name
-}
-
 resource "azurerm_subnet" "load_balancer" {
   name                 = var.lb_subnet_name
   resource_group_name  = var.resource_group_name
   address_prefix       = var.lb_subnet_cidr
   virtual_network_name = azurerm_virtual_network.cluster.name
-
-  lifecycle {
-    ignore_changes = [
-      route_table_id,
-    ]
-  }
 }
 
 resource "azurerm_subnet_route_table_association" "load_balancer" {
   subnet_id      = azurerm_subnet.load_balancer.id
-  route_table_id = data.azurerm_route_table.load_balancer.id
+  route_table_id = var.route_table_id
 }
 
 resource "azurerm_subnet" "cluster" {
@@ -44,13 +33,6 @@ resource "azurerm_subnet" "cluster" {
   resource_group_name  = var.resource_group_name
   address_prefix       = var.cluster_subnet_cidr
   virtual_network_name = azurerm_virtual_network.cluster.name
-
-  lifecycle {
-    ignore_changes = [
-      network_security_group_id,
-      route_table_id,
-    ]
-  }
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {

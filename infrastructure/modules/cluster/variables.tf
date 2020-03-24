@@ -30,12 +30,8 @@ variable "cluster_subnet_cidr" {
   description = "Cluster CIDR block"
 }
 
-variable "route_table_name" {
-  description = "Route Table name"
-}
-
-variable "route_table_resource_group_name" {
-  description = "Resource Group that hosts the Route Table"
+variable "route_table_id" {
+  description = "Route Table ID"
 }
 
 variable "environment" {
@@ -49,6 +45,3 @@ variable "client_id" {
 variable "client_secret" {
   description = "Service Principal Client Secret"
 }
-
-
-
