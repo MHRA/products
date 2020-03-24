@@ -62,8 +62,39 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     network_plugin = "kubenet"
   }
 
+  addon_profile {
+    oms_agent {
+      enabled                    = true
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.cluster.id
+    }
+  }
+
   tags = {
     Environment = var.environment
   }
 }
 
+resource "azurerm_log_analytics_workspace" "cluster" {
+  name                = "cluster-analytics"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "azurerm_log_analytics_solution" "example" {
+  solution_name         = "ContainerInsights" # must match product name below (see: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1775)
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  workspace_resource_id = azurerm_log_analytics_workspace.cluster.id
+  workspace_name        = azurerm_log_analytics_workspace.cluster.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/ContainerInsights"
+  }
+}
