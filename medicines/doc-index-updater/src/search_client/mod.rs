@@ -144,11 +144,12 @@ async fn search(
         .header("api-key", &config.api_key)
         .build()?;
 
-    println!("Requesting from URL: {}", &req.url());
+    tracing::debug!("Requesting from URL: {}", &req.url());
 
     client
         .execute(req)
         .await?
+        .error_for_status()?
         .json::<AzureSearchResults>()
         .await
 }
