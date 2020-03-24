@@ -23,7 +23,7 @@ fn set_get_compatibility_on_state_manager(status: JobStatus) {
 
     let response = get_ok(state.set_status(id, status.clone()));
 
-    assert_eq!(response.status, status.clone());
+    assert_eq!(response.status, status);
 
     let response = get_ok(state.get_status(id));
     assert_eq!(response.status, status);
@@ -47,7 +47,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
 
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
 
-    assert_eq!(response.status, status.clone());
+    assert_eq!(response.status, status);
 
     let r = block_on(
         warp::test::request()

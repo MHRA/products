@@ -4,7 +4,6 @@ use crate::{
 };
 
 use chrono::{SecondsFormat, Utc};
-use lazy_static;
 use regex::Regex;
 use serde::Serialize;
 use std::{collections::HashMap, str};
@@ -57,7 +56,7 @@ impl Into<HashMap<String, String>> for BlobMetadata {
         let mut metadata: HashMap<String, String> = HashMap::new();
 
         metadata.insert("file_name".to_string(), self.file_name.clone());
-        metadata.insert("doc_type".to_string(), self.doc_type.clone().to_string());
+        metadata.insert("doc_type".to_string(), self.doc_type.to_string());
         metadata.insert("title".to_string(), self.title.clone());
         metadata.insert(
             "product_name".to_string(),
@@ -72,7 +71,7 @@ impl Into<HashMap<String, String>> for BlobMetadata {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
         metadata.insert("pl_number".to_string(), self.pl_number.clone());
-        metadata.insert("author".to_string(), self.author.clone());
+        metadata.insert("author".to_string(), self.author);
 
         metadata
     }

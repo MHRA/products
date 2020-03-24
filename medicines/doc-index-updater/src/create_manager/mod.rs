@@ -50,7 +50,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file".to_string() {
+        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
             tracing::info!("Updating state to errored and removing message");
             let _ = state_manager
                 .set_status(
@@ -82,7 +82,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(&storage_client, &file, metadata.clone().into()).await?;
+    let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
     tracing::info!("Uploaded blob {} for job {}", &name, &message.job_id);
 
