@@ -1,11 +1,11 @@
 # Setup rust build environment
-FROM rust:1.41.0 AS build-context
+FROM rust:1.42.0 AS build-context
 
 RUN apt-get update && apt-get install -y \
   redis \
   ;
 
-RUN rustup component add rustfmt
+RUN rustup component add rustfmt clippy
 
 WORKDIR /usr/src/doc-index-updater
 
@@ -44,7 +44,8 @@ FROM build-context AS build
 
 COPY ./src ./src
 
-RUN cargo test --release && \
+RUN cargo clippy --release -- -D warnings && \
+  cargo test --release && \
   cargo build --release
 
 # Create the release

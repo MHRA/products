@@ -1,4 +1,3 @@
-use base64;
 use futures::future;
 use regex::Regex;
 use warp::{Filter, Rejection};
@@ -67,10 +66,13 @@ fn attempt_basic_auth(auth_header: String) -> bool {
 pub fn with_basic_auth() -> impl Filter<Extract = (), Error = Rejection> + Copy {
     warp::header::optional::<String>("Authorization")
         .and_then(|header: Option<String>| match header {
-            Some(auth_header) => match attempt_basic_auth(auth_header) {
-                true => future::ok(()),
-                false => future::err(warp::reject::custom(AuthenticationFailed)),
-            },
+            Some(auth_header) => {
+                if attempt_basic_auth(auth_header) {
+                    future::ok(())
+                } else {
+                    future::err(warp::reject::custom(AuthenticationFailed))
+                }
+            }
             None => future::err(warp::reject::custom(AuthenticationFailed)),
         })
         .untuple_one()
