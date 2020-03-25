@@ -33,15 +33,6 @@ brew install stunnel
 - start stunnel in a new terminal window:
 
 ```bash
-cat <<EOF > stunnel.conf
-debug = 7
-foreground = yes
-
-[doc_index_updater]
-client = yes
-accept = 127.0.0.1:6379
-connect = doc-index-updater-dev.redis.cache.windows.net:6380
-EOF
 stunnel stunnel.conf
 ```
 
@@ -50,6 +41,10 @@ stunnel stunnel.conf
 ```bash
 cargo run
 ```
+
+## Environment variables via Azure key vault
+
+Environment variables are shared via Azure key vault. To get them, run `make get-env`. To update them, run `make set-env`.
 
 ## To run in a local cluster:
 
