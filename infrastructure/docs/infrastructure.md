@@ -69,13 +69,13 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
 3. Source the environment variables
 
    ```sh
-     source .env
+   set -a && source .env && set +a
    ```
 
 4. Initialize terraform (ensure providers/modules are installed and backend is initialized)
 
    ```sh
-     terraform init
+   terraform init
    ```
 
 5. Create a plan, or apply the infrastructure
