@@ -1,4 +1,5 @@
 use crate::{
+    get_env_or_default,
     models::{JobStatus, Message},
     state_manager::StateManager,
 };
@@ -42,10 +43,6 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
 
     let service_bus = Client::new(service_bus_namespace, queue_name, policy_name, policy_key)?;
     Ok(DocIndexUpdaterQueue::new(service_bus))
-}
-
-pub struct DocIndexUpdaterQueue {
-    service_bus: Client,
 }
 
 #[derive(Debug)]
@@ -92,9 +89,19 @@ pub trait ProcessRetrievalError {
     ) -> anyhow::Result<()>;
 }
 
+pub struct DocIndexUpdaterQueue {
+    service_bus: Client,
+    lock_timeout: time::Duration,
+}
+
 impl DocIndexUpdaterQueue {
     fn new(service_bus: Client) -> Self {
-        Self { service_bus }
+        let lock_timeout = get_env_or_default("SERVICE_BUS_MESSAGE_LOCK_TIMEOUT", 10);
+        let lock_timeout = time::Duration::seconds(lock_timeout);
+        Self {
+            service_bus,
+            lock_timeout,
+        }
     }
 
     pub async fn receive<T: Message>(
@@ -102,7 +109,7 @@ impl DocIndexUpdaterQueue {
     ) -> Result<RetrievedMessage<T>, RetrieveFromQueueError> {
         let peek_lock = self
             .service_bus
-            .peek_lock_full(time::Duration::days(1), Some(time::Duration::seconds(10)))
+            .peek_lock_full(time::Duration::days(1), Some(self.lock_timeout))
             .await
             .map_err(|e| {
                 tracing::error!("{:?}", e);
