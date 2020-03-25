@@ -1,8 +1,8 @@
-use anyhow::anyhow;
-use core::fmt::Display;
-use doc_index_updater::{create_manager, delete_manager, document_manager, health, state_manager};
+use doc_index_updater::{
+    create_manager, delete_manager, document_manager, get_env_or_default, health, state_manager,
+};
 use state_manager::get_client;
-use std::{env, error, net::SocketAddr, time::Duration};
+use std::{error, net::SocketAddr, time::Duration};
 use tracing::Level;
 use warp::Filter;
 
@@ -81,25 +81,6 @@ fn use_unstructured_log_subscriber() {
         .finish();
 
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
-}
-
-pub fn get_env_or_default<T>(key: &str, default: T) -> T
-where
-    T: std::str::FromStr + Display,
-{
-    get_env(key).unwrap_or_else(|e| {
-        tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
-        default
-    })
-}
-
-pub fn get_env<T>(key: &str) -> Result<T, anyhow::Error>
-where
-    T: std::str::FromStr,
-{
-    env::var(key)?
-        .parse::<T>()
-        .map_err(|_| anyhow!("failed to parse for {}", key))
 }
 
 fn create_redis_url(server: String, port: String, key: String) -> String {
