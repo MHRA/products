@@ -39,7 +39,7 @@ stunnel stunnel.conf
 - run the service:
 
 ```bash
-cargo run
+make
 ```
 
 ## Environment variables via Azure key vault
