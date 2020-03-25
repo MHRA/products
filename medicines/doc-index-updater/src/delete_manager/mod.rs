@@ -29,7 +29,7 @@ pub async fn delete_service_worker(
             .await
         {
             Ok(()) => {}
-            Err(e) => tracing::error!("{:?}", e),
+            Err(e) => tracing::error!("{:?}", e)
         }
         delay_for(time_to_wait).await;
     }
@@ -42,9 +42,8 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        tracing::info!(
-            "Setting error state in state manager for job {}",
-            self.message.job_id
+        tracing::info!(message = "Setting error state in state manager",
+            correlation_id = self.message.job_id.to_string().as_str()
         );
         state_manager
             .set_status(
@@ -63,6 +62,9 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
+    let correlation_id = message.job_id.to_string();
+    let correlation_id = correlation_id.as_str();
+
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
@@ -70,29 +72,28 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Err
     let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
     let blob_name =
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
+        
     tracing::info!(
-        "Found blob name {} for document content ID {} from index for job {}",
-        &blob_name,
-        &message.document_content_id,
-        &message.job_id,
+        message = format!("Found blob name {} for document content ID {} from index", &blob_name, &message.document_content_id).as_str(),
+        correlation_id
     );
     delete_from_index(&search_client, &blob_name).await?;
     tracing::info!(
-        "Deleted blob {} from index for job {}",
-        &blob_name,
-        &message.job_id
+        message = format!("Deleted blob {} from index", &blob_name).as_str(),
+        correlation_id
     );
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
         .map_err(|e| {
-            tracing::error!("Error deleting blob: {:?}", e);
+            tracing::error!(
+                message = format!("Error deleting blob: {:?}", e).as_str(), 
+                correlation_id
+            );
             anyhow!("Couldn't delete blob {}", &blob_name)
         })?;
     tracing::info!(
-        "Deleted blob {} from storage container {} for job {}",
-        &blob_name,
-        &storage_container_name,
-        &message.job_id
+        message = format!("Deleted blob {} from storage container {}", &blob_name, &storage_container_name).as_str(),
+        correlation_id
     );
 
     Ok(message.job_id)
@@ -100,7 +101,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Err
 
 pub async fn get_blob_name_from_content_id(
     content_id: String,
-    search_client: &search_client::AzureSearchClient,
+    search_client: &search_client::AzureSearchClient
 ) -> Result<String, anyhow::Error> {
     let search_results = search_client.search(content_id.to_owned()).await?;
     for result in search_results.search_results {
@@ -108,8 +109,7 @@ pub async fn get_blob_name_from_content_id(
             return Ok(result.metadata_storage_name);
         }
     }
-    let error_message = format!("Cannot find document with content ID {}", content_id);
-    Err(anyhow!(error_message))
+    Err(anyhow!(format!("Cannot find document with content ID {}", content_id)))
 }
 
 async fn delete_blob(
