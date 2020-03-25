@@ -1,6 +1,6 @@
 # Project architecture
 
-![](./architecture_v0.2.svg)
+![](./architecture.svg)
 
 The diagram above shows how we can leverage Azure’s Kubernetes Service (AKS) to host an API pod for the medicines microservice, a Web pod for the (initially static) website, and an importer “cronjob” pod which periodically imports data from Sentinel’s batch export process. Although each pod is only shown once, in reality there are multiple instances of each, for reliability (across zones) and scalability (new instances can be created and destroyed automatically and in just a few seconds).
 
