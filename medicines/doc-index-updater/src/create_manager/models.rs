@@ -102,8 +102,8 @@ pub struct IndexEntry {
     facets: Vec<String>,
 }
 
-impl IndexEntry {
-    pub fn for_blob(blob: Blob) -> Self {
+impl From<Blob> for IndexEntry {
+    fn from(blob: Blob) -> Self {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: "1".to_owned(),
