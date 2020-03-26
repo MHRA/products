@@ -13,7 +13,7 @@ use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
 
-#[tracing::instrument]
+#[tracing::instrument(skip(state_manager))]
 pub async fn delete_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
