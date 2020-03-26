@@ -2,7 +2,8 @@ name: medicines-web-branch
 
 on:
   push:
-    branches: "!master"
+    branches:
+      - "!master"
     paths:
       - medicines/web/**
       - .github/workflows/medicines-web-branch.yaml
@@ -21,8 +22,8 @@ jobs:
         with:
           frozen-lockfile: true
           cwd: web
-      - name: Test
+      - name: Run tests
         uses: sergioramos/yarn-actions/run@v6
         with:
           cwd: web
-        cmd: test:ci
+          args: test:ci

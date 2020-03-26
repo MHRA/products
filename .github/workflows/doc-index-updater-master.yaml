@@ -2,7 +2,8 @@ name: doc-index-updater-master
 
 on:
   push:
-    branches: master
+    branches:
+      - master
     paths:
       - medicines/doc-index-updater/**
       - .github/workflows/doc-index-updater-master.yaml
