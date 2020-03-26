@@ -42,24 +42,6 @@ impl From<Vec<String>> for VecSanitisedString {
     }
 }
 
-// impl Iterator for VecSanitisedString {
-//     type Item = SanitisedString;
-//     fn next(&mut self) -> Option<Self::Item> {
-//         if let Some(a) = self.iter {
-//             //
-//         } else {
-//             self.iter = self.inner.iter();
-//         }
-
-//         if let Some(a) = self.iter.next() {
-//             Some(SanitisedString::from(a))
-//         } else {
-//             self.iter = None;
-//             None
-//         }
-//     }
-// }
-
 impl VecSanitisedString {
     pub fn to_vec_string(&self) -> Vec<String> {
         self.clone()
