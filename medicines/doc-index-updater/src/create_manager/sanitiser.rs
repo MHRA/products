@@ -83,11 +83,24 @@ mod test {
         );
     }
     #[test]
-    fn sanitise_remove_non_ascii() {
+    fn sanitise_remove_accented_character() {
+        assert_eq!(
+            SanitisedString::from("un café, s'il vous plait").to_string(),
+            "un caf, s'il vous plait"
+        );
+    }
+
+    #[test]
+    fn sanitise_remove_emoji() {
         assert_eq!(
             SanitisedString::from("emoji🙂 ∫test").to_string(),
             "emoji test"
         );
+    }
+    #[test]
+    fn sanitise_the_cure() {
+        // disintegration - get it?
+        assert_eq!(SanitisedString::from("∫x").to_string(), "x");
     }
     #[test]
     fn sanitise_trim() {
