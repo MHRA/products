@@ -1,10 +1,11 @@
-name: doc-index-updater
+name: doc-index-updater-master
 
 on:
   push:
+    branches: master
     paths:
       - medicines/doc-index-updater/**
-      - .github/workflows/doc-index-updater.yaml
+      - .github/workflows/doc-index-updater-master.yaml
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
@@ -19,23 +20,14 @@ jobs:
         with:
           path: products
 
-      - name: Build and test Docker image (BRANCH only)
-        if: github.ref != 'refs/heads/master'
-        working-directory: ./products/medicines/doc-index-updater
-        run: |
-          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci-branch tag=$TAG
-
-      - name: Docker login (MASTER only)
-        if: github.ref == 'refs/heads/master'
+      - name: Docker login
         uses: azure/docker-login@v1
         with:
           login-server: mhraproductsnonprodregistry.azurecr.io
           username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build, test and push Docker image (MASTER only)
-        if: github.ref == 'refs/heads/master'
+      - name: Build, test and push Docker image
         working-directory: ./products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
@@ -44,17 +36,15 @@ jobs:
           echo ::set-env name=TAG::$TAG
           echo ::set-env name=DIGEST::$DIGEST
 
-      - name: Clone Deployments repo (MASTER only)
+      - name: Clone Deployments repo
         uses: actions/checkout@v2
-        if: github.ref == 'refs/heads/master'
         with:
           repository: MHRA/deployments
           path: deployments
           token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
 
-      - name: Update image tag (MASTER only)
+      - name: Update image tag
         uses: stefanprodan/kube-tools@v1
-        if: github.ref == 'refs/heads/master'
         with:
           kustomize: 3.4.0
           command: |
