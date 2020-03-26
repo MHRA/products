@@ -76,6 +76,18 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 
   addon_profile {
+    aci_connector_linux {
+      enabled = false
+    }
+    azure_policy {
+      enabled = false
+    }
+    http_application_routing {
+      enabled = false
+    }
+    kube_dashboard {
+      enabled = false
+    }
     oms_agent {
       enabled                    = true
       log_analytics_workspace_id = azurerm_log_analytics_workspace.cluster.id
