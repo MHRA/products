@@ -24,9 +24,7 @@ $  cargo test
 
 ### Setting the correct environment variables
 
-## Environment
-
-To get the environment variables for non-prod, run:
+To set the environment variables for non-prod from the cache in Azure, run:
 
 ```sh
 ./get-env.sh

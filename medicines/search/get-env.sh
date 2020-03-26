@@ -1,5 +1,5 @@
-az keyvault secret show \
+export $(az keyvault secret show \
   --vault-name mhra-non-prod-02 \
-  --name search-index-creator-env \    
+  --name search-index-creator-env \
   --query value \
-  --output tsv > .env
+  --output tsv | xargs)
