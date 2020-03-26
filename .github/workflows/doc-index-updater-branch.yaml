@@ -20,11 +20,9 @@ jobs:
     steps:
       - name: Clone Repo
         uses: actions/checkout@v2
-        with:
-          path: products
 
       - name: Build and test Docker image
-        working-directory: ./products/medicines/doc-index-updater
+        working-directory: ./medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-branch tag=$TAG
