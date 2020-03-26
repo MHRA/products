@@ -48,7 +48,7 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      - name: Build
+      - name: Build and export
         working-directory: medicines/web
         run: yarn build && yarn export
         env:
@@ -60,12 +60,26 @@ jobs:
         env:
           ROOT_URL_DOMAIN: localhost
 
-      - uses: actions/upload-artifact@v1
+      - name: Upload cypress screenshots
+        uses: actions/upload-artifact@v1
         with:
           name: medicines-cypress-screenshots
           path: medicines/web/cypress/screenshots
 
-      - uses: actions/upload-artifact@v1
+      - name: Upload cypress videos
+        uses: actions/upload-artifact@v1
         with:
           name: medicines-cypress-videos
           path: medicines/web/cypress/videos
+
+      - name: Accessibility check
+        working-directory: medicines/web
+        run: yarn a11y
+        env:
+          ROOT_URL_DOMAIN: localhost
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v1
+        with:
+          name: medicines-dist
+          path: medicines/web/dist
