@@ -40,7 +40,7 @@ First, follow the [setup steps above](#setting-up).
 Destroying the cluster is now just one step:
 
 ```sh
-  terraform destroy --target=module.cluster.azurerm_kubernetes_cluster.cluster
+  terraform destroy --target=module.cluster
 ```
 
 This should give a nice message saying well done on a good destruction job: `Destruction complete.`
@@ -52,7 +52,7 @@ First, follow the [setup steps above](#setting-up).
 1. Provision cluster.
 
    ```sh
-   terraform apply --target=module.cluster.azurerm_kubernetes_cluster.cluster
+   terraform apply --target=module.cluster
    ```
 
 2. Update your `~/.kube/config` with credentials for the new cluster, by running this script.
