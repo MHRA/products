@@ -30,7 +30,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
-    tracing::info!("StateManager config: {:?}", state);
 
     let create_state = state.clone();
     let delete_state = state.clone();

@@ -21,7 +21,7 @@ pub mod models;
 mod search_index;
 mod sftp_client;
 
-#[tracing::instrument]
+#[tracing::instrument(skip(state_manager))]
 pub async fn create_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
