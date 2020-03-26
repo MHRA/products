@@ -52,7 +52,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     ) -> anyhow::Result<()> {
         if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
             tracing::warn!(
-                message = "Couldn't find file. Updating state to errored and removing message.",  
+                message = "Couldn't find file. Updating state to errored and removing message.",
                 correlation_id = self.message.job_id.to_string().as_str()
             );
             let _ = state_manager
@@ -73,7 +73,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
     let correlation_id = message.job_id.to_string();
     let correlation_id = correlation_id.as_str();
-    
+
     tracing::debug!(
         message = format!("Message received: {:?} ", message).as_str(),
         correlation_id
@@ -93,19 +93,19 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
-    
+
     tracing::debug!(
-        message = format!("Uploaded blob {}.", &name).as_str(), 
+        message = format!("Uploaded blob {}.", &name).as_str(),
         correlation_id
     );
-    
+
     add_blob_to_search_index(&search_client, blob).await?;
-    
+
     tracing::info!(
-        message = format!("Successfully added {} to index.", &name).as_str(), 
+        message = format!("Successfully added {} to index.", &name).as_str(),
         correlation_id
     );
-    
+
     Ok(message.job_id)
 }
 

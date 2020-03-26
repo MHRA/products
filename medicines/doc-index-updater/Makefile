@@ -6,6 +6,21 @@ tag := latest
 default: ## run locally
 	export $$(cat .env | xargs) && cargo run
 
+.PHONY: get-env
+get-env: ## run locally
+	az keyvault secret show \
+	  --vault-name mhra-non-prod-02 \
+	  --name doc-index-updater-env \
+	  --query value \
+	  --output tsv > .env
+
+.PHONY: set-env
+set-env: ## run locally
+	az keyvault secret set \
+	--vault-name mhra-non-prod-02 \
+	--name doc-index-updater-env \
+	--file .env
+
 .PHONY: ci-branch
 ci-branch: docker-build ## Build branch in CI
 
