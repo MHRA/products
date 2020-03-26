@@ -18,6 +18,7 @@ use tokio::time::delay_for;
 
 mod hash;
 pub mod models;
+mod sanitiser;
 mod search_index;
 mod sftp_client;
 
