@@ -100,7 +100,6 @@ pub struct IndexEntry {
     suggestions: Vec<String>,
     substance_name: Vec<String>,
     facets: Vec<String>,
-    is_deleted: bool,
 }
 
 impl IndexEntry {
@@ -124,7 +123,6 @@ impl IndexEntry {
             suggestions: vec![],
             substance_name: blob.metadata.active_substances.clone(),
             facets: blob.metadata.facets(),
-            is_deleted: false,
             metadata_storage_content_type: String::default(),
             metadata_storage_size: blob.size,
             metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
