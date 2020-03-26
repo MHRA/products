@@ -36,11 +36,11 @@ jobs:
           node-version: "13.11"
 
       - name: Install modules
-        working-directory: ./medicines/web
+        working-directory: medicines/web
         run: yarn install --frozen-lockfile
 
       - name: Run tests with coverage
-        working-directory: ./medicines/web
+        working-directory: medicines/web
         run: yarn test:ci
 
       - name: Extract branch name
@@ -49,7 +49,23 @@ jobs:
         id: extract_branch
 
       - name: Build
-        working-directory: ./medicines/web
+        working-directory: medicines/web
         run: yarn build && yarn export
         env:
           ASSET_PREFIX: ${{ steps.extract_branch.outputs.branch }}
+
+      - name: Run end-to-end tests
+        working-directory: medicines/web
+        run: mkdir -p cypress/screenshots && yarn test-e2e
+        env:
+          ROOT_URL_DOMAIN: localhost
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: medicines-cypress-screenshots
+          path: medicines/web/cypress/screenshots
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: medicines-cypress-videos
+          path: medicines/web/cypress/videos
