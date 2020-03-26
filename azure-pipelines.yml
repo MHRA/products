@@ -1,293 +1,269 @@
-name: $(Date:yyyyMMdd)$(Rev:.r)
+# name: $(Date:yyyyMMdd)$(Rev:.r)
 
-variables:
-  CARGO_INCREMENTAL: 0
-  RUST_BACKTRACE: 1
-  SERVICE_CONNECTION: Azure Dev
-  STORAGE_ACCOUNT_PRODUCTS: mhraproductsdev
-  STORAGE_ACCOUNT_CPD: mhracpddev
+# # specific path build
+# trigger:
+#   branches:
+#     include:
+#       - "*"
+#   paths:
+#     exclude:
+#       - docs/
+#       - infrastructure/
+#       - medicines/doc-index-updater/
+#       - medicines/doc-index-updater-stub/
 
-stages:
-  - stage: web
-    dependsOn: []
-    jobs:
-      - job: web
-        dependsOn: []
-        pool:
-          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04
+# variables:
+#   CARGO_INCREMENTAL: 0
+#   RUST_BACKTRACE: 1
+#   SERVICE_CONNECTION: Azure Dev
+#   STORAGE_ACCOUNT_PRODUCTS: mhraproductsdev
+#   STORAGE_ACCOUNT_CPD: mhracpddev
 
-        steps:
-          - script: |
-              yarn install --frozen-lockfile
-              yarn test:ci
-            displayName: Run unit tests 🧪
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+# stages:
+#   - stage: web
+#     dependsOn: []
+#     jobs:
+#       - job: web
+#         dependsOn: []
+#         pool:
+#           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+#           vmImage: ubuntu-16.04
 
-          - script: |
-              export ASSET_PREFIX=$(Build.SourceBranchName)
-              export AZURE_SEARCH_API_VERSION=2017-11-11
-              export AZURE_SEARCH_EXACTNESS_BOOST=4
-              export AZURE_SEARCH_INDEX=products-index
-              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
-              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
-              export AZURE_SEARCH_SERVICE=mhraproductsdev
-              export AZURE_SEARCH_WORD_FUZZINESS=1
-              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
-              export GOOGLE_TRACKING_ID=UA-6838115-11
-              yarn install --frozen-lockfile
-              yarn build
-              yarn export
-            displayName: Build web
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+#         steps:
+#           - script: |
+#               yarn install --frozen-lockfile
+#               yarn test:ci
+#             displayName: Run unit tests 🧪
+#             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
-          - script: |
-              export AZURE_SEARCH_API_VERSION=2017-11-11
-              export AZURE_SEARCH_EXACTNESS_BOOST=4
-              export AZURE_SEARCH_INDEX=products-index
-              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
-              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
-              export AZURE_SEARCH_SERVICE=mhraproductsdev
-              export AZURE_SEARCH_WORD_FUZZINESS=1
-              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
-              export GOOGLE_TRACKING_ID=UA-6838115-11
-              mkdir -p cypress/screenshots
-              yarn test-e2e
-            displayName: Run end-to-end tests
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+#           - script: |
+#               export ASSET_PREFIX=$(Build.SourceBranchName)
+#               export AZURE_SEARCH_API_VERSION=2017-11-11
+#               export AZURE_SEARCH_EXACTNESS_BOOST=4
+#               export AZURE_SEARCH_INDEX=products-index
+#               export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+#               export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+#               export AZURE_SEARCH_SERVICE=mhraproductsdev
+#               export AZURE_SEARCH_WORD_FUZZINESS=1
+#               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+#               export GOOGLE_TRACKING_ID=UA-6838115-11
+#               export GOOGLE_USE_DEBUG=true
+#               export ROOT_URL_DOMAIN=.windows.net
+#               yarn install --frozen-lockfile
+#               yarn build
+#               yarn export
+#             displayName: Build web
+#             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
-          - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/screenshots
-            displayName: Publish end-to-end test screenshots
-            artifact: MedicinesCypressScreenshots
-            condition: always()
+#           - script: |
+#               export AZURE_SEARCH_API_VERSION=2017-11-11
+#               export AZURE_SEARCH_EXACTNESS_BOOST=4
+#               export AZURE_SEARCH_INDEX=products-index
+#               export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+#               export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+#               export AZURE_SEARCH_SERVICE=mhraproductsdev
+#               export AZURE_SEARCH_WORD_FUZZINESS=1
+#               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+#               export GOOGLE_TRACKING_ID=UA-6838115-11
+#               export ROOT_URL_DOMAIN=localhost
+#               mkdir -p cypress/screenshots
+#               yarn test-e2e
+#             displayName: Run end-to-end tests
+#             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
-          - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/videos
-            displayName: Publish end-to-end test videos
-            artifact: MedicinesCypressVideo
-            condition: always()
+#           - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/screenshots
+#             displayName: Publish end-to-end test screenshots
+#             artifact: MedicinesCypressScreenshots
+#             condition: always()
 
-          - script: |
-              export AZURE_SEARCH_API_VERSION=2017-11-11
-              export AZURE_SEARCH_EXACTNESS_BOOST=4
-              export AZURE_SEARCH_INDEX=products-index
-              export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
-              export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
-              export AZURE_SEARCH_SERVICE=mhraproductsdev
-              export AZURE_SEARCH_WORD_FUZZINESS=1
-              export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
-              export GOOGLE_TRACKING_ID=UA-6838115-11
-              yarn a11y
-            displayName: Check accessibility
-            workingDirectory: $(Build.SourcesDirectory)/medicines/web
+#           - publish: $(System.DefaultWorkingDirectory)/medicines/web/cypress/videos
+#             displayName: Publish end-to-end test videos
+#             artifact: MedicinesCypressVideo
+#             condition: always()
 
-          - task: CopyFiles@2
-            displayName: Copy Files
-            inputs:
-              SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
-              TargetFolder: $(build.artifactstagingdirectory)
-              CleanTargetFolder: true
+#           - script: |
+#               export AZURE_SEARCH_API_VERSION=2017-11-11
+#               export AZURE_SEARCH_EXACTNESS_BOOST=4
+#               export AZURE_SEARCH_INDEX=products-index
+#               export AZURE_SEARCH_KEY=CFBCBE8AA11AA871C14001527533870C
+#               export AZURE_SEARCH_SCORING_PROFILE=preferKeywords
+#               export AZURE_SEARCH_SERVICE=mhraproductsdev
+#               export AZURE_SEARCH_WORD_FUZZINESS=1
+#               export GOOGLE_GTM_CONTAINER_ID=GTM-WJ5TW34
+#               export GOOGLE_TRACKING_ID=UA-6838115-11
+#               export ROOT_URL_DOMAIN=localhost
+#               yarn a11y
+#             displayName: Check accessibility
+#             workingDirectory: $(Build.SourcesDirectory)/medicines/web
 
-          - task: PublishBuildArtifacts@1
-            displayName: Publish Build Artifacts
-            inputs:
-              PathtoPublish: $(build.artifactstagingdirectory)
-              ArtifactName: build-medicines
+#           - task: CopyFiles@2
+#             displayName: Copy Files
+#             inputs:
+#               SourceFolder: $(Build.SourcesDirectory)/medicines/web/dist
+#               TargetFolder: $(build.artifactstagingdirectory)
+#               CleanTargetFolder: true
 
-      - job: learning_web
-        dependsOn: []
-        pool:
-          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04
-        variables:
-          GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
-          GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
-        steps:
-          - script: |
-              yarn --frozen-lockfile && yarn build
-            displayName: Build learning web (master)
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-            workingDirectory: $(Build.SourcesDirectory)/learning/web
+#           - task: PublishBuildArtifacts@1
+#             displayName: Publish Build Artifacts
+#             inputs:
+#               PathtoPublish: $(build.artifactstagingdirectory)
+#               ArtifactName: build-medicines
 
-          - script: |
-              export PATH_PREFIX=$(Build.SourceBranchName) && yarn --frozen-lockfile && yarn build
-            displayName: Build learning web (branch)
-            condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-            workingDirectory: $(Build.SourcesDirectory)/learning/web
+#       - job: learning_web
+#         dependsOn: []
+#         pool:
+#           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+#           vmImage: ubuntu-16.04
+#         variables:
+#           GATSBY_GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
+#           GATSBY_GOOGLE_TAG_MANAGER_ID: GTM-WJ5TW34
+#         steps:
+#           - script: |
+#               yarn --frozen-lockfile && yarn build
+#             displayName: Build learning web (master)
+#             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
-          - script: |
-              yarn a11y
-            displayName: Check accessibility
-            workingDirectory: $(Build.SourcesDirectory)/learning/web
+#           - script: |
+#               export PATH_PREFIX=$(Build.SourceBranchName) && yarn --frozen-lockfile && yarn build
+#             displayName: Build learning web (branch)
+#             condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+#             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
-          - script: |
-              yarn test:ci
-            displayName: Run unit tests
-            workingDirectory: $(Build.SourcesDirectory)/learning/web
+#           - script: |
+#               yarn a11y
+#             displayName: Check accessibility
+#             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
-          - script: |
-              mkdir -p cypress/screenshots
-              yarn test-e2e
-            displayName: Run end-to-end tests
-            workingDirectory: $(Build.SourcesDirectory)/learning/web
+#           - script: |
+#               yarn test:ci
+#             displayName: Run unit tests
+#             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
-          - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/screenshots
-            displayName: Publish end-to-end test screenshots
-            artifact: LearningCypressScreenshots
-            condition: always()
+#           - script: |
+#               mkdir -p cypress/screenshots
+#               yarn test-e2e
+#             displayName: Run end-to-end tests
+#             workingDirectory: $(Build.SourcesDirectory)/learning/web
 
-          - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/videos
-            displayName: Publish end-to-end test videos
-            artifact: LearningCypressVideo
-            condition: always()
+#           - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/screenshots
+#             displayName: Publish end-to-end test screenshots
+#             artifact: LearningCypressScreenshots
+#             condition: always()
 
-          - task: CopyFiles@2
-            displayName: Copy Files
-            inputs:
-              SourceFolder: $(Build.SourcesDirectory)/learning/web/public
-              TargetFolder: $(build.artifactstagingdirectory)
-              CleanTargetFolder: true
+#           - publish: $(System.DefaultWorkingDirectory)/learning/web/cypress/videos
+#             displayName: Publish end-to-end test videos
+#             artifact: LearningCypressVideo
+#             condition: always()
 
-          - task: PublishBuildArtifacts@1
-            displayName: Publish Build Artifacts
-            inputs:
-              PathtoPublish: $(build.artifactstagingdirectory)
-              ArtifactName: build-learning
+#           - task: CopyFiles@2
+#             displayName: Copy Files
+#             inputs:
+#               SourceFolder: $(Build.SourcesDirectory)/learning/web/public
+#               TargetFolder: $(build.artifactstagingdirectory)
+#               CleanTargetFolder: true
 
-  - stage: deploy_web
-    dependsOn: [web]
-    jobs:
-      - deployment: DeployProductsWeb
-        displayName: Deploy Products Web
-        pool:
-          vmImage: windows-latest
-        environment: dev
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: build-medicines
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage (master)
-                  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-medicines
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_PRODUCTS)
-                    containerName: $web
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
-                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-medicines
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_PRODUCTS)
-                    containerName: $(Build.SourceBranchName)
-                - task: AzureCLI@2
-                  displayName: Set bucket to be public
-                  inputs:
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    scriptType: ps
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az storage container set-permission `
-                        --public-access container `
-                        --name $(Build.SourceBranchName) `
-                        --account-name=$(STORAGE_ACCOUNT_PRODUCTS)
-      - deployment: DeployCPDWeb
-        displayName: Deploy CPD Web
-        pool:
-          vmImage: windows-latest
-        environment: dev
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: build-learning
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage (master)
-                  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-learning
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_CPD)
-                    containerName: $web
-                - task: AzureFileCopy@3
-                  displayName: Copy to Blob Storage ($(Build.SourceBranchName))
-                  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  inputs:
-                    sourcePath: $(Pipeline.Workspace)/build-learning
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    destination: azureBlob
-                    storage: $(STORAGE_ACCOUNT_CPD)
-                    containerName: $(Build.SourceBranchName)
-                - task: AzureCLI@2
-                  displayName: Set bucket to be public
-                  inputs:
-                    azureSubscription: $(SERVICE_CONNECTION)
-                    scriptType: ps
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az storage container set-permission `
-                        --public-access container `
-                        --name $(Build.SourceBranchName) `
-                        --account-name=$(STORAGE_ACCOUNT_CPD)
-  - stage: services
-    dependsOn: []
-    jobs:
-      - job: services_master
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default beta
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install stable Rust
-          - script: |
-              cargo build -v --release
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v --release
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
-      - job: services_branch
-        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
-        dependsOn: []
-        pool:
-          # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
-          vmImage: ubuntu-16.04
-        steps:
-          - script: |
-              set -xeo pipefail
-              export CARGO_HOME="$HOME/.cargo"
-              curl https://sh.rustup.rs -sSf | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup toolchain list
-              rustup default nightly
-              rustc -Vv
-              cargo -V
-              echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-            displayName: Install nightly Rust
-          - script: |
-              cargo build -v
-            displayName: Build services
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-          - script: |
-              cargo test -v
-            workingDirectory: $(Build.SourcesDirectory)/medicines
-            displayName: Run tests
+#           - task: PublishBuildArtifacts@1
+#             displayName: Publish Build Artifacts
+#             inputs:
+#               PathtoPublish: $(build.artifactstagingdirectory)
+#               ArtifactName: build-learning
+
+#   - stage: deploy_web
+#     dependsOn: [web]
+#     jobs:
+#       - deployment: DeployProductsWeb
+#         displayName: Deploy Products Web
+#         pool:
+#           vmImage: windows-latest
+#         environment: dev
+#         strategy:
+#           runOnce:
+#             deploy:
+#               steps:
+#                 - download: current
+#                   artifact: build-medicines
+#                 - task: AzureFileCopy@3
+#                   displayName: Copy to Blob Storage (master)
+#                   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#                   inputs:
+#                     sourcePath: $(Pipeline.Workspace)/build-medicines
+#                     azureSubscription: $(SERVICE_CONNECTION)
+#                     destination: azureBlob
+#                     storage: $(STORAGE_ACCOUNT_PRODUCTS)
+#                     containerName: $web
+#       - deployment: DeployCPDWeb
+#         displayName: Deploy CPD Web
+#         pool:
+#           vmImage: windows-latest
+#         environment: dev
+#         strategy:
+#           runOnce:
+#             deploy:
+#               steps:
+#                 - download: current
+#                   artifact: build-learning
+#                 - task: AzureFileCopy@3
+#                   displayName: Copy to Blob Storage (master)
+#                   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#                   inputs:
+#                     sourcePath: $(Pipeline.Workspace)/build-learning
+#                     azureSubscription: $(SERVICE_CONNECTION)
+#                     destination: azureBlob
+#                     storage: $(STORAGE_ACCOUNT_CPD)
+#                     containerName: $web
+#   - stage: services
+#     dependsOn: []
+#     jobs:
+#       - job: services_master
+#         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#         dependsOn: []
+#         pool:
+#           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+#           vmImage: ubuntu-16.04
+#         steps:
+#           - script: |
+#               set -xeo pipefail
+#               export CARGO_HOME="$HOME/.cargo"
+#               curl https://sh.rustup.rs -sSf | sh -s -- -y
+#               source $HOME/.cargo/env
+#               rustup toolchain list
+#               rustup default beta
+#               rustc -Vv
+#               cargo -V
+#               echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+#             displayName: Install stable Rust
+#           - script: |
+#               cargo build -v --release
+#             displayName: Build services
+#             workingDirectory: $(Build.SourcesDirectory)/medicines
+#           - script: |
+#               cargo test -v --release
+#             workingDirectory: $(Build.SourcesDirectory)/medicines
+#             displayName: Run tests
+#       - job: services_branch
+#         condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+#         dependsOn: []
+#         pool:
+#           # We are using this version, waiting for Ubuntu or Cypress to fix the issue with running Cypress on ubuntu-latest version
+#           vmImage: ubuntu-16.04
+#         steps:
+#           - script: |
+#               set -xeo pipefail
+#               export CARGO_HOME="$HOME/.cargo"
+#               curl https://sh.rustup.rs -sSf | sh -s -- -y
+#               source $HOME/.cargo/env
+#               rustup toolchain list
+#               rustup default nightly
+#               rustc -Vv
+#               cargo -V
+#               echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+#             displayName: Install nightly Rust
+#           - script: |
+#               cargo build -v
+#             displayName: Build services
+#             workingDirectory: $(Build.SourcesDirectory)/medicines
+#           - script: |
+#               cargo test -v
+#             workingDirectory: $(Build.SourcesDirectory)/medicines
+#             displayName: Run tests

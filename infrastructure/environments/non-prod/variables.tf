@@ -5,7 +5,7 @@ variable "REGION" {
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products"
+  default     = "adazr-rg-1001"
 }
 
 variable "CLIENT_ID" {

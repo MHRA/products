@@ -141,18 +141,17 @@ export const facetSearch = async (
   query: string,
 ): Promise<[string, IFacetResult]> => {
   const body = await getJson(buildFacetUrl(query));
-
   return [query, body['@search.facets']];
 };
 
 const createFilter = (filters: ISearchFilters) => {
   const filterParams: string[] = [];
-  if (filters.docType) {
+  if (filters.docType.length > 0) {
     const docTypeFilters = [];
     for (const docType of filters.docType) {
       docTypeFilters.push(`doc_type eq '${docType}'`);
     }
-    filterParams.push(docTypeFilters.join(' or '));
+    filterParams.push('(' + docTypeFilters.join(' or ') + ')');
   }
   if (filters.substanceName) {
     filterParams.push(

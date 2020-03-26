@@ -57,6 +57,8 @@ const StyledContentWrapper = styled.main`
   }
 `;
 
+const cookieDomain = (process.env.ROOT_URL_DOMAIN as string) || 'localhost';
+
 interface ICookieForm {
   storageAllowed: boolean;
   setStorageAllowed: any;
@@ -83,7 +85,8 @@ const CookieForm: React.FC<ICookieForm> = props => {
       window.sessionStorage.clear();
       const cookies = new Cookies();
       for (const cookieName of Object.keys(cookies.getAll())) {
-        cookies.remove(cookieName);
+        cookies.set(cookieName, {}, { path: '/', expires: new Date() });
+        cookies.remove(cookieName, { path: '/', domain: cookieDomain });
       }
     }
 

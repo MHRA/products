@@ -195,7 +195,7 @@ function toSentenceCase(substance: string): string {
   );
 }
 
-const SearchResults = (props: {
+interface ISearchResultsProps {
   drugs: IDocument[];
   page: number;
   pageSize: number;
@@ -205,7 +205,11 @@ const SearchResults = (props: {
   disclaimerAgree: boolean;
   docTypes: DocType[];
   handleDocTypeCheckbox: (d: DocType) => void;
-}) => {
+  handlePageChange: (num: number) => void;
+  isLoading: boolean;
+}
+
+const SearchResults = (props: ISearchResultsProps) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
@@ -243,7 +247,13 @@ const SearchResults = (props: {
     setShowDisclaimerWarning(false);
   };
 
-  return (
+  return props.isLoading ? (
+    <StyledDrugList>
+      <h1 className="title">
+        {`Loading results for ${showingResultsForTerm}...`}
+      </h1>
+    </StyledDrugList>
+  ) : (
     <>
       <StyledDrugList>
         <div>
@@ -351,6 +361,7 @@ const SearchResults = (props: {
           resultCount={resultCount}
           searchTerm={searchTerm}
           enabledDocTypes={docTypes}
+          handlePageChange={props.handlePageChange}
         />
       ) : (
         ''

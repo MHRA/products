@@ -115,17 +115,14 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
 
-  const searchLink = (item: IProduct) => {
-    if (level < 2) {
-      return {
-        query: {
-          substance: item.name,
-          index: item.name.length === 1 ? true : null,
-        },
-      };
+  const searchLink = (itemName: string) => {
+    if (level === 0) {
+      return `/substance-index?query=${itemName}`;
     }
-
-    return { query: { product: true, page: 1, search: item.name } };
+    if (level === 1) {
+      return `/substance?query=${encodeURIComponent(itemName)}`;
+    }
+    return `/product?query=${encodeURIComponent(itemName)}`;
   };
 
   return (
@@ -135,7 +132,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
         {items.map(item => {
           return (
             <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
-              <Link href={searchLink(item)}>
+              <Link href={searchLink(item.name)}>
                 <a>
                   {item.name} {item.count && <>({item.count} files)</>}
                 </a>

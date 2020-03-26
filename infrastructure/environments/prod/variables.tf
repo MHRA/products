@@ -1,19 +1,11 @@
 variable "REGION" {
   description = "Azure region"
-  default     = "uksouth"
+  default     = "westeurope"
 }
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "products"
-}
-
-variable "CLIENT_ID" {
-  description = "Service Principal Client ID"
-}
-
-variable "CLIENT_SECRET" {
-  description = "Service Principal Client Secret"
+  default     = "mpazr-rg-1023"
 }
 
 variable "ENVIRONMENT" {

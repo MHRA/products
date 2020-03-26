@@ -17,7 +17,7 @@ To run the following steps, first you should:
    az login
    ```
 
-4. Run the following command changing `SUBSCRIPTION_ID` with the ID found in the output from previous command
+4. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from previous command:
 
    ```sh
    az account set --subscription="SUBSCRIPTION_ID"
@@ -51,17 +51,31 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
 ## Provisioning infrastructure in an existing environment
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
-2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values. _If you don't have the values, ask a colleague._
+
+2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values.
+
+   To get the values:
+
+   1. Make sure you have logged in to the Azure CLI: `az login`. The `id` field returned by this command is your `ARM_SUBSCRIPTION_ID`.
+
+   2. Create a service principal: `az ad sp create-for-rbac --name "MakeUpSomeName"`. Use the output values from this command as your environment variables:
+
+      | Environment variable | Field      |
+      | -------------------- | ---------- |
+      | `ARM_CLIENT_ID`      | `appId`    |
+      | `ARM_CLIENT_SECRET`  | `password` |
+      | `ARM_TENANT_ID`      | `tenant`   |
+
 3. Source the environment variables
 
    ```sh
-     source .env
+   set -a && source .env && set +a
    ```
 
 4. Initialize terraform (ensure providers/modules are installed and backend is initialized)
 
    ```sh
-     terraform init
+   terraform init
    ```
 
 5. Create a plan, or apply the infrastructure
@@ -76,9 +90,9 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
    ```
    Outputs:
 
-   cpd-primary-access-key = APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
-   cpd-static-web-url = https://mhracpdnonprod.z33.web.core.windows.net/
-   products-primary-access-key = ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
-   products-static-web-url = https://mhraproductsnonprod.z33.web.core.windows.net/
+   cpd_primary_access_key = APtr7/7Z5tADWy6XP/kcnwkqgGoHssWP+16QoURBFoXXQpZp5XxIGSA44my/TvnNsQcPOGDojki6mQo2WNxqFQ==
+   cpd_static_web_url = https://mhracpdnonprod.z33.web.core.windows.net/
+   products_primary_access_key = ErgFGAmFm3xJhl84jMHESRNZIU3o4nmmGKnHes9qydvlQexD8/4noYMpubeoVBK3fHnH4p2jMj3ObzN79OtfjQ==
+   products_static_web_url = https://mhraproductsnonprod.z33.web.core.windows.net/
    search_admin_key = CB28B1A47E29FF4620184BD27B89945E
    ```

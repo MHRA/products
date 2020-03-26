@@ -1,44 +1,45 @@
 provider "azurerm" {
-  version = "~>1.38.0"
+  version = "~> 1.38.0"
 }
 
 terraform {
   backend "azurerm" {
-    resource_group_name = "tfstate"
-    key                 = "prod.terraform.tfstate"
+    resource_group_name  = "tfstate"
+    storage_account_name = "mhraprodtfstate"
+    container_name       = "tfstate"
+    key                  = "prod.terraform.tfstate"
   }
 }
 
 locals {
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
-  location            = var.REGION
-  environment         = var.ENVIRONMENT
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
+  namespace = "mhraproductsprod"
+}
+
+resource "azurerm_resource_group" "products" {
+  name     = var.RESOURCE_GROUP_PRODUCTS
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
 }
 
 # website
 module "products" {
-  source              = "../../modules/products"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
-}
+  source = "../../modules/products"
 
-# AKS
-module cluster {
-  source              = "../../modules/cluster"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
-  client_id           = local.client_id
-  client_secret       = local.client_secret
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # CPD
 module cpd {
-  source              = "../../modules/cpd"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
+  source = "../../modules/cpd"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = azurerm_resource_group.products.name
 }

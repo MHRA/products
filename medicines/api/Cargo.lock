@@ -923,7 +923,7 @@ dependencies = [
 [[package]]
 name = "juniper"
 version = "0.14.2"
-source = "git+https://github.com/graphql-rust/juniper#211737cee0c6b79ad86246d69ed39e2725fc2110"
+source = "git+https://github.com/graphql-rust/juniper?rev=211737cee0c6b79ad86246d69ed39e2725fc2110#211737cee0c6b79ad86246d69ed39e2725fc2110"
 dependencies = [
  "chrono",
  "fnv",
@@ -939,7 +939,7 @@ dependencies = [
 [[package]]
 name = "juniper_codegen"
 version = "0.14.2"
-source = "git+https://github.com/graphql-rust/juniper#211737cee0c6b79ad86246d69ed39e2725fc2110"
+source = "git+https://github.com/graphql-rust/juniper?rev=211737cee0c6b79ad86246d69ed39e2725fc2110#211737cee0c6b79ad86246d69ed39e2725fc2110"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",

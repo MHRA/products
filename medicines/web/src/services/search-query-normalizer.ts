@@ -12,7 +12,7 @@ const escapeSpecialWords = (word: string): string =>
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
 
-const addNormalizedProductLicenses = (q: string): string => {
+const extractNormalizedProductLicenses = (q: string): string => {
   const normalizedProductLicences = q
     .match(extractProductLicenseRegExp)
     ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'));
@@ -21,17 +21,18 @@ const addNormalizedProductLicenses = (q: string): string => {
     const normalizedProductLicencesString: string = normalizedProductLicences.join(
       ' ',
     );
-    return `${q} ${normalizedProductLicencesString}`;
+    const qWithoutProductLicences = q.replace(extractProductLicenseRegExp, '');
+    return `${qWithoutProductLicences} ${normalizedProductLicencesString}`;
   }
 
   return `${q}`;
 };
 
 const splitByNonSearchableCharacters = (query: string) =>
-  query.split(/(?:[,+\-!(){}\[\]^~*?:\/]|\s+)/gi);
+  query.split(/(?:[,+\-!(){}\[\]^~*?:%\/]|\s+)/gi);
 
 export const buildFuzzyQuery = (query: string): string => {
-  return splitByNonSearchableCharacters(addNormalizedProductLicenses(query))
+  return splitByNonSearchableCharacters(extractNormalizedProductLicenses(query))
     .filter(x => x.length > 0)
     .map(word => escapeSpecialWords(word))
     .map(word => preferExactMatchButSupportFuzzyMatch(word))

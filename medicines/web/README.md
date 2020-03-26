@@ -20,6 +20,8 @@ export AZURE_SEARCH_SERVICE=
 export AZURE_SEARCH_WORD_FUZZINESS=
 export GOOGLE_GTM_CONTAINER_ID=
 export GOOGLE_TRACKING_ID=
+export GOOGLE_USE_DEBUG=
+export ROOT_URL_DOMAIN=
 ```
 
 We recommend that you set these in your `.profile` or `.bashrc` file so that it persists past the lifetime of your terminal session.

@@ -5,46 +5,70 @@ provider "azurerm" {
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"
+    storage_account_name = "mhranonprodtfstate"
     container_name       = "tfstate"
-    storage_account_name = "tfstate4338"
     key                  = "non-prod.terraform.tfstate"
   }
 }
 
 locals {
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
-  location            = var.REGION
-  environment         = var.ENVIRONMENT
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
+  namespace = "mhraproductsnonprod"
+}
+
+resource "azurerm_resource_group" "products" {
+  name     = var.RESOURCE_GROUP_PRODUCTS
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
 }
 
 # website
 module "products" {
-  source              = "../../modules/products"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
+  source = "../../modules/products"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # AKS
 module cluster {
-  source              = "../../modules/cluster"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
-  client_id           = local.client_id
-  client_secret       = local.client_secret
+  source = "../../modules/cluster"
+
+  client_id                       = var.CLIENT_ID
+  client_secret                   = var.CLIENT_SECRET
+  environment                     = var.ENVIRONMENT
+  location                        = var.REGION
+  resource_group_name             = azurerm_resource_group.products.name
+  vnet_name                       = "aparz-spoke-np-products"
+  vnet_cidr                       = "10.5.65.0/24"
+  lb_subnet_name                  = "adarz-spoke-products-sn-01"
+  lb_subnet_cidr                  = "10.5.65.0/26"
+  cluster_subnet_name             = "adarz-spoke-products-sn-02"
+  cluster_subnet_cidr             = "10.5.65.64/26"
+  route_table_name                = "adarz-spoke-rt-products-internal-only"
+  route_table_resource_group_name = "asazr-rg-1001"
 }
 
 # CPD
 module cpd {
-  source              = "../../modules/cpd"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  environment         = local.environment
+  source = "../../modules/cpd"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = azurerm_resource_group.products.name
 }
 
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
 
-
-
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  name                = "doc-index-updater-${var.ENVIRONMENT}"
+  resource_group_name = azurerm_resource_group.products.name
+}
