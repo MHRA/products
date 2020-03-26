@@ -31,11 +31,11 @@ impl BlobMetadata {
 
 impl Into<BlobMetadata> for Document {
     fn into(self) -> BlobMetadata {
-        let title = sanitize(&self.name);
+        let title = sanitise(&self.name);
         let pl_number = extract_product_licences(&title);
 
         BlobMetadata {
-            file_name: sanitize(&self.id),
+            file_name: sanitise(&self.id),
             doc_type: self.document_type,
             title,
             pl_number,
@@ -45,7 +45,7 @@ impl Into<BlobMetadata> for Document {
                 .iter()
                 .map(|a| a.to_uppercase())
                 .collect(),
-            author: sanitize(&self.author),
+            author: sanitise(&self.author),
             keywords: self.keywords,
         }
     }
@@ -135,7 +135,7 @@ impl IndexEntry {
     }
 }
 
-pub fn sanitize(s: &str) -> String {
+pub fn sanitise(s: &str) -> String {
     s.replace(|c: char| !c.is_ascii(), "")
         .replace("\n", " ")
         .trim()
@@ -241,16 +241,16 @@ mod test {
     }
 
     #[test]
-    fn sanitize_remove_newline() {
-        assert_eq!(sanitize("newline\ntest"), "newline test");
+    fn sanitise_remove_newline() {
+        assert_eq!(sanitise("newline\ntest"), "newline test");
     }
     #[test]
-    fn sanitize_remove_non_ascii() {
-        assert_eq!(sanitize("emoji🙂 ∫test"), "emoji test");
+    fn sanitise_remove_non_ascii() {
+        assert_eq!(sanitise("emoji🙂 ∫test"), "emoji test");
     }
     #[test]
-    fn sanitize_trim() {
-        assert_eq!(sanitize(" test "), "test");
+    fn sanitise_trim() {
+        assert_eq!(sanitise(" test "), "test");
     }
     #[test]
     fn test_create_facets_by_active_substance() {
