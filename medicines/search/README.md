@@ -27,7 +27,7 @@ $  cargo test
 To set the environment variables for non-prod from the cache in Azure, run:
 
 ```sh
-./get-env.sh
+./get-env-non-prod.sh
 ```
 
 The environment variables which need to be set to run the Search tool are as follows.
