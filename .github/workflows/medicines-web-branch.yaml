@@ -1,0 +1,28 @@
+name: medicines-web-branch
+
+on:
+  push:
+    branches: "!master"
+    paths:
+      - medicines/web/**
+      - .github/workflows/medicines-web-branch.yaml
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: web
+      - name: Install
+        uses: sergioramos/yarn-actions/install@v6
+        with:
+          frozen-lockfile: true
+          cwd: web
+      - name: Test
+        uses: sergioramos/yarn-actions/run@v6
+        with:
+          cwd: web
+        cmd: test:ci

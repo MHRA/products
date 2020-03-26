@@ -12,6 +12,7 @@ env:
 
 jobs:
   build-and-test:
+    name: Build, Test and Deploy
     runs-on: ubuntu-latest
 
     steps:
