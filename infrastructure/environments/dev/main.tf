@@ -26,14 +26,14 @@ resource "azurerm_resource_group" "products" {
 }
 
 # website
-# module "products" {
-#   source = "../../modules/products"
+module "products" {
+  source = "../../modules/products"
 
-#   environment         = var.ENVIRONMENT
-#   location            = var.REGION
-#   namespace           = local.namespace
-#   resource_group_name = azurerm_resource_group.products.name
-# }
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = azurerm_resource_group.products.name
+}
 
 resource "azurerm_route_table" "load_balancer" {
   name                = local.namespace
@@ -55,11 +55,11 @@ module cluster {
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
   vnet_name           = "aparz-spoke-dev-products"
-  vnet_cidr           = "10.5.100.0/24"
+  vnet_cidr           = "10.6.65.0/24"
   lb_subnet_name      = "adarz-spoke-products-dev-sn-01"
-  lb_subnet_cidr      = "10.5.100.0/26"
+  lb_subnet_cidr      = "10.6.65.0/26"
   cluster_subnet_name = "adarz-spoke-products-dev-sn-02"
-  cluster_subnet_cidr = "10.5.100.64/26"
+  cluster_subnet_cidr = "10.6.65.64/26"
   route_table_id      = azurerm_route_table.load_balancer.id
 }
 
