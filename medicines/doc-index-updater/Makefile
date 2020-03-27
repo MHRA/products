@@ -4,7 +4,7 @@ tag := latest
 
 .PHONY: default
 default: ## run locally
-	export $$(cat .env | xargs) && cargo run
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
 
 .PHONY: get-env
 get-env: ## run locally
