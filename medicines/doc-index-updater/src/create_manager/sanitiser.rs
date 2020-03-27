@@ -44,7 +44,7 @@ impl From<Vec<String>> for VecSanitisedString {
 
 impl VecSanitisedString {
     pub fn to_vec_string(&self) -> Vec<String> {
-        self.clone()
+        self.inner
             .iter()
             .map(|s: &String| SanitisedString::from(s).to_string())
             .collect::<Vec<String>>()
@@ -56,10 +56,6 @@ impl VecSanitisedString {
 
     pub fn to_json(&self) -> String {
         serde_json::to_string(&self.to_vec_string()).expect("Couldn't create JSON array.")
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<'_, String> {
-        self.inner.iter()
     }
 }
 

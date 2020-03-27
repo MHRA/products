@@ -23,7 +23,7 @@ pub struct BlobMetadata {
 impl BlobMetadata {
     fn facets(&self) -> Vec<String> {
         create_facets_by_active_substance(
-            self.product_names.join(", "),
+            self.product_names.clone(),
             self.active_substances.clone(),
         )
     }
@@ -146,17 +146,18 @@ pub fn to_json(words: Vec<String>) -> String {
 }
 
 pub fn create_facets_by_active_substance(
-    product: String,
+    products: VecSanitisedString,
     active_substances: VecSanitisedString,
 ) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
+        .to_vec_string()
         .iter()
         .map(|a| {
             let first = a.to_string().chars().next().unwrap();
             vec![
                 first.to_string(),
                 [first.to_string(), a.to_string()].join(", "),
-                [first.to_string(), a.to_string(), product.to_string()].join(", "),
+                [first.to_string(), a.to_string(), products.join(", ")].join(", "),
             ]
         })
         .flatten()
@@ -246,8 +247,9 @@ mod test {
             "HYDROCHLOROTHIAZIDE".to_string(),
             "L-TEST".to_string(),
         ];
-        let product =
-            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned();
+        let products = vec![
+            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned(),
+        ];
         let expected = vec![
             "H", 
             "H, HYDROCHLOROTHIAZIDE", 
@@ -259,7 +261,34 @@ mod test {
             "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
         ];
         assert_eq!(
-            create_facets_by_active_substance(product, VecSanitisedString::from(active_substances)),
+            create_facets_by_active_substance(
+                VecSanitisedString::from(products),
+                VecSanitisedString::from(active_substances)
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_create_facets_by_active_substance_sanitises() {
+        let active_substances = vec!["CAFÉ".to_string(), "FÊTE".to_string(), "NAÏVE".to_string()];
+        let products = vec!["MOTÖRHEAD".to_owned()];
+        let expected = vec![
+            "C",
+            "C, CAF",
+            "C, CAF, MOTRHEAD",
+            "F",
+            "F, FTE",
+            "F, FTE, MOTRHEAD",
+            "N",
+            "N, NAVE",
+            "N, NAVE, MOTRHEAD",
+        ];
+        assert_eq!(
+            create_facets_by_active_substance(
+                VecSanitisedString::from(products),
+                VecSanitisedString::from(active_substances)
+            ),
             expected
         );
     }
