@@ -75,7 +75,7 @@ fn use_json_log_subscriber() {
 fn use_unstructured_log_subscriber() {
     let subscriber = tracing_subscriber::fmt::Subscriber::builder()
         .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
-        .with_max_level(Level::INFO)
+        .with_max_level(Level::DEBUG)
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();
 
