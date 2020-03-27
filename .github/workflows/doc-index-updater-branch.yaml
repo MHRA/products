@@ -3,7 +3,7 @@ name: doc-index-updater-branch
 on:
   push:
     branches:
-      - "*"
+      - "*/*"
       - "!master"
     paths:
       - medicines/doc-index-updater/**
