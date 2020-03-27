@@ -55,12 +55,14 @@ jobs:
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1
+        if: failure()
         with:
           name: medicines-cypress-screenshots
           path: medicines/web/cypress/screenshots
 
       - name: Upload cypress videos
         uses: actions/upload-artifact@v1
+        if: always()
         with:
           name: medicines-cypress-videos
           path: medicines/web/cypress/videos

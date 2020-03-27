@@ -46,12 +46,14 @@ jobs:
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1
+        if: failure()
         with:
           name: learning-cypress-screenshots
           path: learning/web/cypress/screenshots
 
       - name: Upload cypress videos
         uses: actions/upload-artifact@v1
+        if: always()
         with:
           name: learning-cypress-videos
           path: learning/web/cypress/videos
