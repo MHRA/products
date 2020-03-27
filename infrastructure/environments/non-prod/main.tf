@@ -2,6 +2,14 @@ provider "azurerm" {
   version = "~> 1.38.0"
 }
 
+provider "random" {
+  version = "~> 2.2"
+}
+
+provider "null" {
+  version = "~> 2.1"
+}
+
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"

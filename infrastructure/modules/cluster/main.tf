@@ -99,8 +99,13 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
+resource "random_string" "cluster_analytics" {
+  length  = 4
+  special = false
+}
+
 resource "azurerm_log_analytics_workspace" "cluster" {
-  name                = "cluster-analytics"
+  name                = "mhra-products-cluster-analytics-${random_string.cluster_analytics.result}"
   location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "PerGB2018"
@@ -111,7 +116,7 @@ resource "azurerm_log_analytics_workspace" "cluster" {
   }
 }
 
-resource "azurerm_log_analytics_solution" "example" {
+resource "azurerm_log_analytics_solution" "cluster" {
   solution_name         = "ContainerInsights" # must match product name below (see: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1775)
   location              = var.location
   resource_group_name   = var.resource_group_name
