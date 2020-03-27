@@ -19,10 +19,6 @@ terraform {
   }
 }
 
-locals {
-  namespace = "mhraproductsnonprod"
-}
-
 resource "azurerm_resource_group" "products" {
   name     = var.RESOURCE_GROUP_PRODUCTS
   location = var.REGION
@@ -38,7 +34,7 @@ module "products" {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = local.namespace
+  namespace           = "mhraproductsnonprod"
   resource_group_name = azurerm_resource_group.products.name
 }
 
@@ -67,7 +63,7 @@ module cpd {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = local.namespace
+  namespace           = "mhracpdnonprod"
   resource_group_name = azurerm_resource_group.products.name
 }
 
