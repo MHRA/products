@@ -150,6 +150,7 @@ pub fn create_facets_by_active_substance(
     active_substances: VecSanitisedString,
 ) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
+        .to_vec_string()
         .iter()
         .map(|a| {
             let first = a.to_string().chars().next().unwrap();
