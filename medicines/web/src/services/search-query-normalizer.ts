@@ -10,7 +10,7 @@ const escapeSpecialWords = (word: string): string =>
   word.replace(/(\|\||&&|\bAND\b|\bOR\b|\bNOT\b)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
-  `${word}~${searchWordFuzziness} ${word}^${searchExactnessBoost}`;
+  `(${word}~${searchWordFuzziness}||${word}^${searchExactnessBoost})`;
 
 const extractNormalizedProductLicenses = (q: string): string => {
   const normalizedProductLicences = q
