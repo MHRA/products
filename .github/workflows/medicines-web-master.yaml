@@ -1,0 +1,80 @@
+name: medicines-web-master
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - medicines/web/**
+      - .github/workflows/medicines-web-master.yaml
+
+env:
+  AZURE_SEARCH_API_VERSION: 2017-11-11
+  AZURE_SEARCH_EXACTNESS_BOOST: 4
+  AZURE_SEARCH_INDEX: products-index
+  AZURE_SEARCH_KEY: CFBCBE8AA11AA871C14001527533870C
+  AZURE_SEARCH_SCORING_PROFILE: preferKeywords
+  AZURE_SEARCH_SERVICE: mhraproductsdev
+  AZURE_SEARCH_WORD_FUZZINESS: 1
+  GOOGLE_GTM_CONTAINER_ID: GTM-WJ5TW34
+  GOOGLE_TRACKING_ID: UA-6838115-11
+  GOOGLE_USE_DEBUG: true
+  ROOT_URL_DOMAIN: .windows.net
+
+jobs:
+  build:
+    name: Build, test and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "13.11"
+
+      - name: Install modules
+        working-directory: medicines/web
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests with coverage
+        working-directory: medicines/web
+        run: yarn test:ci
+
+      - name: Build and export
+        working-directory: medicines/web
+        run: yarn build && yarn export
+
+      - name: Run cypress end-to-end tests
+        working-directory: medicines/web
+        run: mkdir -p cypress/screenshots && yarn test-e2e
+        env:
+          ROOT_URL_DOMAIN: localhost
+
+      - name: Upload cypress screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-cypress-screenshots
+          path: medicines/web/cypress/screenshots
+
+      - name: Upload cypress videos
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: medicines-cypress-videos
+          path: medicines/web/cypress/videos
+
+      - name: Accessibility check
+        working-directory: medicines/web
+        run: yarn a11y
+        env:
+          ROOT_URL_DOMAIN: localhost
+
+      - name: Deploy products web to static site in azure storage
+        uses: lauchacarro/Azure-Storage-Action@master
+        with:
+          enabled-static-website: true
+          folder: medicines/web/dist
+          connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}
