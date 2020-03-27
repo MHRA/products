@@ -266,6 +266,27 @@ mod test {
     }
 
     #[test]
+    fn test_create_facets_by_active_substance_sanitises() {
+        let active_substances = vec!["CAFÉ".to_string(), "FÊTE".to_string(), "NAÏVE".to_string()];
+        let product = "MOTÖRHEAD".to_owned();
+        let expected = vec![
+            "C",
+            "C, CAF",
+            "C, CAF, MOTRHEAD",
+            "F",
+            "F, FTE",
+            "F, FTE, MOTRHEAD",
+            "N",
+            "N, NAVE",
+            "N, NAVE, MOTRHEAD",
+        ];
+        assert_eq!(
+            create_facets_by_active_substance(product, VecSanitisedString::from(active_substances)),
+            expected
+        );
+    }
+
+    #[test]
     fn extract_product_license_test() {
         let input = vec![
             "00 PL123451234",
