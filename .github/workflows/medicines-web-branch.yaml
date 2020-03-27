@@ -83,3 +83,9 @@ jobs:
         with:
           name: medicines-dist
           path: medicines/web/dist
+
+      - uses: lauchacarro/Azure-Storage-Action@master
+        with:
+          enabled-static-website: true
+          folder: medicines/web/dist
+          connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}
