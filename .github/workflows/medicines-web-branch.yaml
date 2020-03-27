@@ -3,7 +3,7 @@ name: medicines-web-branch
 on:
   push:
     branches:
-      - "*/*"
+      - "**"
       - "!master"
     paths:
       - medicines/web/**

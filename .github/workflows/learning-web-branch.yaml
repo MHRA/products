@@ -3,7 +3,7 @@ name: learning-web-branch
 on:
   push:
     branches:
-      - "*/*"
+      - "**"
       - "!master"
     paths:
       - learning/web/**
