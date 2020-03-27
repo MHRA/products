@@ -24,7 +24,13 @@ $  cargo test
 
 ### Setting the correct environment variables
 
-There are some environment variables which need to be set to run the Search tool:
+To set the environment variables for non-prod from the cache in Azure, run:
+
+```sh
+./get-env-non-prod.sh
+```
+
+The environment variables which need to be set to run the Search tool are as follows.
 
 - `API_ADMIN_KEY` - This is an admin key for your Azure Search service account;
 - `DATASOURCE_NAME` - This is the name of the Azure Search datasource you want to perform operations on;
@@ -35,7 +41,7 @@ There are some environment variables which need to be set to run the Search tool
 - `STORAGE_CONTAINER` - This is the name of the Azure blob container that holds the source documents;
 - `STORAGE_MASTER_KEY` - This is a write access key to your Azure Storage account.
 
-You can find these in the [Azure portal](https://portal.azure.com). For `STORAGE_ACCOUNT` and `STORAGE_MASTER_KEY`, navigate to your Storage Account, then choose Access Keys on the left navigation panel. `SEARCH_SERVICE` is just the name of your Search service. For `API_ADMIN_KEY`, navigate to your Search Service and then Keys on the left navigation panel.
+If these are out of sync, you can find these in the [Azure portal](https://portal.azure.com). For `STORAGE_ACCOUNT` and `STORAGE_MASTER_KEY`, navigate to your Storage Account, then choose Access Keys on the left navigation panel. `SEARCH_SERVICE` is just the name of your Search service. For `API_ADMIN_KEY`, navigate to your Search Service and then Keys on the left navigation panel.
 
 ### Datasources
 

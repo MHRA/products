@@ -18,10 +18,11 @@ use tokio::time::delay_for;
 
 mod hash;
 pub mod models;
+mod sanitiser;
 mod search_index;
 mod sftp_client;
 
-#[tracing::instrument]
+#[tracing::instrument(skip(state_manager))]
 pub async fn create_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
