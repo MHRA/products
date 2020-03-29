@@ -4,4 +4,4 @@ create_cluster:
 
 .PHONY: delete_cluster
 delete_cluster:
-	kind delete 
+	kind delete cluster
