@@ -9,3 +9,7 @@ output "products_static_web_url" {
 output "search_admin_key" {
   value = azurerm_search_service.search.primary_key
 }
+
+output "products-hostname-cdn" {
+  value = azurerm_cdn_endpoint.products.host_name
+}
