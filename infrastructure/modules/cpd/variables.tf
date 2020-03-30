@@ -10,4 +10,3 @@ variable "environment" {
 variable "namespace" {
   description = "Namespace to use on cluster and storage"
 }
-

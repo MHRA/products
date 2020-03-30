@@ -1,3 +1,23 @@
+output "kube_config" {
+  value = module.cluster.kube_config
+}
+
+output "public_ip" {
+  value = module.cluster.public_ip
+}
+
+output "host" {
+  value = module.cluster.host
+}
+
+output "client_certificate" {
+  value = module.cluster.client_certificate
+}
+
+output "resource_group_name" {
+  value = module.cluster.resource_group_name
+}
+
 output "products_primary_access_key" {
   value = module.products.products_primary_access_key
 }
@@ -19,9 +39,9 @@ output "cpd_static_web_url" {
 }
 
 output "products-hostname-cdn" {
-  value = azurerm_cdn_endpoint.products.host_name
+  value = module.products.products-hostname-cdn
 }
 
 output "cpd-hostname-cdn" {
-  value = azurerm_cdn_endpoint.cpd.host_name
+  value = module.cpd.cpd-hostname-cdn
 }
