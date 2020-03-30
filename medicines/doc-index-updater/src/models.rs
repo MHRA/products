@@ -3,6 +3,7 @@ use core::fmt;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use tracing_futures::Instrument;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -226,8 +227,14 @@ impl Message for CreateMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
+
     async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
-        crate::create_manager::process_message(self).await
+        crate::create_manager::process_message(self.clone())
+            .instrument(tracing::info_span!(
+                "processing_CREATE",
+                correlation_id = self.get_id().to_string().as_str()
+            ))
+            .await
     }
 }
 
@@ -240,8 +247,14 @@ impl Message for DeleteMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
+
     async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
-        crate::delete_manager::process_message(self).await
+        crate::delete_manager::process_message(self.clone())
+            .instrument(tracing::info_span!(
+                "processing_DELETE",
+                correlation_id = self.get_id().to_string().as_str()
+            ))
+            .await
     }
 }
 

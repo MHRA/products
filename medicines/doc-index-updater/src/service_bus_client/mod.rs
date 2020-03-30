@@ -165,17 +165,18 @@ impl DocIndexUpdaterQueue {
             self.receive().await;
 
         if let Ok(retrieval) = retrieved_result {
+            let correlation_id = retrieval.message.get_id().to_string();
+            let correlation_id = correlation_id.as_str();
+
             let processing_result = retrieval.message.clone().process().await;
+
             match processing_result {
                 Ok(job_id) => {
                     state_manager.set_status(job_id, JobStatus::Done).await?;
                     retrieval.remove().await?;
                 }
                 Err(e) => {
-                    tracing::error!(
-                        message = format!("Error {:?}", e).as_str(),
-                        correlation_id = retrieval.message.get_id().to_string().as_str()
-                    );
+                    tracing::error!(message = format!("Error {:?}", e).as_str(), correlation_id);
                     retrieval.handle_processing_error(e, &state_manager).await?;
                 }
             };
