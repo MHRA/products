@@ -34,43 +34,43 @@ Cypress.on('window:before:load', win => {
 
 const mockParacetamolResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(paracetamol~1||paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
     'fixture:search_results.json',
   );
 
 const mockParacetamolResultsPage2 = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(paracetamol~1||paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
     'fixture:search_results.json',
   );
 
 const mockIbuprofenResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1||ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
     'fixture:search_results.json',
   );
 
 const mockIbuprofenResultsPage2 = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1||ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
     'fixture:search_results.page2.json',
   );
 
 const mockIbuprofenSpcResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1||ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
     'fixture:search_results.spc.json',
   );
 
 const mockIbuprofenSpcResultsPage2 = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1||ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
     'fixture:search_results.spc.page2.json',
   );
 
 const mockIbuprofenSpcPilResults = () =>
   cy.route(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1||ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc'+or+doc_type+eq+'Pil')`,
+    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc'+or+doc_type+eq+'Pil')`,
     'fixture:search_results.spcpil.json',
   );
 
