@@ -2,7 +2,7 @@ pub use self::redis::get_client;
 use self::redis::{get_from_redis, set_in_redis, MyRedisError};
 use crate::{
     auth_manager,
-    models::{JobStatus, JobStatusResponse},
+    models::{JobStatus, JobStatusResponse, XMLJobStatusResponse},
 };
 use ::redis::Client;
 use uuid::Uuid;
@@ -46,6 +46,17 @@ pub fn get_job_status(
         .and_then(get_status_handler)
 }
 
+pub fn get_job_status_xml(
+    state_manager: StateManager,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("jobs" / Uuid)
+        .and(warp::get())
+        .and(auth_manager::with_basic_auth())
+        .and(warp::header::exact_ignore_case("accept", "application/xml"))
+        .and(with_state(state_manager))
+        .and_then(get_status_handler_xml)
+}
+
 fn handle_known_errors(id: Uuid, e: MyRedisError) -> Result<JobStatusResponse, MyRedisError> {
     tracing::error!("{}", e);
     if let MyRedisError::IncompatibleType(_) = e {
@@ -66,6 +77,16 @@ fn to_response_with_status(response: JobStatusResponse) -> impl Reply {
     }
 }
 
+fn to_response_with_status_xml(response: JobStatusResponse) -> impl Reply {
+    let status = response.status.clone();
+    let xml_response: XMLJobStatusResponse = response.into();
+    let xml = warp::reply::xml(&xml_response);
+    match status {
+        JobStatus::NotFound => warp::reply::with_status(xml, StatusCode::NOT_FOUND),
+        _ => warp::reply::with_status(xml, StatusCode::OK),
+    }
+}
+
 #[tracing::instrument]
 async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
     mgr.get_status(id)
@@ -73,6 +94,15 @@ async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, R
         .or_else(|e| handle_known_errors(id, e))
         .map_err(Into::into)
         .map(to_response_with_status)
+}
+
+#[tracing::instrument]
+async fn get_status_handler_xml(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+    mgr.get_status(id)
+        .await
+        .or_else(|e| handle_known_errors(id, e))
+        .map_err(Into::into)
+        .map(to_response_with_status_xml)
 }
 
 pub fn set_job_status(
