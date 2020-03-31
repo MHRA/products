@@ -2,6 +2,10 @@
   "name": "INDEXER_NAME_PLACEHOLDER",
   "dataSourceName": "DATASOURCE_NAME_PLACEHOLDER",
   "targetIndexName": "INDEX_NAME_PLACEHOLDER",
+  "schedule": {
+    "interval": "P1D",
+    "startTime": "2020-01-01T00:00:00Z"
+  },
   "parameters": {
     "configuration": { "indexStorageMetadataOnlyForOversizedDocuments": true }
   },

@@ -1,0 +1,28 @@
+name: doc-index-updater-branch
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!master"
+    paths:
+      - medicines/doc-index-updater/**
+      - .github/workflows/doc-index-updater-branch.yaml
+
+env:
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+
+      - name: Build and test Docker image
+        working-directory: ./medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-branch tag=$TAG

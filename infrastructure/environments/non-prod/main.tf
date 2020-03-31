@@ -2,6 +2,14 @@ provider "azurerm" {
   version = "~> 1.38.0"
 }
 
+provider "random" {
+  version = "~> 2.2"
+}
+
+provider "null" {
+  version = "~> 2.1"
+}
+
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"
@@ -9,10 +17,6 @@ terraform {
     container_name       = "tfstate"
     key                  = "non-prod.terraform.tfstate"
   }
-}
-
-locals {
-  namespace = "mhraproductsnonprod"
 }
 
 resource "azurerm_resource_group" "products" {
@@ -30,7 +34,7 @@ module "products" {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = local.namespace
+  namespace           = "mhraproductsnonprod"
   resource_group_name = azurerm_resource_group.products.name
 }
 
@@ -59,7 +63,7 @@ module cpd {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = local.namespace
+  namespace           = "mhracpdnonprod"
   resource_group_name = azurerm_resource_group.products.name
 }
 

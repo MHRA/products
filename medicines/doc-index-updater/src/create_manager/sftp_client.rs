@@ -44,13 +44,28 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
     let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
     let password = get_env_fail_fast("SENTINEL_SFTP_PASSWORD").await;
 
+    tracing::debug!(
+        message = format!(
+            "Initiating Sentinel sftp connection with server: {} with user: {}",
+            server, user
+        )
+        .as_str()
+    );
     let tcp = TcpStream::connect(format!("{}:22", server))?;
+
+    tracing::debug!(message = "SFTP server connection established");
+
     let mut ssh_session = Session::new()?;
     ssh_session.set_tcp_stream(tcp);
     ssh_session.handshake()?;
 
+    tracing::debug!(message = "SFTP server handshake complete");
+
     ssh_session.userauth_password(&user, &password)?;
+
     assert!(ssh_session.authenticated());
+
+    tracing::debug!(message = "SFTP session authenticated");
 
     let sftp = ssh_session.sftp()?;
 

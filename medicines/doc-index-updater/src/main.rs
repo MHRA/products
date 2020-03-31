@@ -30,7 +30,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
 
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
-    tracing::info!("StateManager config: {:?}", state);
 
     let create_state = state.clone();
     let delete_state = state.clone();
@@ -39,6 +38,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
         tokio::spawn(async move {
             warp::serve(
                 health::get_health()
+                    .or(state_manager::get_job_status_xml(state.clone()))
                     .or(state_manager::get_job_status(state.clone()))
                     .or(state_manager::set_job_status(state.clone()))
                     .or(document_manager::check_in_xml_document(state.clone()))
@@ -76,7 +76,7 @@ fn use_json_log_subscriber() {
 fn use_unstructured_log_subscriber() {
     let subscriber = tracing_subscriber::fmt::Subscriber::builder()
         .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
-        .with_max_level(Level::INFO)
+        .with_max_level(Level::DEBUG)
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .finish();
 

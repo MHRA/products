@@ -1,8 +1,8 @@
+use super::sanitiser::{SanitisedString, VecSanitisedString};
 use crate::{
     create_manager::Blob,
     models::{Document, DocumentType},
 };
-
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
 use serde::Serialize;
@@ -10,20 +10,20 @@ use std::{collections::HashMap, str};
 
 #[derive(Clone)]
 pub struct BlobMetadata {
-    file_name: String,
+    file_name: SanitisedString,
     doc_type: DocumentType,
-    title: String,
+    title: SanitisedString,
     pl_number: String,
-    product_names: Vec<String>,
-    active_substances: Vec<String>,
-    author: String,
-    keywords: Option<Vec<String>>,
+    product_names: VecSanitisedString,
+    active_substances: VecSanitisedString,
+    author: SanitisedString,
+    keywords: Option<VecSanitisedString>,
 }
 
 impl BlobMetadata {
     fn facets(&self) -> Vec<String> {
         create_facets_by_active_substance(
-            self.product_names.join(", "),
+            self.product_names.clone(),
             self.active_substances.clone(),
         )
     }
@@ -31,22 +31,31 @@ impl BlobMetadata {
 
 impl Into<BlobMetadata> for Document {
     fn into(self) -> BlobMetadata {
-        let title = sanitize(&self.name);
-        let pl_number = extract_product_licences(&title);
+        let title = SanitisedString::from(&self.name);
+        let pl_number = extract_product_licences(&title.to_string());
 
         BlobMetadata {
-            file_name: sanitize(&self.id),
+            file_name: SanitisedString::from(&self.id),
             doc_type: self.document_type,
             title,
             pl_number,
-            product_names: self.products.iter().map(|a| a.to_uppercase()).collect(),
-            active_substances: self
-                .active_substances
-                .iter()
-                .map(|a| a.to_uppercase())
-                .collect(),
-            author: sanitize(&self.author),
-            keywords: self.keywords,
+            product_names: VecSanitisedString::from(
+                self.products
+                    .iter()
+                    .map(|a| a.to_uppercase())
+                    .collect::<Vec<String>>(),
+            ),
+            active_substances: VecSanitisedString::from(
+                self.active_substances
+                    .iter()
+                    .map(|a| a.to_uppercase())
+                    .collect::<Vec<String>>(),
+            ),
+            author: SanitisedString::from(&self.author),
+            keywords: match self.keywords {
+                Some(a) => Some(VecSanitisedString::from(a)),
+                None => None,
+            },
         }
     }
 }
@@ -55,23 +64,20 @@ impl Into<HashMap<String, String>> for BlobMetadata {
     fn into(self) -> HashMap<String, String> {
         let mut metadata: HashMap<String, String> = HashMap::new();
 
-        metadata.insert("file_name".to_string(), self.file_name.clone());
+        metadata.insert("file_name".to_string(), self.file_name.to_string());
         metadata.insert("doc_type".to_string(), self.doc_type.to_string());
-        metadata.insert("title".to_string(), self.title.clone());
-        metadata.insert(
-            "product_name".to_string(),
-            to_json(self.product_names.clone()),
-        );
+        metadata.insert("title".to_string(), self.title.to_string());
+        metadata.insert("product_name".to_string(), self.product_names.to_json());
         metadata.insert(
             "substance_name".to_string(),
-            to_json(self.active_substances.clone()),
+            self.active_substances.to_json(),
         );
         metadata.insert("facets".to_string(), to_json(self.facets()));
         if let Some(keywords) = self.keywords.clone() {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
         metadata.insert("pl_number".to_string(), self.pl_number.clone());
-        metadata.insert("author".to_string(), self.author);
+        metadata.insert("author".to_string(), self.author.to_string());
 
         metadata
     }
@@ -102,8 +108,8 @@ pub struct IndexEntry {
     facets: Vec<String>,
 }
 
-impl IndexEntry {
-    pub fn for_blob(blob: Blob) -> Self {
+impl From<Blob> for IndexEntry {
+    fn from(blob: Blob) -> Self {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: "1".to_owned(),
@@ -113,33 +119,26 @@ impl IndexEntry {
             keywords: blob
                 .metadata
                 .keywords
-                .to_owned()
+                .clone()
                 .unwrap_or_default()
                 .join(", "),
-            title: blob.metadata.title.to_owned(),
-            pl_number: vec![blob.metadata.pl_number.to_owned()],
-            file_name: blob.metadata.file_name.to_owned(),
+            title: blob.metadata.title.to_string(),
+            pl_number: vec![blob.metadata.pl_number.to_string()],
+            file_name: blob.metadata.file_name.to_string(),
             doc_type: blob.metadata.doc_type.to_string(),
             suggestions: vec![],
-            substance_name: blob.metadata.active_substances.clone(),
+            substance_name: blob.metadata.active_substances.to_vec_string(),
             facets: blob.metadata.facets(),
             metadata_storage_content_type: String::default(),
             metadata_storage_size: blob.size,
             metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             metadata_storage_content_md5: String::default(),
             metadata_storage_name: blob.name.to_owned(),
-            metadata_storage_path: blob.path.to_owned(),
+            metadata_storage_path: blob.path,
             metadata_content_type: String::default(),
             metadata_language: String::default(),
         }
     }
-}
-
-pub fn sanitize(s: &str) -> String {
-    s.replace(|c: char| !c.is_ascii(), "")
-        .replace("\n", " ")
-        .trim()
-        .to_string()
 }
 
 pub fn to_json(words: Vec<String>) -> String {
@@ -147,17 +146,18 @@ pub fn to_json(words: Vec<String>) -> String {
 }
 
 pub fn create_facets_by_active_substance(
-    product: String,
-    active_substances: Vec<String>,
+    products: VecSanitisedString,
+    active_substances: VecSanitisedString,
 ) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
+        .to_vec_string()
         .iter()
         .map(|a| {
-            let first = a.chars().next().unwrap();
+            let first = a.to_string().chars().next().unwrap();
             vec![
                 first.to_string(),
                 [first.to_string(), a.to_string()].join(", "),
-                [first.to_string(), a.to_string(), product.to_string()].join(", "),
+                [first.to_string(), a.to_string(), products.join(", ")].join(", "),
             ]
         })
         .flatten()
@@ -241,26 +241,15 @@ mod test {
     }
 
     #[test]
-    fn sanitize_remove_newline() {
-        assert_eq!(sanitize("newline\ntest"), "newline test");
-    }
-    #[test]
-    fn sanitize_remove_non_ascii() {
-        assert_eq!(sanitize("emoji🙂 ∫test"), "emoji test");
-    }
-    #[test]
-    fn sanitize_trim() {
-        assert_eq!(sanitize(" test "), "test");
-    }
-    #[test]
     fn test_create_facets_by_active_substance() {
         let active_substances = vec![
             "LOSARTAN POTASSIUM".to_string(),
             "HYDROCHLOROTHIAZIDE".to_string(),
             "L-TEST".to_string(),
         ];
-        let product =
-            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned();
+        let products = vec![
+            "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned(),
+        ];
         let expected = vec![
             "H", 
             "H, HYDROCHLOROTHIAZIDE", 
@@ -272,7 +261,34 @@ mod test {
             "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
         ];
         assert_eq!(
-            create_facets_by_active_substance(product, active_substances),
+            create_facets_by_active_substance(
+                VecSanitisedString::from(products),
+                VecSanitisedString::from(active_substances)
+            ),
+            expected
+        );
+    }
+
+    #[test]
+    fn test_create_facets_by_active_substance_sanitises() {
+        let active_substances = vec!["CAFÉ".to_string(), "FÊTE".to_string(), "NAÏVE".to_string()];
+        let products = vec!["MOTÖRHEAD".to_owned()];
+        let expected = vec![
+            "C",
+            "C, CAF",
+            "C, CAF, MOTRHEAD",
+            "F",
+            "F, FTE",
+            "F, FTE, MOTRHEAD",
+            "N",
+            "N, NAVE",
+            "N, NAVE, MOTRHEAD",
+        ];
+        assert_eq!(
+            create_facets_by_active_substance(
+                VecSanitisedString::from(products),
+                VecSanitisedString::from(active_substances)
+            ),
             expected
         );
     }

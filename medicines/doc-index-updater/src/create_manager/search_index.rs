@@ -7,7 +7,7 @@ pub async fn add_blob_to_search_index(
     search_client: &search_client::AzureSearchClient,
     blob: Blob,
 ) -> Result<(), anyhow::Error> {
-    let entry = IndexEntry::for_blob(blob);
+    let entry: IndexEntry = blob.into();
 
     tracing::info!("Creating index entry ({:?})", entry);
     search_client.create(entry).await.map_err(|e| {
