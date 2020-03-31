@@ -234,6 +234,7 @@ impl Message for DeleteMessage {
 #[cfg(test)]
 mod test {
     use super::*;
+    use serde_xml_rs::from_reader;
     use test_case::test_case;
 
     #[test_case("Accepted", Ok(JobStatus::Accepted))]
@@ -245,5 +246,104 @@ mod test {
     #[test_case("Bedro", Err("Status unknown: Bedro".to_owned()))]
     fn test_parse_job_status(input: &str, output: Result<JobStatus, String>) {
         assert_eq!(input.parse::<JobStatus>(), output);
+    }
+
+    #[test]
+    fn test_deserialize_xml_doc() {
+        let raw_xml_body = r##"
+        <document>
+            <id>con33333333</id>
+            <name>Name of an SPC</name>
+            <type>SPC</type>
+            <author>theauthor</author>
+            <products>
+                <product>This is a product</product>
+                <product>This is another product</product>
+            </products>
+            <pl_number>PL 12345/0010-0001</pl_number>
+            <keywords>
+                <keyword>
+                    Test
+                </keyword>
+                <keyword>
+                    Test 2
+                </keyword>
+            </keywords>
+            <active_substances>
+                <active_substance>Caffeine</active_substance>
+                <active_substance>Caffeine 2</active_substance>
+            </active_substances>
+            <file_source>Sentinel</file_source>
+            <file_path>example_file.txt</file_path>
+        </document>
+        "##;
+        let doc: XMLDocument = from_reader(raw_xml_body.as_bytes()).unwrap();
+        assert_eq!(doc.id, "con33333333");
+        assert_eq!(doc.name, "Name of an SPC");
+        assert_eq!(doc.document_type, DocumentType::Spc);
+        assert_eq!(doc.author, "theauthor");
+        assert_eq!(doc.products.product[0], "This is a product");
+        assert_eq!(doc.products.product[1], "This is another product");
+        assert_eq!(doc.pl_number, "PL 12345/0010-0001");
+        if let Some(keywords) = doc.keywords {
+            assert_eq!(keywords.keyword[0], "Test");
+            assert_eq!(keywords.keyword[1], "Test 2");
+        } else {
+            panic!("Keywords not deserialized properly");
+        }
+        assert_eq!(doc.active_substances.active_substance[0], "Caffeine");
+        assert_eq!(doc.active_substances.active_substance[1], "Caffeine 2");
+        assert_eq!(doc.file_source, FileSource::Sentinel);
+        assert_eq!(doc.file_path, "example_file.txt");
+    }
+
+    #[test]
+    fn test_convert_xml_doc_into_standard_doc() {
+        let raw_xml_body = r##"
+        <document>
+            <id>con33333333</id>
+            <name>Name of an SPC</name>
+            <type>SPC</type>
+            <author>theauthor</author>
+            <products>
+                <product>This is a product</product>
+                <product>This is another product</product>
+            </products>
+            <pl_number>PL 12345/0010-0001</pl_number>
+            <keywords>
+                <keyword>
+                    Test
+                </keyword>
+                <keyword>
+                    Test 2
+                </keyword>
+            </keywords>
+            <active_substances>
+                <active_substance>Caffeine</active_substance>
+                <active_substance>Caffeine 2</active_substance>
+            </active_substances>
+            <file_source>Sentinel</file_source>
+            <file_path>example_file.txt</file_path>
+        </document>
+        "##;
+        let xml_doc: XMLDocument = from_reader(raw_xml_body.as_bytes()).unwrap();
+        let doc = Into::<Document>::into(xml_doc);
+        assert_eq!(doc.id, "con33333333");
+        assert_eq!(doc.name, "Name of an SPC");
+        assert_eq!(doc.document_type, DocumentType::Spc);
+        assert_eq!(doc.author, "theauthor");
+        assert_eq!(doc.products[0], "This is a product");
+        assert_eq!(doc.products[1], "This is another product");
+        assert_eq!(doc.pl_number, "PL 12345/0010-0001");
+        if let Some(keywords) = doc.keywords {
+            assert_eq!(keywords[0], "Test");
+            assert_eq!(keywords[1], "Test 2");
+        } else {
+            panic!("Keywords not deserialized properly");
+        }
+        assert_eq!(doc.active_substances[0], "Caffeine");
+        assert_eq!(doc.active_substances[1], "Caffeine 2");
+        assert_eq!(doc.file_source, FileSource::Sentinel);
+        assert_eq!(doc.file_path, "example_file.txt");
     }
 }
