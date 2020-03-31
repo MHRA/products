@@ -76,7 +76,6 @@ pub enum FileSource {
 
 impl Into<Document> for XMLDocument {
     fn into(self) -> Document {
-        println!("{:#?}", self);
         Document {
             id: self.id,
             name: self.name,
