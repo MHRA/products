@@ -21,9 +21,17 @@ for i in 1 2 3 4 5; do
   result=$(curl --user username:password -X "GET" "http://localhost:8000/jobs/${job_id}")
   echo "$result"
   status=$(echo "$result" | jq '.status' | sed -e 's/\"//' | sed -e 's/\"//')
-  if [ "$status" = "Done" ]; then
-    break # Success
-  fi
+
+  case "$status" in
+  "Done")
+    echo "SUCCESS: File deleted from index."
+    break
+    ;;
+  *"Error"*)
+    echo "FAIL: File NOT deleted from index."
+    exit 1
+    ;;
+  esac
   sleep 5
 done
 if [ "$status" != "Done" ]; then
