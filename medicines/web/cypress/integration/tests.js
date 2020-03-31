@@ -80,13 +80,7 @@ const longerTimeout = 20000;
 
 describe('Search', function() {
   it('can search for Paracetamol', function() {
-    cy.log(baseUrl);
-    cy.log(apiKey);
-    cy.log(genericSearchParams);
-    console.log(baseUrl);
-    console.log(apiKey);
-    console.log(genericSearchParams);
-    console.server();
+    cy.server();
     mockParacetamolResults();
     mockParacetamolResultsPage2();
     cy.visit('/');
