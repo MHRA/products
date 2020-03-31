@@ -34,11 +34,15 @@ impl FromStr for JobStatus {
             status => {
                 // If this message is in the format "Error(error code: error message)",
                 // reconstruct it into JobStatus::Error.
-                let error_re = Regex::new(r"^Error\((?P<code>[^:]*): (?P<message>.*)\)$").unwrap();
+                let error_re = Regex::new(r"^Error\((?P<code>[^:]*): (?P<message>.*)\)$")
+                    .expect("Regex failed to compile");
                 match error_re.captures(status) {
                     Some(capture) => Ok(JobStatus::Error {
-                        message: capture.name("message").unwrap().as_str().to_string(),
-                        code: capture.name("code").unwrap().as_str().to_string(),
+                        message: capture
+                            .name("message")
+                            .map_or("", |m| m.as_str())
+                            .to_string(),
+                        code: capture.name("code").map_or("", |m| m.as_str()).to_string(),
                     }),
                     None => Err(format!("Status unknown: {}", status)),
                 }

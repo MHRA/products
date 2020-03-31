@@ -19,7 +19,8 @@ fn auth_is_correct(username: String, password: String) -> bool {
 }
 
 fn extract_encoded_credentials(auth_header: String) -> Option<String> {
-    let re = Regex::new(r"^Basic\s(?P<encoded_credentials>[-A-Za-z0-9+/]*={0,3})$").unwrap();
+    let re = Regex::new(r"^Basic\s(?P<encoded_credentials>[-A-Za-z0-9+/]*={0,3})$")
+        .expect("Regex failed to compile");
 
     if let Some(caps) = re.captures(&auth_header) {
         match caps.name("encoded_credentials") {
@@ -33,7 +34,8 @@ fn extract_encoded_credentials(auth_header: String) -> Option<String> {
 
 fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
     if let Ok(credentials) = base64::decode(&encoded_credentials) {
-        let re = Regex::new(r"^(?P<username>\w+):(?P<password>\w+)$").unwrap();
+        let re =
+            Regex::new(r"^(?P<username>\w+):(?P<password>\w+)$").expect("Regex failed to compile");
         match re.captures(std::str::from_utf8(&credentials).unwrap_or("")) {
             Some(caps) => {
                 if let (Some(username), Some(password)) =

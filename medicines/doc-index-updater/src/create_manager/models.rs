@@ -153,12 +153,15 @@ pub fn create_facets_by_active_substance(
         .to_vec_string()
         .iter()
         .map(|a| {
-            let first = a.to_string().chars().next().unwrap();
-            vec![
-                first.to_string(),
-                [first.to_string(), a.to_string()].join(", "),
-                [first.to_string(), a.to_string(), products.join(", ")].join(", "),
-            ]
+            if let Some(first) = a.to_string().chars().next() {
+                vec![
+                    first.to_string(),
+                    [first.to_string(), a.to_string()].join(", "),
+                    [first.to_string(), a.to_string(), products.join(", ")].join(", "),
+                ]
+            } else {
+                vec![]
+            }
         })
         .flatten()
         .collect();
