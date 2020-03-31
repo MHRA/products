@@ -6,10 +6,12 @@
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
 let polyfill;
-const baseUrl =
-  'https://mhraproductsdev.search.windows.net/indexes/products-index/docs';
-const apiKey =
-  'api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11';
+const baseUrl = `https://${Cypress.env(
+  'SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('INDEX_NAME')}/docs`;
+const apiKey = `api-key=${Cypress.env(
+  'SEARCH_QUERY_KEY',
+)}&api-version=2017-11-11`;
 const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package
@@ -78,7 +80,13 @@ const longerTimeout = 20000;
 
 describe('Search', function() {
   it('can search for Paracetamol', function() {
-    cy.server();
+    cy.log(baseUrl);
+    cy.log(apiKey);
+    cy.log(genericSearchParams);
+    console.log(baseUrl);
+    console.log(apiKey);
+    console.log(genericSearchParams);
+    console.server();
     mockParacetamolResults();
     mockParacetamolResultsPage2();
     cy.visit('/');
