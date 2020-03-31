@@ -76,33 +76,19 @@ pub enum FileSource {
 
 impl Into<Document> for XMLDocument {
     fn into(self) -> Document {
+        println!("{:#?}", self);
         Document {
             id: self.id,
             name: self.name,
             document_type: self.document_type,
             author: self.author,
-            products: self
-                .products
-                .product
-                .iter()
-                .map(|product| product.to_string())
-                .collect::<Vec<String>>(),
+            products: self.products.product,
             keywords: match self.keywords {
-                Some(kw) => Some(
-                    kw.keyword
-                        .iter()
-                        .map(|keyword| keyword.to_string())
-                        .collect::<Vec<String>>(),
-                ),
+                Some(kw) => Some(kw.keyword),
                 None => None,
             },
             pl_number: self.pl_number,
-            active_substances: self
-                .active_substances
-                .active_substance
-                .iter()
-                .map(|active_substance| active_substance.to_string())
-                .collect::<Vec<String>>(),
+            active_substances: self.active_substances.active_substance,
             file_source: self.file_source,
             file_path: self.file_path,
         }
