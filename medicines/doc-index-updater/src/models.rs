@@ -76,6 +76,7 @@ pub enum FileSource {
 
 impl Into<Document> for XMLDocument {
     fn into(self) -> Document {
+        println!("{:#?}", self);
         Document {
             id: self.id,
             name: self.name,
@@ -83,13 +84,15 @@ impl Into<Document> for XMLDocument {
             author: self.author,
             products: self
                 .products
+                .product
                 .iter()
-                .map(move |active_substance| active_substance.name.clone())
+                .map(move |product| product.clone())
                 .collect::<Vec<String>>(),
             keywords: match self.keywords {
                 Some(kw) => Some(
-                    kw.iter()
-                        .map(move |keyword| keyword.name.clone())
+                    kw.keyword
+                        .iter()
+                        .map(move |keyword| keyword.clone())
                         .collect::<Vec<String>>(),
                 ),
                 None => None,
@@ -97,8 +100,9 @@ impl Into<Document> for XMLDocument {
             pl_number: self.pl_number,
             active_substances: self
                 .active_substances
+                .active_substance
                 .iter()
-                .map(move |active_substance| active_substance.name.clone())
+                .map(move |active_substance| active_substance.clone())
                 .collect::<Vec<String>>(),
             file_source: self.file_source,
             file_path: self.file_path,
@@ -107,24 +111,21 @@ impl Into<Document> for XMLDocument {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Product {
+pub struct Products {
     #[serde(default)]
-    #[serde(rename = "product")]
-    pub name: String,
+    pub product: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Keyword {
+pub struct Keywords {
     #[serde(default)]
-    #[serde(rename = "keyword")]
-    pub name: String,
+    pub keyword: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ActiveSubstance {
+pub struct ActiveSubstances {
     #[serde(default)]
-    #[serde(rename = "active_substance")]
-    pub name: String,
+    pub active_substance: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -134,10 +135,10 @@ pub struct XMLDocument {
     #[serde(rename = "type")]
     pub document_type: DocumentType,
     pub author: String,
-    pub products: Vec<Product>,
-    pub keywords: Option<Vec<Keyword>>,
+    pub products: Products,
+    pub keywords: Option<Keywords>,
     pub pl_number: String,
-    pub active_substances: Vec<ActiveSubstance>,
+    pub active_substances: ActiveSubstances,
     pub file_source: FileSource,
     pub file_path: String,
 }
