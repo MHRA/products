@@ -3,6 +3,14 @@ provider "azurerm" {
   features {}
 }
 
+provider "random" {
+  version = "~> 2.2"
+}
+
+provider "null" {
+  version = "~> 2.1"
+}
+
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"
@@ -73,12 +81,12 @@ module cluster {
 #   resource_group_name = azurerm_resource_group.products.name
 # }
 
-# # Service Bus
-# module service_bus {
-#   source = "../../modules/service-bus"
+# Service Bus
+module service_bus {
+  source = "../../modules/service-bus"
 
-#   environment         = var.ENVIRONMENT
-#   location            = var.REGION
-#   name                = "doc-index-updater-${var.ENVIRONMENT}"
-#   resource_group_name = azurerm_resource_group.products.name
-# }
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  name                = "doc-index-updater-${var.ENVIRONMENT}"
+  resource_group_name = azurerm_resource_group.products.name
+}
