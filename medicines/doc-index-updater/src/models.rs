@@ -109,18 +109,21 @@ impl Into<Document> for XMLDocument {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Product {
     #[serde(default)]
+    #[serde(rename = "product")]
     pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Keyword {
     #[serde(default)]
+    #[serde(rename = "keyword")]
     pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActiveSubstance {
     #[serde(default)]
+    #[serde(rename = "active_substance")]
     pub name: String,
 }
 
