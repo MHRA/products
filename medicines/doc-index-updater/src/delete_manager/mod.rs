@@ -41,10 +41,7 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        tracing::info!(
-            message = "Setting error state in state manager",
-            correlation_id = self.message.job_id.to_string().as_str()
-        );
+        tracing::info!("Setting error state in state manager");
         state_manager
             .set_status(
                 self.message.job_id,

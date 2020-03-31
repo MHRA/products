@@ -51,10 +51,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
         if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
-            tracing::warn!(
-                message = "Couldn't find file. Updating state to errored and removing message.",
-                correlation_id = self.message.job_id.to_string().as_str()
-            );
+            tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
             let _ = state_manager
                 .set_status(
                     self.message.job_id,
