@@ -10,6 +10,6 @@ output "search_admin_key" {
   value = azurerm_search_service.search.primary_key
 }
 
-output "products-hostname-cdn" {
+output "products_hostname_cdn" {
   value = azurerm_cdn_endpoint.products.host_name
 }
