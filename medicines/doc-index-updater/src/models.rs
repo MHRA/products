@@ -232,7 +232,7 @@ impl Message for CreateMessage {
         crate::create_manager::process_message(self.clone())
             .instrument(tracing::info_span!(
                 "processing_CREATE",
-                correlation_id = self.get_id().to_string().as_str()
+                correlation_id = self.get_id().to_string().as_str()         
             ))
             .await
     }
