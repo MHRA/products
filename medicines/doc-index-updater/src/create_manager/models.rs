@@ -8,7 +8,7 @@ use regex::Regex;
 use serde::Serialize;
 use std::{collections::HashMap, str};
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct BlobMetadata {
     file_name: SanitisedString,
     doc_type: DocumentType,
@@ -32,7 +32,7 @@ impl BlobMetadata {
 impl Into<BlobMetadata> for Document {
     fn into(self) -> BlobMetadata {
         let title = SanitisedString::from(&self.name);
-        let pl_number = extract_product_licences(&title.to_string());
+        let pl_number = extract_product_licences(&self.pl_number.to_string());
 
         BlobMetadata {
             file_name: SanitisedString::from(&self.id),
@@ -323,6 +323,7 @@ mod test {
             "21 pl-12345-1234",
             "22 12345-1234",
             "23 12345-1234GG",
+            "PL 12345/1234-0001",
             "leaflet MAH GENERIC_PL 12345-1234R.pdf",
         ];
         let output = "[\"PL123451234\"]";
@@ -340,5 +341,36 @@ mod test {
     #[test]
     fn extract_product_license_test_not_found() {
         assert_eq!(extract_product_licences("no pl number here"), "[]");
+    }
+    #[test]
+    fn parses_blob_metadata_from_document() {
+        let document = Document {
+            id: "con12345".to_string(),
+            name: "Some SPC".to_string(),
+            document_type: DocumentType::Spc,
+            author: "test".to_string(),
+            products: vec!["Generic Paracetamol".to_string()],
+            keywords: None,
+            pl_number: "PL 12345/0010-0001".to_string(),
+            active_substances: vec!["paracetamol".to_string()],
+            file_source: FileSource::Sentinel,
+            file_path: "/home/sentinel/something.pdf".to_string(),
+        };
+
+        let result: BlobMetadata = document.into();
+
+        assert_eq!(
+            result,
+            BlobMetadata {
+                file_name: SanitisedString::from("con12345".to_string()),
+                doc_type: DocumentType::Spc,
+                title: SanitisedString::from("Some SPC".to_string()),
+                pl_number: "[\"PL123450010\"]".to_string(),
+                product_names: VecSanitisedString::from(vec!["GENERIC PARACETAMOL".to_string()]),
+                active_substances: VecSanitisedString::from(vec!["PARACETAMOL".to_string()]),
+                author: SanitisedString::from("test".to_string()),
+                keywords: None,
+            }
+        )
     }
 }
