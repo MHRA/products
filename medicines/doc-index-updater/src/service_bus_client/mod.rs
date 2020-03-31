@@ -170,7 +170,10 @@ impl DocIndexUpdaterQueue {
             let correlation_id = correlation_id.as_str();
 
             process(retrieval, state_manager)
-                .instrument(tracing::info_span!("processing", correlation_id))
+                .instrument(tracing::info_span!(
+                    "try_process_from_queue",
+                    correlation_id
+                ))
                 .await?
         }
         Ok(())
