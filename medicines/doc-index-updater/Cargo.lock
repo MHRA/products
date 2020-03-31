@@ -398,6 +398,7 @@ dependencies = [
  "regex",
  "reqwest",
  "serde",
+ "serde-xml-rs 0.4.0",
  "serde_derive",
  "serde_json",
  "sha1",
