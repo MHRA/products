@@ -85,13 +85,13 @@ impl Into<Document> for XMLDocument {
                 .products
                 .product
                 .iter()
-                .map(move |product| product.clone())
+                .map(|product| product.to_string())
                 .collect::<Vec<String>>(),
             keywords: match self.keywords {
                 Some(kw) => Some(
                     kw.keyword
                         .iter()
-                        .map(move |keyword| keyword.clone())
+                        .map(|keyword| keyword.to_string())
                         .collect::<Vec<String>>(),
                 ),
                 None => None,
@@ -101,7 +101,7 @@ impl Into<Document> for XMLDocument {
                 .active_substances
                 .active_substance
                 .iter()
-                .map(move |active_substance| active_substance.clone())
+                .map(|active_substance| active_substance.to_string())
                 .collect::<Vec<String>>(),
             file_source: self.file_source,
             file_path: self.file_path,
