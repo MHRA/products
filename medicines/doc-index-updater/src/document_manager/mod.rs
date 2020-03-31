@@ -8,6 +8,7 @@ use crate::{
     state_manager::{with_state, StateManager},
 };
 use time::Duration;
+use tracing_futures::Instrument;
 use uuid::Uuid;
 use warp::{
     reply::{Json, Xml},
@@ -33,8 +34,17 @@ async fn delete_document_handler(
         };
         let duration = Duration::days(1);
 
+        let correlation_id = id.to_string();
+        let correlation_id = correlation_id.as_str();
+
         match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager.set_status(id, JobStatus::Accepted).await?),
+            Ok(_) => Ok(state_manager
+                .set_status(id, JobStatus::Accepted)
+                .instrument(tracing::info_span!(
+                    "delete_document_handler",
+                    correlation_id
+                ))
+                .await?),
             Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {
@@ -71,8 +81,16 @@ async fn check_in_document_handler(
             document: doc,
         };
         let duration = Duration::days(1);
+
+        let correlation_id = id.to_string();
+        let correlation_id = correlation_id.as_str();
+
         match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager.set_status(id, JobStatus::Accepted).await?),
+            Ok(_) => Ok(state_manager.set_status(id, JobStatus::Accepted)
+            .instrument(tracing::info_span!(
+                "check_in_document_handler",
+                correlation_id
+            )).await?),
             Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {

@@ -230,8 +230,9 @@ impl Message for CreateMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
+
     async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
-        crate::create_manager::process_message(self).await
+        crate::create_manager::process_message(self.clone()).await
     }
 }
 
@@ -244,8 +245,9 @@ impl Message for DeleteMessage {
     fn to_json_string(&self) -> Result<String, serde_json::Error> {
         Ok(serde_json::to_string(&self)?)
     }
+
     async fn process(self) -> std::result::Result<uuid::Uuid, anyhow::Error> {
-        crate::delete_manager::process_message(self).await
+        crate::delete_manager::process_message(self.clone()).await
     }
 }
 

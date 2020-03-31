@@ -13,7 +13,6 @@ use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
 
-#[tracing::instrument(skip(state_manager))]
 pub async fn delete_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
@@ -42,10 +41,7 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
         e: anyhow::Error,
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
-        tracing::info!(
-            message = "Setting error state in state manager",
-            correlation_id = self.message.job_id.to_string().as_str()
-        );
+        tracing::info!("Setting error state in state manager");
         state_manager
             .set_status(
                 self.message.job_id,
@@ -63,9 +59,6 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
-    let correlation_id = message.job_id.to_string();
-    let correlation_id = correlation_id.as_str();
-
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
@@ -75,34 +68,22 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Err
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
 
     tracing::info!(
-        message = format!(
-            "Found blob name {} for document content ID {} from index",
-            &blob_name, &message.document_content_id
-        )
-        .as_str(),
-        correlation_id
+        "Found blob name {} for document content ID {} from index",
+        &blob_name,
+        &message.document_content_id
     );
     delete_from_index(&search_client, &blob_name).await?;
-    tracing::info!(
-        message = format!("Deleted blob {} from index", &blob_name).as_str(),
-        correlation_id
-    );
+    tracing::info!("Deleted blob {} from index", &blob_name);
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
         .map_err(|e| {
-            tracing::error!(
-                message = format!("Error deleting blob: {:?}", e).as_str(),
-                correlation_id
-            );
+            tracing::error!("Error deleting blob: {:?}", e);
             anyhow!("Couldn't delete blob {}", &blob_name)
         })?;
     tracing::info!(
-        message = format!(
-            "Deleted blob {} from storage container {}",
-            &blob_name, &storage_container_name
-        )
-        .as_str(),
-        correlation_id
+        "Deleted blob {} from storage container {}",
+        &blob_name,
+        &storage_container_name
     );
 
     Ok(message.job_id)
