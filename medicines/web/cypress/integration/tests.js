@@ -7,10 +7,10 @@
 
 let polyfill;
 const baseUrl = `https://${Cypress.env(
-  'SEARCH_SERVICE',
-)}.search.windows.net/indexes/${Cypress.env('INDEX_NAME')}/docs`;
+  'AZURE_SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
 const apiKey = `api-key=${Cypress.env(
-  'SEARCH_QUERY_KEY',
+  'AZURE_SEARCH_KEY',
 )}&api-version=2017-11-11`;
 const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
