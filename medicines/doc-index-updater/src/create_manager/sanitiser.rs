@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct SanitisedString {
     inner: String,
 }
@@ -31,7 +31,7 @@ impl ToString for SanitisedString {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct VecSanitisedString {
     inner: Vec<String>,
 }
