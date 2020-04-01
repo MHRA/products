@@ -6,6 +6,6 @@ output "cpd_static_web_url" {
   value = azurerm_storage_account.cpd.primary_web_endpoint
 }
 
-output "cpd-hostname-cdn" {
+output "cpd_hostname_cdn" {
   value = azurerm_cdn_endpoint.cpd.host_name
 }

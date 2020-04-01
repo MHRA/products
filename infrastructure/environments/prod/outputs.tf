@@ -38,10 +38,10 @@ output "cpd_static_web_url" {
   value = module.cpd.cpd_static_web_url
 }
 
-output "products-hostname-cdn" {
-  value = module.products.products-hostname-cdn
+output "products_hostname_cdn" {
+  value = module.products.products_hostname_cdn
 }
 
-output "cpd-hostname-cdn" {
-  value = module.cpd.cpd-hostname-cdn
+output "cpd_hostname_cdn" {
+  value = module.cpd.cpd_hostname_cdn
 }
