@@ -54,12 +54,3 @@ output "storage_account_name" {
 output "storage_master_key" {
   value = module.products.storage_access_key
 }
-
-
-# output "cpd_primary_access_key" {
-#   value = module.cpd.cpd_primary_access_key
-# }
-
-# output "cpd_static_web_url" {
-#   value = module.cpd.cpd_static_web_url
-# }
