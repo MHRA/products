@@ -3,19 +3,19 @@ image := mhraproductsnonprodregistry.azurecr.io/products/$(app)
 tag := latest
 
 .PHONY: default
-default: ## run locally
+default: ## Run locally
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
 
 .PHONY: test
-test: ## run locally
+test: ## Run tests [TEST=test_name (optional)]
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
 
 .PHONY: source-env
-source-env: ## run locally
+source-env: ## Export .env and .env.overrides variables into current shell
 	export $$(cat .env .env.overrides 2> /dev/null | xargs)
 
 .PHONY: get-env
-get-env: ## run locally
+get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
 	  --vault-name mhra-non-prod-02 \
 	  --name doc-index-updater-env \
@@ -23,7 +23,7 @@ get-env: ## run locally
 	  --output tsv > .env
 
 .PHONY: set-env
-set-env: ## run locally
+set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
 	--vault-name mhra-non-prod-02 \
 	--name doc-index-updater-env \
