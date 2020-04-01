@@ -1,10 +1,10 @@
 use crate::{
     auth_manager,
     models::{
-        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, XMLDocument,
+        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message, XMLDocument,
         XMLJobStatusResponse,
     },
-    service_bus_client::{create_factory, delete_factory},
+    service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, MyRedisError, StateManager},
 };
 use time::Duration;
@@ -32,6 +32,22 @@ async fn accept_job(state_manager: &StateManager) -> Result<JobStatusResponse, M
         .await
 }
 
+async fn queue_job<T>(
+    queue: &mut DocIndexUpdaterQueue,
+    state_manager: StateManager,
+    message: T,
+) -> Result<JobStatusResponse, Rejection>
+where
+    T: Message,
+{
+    let duration = Duration::days(1);
+
+    match queue.send(message.clone(), duration).await {
+        Ok(_) => Ok(state_manager.get_status(message.get_id()).await?),
+        Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
+    }
+}
+
 async fn delete_document_handler(
     document_content_id: String,
     state_manager: StateManager,
@@ -43,12 +59,7 @@ async fn delete_document_handler(
             job_id: id,
             document_content_id,
         };
-        let duration = Duration::days(1);
-
-        match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager.get_status(id).await?),
-            Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
-        }
+        queue_job(&mut queue, state_manager, message).await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }
@@ -83,12 +94,8 @@ async fn check_in_document_handler(
             job_id: id,
             document: doc,
         };
-        let duration = Duration::days(1);
 
-        match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager.get_status(id).await?),
-            Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
-        }
+        queue_job(&mut queue, state_manager, message).await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }
