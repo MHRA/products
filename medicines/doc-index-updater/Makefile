@@ -10,10 +10,6 @@ default: ## Run locally
 test: ## Run tests [TEST=test_name (optional)]
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
 
-.PHONY: source-env
-source-env: ## Export .env and .env.overrides variables into current shell
-	export $$(cat .env .env.overrides 2> /dev/null | xargs)
-
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
