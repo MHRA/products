@@ -62,7 +62,7 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 [[package]]
 name = "azure_sdk_core"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#ce612fd96759e2514b4611a039fb9726e0995645"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -92,7 +92,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_service_bus"
 version = "0.42.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#ce612fd96759e2514b4611a039fb9726e0995645"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -120,7 +120,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_storage_blob"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#ce612fd96759e2514b4611a039fb9726e0995645"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -151,7 +151,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_storage_core"
 version = "0.40.0"
-source = "git+https://github.com/redbadger/AzureSDKForRust?branch=service-bus-peek-lock-timeout#ce612fd96759e2514b4611a039fb9726e0995645"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -398,6 +398,7 @@ dependencies = [
  "regex",
  "reqwest",
  "serde",
+ "serde-xml-rs 0.4.0",
  "serde_derive",
  "serde_json",
  "sha1",

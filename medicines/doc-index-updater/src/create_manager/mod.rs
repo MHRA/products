@@ -22,7 +22,6 @@ mod sanitiser;
 mod search_index;
 mod sftp_client;
 
-#[tracing::instrument(skip(state_manager))]
 pub async fn create_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
@@ -52,10 +51,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
         state_manager: &StateManager,
     ) -> anyhow::Result<()> {
         if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
-            tracing::warn!(
-                message = "Couldn't find file. Updating state to errored and removing message.",
-                correlation_id = self.message.job_id.to_string().as_str()
-            );
+            tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
             let _ = state_manager
                 .set_status(
                     self.message.job_id,
@@ -72,13 +68,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 }
 
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
-    let correlation_id = message.job_id.to_string();
-    let correlation_id = correlation_id.as_str();
-
-    tracing::debug!(
-        message = format!("Message received: {:?} ", message).as_str(),
-        correlation_id
-    );
+    tracing::debug!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
@@ -95,17 +85,11 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
 
-    tracing::debug!(
-        message = format!("Uploaded blob {}.", &name).as_str(),
-        correlation_id
-    );
+    tracing::debug!("Uploaded blob {}.", &name);
 
     add_blob_to_search_index(&search_client, blob).await?;
 
-    tracing::info!(
-        message = format!("Successfully added {} to index.", &name).as_str(),
-        correlation_id
-    );
+    tracing::info!("Successfully added {} to index.", &name);
 
     Ok(message.job_id)
 }

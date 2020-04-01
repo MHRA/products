@@ -43,7 +43,7 @@ pub fn get_job_status(
         .and(warp::get())
         .and(auth_manager::with_basic_auth())
         .and(with_state(state_manager))
-        .and_then(get_status_handler)
+        .and_then(get_status_handler_json)
 }
 
 pub fn get_job_status_xml(
@@ -88,20 +88,22 @@ fn to_response_with_status_xml(response: JobStatusResponse) -> impl Reply {
 }
 
 #[tracing::instrument]
-async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<JobStatusResponse, Rejection> {
     mgr.get_status(id)
         .await
         .or_else(|e| handle_known_errors(id, e))
         .map_err(Into::into)
+}
+
+async fn get_status_handler_json(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+    get_status_handler(id, mgr)
+        .await
         .map(to_response_with_status)
 }
 
-#[tracing::instrument]
 async fn get_status_handler_xml(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
-    mgr.get_status(id)
+    get_status_handler(id, mgr)
         .await
-        .or_else(|e| handle_known_errors(id, e))
-        .map_err(Into::into)
         .map(to_response_with_status_xml)
 }
 
