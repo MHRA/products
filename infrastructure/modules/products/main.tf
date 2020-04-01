@@ -6,6 +6,11 @@ resource "azurerm_storage_account" "products" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
 
+  static_website {
+    error_404_document = "404.html"
+    index_document     = "index.html"
+  }
+
   tags = {
     environment = var.environment
   }
@@ -21,13 +26,6 @@ resource "azurerm_storage_container" "docs" {
   name                  = "docs"
   storage_account_name  = azurerm_storage_account.products.name
   container_access_type = "blob"
-}
-
-# waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
-# (which is imminent), but in the meantime ...
-module "products_staticweb" {
-  source               = "github.com/StefanSchoof/terraform-azurerm-static-website.git"
-  storage_account_name = azurerm_storage_account.products.name
 }
 
 resource "azurerm_search_service" "search" {

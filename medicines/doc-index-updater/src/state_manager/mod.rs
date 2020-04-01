@@ -1,5 +1,5 @@
-pub use self::redis::get_client;
-use self::redis::{get_from_redis, set_in_redis, MyRedisError};
+pub use self::redis::{get_client, MyRedisError};
+use self::redis::{get_from_redis, set_in_redis};
 use crate::{
     auth_manager,
     models::{JobStatus, JobStatusResponse, XMLJobStatusResponse},

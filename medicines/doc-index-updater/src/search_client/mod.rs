@@ -19,11 +19,11 @@ pub struct AzureResult {
     pub product_name: Option<String>,
     pub substance_name: Vec<String>,
     pub title: String,
-    pub created: String,
+    pub created: Option<String>,
     pub facets: Vec<String>,
     pub keywords: Option<String>,
     pub metadata_storage_size: i32,
-    pub release_state: String,
+    pub release_state: Option<String>,
     pub rev_label: Option<String>,
     pub suggestions: Vec<String>,
     #[serde(rename = "@search.score")]

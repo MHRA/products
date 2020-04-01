@@ -5,7 +5,6 @@ output "kube_config" {
 output "public_ip" {
   value = module.cluster.public_ip
 }
-
 output "host" {
   value = module.cluster.host
 }
@@ -26,20 +25,13 @@ output "products_static_web_url" {
   value = module.products.products_static_web_url
 }
 
+output "search_service_name" {
+  # TODO: fragile
+  value = local.namespace
+}
+
 output "search_admin_key" {
   value = module.products.search_admin_key
-}
-
-output "cpd_primary_access_key" {
-  value = module.cpd.cpd_primary_access_key
-}
-
-output "cpd_static_web_url" {
-  value = module.cpd.cpd_static_web_url
-}
-
-output "search_service_name" {
-  value = module.products.search_service_name
 }
 
 output "service_bus_queue_keys" {
@@ -55,7 +47,8 @@ output "service_bus_name" {
 }
 
 output "storage_account_name" {
-  value = module.products.storage_account_name
+  # TODO: fragile
+  value = local.namespace
 }
 
 output "storage_master_key" {
