@@ -72,16 +72,6 @@ module cluster {
   route_table_id      = azurerm_route_table.load_balancer.id
 }
 
-# CPD
-# module cpd {
-#   source = "../../modules/cpd"
-
-#   environment         = var.ENVIRONMENT
-#   location            = var.REGION
-#   namespace           = local.namespace
-#   resource_group_name = azurerm_resource_group.products.name
-# }
-
 # Service Bus
 module service_bus {
   source = "../../modules/service-bus"
