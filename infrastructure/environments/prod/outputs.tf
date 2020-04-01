@@ -45,3 +45,27 @@ output "products_hostname_cdn" {
 output "cpd_hostname_cdn" {
   value = module.cpd.cpd_hostname_cdn
 }
+
+output "search_service_name" {
+  value = module.products.search_service_name
+}
+
+output "service_bus_queue_keys" {
+  value = module.service_bus.queues_default_primary_key
+}
+
+output "redis_access_key" {
+  value = module.service_bus.redis_access_key
+}
+
+output "service_bus_name" {
+  value = local.service_bus_name
+}
+
+output "storage_account_name" {
+  value = module.products.storage_account_name
+}
+
+output "storage_master_key" {
+  value = module.products.storage_access_key
+}
