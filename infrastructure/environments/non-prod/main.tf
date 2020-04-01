@@ -1,5 +1,6 @@
 provider "azurerm" {
-  version = "~> 1.38.0"
+  version = "=2.2.0"
+  features {}
 }
 
 provider "random" {
@@ -19,6 +20,11 @@ terraform {
   }
 }
 
+locals {
+  namespace        = "mhraproductsnonprod"
+  service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+}
+
 resource "azurerm_resource_group" "products" {
   name     = var.RESOURCE_GROUP_PRODUCTS
   location = var.REGION
@@ -34,7 +40,7 @@ module "products" {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = "mhraproductsnonprod"
+  namespace           = local.namespace
   resource_group_name = azurerm_resource_group.products.name
 }
 
@@ -77,6 +83,6 @@ module service_bus {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  name                = "doc-index-updater-${var.ENVIRONMENT}"
+  name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
 }

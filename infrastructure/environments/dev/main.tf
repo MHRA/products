@@ -21,7 +21,8 @@ terraform {
 }
 
 locals {
-  namespace = "mhraproductsdevelopment"
+  namespace        = "mhraproductsdevelopment"
+  service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
 resource "azurerm_resource_group" "products" {
@@ -87,6 +88,6 @@ module service_bus {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  name                = "doc-index-updater-${var.ENVIRONMENT}"
+  name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
 }
