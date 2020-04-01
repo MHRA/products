@@ -6,6 +6,11 @@ resource "azurerm_storage_account" "products" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
 
+  static_website {
+    error_404_document = "404.html"
+    index_document     = "index.html"
+  }
+
   tags = {
     environment = var.environment
   }
