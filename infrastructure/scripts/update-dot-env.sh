@@ -53,5 +53,10 @@ STORAGE_MASTER_KEY=$(echo "$OUTPUT" | jq .storage_master_key.value --raw-output)
 
 echo
 echo "Updated medicines/doc-index-updater/.env"
+
 echo
-echo "Don't forget to run make set-env to save the environment variables"
+echo "Running make set-env to save the new variables"
+
+cd ../../medicines/doc-index-updater
+
+make set-env
