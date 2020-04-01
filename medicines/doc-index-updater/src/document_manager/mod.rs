@@ -44,7 +44,18 @@ where
 
     match queue.send(message.clone(), duration).await {
         Ok(_) => Ok(state_manager.get_status(message.get_id()).await?),
-        Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
+        Err(_) => {
+            let state = state_manager
+                .set_status(
+                    message.get_id(),
+                    JobStatus::Error {
+                        message: "Failed to dispatch to queue".to_owned(),
+                        code: "".to_owned(),
+                    },
+                )
+                .await?;
+            Ok(state)
+        }
     }
 }
 
