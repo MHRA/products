@@ -16,6 +16,14 @@ variable "CLIENT_SECRET" {
   description = "Service Principal Client Secret"
 }
 
+variable "CLIENT_ID" {
+  description = "Service Principal Client ID"
+}
+
+variable "CLIENT_SECRET" {
+  description = "Service Principal Client Secret"
+}
+
 variable "ENVIRONMENT" {
   description = "Environment name"
   default     = "prod"
