@@ -8,7 +8,6 @@ default: ## run locally
 
 .PHONY: test
 test: ## run locally
-	@echo ./prog $$TEST
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
 
 .PHONY: source-env
