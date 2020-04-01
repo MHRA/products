@@ -6,6 +6,10 @@ tag := latest
 default: ## run locally
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
 
+.PHONY: test
+test: ## run locally
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test
+
 .PHONY: get-env
 get-env: ## run locally
 	az keyvault secret show \
