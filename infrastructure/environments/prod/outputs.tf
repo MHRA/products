@@ -18,10 +18,26 @@ output "cpd_static_web_url" {
   value = module.cpd.cpd_static_web_url
 }
 
-output "products-hostname-cdn" {
-  value = azurerm_cdn_endpoint.products.host_name
+output "search_service_name" {
+  value = module.products.search_service_name
 }
 
-output "cpd-hostname-cdn" {
-  value = azurerm_cdn_endpoint.cpd.host_name
+output "service_bus_queue_keys" {
+  value = module.service_bus.queues_default_primary_key
+}
+
+output "redis_access_key" {
+  value = module.service_bus.redis_access_key
+}
+
+output "service_bus_name" {
+  value = local.service_bus_name
+}
+
+output "storage_account_name" {
+  value = module.products.storage_account_name
+}
+
+output "storage_master_key" {
+  value = module.products.storage_access_key
 }

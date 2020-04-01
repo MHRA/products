@@ -15,7 +15,7 @@ select opt in "${OPTIONS[@]}"; do
     break
     ;;
   prod,* | *,prod)
-    echo 'TODO 🏗'
+    az aks get-credentials --resource-group 'mpazr-rg-1023' --name 'prod'
     break
     ;;
   quit,* | *,quit)

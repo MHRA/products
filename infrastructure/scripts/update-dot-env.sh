@@ -7,7 +7,7 @@ set -euo pipefail
 # - `jq` needs to be installed - https://stedolan.github.io/jq/
 
 PS3='Please enter your current environment: '
-OPTIONS=("dev" "non-prod" "quit") # TODO: prod
+OPTIONS=("dev" "non-prod" "prod" "quit")
 
 select opt in "${OPTIONS[@]}"; do
     case "$opt,$REPLY" in
@@ -19,8 +19,12 @@ select opt in "${OPTIONS[@]}"; do
         pushd ../environments/non-prod/
         break
         ;;
-    quit,* | *,quit)
+    prod,* | *,prod)
+        pushd ../environments/prod/
         break
+        ;;
+    quit,* | *,quit)
+        exit 0
         ;;
     *) echo "invalid option $REPLY" ;;
     esac
