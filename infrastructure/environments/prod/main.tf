@@ -45,11 +45,11 @@ module cluster {
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
   vnet_name           = "aparz-spoke-${var.ENVIRONMENT}-products"
-  vnet_cidr           = "10.6.65.0/24"
+  vnet_cidr           = "10.5.66.0/24"
   lb_subnet_name      = "aparz-spoke-products-sn-01"
-  lb_subnet_cidr      = "10.6.65.0/26"
+  lb_subnet_cidr      = "10.5.66.0/26"
   cluster_subnet_name = "aparz-spoke-products-sn-02"
-  cluster_subnet_cidr = "10.6.65.64/26"
+  cluster_subnet_cidr = "10.5.66.64/26"
   route_table_id      = data.azurerm_route_table.load_balancer.id
 }
 
