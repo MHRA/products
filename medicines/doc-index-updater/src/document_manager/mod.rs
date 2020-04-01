@@ -5,7 +5,7 @@ use crate::{
         XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory},
-    state_manager::{with_state, StateManager},
+    state_manager::{with_state, MyRedisError, StateManager},
 };
 use time::Duration;
 use tracing_futures::Instrument;
@@ -22,29 +22,31 @@ pub struct FailedToDeserialize;
 impl warp::reject::Reject for FailedToDispatchToQueue {}
 impl warp::reject::Reject for FailedToDeserialize {}
 
+async fn accept_job(state_manager: &StateManager) -> Result<JobStatusResponse, MyRedisError> {
+    let id = Uuid::new_v4();
+    let correlation_id = id.to_string();
+    let correlation_id = correlation_id.as_str();
+    state_manager
+        .set_status(id, JobStatus::Accepted)
+        .instrument(tracing::info_span!("document_manager", correlation_id))
+        .await
+}
+
 async fn delete_document_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
-        let id = Uuid::new_v4();
+        let id = accept_job(&state_manager).await?.id;
+
         let message = DeleteMessage {
             job_id: id,
             document_content_id,
         };
         let duration = Duration::days(1);
 
-        let correlation_id = id.to_string();
-        let correlation_id = correlation_id.as_str();
-
         match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager
-                .set_status(id, JobStatus::Accepted)
-                .instrument(tracing::info_span!(
-                    "delete_document_handler",
-                    correlation_id
-                ))
-                .await?),
+            Ok(_) => Ok(state_manager.get_status(id).await?),
             Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {
@@ -75,22 +77,16 @@ async fn check_in_document_handler(
     state_manager: StateManager,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = create_factory().await {
-        let id = Uuid::new_v4();
+        let id = accept_job(&state_manager).await?.id;
+
         let message = CreateMessage {
             job_id: id,
             document: doc,
         };
         let duration = Duration::days(1);
 
-        let correlation_id = id.to_string();
-        let correlation_id = correlation_id.as_str();
-
         match queue.send(message, duration).await {
-            Ok(_) => Ok(state_manager.set_status(id, JobStatus::Accepted)
-            .instrument(tracing::info_span!(
-                "check_in_document_handler",
-                correlation_id
-            )).await?),
+            Ok(_) => Ok(state_manager.get_status(id).await?),
             Err(_) => Err(warp::reject::custom(FailedToDispatchToQueue)),
         }
     } else {
