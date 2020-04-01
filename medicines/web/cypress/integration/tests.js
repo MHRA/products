@@ -6,10 +6,12 @@
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
 let polyfill;
-const baseUrl =
-  'https://mhraproductsdev.search.windows.net/indexes/products-index/docs';
-const apiKey =
-  'api-key=CFBCBE8AA11AA871C14001527533870C&api-version=2017-11-11';
+const baseUrl = `https://${Cypress.env(
+  'AZURE_SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
+const apiKey = `api-key=${Cypress.env(
+  'AZURE_SEARCH_KEY',
+)}&api-version=2017-11-11`;
 const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package

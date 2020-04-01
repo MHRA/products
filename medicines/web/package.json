@@ -79,7 +79,8 @@
     "lint": "yarn tslint",
     "sitemap": "ts-node --project src/tools/tsconfig.json src/tools/sitemap-generator.ts",
     "start": "next start",
-    "test-e2e": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run --env AZURE_SEARCH_SERVICE=$AZURE_SEARCH_SERVICE,AZURE_SEARCH_INDEX=$AZURE_SEARCH_INDEX,AZURE_SEARCH_KEY=$AZURE_SEARCH_KEY; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e-interactive": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run --headed --env AZURE_SEARCH_SERVICE=$AZURE_SEARCH_SERVICE,AZURE_SEARCH_INDEX=$AZURE_SEARCH_INDEX,AZURE_SEARCH_KEY=$AZURE_SEARCH_KEY; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "test": "yarn jest",
     "test:ci": "yarn jest --coverage --ci"
   },
