@@ -6,6 +6,11 @@ resource "azurerm_storage_account" "cpd" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
 
+  static_website {
+    error_404_document = "404.html"
+    index_document     = "index.html"
+  }
+
   tags = {
     environment = var.environment
   }
@@ -15,13 +20,6 @@ resource "azurerm_storage_container" "cpd_website" {
   name                  = "$web"
   storage_account_name  = azurerm_storage_account.cpd.name
   container_access_type = "container"
-}
-
-# waiting for this to be resolved: https://github.com/terraform-providers/terraform-provider-azurerm/issues/1903
-# (which is imminent), but in the meantime ...
-module "cpd_staticweb" {
-  source               = "github.com/StefanSchoof/terraform-azurerm-static-website.git"
-  storage_account_name = azurerm_storage_account.cpd.name
 }
 
 resource "azurerm_cdn_profile" "cpd" {
@@ -42,4 +40,3 @@ resource "azurerm_cdn_endpoint" "cpd" {
     host_name = azurerm_storage_account.cpd.primary_web_host
   }
 }
-

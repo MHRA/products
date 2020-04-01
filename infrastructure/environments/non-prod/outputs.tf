@@ -39,8 +39,7 @@ output "cpd_static_web_url" {
 }
 
 output "search_service_name" {
-  # TODO: fragile
-  value = local.namespace
+  value = module.products.search_service_name
 }
 
 output "service_bus_queue_keys" {
@@ -56,8 +55,7 @@ output "service_bus_name" {
 }
 
 output "storage_account_name" {
-  # TODO: fragile
-  value = local.namespace
+  value = module.products.storage_account_name
 }
 
 output "storage_master_key" {
