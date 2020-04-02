@@ -1,4 +1,4 @@
-### doc-index-updater
+# doc-index-updater
 
 ![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
 
@@ -16,7 +16,9 @@ az acr login --name mhraproductsnonprodregistry
 docker push mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 ```
 
-## To run locally (by tunneling redis connection to Azure over TLS):
+## To run locally
+
+Run locally by tunneling redis connection to Azure over TLS.
 
 - install `stunnel` with homebrew:
 
@@ -30,7 +32,9 @@ brew install stunnel
 stunnel stunnel.conf
 ```
 
-- run the service:
+- setup environment variables, [via the steps below](#environment-variables)
+
+- run the service
 
 ```bash
 make
@@ -69,9 +73,5 @@ Run specific tests by passing `<arguments>` through to `cargo test`:
 ```bash
 make test TEST=<arguments>
 ```
-
-## To run in a local cluster:
-
-- follow the [README.md](./examples/local-cluster/README.md)
 
 [azure portal]: https://portal.azure.com/
