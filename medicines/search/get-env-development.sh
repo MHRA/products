@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export $(az keyvault secret show \
   --vault-name mhra-non-prod \
   --name search-index-creator-env \
