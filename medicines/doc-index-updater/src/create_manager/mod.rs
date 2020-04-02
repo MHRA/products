@@ -47,23 +47,83 @@ pub async fn create_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
         self,
-        e: anyhow::Error,
+        error: anyhow::Error,
         state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()> {
-        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
-            tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
-            let _ = state_manager
-                .set_status(
-                    self.message.job_id,
-                    JobStatus::Error {
-                        message: "Couldn't find file".to_string(),
-                        code: "404".to_string(),
-                    },
-                )
-                .await?;
-            let _ = self.remove().await?;
-        }
-        Ok(())
+        let message = self.message.clone();
+        handle_processing_error_for_create_message(self, message, error, state_manager).await
+    }
+}
+
+async fn handle_processing_error_for_create_message<T>(
+    removeable: T,
+    message: CreateMessage,
+    error: anyhow::Error,
+    state_manager: &(dyn JobStatusClient + Send + Sync),
+) -> anyhow::Result<()>
+where
+    T: Removeable,
+{
+    if error.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
+        tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
+        let _ = state_manager
+            .set_status(
+                message.job_id,
+                JobStatus::Error {
+                    message: "Couldn't find file".to_string(),
+                    code: "404".to_string(),
+                },
+            )
+            .await?;
+        let _ = removeable.remove().await?;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{
+        models::{get_test_create_message, CreateMessage},
+        service_bus_client::ShouldRemove,
+        state_manager::TestJobStatusClient,
+    };
+    use tokio_test::block_on;
+
+    fn given_an_error_has_occurred() -> anyhow::Error {
+        anyhow!("literally any error")
+    }
+
+    fn given_we_have_a_create_message() -> CreateMessage {
+        get_test_create_message(Uuid::new_v4())
+    }
+
+    fn when_we_handle_the_error(
+        message: CreateMessage,
+        error: anyhow::Error,
+        state_manager: TestJobStatusClient,
+        removeable: ShouldRemove,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_create_message(
+            removeable,
+            message,
+            error,
+            &state_manager,
+        ))
+        .map_err(|e| {
+            println!("{:#?}", e.to_string());
+            e
+        })
+    }
+
+    #[test]
+    fn test_an_error_removes_create_message() {
+        let message = given_we_have_a_create_message();
+        let error = given_an_error_has_occurred();
+        let state_manager = TestJobStatusClient {};
+        let removeable = ShouldRemove {};
+        let result = when_we_handle_the_error(message, error, state_manager, removeable);
+        assert!(result.is_ok());
     }
 }
 
