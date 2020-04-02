@@ -50,12 +50,16 @@ Environment variables are shared via Azure key vault. To get them, run `make get
 
 ## To run the tests
 
+Run all tests:
+
 ```bash
 make test
+```
 
-OR
+Run specific tests by passing `<arguments>` through to `cargo test`:
 
-make test TEST=test_name  (if only wanting to run a specific test during development)
+```bash
+make test TEST=<arguments>
 ```
 
 ## To run in a local cluster:
