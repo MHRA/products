@@ -65,22 +65,22 @@ where
             },
         )
         .await?;
-    //let _ = removeable.remove().await?;
+    let _ = removeable.remove().await?;
     Ok(())
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::DeleteMessage;
+    use crate::models::{DeleteMessage, JobStatusResponse};
     use tokio_test::block_on;
 
-    struct ShouldNotRemove {}
+    struct ShouldRemove {}
 
     #[async_trait]
-    impl Removeable for ShouldNotRemove {
+    impl Removeable for ShouldRemove {
         async fn remove(&self) -> Result<String, anyhow::Error> {
-            Err(anyhow!("fail"))
+            Ok("success".to_owned())
         }
     }
 
@@ -90,7 +90,7 @@ mod test {
     impl JobStatusClient for TestJobStatusClient {
         async fn get_status(
             &self,
-            id: Uuid,
+            _id: Uuid,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
             unimplemented!()
         }
@@ -99,31 +99,46 @@ mod test {
             id: Uuid,
             status: JobStatus,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-            unimplemented!("you should not have called this!")
+            Ok(JobStatusResponse { id, status })
         }
     }
 
-    #[test]
-    fn test_new_one() {
-        // given a recoverable error has occurred
-        let error = anyhow!("recoverable error");
-        // and the message is a DeleteMessage
-        let message = DeleteMessage {
+    fn given_an_error_has_occurred() -> anyhow::Error {
+        anyhow!("literally any error")
+    }
+
+    fn given_we_have_a_delete_message() -> DeleteMessage {
+        DeleteMessage {
             document_content_id: "our_id".to_owned(),
             job_id: Uuid::new_v4(),
-        };
-        //and we have a state_manager
-        let state_manager = TestJobStatusClient {};
-        // and the removeable is set to fail if removed
-        let removeable = ShouldNotRemove {};
-        // when we handle the error
-        let result = block_on(handle_processing_error_for_delete_message(
+        }
+    }
+
+    fn when_we_handle_the_error(
+        message: DeleteMessage,
+        error: anyhow::Error,
+        state_manager: TestJobStatusClient,
+        removeable: ShouldRemove,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_delete_message(
             removeable,
             message,
             error,
             &state_manager,
-        ));
-        // the message is not removed
+        ))
+        .map_err(|e| {
+            println!("{:#?}", e.to_string());
+            e
+        })
+    }
+
+    #[test]
+    fn test_an_error_removes_delete_message() {
+        let message = given_we_have_a_delete_message();
+        let error = given_an_error_has_occurred();
+        let state_manager = TestJobStatusClient {};
+        let removeable = ShouldRemove {};
+        let result = when_we_handle_the_error(message, error, state_manager, removeable);
         assert!(result.is_ok());
     }
 }
