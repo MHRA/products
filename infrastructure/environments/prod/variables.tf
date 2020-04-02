@@ -18,5 +18,5 @@ variable "CLIENT_SECRET" {
 
 variable "ENVIRONMENT" {
   description = "Environment name"
-  default     = "prod"
+  default     = "production"
 }
