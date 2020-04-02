@@ -21,13 +21,8 @@ locals {
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
-resource "azurerm_resource_group" "products" {
-  name     = var.RESOURCE_GROUP_PRODUCTS
-  location = var.REGION
-
-  tags = {
-    environment = var.ENVIRONMENT
-  }
+data "azurerm_resource_group" "products" {
+  name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # website
@@ -37,12 +32,17 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
-  resource_group_name = azurerm_resource_group.products.name
+  resource_group_name = data.azurerm_resource_group.products.name
 }
 
 data "azurerm_route_table" "load_balancer" {
   name                = "adarz-spoke-rt-products-internal-only"
   resource_group_name = "asazr-rg-1001"
+}
+
+data "azurerm_virtual_network" "cluster" {
+  name                = "aparz-spoke-pd-products"
+  resource_group_name = "adazr-rg-1001"
 }
 
 # AKS
@@ -53,9 +53,8 @@ module cluster {
   client_secret       = var.CLIENT_SECRET
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = azurerm_resource_group.products.name
-  vnet_name           = "aparz-spoke-np-products"
-  vnet_cidr           = "10.5.65.0/25"
+  resource_group_name = data.azurerm_resource_group.products.name
+  vnet_name           = data.azurerm_virtual_network.cluster.name
   lb_subnet_name      = "adarz-spoke-products-sn-01"
   lb_subnet_cidr      = "10.5.65.0/26"
   cluster_subnet_name = "adarz-spoke-products-sn-02"

@@ -10,8 +10,8 @@ variable "vnet_name" {
   description = "Virtual Network name"
 }
 
-variable "vnet_cidr" {
-  description = "CIDR block for cluster vnet"
+variable "vnet_resource_group" {
+  description = "Virtual Network resource group name"
 }
 
 variable "lb_subnet_name" {
@@ -44,4 +44,9 @@ variable "client_id" {
 
 variable "client_secret" {
   description = "Service Principal Client Secret"
+}
+
+variable "default_node_count" {
+  description = "Default number of nodes in AKS cluster"
+  default     = "2"
 }

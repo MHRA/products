@@ -30,22 +30,6 @@ output "search_admin_key" {
   value = module.products.search_admin_key
 }
 
-output "cpd_primary_access_key" {
-  value = module.cpd.cpd_primary_access_key
-}
-
-output "cpd_static_web_url" {
-  value = module.cpd.cpd_static_web_url
-}
-
-output "products_hostname_cdn" {
-  value = module.products.products_hostname_cdn
-}
-
-output "cpd_hostname_cdn" {
-  value = module.cpd.cpd_hostname_cdn
-}
-
 output "search_service_name" {
   value = module.products.search_service_name
 }

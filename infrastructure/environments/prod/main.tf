@@ -21,13 +21,8 @@ locals {
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
-resource "azurerm_resource_group" "products" {
-  name     = var.RESOURCE_GROUP_PRODUCTS
-  location = var.REGION
-
-  tags = {
-    environment = var.ENVIRONMENT
-  }
+data "azurerm_resource_group" "products" {
+  name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # website
@@ -37,12 +32,17 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
-  resource_group_name = azurerm_resource_group.products.name
+  resource_group_name = data.azurerm_resource_group.products.name
 }
 
 data "azurerm_route_table" "load_balancer" {
   name                = "aparz-spoke-rt-products-internal-only"
   resource_group_name = "asazr-rg-1001"
+}
+
+data "azurerm_virtual_network" "cluster" {
+  name                = "aparz-spoke-pd-products"
+  resource_group_name = "adazr-rg-1001"
 }
 
 # AKS
@@ -53,24 +53,15 @@ module cluster {
   client_secret       = var.CLIENT_SECRET
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = azurerm_resource_group.products.name
-  vnet_name           = "aparz-spoke-${var.ENVIRONMENT}-products"
-  vnet_cidr           = "10.5.66.0/24"
+  resource_group_name = data.azurerm_resource_group.products.name
+  vnet_name           = data.azurerm_virtual_network.cluster.name
+  vnet_resource_group = data.azurerm_virtual_network.cluster.resource_group_name
   lb_subnet_name      = "aparz-spoke-products-sn-01"
   lb_subnet_cidr      = "10.5.66.0/26"
   cluster_subnet_name = "aparz-spoke-products-sn-02"
   cluster_subnet_cidr = "10.5.66.64/26"
   route_table_id      = data.azurerm_route_table.load_balancer.id
-}
-
-# CPD
-module cpd {
-  source = "../../modules/cpd"
-
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  namespace           = "mhracpdprod"
-  resource_group_name = azurerm_resource_group.products.name
+  default_node_count  = "3"
 }
 
 # Service Bus
@@ -80,5 +71,5 @@ module service_bus {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   name                = local.service_bus_name
-  resource_group_name = azurerm_resource_group.products.name
+  resource_group_name = data.azurerm_resource_group.products.name
 }

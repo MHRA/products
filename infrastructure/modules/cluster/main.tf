@@ -9,18 +9,11 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
-resource "azurerm_virtual_network" "cluster" {
-  name                = var.vnet_name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  address_space       = [var.vnet_cidr]
-}
-
 resource "azurerm_subnet" "load_balancer" {
   name                 = var.lb_subnet_name
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = var.vnet_resource_group
   address_prefix       = var.lb_subnet_cidr
-  virtual_network_name = azurerm_virtual_network.cluster.name
+  virtual_network_name = var.vnet_name
 }
 
 resource "azurerm_subnet_route_table_association" "load_balancer" {
@@ -30,9 +23,9 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
 
 resource "azurerm_subnet" "cluster" {
   name                 = var.cluster_subnet_name
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = var.vnet_resource_group
   address_prefix       = var.cluster_subnet_cidr
-  virtual_network_name = azurerm_virtual_network.cluster.name
+  virtual_network_name = var.vnet_name
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
@@ -42,10 +35,11 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   resource_group_name = var.resource_group_name
 
   default_node_pool {
-    name           = "default"
-    node_count     = "2"
-    vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_subnet.cluster.id
+    name               = "default"
+    node_count         = var.default_node_count
+    vm_size            = "Standard_D2_v2"
+    vnet_subnet_id     = azurerm_subnet.cluster.id
+    availability_zones = ["1", "2", "3"]
   }
 
   service_principal {

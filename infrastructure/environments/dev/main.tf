@@ -50,6 +50,13 @@ resource "azurerm_route_table" "load_balancer" {
   }
 }
 
+resource "azurerm_virtual_network" "cluster" {
+  name                = "aparz-spoke-dev-products"
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
+  address_space       = ["10.5.65.128/25"]
+}
+
 # AKS
 module cluster {
   source = "../../modules/cluster"
@@ -59,8 +66,7 @@ module cluster {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
-  vnet_name           = "aparz-spoke-dev-products"
-  vnet_cidr           = "10.5.65.128/25"
+  vnet_name           = azurerm_virtual_network.cluster.name
   lb_subnet_name      = "adarz-spoke-products-dev-sn-01"
   lb_subnet_cidr      = "10.5.65.128/26"
   cluster_subnet_name = "adarz-spoke-products-dev-sn-02"
