@@ -28,6 +28,7 @@ To set the environment variables for non-prod from the cache in Azure, run:
 
 ```sh
 make get-env-non-prod
+export $(cat .env | xargs)
 ```
 
 You can also target dev by pulling dev environment variables via `make get-env-dev`.
