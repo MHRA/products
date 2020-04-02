@@ -1,7 +1,7 @@
 use crate::{
     get_env_or_default,
     models::{JobStatus, Message},
-    state_manager::StateManager,
+    state_manager::{JobStatusClient, StateManager},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -70,8 +70,17 @@ pub struct RetrievedMessage<T: Message> {
     peek_lock: PeekLockResponse,
 }
 
-impl<T: Message> RetrievedMessage<T> {
-    pub async fn remove(&self) -> Result<String, anyhow::Error> {
+#[async_trait]
+pub trait Removeable {
+    async fn remove(&self) -> Result<String, anyhow::Error>;
+}
+
+#[async_trait]
+impl<T> Removeable for RetrievedMessage<T>
+where
+    T: Message + Send + Sync,
+{
+    async fn remove(&self) -> Result<String, anyhow::Error> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
@@ -86,7 +95,7 @@ pub trait ProcessRetrievalError {
     async fn handle_processing_error(
         self,
         e: anyhow::Error,
-        state_manager: &StateManager,
+        state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()>;
 }
 
@@ -159,7 +168,7 @@ impl DocIndexUpdaterQueue {
     ) -> anyhow::Result<()>
     where
         T: Message,
-        RetrievedMessage<T>: ProcessRetrievalError,
+        RetrievedMessage<T>: ProcessRetrievalError + Removeable,
     {
         tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
@@ -182,11 +191,11 @@ impl DocIndexUpdaterQueue {
 
 async fn process<T>(
     retrieval: RetrievedMessage<T>,
-    state_manager: &StateManager,
+    state_manager: &(dyn JobStatusClient + Send + Sync),
 ) -> anyhow::Result<()>
 where
     T: Message,
-    RetrievedMessage<T>: ProcessRetrievalError,
+    RetrievedMessage<T>: ProcessRetrievalError + Removeable,
 {
     let processing_result = retrieval.message.clone().process().await;
 
@@ -197,7 +206,7 @@ where
         }
         Err(e) => {
             tracing::error!(message = format!("Error {:?}", e).as_str());
-            retrieval.handle_processing_error(e, &state_manager).await?;
+            retrieval.handle_processing_error(e, state_manager).await?;
         }
     };
     Ok(())

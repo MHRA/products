@@ -2,8 +2,8 @@ use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     search_client,
-    service_bus_client::{create_factory, ProcessRetrievalError, RetrievedMessage},
-    state_manager::StateManager,
+    service_bus_client::{create_factory, ProcessRetrievalError, Removeable, RetrievedMessage},
+    state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
 use uuid::Uuid;
@@ -48,7 +48,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
         self,
         e: anyhow::Error,
-        state_manager: &StateManager,
+        state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()> {
         if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
             tracing::warn!("Couldn't find file. Updating state to errored and removing message.");

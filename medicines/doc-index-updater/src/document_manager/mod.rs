@@ -5,7 +5,7 @@ use crate::{
         XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
-    state_manager::{with_state, MyRedisError, StateManager},
+    state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
 use time::Duration;
 use tracing_futures::Instrument;
@@ -22,7 +22,10 @@ pub struct FailedToDeserialize;
 impl warp::reject::Reject for FailedToDispatchToQueue {}
 impl warp::reject::Reject for FailedToDeserialize {}
 
-async fn accept_job(state_manager: &StateManager) -> Result<JobStatusResponse, MyRedisError> {
+async fn accept_job<U>(state_manager: &U) -> Result<JobStatusResponse, MyRedisError>
+where
+    U: JobStatusClient + Sized,
+{
     let id = Uuid::new_v4();
     let correlation_id = id.to_string();
     let correlation_id = correlation_id.as_str();
@@ -32,13 +35,14 @@ async fn accept_job(state_manager: &StateManager) -> Result<JobStatusResponse, M
         .await
 }
 
-async fn queue_job<T>(
+async fn queue_job<T, U>(
     queue: &mut DocIndexUpdaterQueue,
-    state_manager: StateManager,
+    state_manager: &U,
     message: T,
 ) -> Result<JobStatusResponse, Rejection>
 where
     T: Message,
+    U: JobStatusClient + Sized,
 {
     let duration = Duration::days(1);
 
@@ -70,7 +74,7 @@ async fn delete_document_handler(
             job_id: id,
             document_content_id,
         };
-        queue_job(&mut queue, state_manager, message).await
+        queue_job(&mut queue, &state_manager, message).await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }
@@ -106,7 +110,7 @@ async fn check_in_document_handler(
             document: doc,
         };
 
-        queue_job(&mut queue, state_manager, message).await
+        queue_job(&mut queue, &state_manager, message).await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }

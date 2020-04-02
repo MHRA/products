@@ -1,8 +1,8 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
-    service_bus_client::{delete_factory, ProcessRetrievalError, RetrievedMessage},
-    state_manager::StateManager,
+    service_bus_client::{delete_factory, ProcessRetrievalError, Removeable, RetrievedMessage},
+    state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
 use anyhow::anyhow;
@@ -38,21 +38,93 @@ pub async fn delete_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     async fn handle_processing_error(
         self,
-        e: anyhow::Error,
-        state_manager: &StateManager,
+        error: anyhow::Error,
+        state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()> {
-        tracing::info!("Setting error state in state manager");
-        state_manager
-            .set_status(
-                self.message.job_id,
-                JobStatus::Error {
-                    message: e.to_string(),
-                    code: "".to_string(),
-                },
-            )
-            .await?;
-        let _ = self.remove().await?;
-        Ok(())
+        let message = self.message.clone();
+        handle_processing_error_for_delete_message(self, message, error, state_manager).await
+    }
+}
+
+async fn handle_processing_error_for_delete_message<T>(
+    removeable: T,
+    message: DeleteMessage,
+    error: anyhow::Error,
+    state_manager: &(dyn JobStatusClient + Send + Sync),
+) -> anyhow::Result<()>
+where
+    T: Removeable,
+{
+    tracing::info!("Setting error state in state manager");
+    state_manager
+        .set_status(
+            message.job_id,
+            JobStatus::Error {
+                message: error.to_string(),
+                code: "".to_string(),
+            },
+        )
+        .await?;
+    //let _ = removeable.remove().await?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::models::DeleteMessage;
+    use tokio_test::block_on;
+
+    struct ShouldNotRemove {}
+
+    #[async_trait]
+    impl Removeable for ShouldNotRemove {
+        async fn remove(&self) -> Result<String, anyhow::Error> {
+            Err(anyhow!("fail"))
+        }
+    }
+
+    struct TestJobStatusClient {}
+
+    #[async_trait]
+    impl JobStatusClient for TestJobStatusClient {
+        async fn get_status(
+            &self,
+            id: Uuid,
+        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+            unimplemented!()
+        }
+        async fn set_status(
+            &self,
+            id: Uuid,
+            status: JobStatus,
+        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+            unimplemented!("you should not have called this!")
+        }
+    }
+
+    #[test]
+    fn test_new_one() {
+        // given a recoverable error has occurred
+        let error = anyhow!("recoverable error");
+        // and the message is a DeleteMessage
+        let message = DeleteMessage {
+            document_content_id: "our_id".to_owned(),
+            job_id: Uuid::new_v4(),
+        };
+        //and we have a state_manager
+        let state_manager = TestJobStatusClient {};
+        // and the removeable is set to fail if removed
+        let removeable = ShouldNotRemove {};
+        // when we handle the error
+        let result = block_on(handle_processing_error_for_delete_message(
+            removeable,
+            message,
+            error,
+            &state_manager,
+        ));
+        // the message is not removed
+        assert!(result.is_ok());
     }
 }
 

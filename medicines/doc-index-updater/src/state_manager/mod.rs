@@ -14,18 +14,31 @@ pub struct StateManager {
     pub client: Client,
 }
 
+#[async_trait::async_trait]
+pub trait JobStatusClient {
+    async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError>;
+    async fn set_status(
+        &self,
+        id: Uuid,
+        status: JobStatus,
+    ) -> Result<JobStatusResponse, MyRedisError>;
+}
+
 impl StateManager {
     pub fn new(client: Client) -> Self {
         StateManager { client }
     }
+}
 
-    pub async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
+#[async_trait::async_trait]
+impl JobStatusClient for StateManager {
+    async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
         let status = get_from_redis(self.client.clone(), id).await?;
 
         Ok(JobStatusResponse { id, status })
     }
 
-    pub async fn set_status(
+    async fn set_status(
         &self,
         id: Uuid,
         status: JobStatus,
