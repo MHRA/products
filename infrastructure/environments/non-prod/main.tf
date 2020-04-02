@@ -25,6 +25,13 @@ data "azurerm_resource_group" "products" {
   name = var.RESOURCE_GROUP_PRODUCTS
 }
 
+
+resource "azurerm_subnet_route_table_association" "load_balancer" {
+  subnet_id      = var.lb_subnet_id
+  route_table_id = var.route_table_id
+}
+
+
 # website
 module "products" {
   source = "../../modules/products"
@@ -33,6 +40,20 @@ module "products" {
   location            = var.REGION
   namespace           = local.namespace
   resource_group_name = data.azurerm_resource_group.products.name
+}
+
+# website
+module "products_web" {
+  source = "../../modules/products-web"
+
+  storage_account_name = module.products.storage_account_name
+  resource_group_name  = data.azurerm_resource_group.products.name
+  origin_host_name=
+  cdn_region="westeurope" # uksouth is not a valid option currently for cdn profiles
+
+  environment = var.ENVIRONMENT
+  location    = var.REGION
+  namespace   = local.namespace
 }
 
 data "azurerm_route_table" "load_balancer" {

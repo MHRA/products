@@ -9,18 +9,6 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
-resource "azurerm_subnet" "load_balancer" {
-  name                 = var.lb_subnet_name
-  resource_group_name  = var.vnet_resource_group
-  address_prefix       = var.lb_subnet_cidr
-  virtual_network_name = var.vnet_name
-}
-
-resource "azurerm_subnet_route_table_association" "load_balancer" {
-  subnet_id      = azurerm_subnet.load_balancer.id
-  route_table_id = var.route_table_id
-}
-
 resource "azurerm_subnet" "cluster" {
   name                 = var.cluster_subnet_name
   resource_group_name  = var.vnet_resource_group

@@ -16,12 +16,6 @@ resource "azurerm_storage_account" "products" {
   }
 }
 
-resource "azurerm_storage_container" "products_website" {
-  name                  = "$web"
-  storage_account_name  = azurerm_storage_account.products.name
-  container_access_type = "container"
-}
-
 resource "azurerm_storage_container" "docs" {
   name                  = "docs"
   storage_account_name  = azurerm_storage_account.products.name
@@ -48,24 +42,5 @@ resource "azurerm_container_registry" "products" {
 
   tags = {
     environment = var.environment
-  }
-}
-
-resource "azurerm_cdn_profile" "products" {
-  name                = "mhraproducts${var.environment}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
-resource "azurerm_cdn_endpoint" "products" {
-  name                = "mhraproducts${var.environment}"
-  profile_name        = azurerm_cdn_profile.products.name
-  location            = azurerm_cdn_profile.products.location
-  resource_group_name = var.resource_group_name
-  origin_host_header  = azurerm_storage_account.products.primary_web_host
-  origin {
-    name      = "mhraproducts${var.environment}"
-    host_name = azurerm_storage_account.products.primary_web_host
   }
 }

@@ -14,12 +14,8 @@ variable "vnet_resource_group" {
   description = "Virtual Network resource group name"
 }
 
-variable "lb_subnet_name" {
-  description = "Load Balancer Subnet name"
-}
-
-variable "lb_subnet_cidr" {
-  description = "Load Balancer CIDR block"
+variable "lb_subnet_id" {
+  description = "Load Balancer Subnet id"
 }
 
 variable "cluster_subnet_name" {
