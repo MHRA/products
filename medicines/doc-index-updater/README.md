@@ -2,18 +2,10 @@
 
 ![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
 
-You will need the keys specified by `.env.example`.
-You can find these by going to [portal.azure.com][azure portal].
-
-Rename this to `.env`, fill the values and run `source .env`.
-Never commit `.env`.
-
-Alternatively use `make get-env` if you have access to our azure key vault - see below `Environment variables via Azure key vault`
-
 ## To build a docker image:
 
 ```bash
-  make docker
+make docker
 ```
 
 ## To push image to Azure container registry (ACR):
@@ -44,9 +36,25 @@ stunnel stunnel.conf
 make
 ```
 
-## Environment variables via Azure key vault
+## Environment variables
 
-Environment variables are shared via Azure key vault. To get them, run `make get-env`. To update them, run `make set-env`.
+The environment variables needed are listed in `.env.example`.
+
+Use this to create a `.env` file reflecting your environment which the `make` command will read.
+
+If you are using the shared environments, grab the shared envs…
+
+### via Azure key vault
+
+Environment variables are shared via Azure key vault.
+
+To get them, run `make get-env`.
+
+### via Azure portal
+
+In the event that environment variables change, find environment variables via [portal.azure.com][azure portal] or from terraform output.
+
+Don't forget to run `make set-env` to share with the team.
 
 ## To run the tests
 
