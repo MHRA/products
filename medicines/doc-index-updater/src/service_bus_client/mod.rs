@@ -75,6 +75,17 @@ pub trait Removeable {
     async fn remove(&self) -> Result<String, anyhow::Error>;
 }
 
+#[cfg(test)]
+pub struct ShouldRemove {}
+
+#[cfg(test)]
+#[async_trait]
+impl Removeable for ShouldRemove {
+    async fn remove(&self) -> Result<String, anyhow::Error> {
+        Ok("success".to_owned())
+    }
+}
+
 #[async_trait]
 impl<T> Removeable for RetrievedMessage<T>
 where

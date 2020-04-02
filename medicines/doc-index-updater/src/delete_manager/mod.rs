@@ -72,36 +72,10 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::{DeleteMessage, JobStatusResponse};
+    use crate::{
+        models::DeleteMessage, service_bus_client::ShouldRemove, state_manager::TestJobStatusClient,
+    };
     use tokio_test::block_on;
-
-    struct ShouldRemove {}
-
-    #[async_trait]
-    impl Removeable for ShouldRemove {
-        async fn remove(&self) -> Result<String, anyhow::Error> {
-            Ok("success".to_owned())
-        }
-    }
-
-    struct TestJobStatusClient {}
-
-    #[async_trait]
-    impl JobStatusClient for TestJobStatusClient {
-        async fn get_status(
-            &self,
-            _id: Uuid,
-        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-            unimplemented!()
-        }
-        async fn set_status(
-            &self,
-            id: Uuid,
-            status: JobStatus,
-        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-            Ok(JobStatusResponse { id, status })
-        }
-    }
 
     fn given_an_error_has_occurred() -> anyhow::Error {
         anyhow!("literally any error")
