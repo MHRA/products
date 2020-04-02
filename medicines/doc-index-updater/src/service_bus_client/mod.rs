@@ -72,16 +72,19 @@ pub struct RetrievedMessage<T: Message> {
 
 #[async_trait]
 pub trait Removeable {
-    async fn remove(&self) -> Result<String, anyhow::Error>;
+    async fn remove(&mut self) -> Result<String, anyhow::Error>;
 }
 
 #[cfg(test)]
-pub struct ShouldRemove {}
+pub struct ShouldRemove {
+    pub is_removed: bool,
+}
 
 #[cfg(test)]
 #[async_trait]
 impl Removeable for ShouldRemove {
-    async fn remove(&self) -> Result<String, anyhow::Error> {
+    async fn remove(&mut self) -> Result<String, anyhow::Error> {
+        self.is_removed = true;
         Ok("success".to_owned())
     }
 }
@@ -91,7 +94,7 @@ impl<T> Removeable for RetrievedMessage<T>
 where
     T: Message + Send + Sync,
 {
-    async fn remove(&self) -> Result<String, anyhow::Error> {
+    async fn remove(&mut self) -> Result<String, anyhow::Error> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
@@ -104,7 +107,7 @@ where
 #[async_trait]
 pub trait ProcessRetrievalError {
     async fn handle_processing_error(
-        self,
+        &mut self,
         e: anyhow::Error,
         state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()>;
@@ -201,7 +204,7 @@ impl DocIndexUpdaterQueue {
 }
 
 async fn process<T>(
-    retrieval: RetrievedMessage<T>,
+    mut retrieval: RetrievedMessage<T>,
     state_manager: &(dyn JobStatusClient + Send + Sync),
 ) -> anyhow::Result<()>
 where

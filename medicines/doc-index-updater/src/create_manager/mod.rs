@@ -46,7 +46,7 @@ pub async fn create_service_worker(
 #[async_trait]
 impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
-        self,
+        &mut self,
         error: anyhow::Error,
         state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()> {
@@ -56,7 +56,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 }
 
 async fn handle_processing_error_for_create_message<T>(
-    removeable: T,
+    removeable: &mut T,
     message: CreateMessage,
     error: anyhow::Error,
     state_manager: &(dyn JobStatusClient + Send + Sync),
@@ -102,7 +102,7 @@ mod test {
         message: CreateMessage,
         error: anyhow::Error,
         state_manager: TestJobStatusClient,
-        removeable: ShouldRemove,
+        removeable: &mut ShouldRemove,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
             removeable,
@@ -117,13 +117,14 @@ mod test {
     }
 
     #[test]
-    fn test_an_error_removes_create_message() {
+    fn test_an_unknown_error_does_not_remove_create_message() {
         let message = given_we_have_a_create_message();
         let error = given_an_error_has_occurred();
         let state_manager = TestJobStatusClient {};
-        let removeable = ShouldRemove {};
-        let result = when_we_handle_the_error(message, error, state_manager, removeable);
+        let mut removeable = ShouldRemove { is_removed: false };
+        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
         assert!(result.is_ok());
+        assert_eq!(removeable.is_removed, false);
     }
 }
 

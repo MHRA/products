@@ -37,7 +37,7 @@ pub async fn delete_service_worker(
 #[async_trait]
 impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     async fn handle_processing_error(
-        self,
+        &mut self,
         error: anyhow::Error,
         state_manager: &(dyn JobStatusClient + Send + Sync),
     ) -> anyhow::Result<()> {
@@ -47,7 +47,7 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 }
 
 async fn handle_processing_error_for_delete_message<T>(
-    removeable: T,
+    removeable: &mut T,
     message: DeleteMessage,
     error: anyhow::Error,
     state_manager: &(dyn JobStatusClient + Send + Sync),
@@ -92,7 +92,7 @@ mod test {
         message: DeleteMessage,
         error: anyhow::Error,
         state_manager: TestJobStatusClient,
-        removeable: ShouldRemove,
+        removeable: &mut ShouldRemove,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(
             removeable,
@@ -111,9 +111,10 @@ mod test {
         let message = given_we_have_a_delete_message();
         let error = given_an_error_has_occurred();
         let state_manager = TestJobStatusClient {};
-        let removeable = ShouldRemove {};
-        let result = when_we_handle_the_error(message, error, state_manager, removeable);
+        let mut removeable = ShouldRemove { is_removed: false };
+        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
         assert!(result.is_ok());
+        assert!(removeable.is_removed);
     }
 }
 
