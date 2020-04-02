@@ -8,6 +8,8 @@ You can find these by going to [portal.azure.com][azure portal].
 Rename this to `.env`, fill the values and run `source .env`.
 Never commit `.env`.
 
+Alternatively use `make get-env` if you have access to our azure key vault - see below `Environment variables via Azure key vault`
+
 ## To build a docker image:
 
 ```bash
@@ -45,6 +47,16 @@ make
 ## Environment variables via Azure key vault
 
 Environment variables are shared via Azure key vault. To get them, run `make get-env`. To update them, run `make set-env`.
+
+## To run the tests
+
+```bash
+make test
+
+OR
+
+make test TEST=test_name  (if only wanting to run a specific test during development)
+```
 
 ## To run in a local cluster:
 
