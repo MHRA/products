@@ -24,7 +24,7 @@ impl warp::reject::Reject for FailedToDeserialize {}
 
 async fn accept_job<U>(state_manager: &U) -> Result<JobStatusResponse, MyRedisError>
 where
-    U: JobStatusClient + Sized,
+    U: JobStatusClient,
 {
     let id = Uuid::new_v4();
     let correlation_id = id.to_string();
@@ -42,7 +42,7 @@ async fn queue_job<T, U>(
 ) -> Result<JobStatusResponse, Rejection>
 where
     T: Message,
-    U: JobStatusClient + Sized,
+    U: JobStatusClient,
 {
     let duration = Duration::days(1);
 
