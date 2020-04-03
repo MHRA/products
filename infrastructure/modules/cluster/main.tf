@@ -9,42 +9,6 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
-resource "azurerm_subnet" "cluster" {
-  name                 = var.cluster_subnet_name
-  resource_group_name  = var.vnet_resource_group
-  address_prefix       = var.cluster_subnet_cidr
-  virtual_network_name = var.vnet_name
-}
-
-resource "azurerm_route_table" "cluster" {
-  name                = "cluster-route-table-${var.environment}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  dynamic "route" {
-    for_each = [for r in var.cluster_route_destination_cidr_blocks : {
-      name  = replace(replace(r, ".", "_"), "/", "__")
-      route = r
-    }]
-
-    content {
-      name                   = route.value.name
-      address_prefix         = route.value.route
-      next_hop_type          = "VirtualAppliance"
-      next_hop_in_ip_address = var.cluster_route_next_hop
-    }
-  }
-
-  tags = {
-    Environment = var.environment
-  }
-}
-
-resource "azurerm_subnet_route_table_association" "cluster" {
-  subnet_id      = azurerm_subnet.cluster.id
-  route_table_id = azurerm_route_table.cluster.id
-}
-
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment
   location            = var.location
@@ -55,7 +19,6 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name               = "default"
     node_count         = var.default_node_count
     vm_size            = "Standard_D2_v2"
-    vnet_subnet_id     = azurerm_subnet.cluster.id
     availability_zones = ["1", "2", "3"]
   }
 
@@ -91,6 +54,28 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     Environment = var.environment
   }
 }
+
+# data "azurerm_subnet" "cluster" {
+#   name                 = split("/", azurerm_kubernetes_cluster.cluster.default_node_pool[0].vnet_subnet_id)[10]
+#   resource_group_name  = var.resource_group_name
+#   virtual_network_name = var.vnet_name
+# }
+
+# data "azurerm_route_table" "cluster" {
+#   name                = split("/", data.azurerm_subnet.cluster.route_table_id)[8]
+#   resource_group_name = var.resource_group_name
+# }
+
+# resource "azurerm_route" "example" {
+#   for_each = var.cluster_route_destination_cidr_blocks
+
+#   name                   = replace(replace(each.value, ".", "_"), "/", "__")
+#   resource_group_name    = var.resource_group_name
+#   route_table_name       = data.azurerm_route_table.cluster.name
+#   address_prefix         = each.value
+#   next_hop_type          = "VirtualAppliance"
+#   next_hop_in_ip_address = var.cluster_route_next_hop
+# }
 
 resource "random_string" "cluster_analytics" {
   length  = 4
