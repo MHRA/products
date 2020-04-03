@@ -95,7 +95,7 @@ pub trait ProcessRetrievalError {
     async fn handle_processing_error(
         &mut self,
         e: anyhow::Error,
-        state_manager: &(dyn JobStatusClient),
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()>;
 }
 
@@ -191,7 +191,7 @@ impl DocIndexUpdaterQueue {
 
 async fn process<T>(
     mut retrieval: RetrievedMessage<T>,
-    state_manager: &(dyn JobStatusClient),
+    state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
     T: Message,

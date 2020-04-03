@@ -22,10 +22,9 @@ pub struct FailedToDeserialize;
 impl warp::reject::Reject for FailedToDispatchToQueue {}
 impl warp::reject::Reject for FailedToDeserialize {}
 
-async fn accept_job<U>(state_manager: &U) -> Result<JobStatusResponse, MyRedisError>
-where
-    U: JobStatusClient,
-{
+async fn accept_job(
+    state_manager: &impl JobStatusClient,
+) -> Result<JobStatusResponse, MyRedisError> {
     let id = Uuid::new_v4();
     let correlation_id = id.to_string();
     let correlation_id = correlation_id.as_str();
@@ -35,14 +34,13 @@ where
         .await
 }
 
-async fn queue_job<T, U>(
+async fn queue_job<T>(
     queue: &mut DocIndexUpdaterQueue,
-    state_manager: &U,
+    state_manager: &impl JobStatusClient,
     message: T,
 ) -> Result<JobStatusResponse, Rejection>
 where
     T: Message,
-    U: JobStatusClient,
 {
     let duration = Duration::days(1);
 

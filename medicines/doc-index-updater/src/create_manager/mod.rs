@@ -48,7 +48,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
         &mut self,
         error: anyhow::Error,
-        state_manager: &(dyn JobStatusClient),
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
         let message = self.message.clone();
         handle_processing_error_for_create_message(self, message, error, state_manager).await
@@ -59,7 +59,7 @@ async fn handle_processing_error_for_create_message<T>(
     removeable: &mut T,
     message: CreateMessage,
     error: anyhow::Error,
-    state_manager: &(dyn JobStatusClient),
+    state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
     T: Removeable,
