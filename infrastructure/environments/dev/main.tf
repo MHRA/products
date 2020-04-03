@@ -40,6 +40,16 @@ module "products" {
   resource_group_name = azurerm_resource_group.products.name
 }
 
+# website
+module "products_web" {
+  source = "../../modules/products-web"
+
+  environment          = var.ENVIRONMENT
+  storage_account_name = module.products.storage_account_name
+  resource_group_name  = azurerm_resource_group.products.name
+  origin_host_name     = module.products.storage_account_primary_web_host
+}
+
 resource "azurerm_route_table" "load_balancer" {
   name                = local.namespace
   location            = azurerm_resource_group.products.location
@@ -57,6 +67,14 @@ resource "azurerm_virtual_network" "cluster" {
   address_space       = ["10.5.65.128/25"]
 }
 
+
+resource "azurerm_subnet" "load_balancer" {
+  name                 = "adarz-spoke-products-sn-01"
+  address_prefix       = "10.5.65.128/26"
+  resource_group_name  = azurerm_virtual_network.cluster.resource_group_name
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
+
 # AKS
 module cluster {
   source = "../../modules/cluster"
@@ -67,8 +85,8 @@ module cluster {
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
   vnet_name           = azurerm_virtual_network.cluster.name
-  lb_subnet_name      = "adarz-spoke-products-dev-sn-01"
-  lb_subnet_cidr      = "10.5.65.128/26"
+  vnet_resource_group = azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_id        = azurerm_subnet.load_balancer.id
   cluster_subnet_name = "adarz-spoke-products-dev-sn-02"
   cluster_subnet_cidr = "10.5.65.192/26"
   route_table_id      = azurerm_route_table.load_balancer.id
