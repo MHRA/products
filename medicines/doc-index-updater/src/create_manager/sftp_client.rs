@@ -1,5 +1,5 @@
 use crate::models::FileSource;
-use ssh2::{File, Session, Sftp};
+use ssh2::{Channel, Session};
 use std::{fmt::Display, io::Read, net::TcpStream};
 
 #[derive(Debug)]
@@ -39,7 +39,7 @@ impl From<std::io::Error> for SentinelSftpError {
     }
 }
 
-async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
+async fn sentinel_session_factory() -> Result<Session, SentinelSftpError> {
     let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
     let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
     let password = get_env_fail_fast("SENTINEL_SFTP_PASSWORD").await;
@@ -65,11 +65,7 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
 
     assert!(ssh_session.authenticated());
 
-    tracing::debug!(message = "SFTP session authenticated");
-
-    let sftp = ssh_session.sftp()?;
-
-    Ok(sftp)
+    Ok(ssh_session)
 }
 
 pub async fn get_env_fail_fast(name: &str) -> String {
@@ -77,29 +73,31 @@ pub async fn get_env_fail_fast(name: &str) -> String {
     std::env::var(name).expect(&failure_message)
 }
 
-async fn retrieve_file_from_sftp(
-    sftp: &mut ssh2::Sftp,
+async fn retrieve_scp_channel(
+    session: Session,
     filepath: String,
-) -> Result<File, anyhow::Error> {
+) -> Result<Channel, anyhow::Error> {
     let path = std::path::Path::new(&filepath);
     let path = match path.strip_prefix("/") {
         Ok(p) => p,
         Err(_) => path,
     };
     tracing::info!("{:?}", path);
-    Ok(sftp.open(path).map_err(|e| {
+    let channel_and_stats_result = session.scp_recv(path).map_err(|e| {
         tracing::error!("{:?}", e);
         e
-    })?)
+    })?;
+
+    Ok(channel_and_stats_result.0)
 }
 
 pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, anyhow::Error> {
-    let mut sentinel_sftp_client = match source {
-        FileSource::Sentinel => sentinel_sftp_factory().await?,
+    let sentinel_session = match source {
+        FileSource::Sentinel => sentinel_session_factory().await?,
     };
-    let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
+    let mut channel = retrieve_scp_channel(sentinel_session, filepath.clone()).await?;
     let mut bytes = Vec::<u8>::new();
-    let size = file.read_to_end(&mut bytes)?;
-    tracing::info!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
+    let size = channel.read_to_end(&mut bytes)?;
+    tracing::info!("File retrieved using SCP at {} ({} bytes) ", filepath, size);
     Ok(bytes)
 }
