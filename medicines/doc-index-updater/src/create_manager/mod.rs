@@ -161,7 +161,7 @@ mod test {
     use super::*;
     use crate::{
         models::{get_test_create_message, CreateMessage},
-        service_bus_client::ShouldRemove,
+        service_bus_client::TestRemoveable,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;
@@ -178,7 +178,7 @@ mod test {
         message: CreateMessage,
         error: anyhow::Error,
         state_manager: TestJobStatusClient,
-        removeable: &mut ShouldRemove,
+        removeable: &mut TestRemoveable,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
             removeable,
@@ -195,7 +195,7 @@ mod test {
     #[test]
     fn test_an_unknown_error_does_not_remove_create_message() {
         let state_manager = TestJobStatusClient {};
-        let mut removeable = ShouldRemove { is_removed: false };
+        let mut removeable = TestRemoveable { is_removed: false };
         let message = given_we_have_a_create_message();
         let error = given_an_error_has_occurred();
 

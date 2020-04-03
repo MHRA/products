@@ -76,13 +76,13 @@ pub trait Removeable {
 }
 
 #[cfg(test)]
-pub struct ShouldRemove {
+pub struct TestRemoveable {
     pub is_removed: bool,
 }
 
 #[cfg(test)]
 #[async_trait]
-impl Removeable for ShouldRemove {
+impl Removeable for TestRemoveable {
     async fn remove(&mut self) -> Result<String, anyhow::Error> {
         self.is_removed = true;
         Ok("success".to_owned())
