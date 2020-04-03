@@ -13,4 +13,3 @@ mime = "0.3.14"
 rand = "0.7.2"
 reqwest = { version = "0.10.4", features = ["json"] }
 tokio = { version = "0.2", features = ["macros", "time"] }
-proc-macro2 = "1.0.10"
