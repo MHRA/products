@@ -187,10 +187,6 @@ mod test {
             error,
             &state_manager,
         ))
-        .map_err(|e| {
-            println!("{:#?}", e.to_string());
-            e
-        })
     }
 
     #[test]
