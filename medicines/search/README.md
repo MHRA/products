@@ -27,8 +27,11 @@ $  cargo test
 To set the environment variables for non-prod from the cache in Azure, run:
 
 ```sh
-./get-env-non-prod.sh
+make get-env-non-prod
+export $(cat .env | xargs)
 ```
+
+You can also target dev by pulling dev environment variables via `make get-env-dev`.
 
 The environment variables which need to be set to run the Search tool are as follows.
 
@@ -42,6 +45,8 @@ The environment variables which need to be set to run the Search tool are as fol
 - `STORAGE_MASTER_KEY` - This is a write access key to your Azure Storage account.
 
 If these are out of sync, you can find these in the [Azure portal](https://portal.azure.com). For `STORAGE_ACCOUNT` and `STORAGE_MASTER_KEY`, navigate to your Storage Account, then choose Access Keys on the left navigation panel. `SEARCH_SERVICE` is just the name of your Search service. For `API_ADMIN_KEY`, navigate to your Search Service and then Keys on the left navigation panel.
+
+Run `make set-env-dev` or `make set-env-non-prod` to update the environment variables for that environment.
 
 ### Datasources
 
