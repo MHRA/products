@@ -75,20 +75,6 @@ pub trait Removeable {
     async fn remove(&mut self) -> Result<String, anyhow::Error>;
 }
 
-#[cfg(test)]
-pub struct TestRemoveable {
-    pub is_removed: bool,
-}
-
-#[cfg(test)]
-#[async_trait]
-impl Removeable for TestRemoveable {
-    async fn remove(&mut self) -> Result<String, anyhow::Error> {
-        self.is_removed = true;
-        Ok("success".to_owned())
-    }
-}
-
 #[async_trait]
 impl<T> Removeable for RetrievedMessage<T>
 where
@@ -224,4 +210,20 @@ where
         }
     };
     Ok(())
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+    pub struct TestRemoveable {
+        pub is_removed: bool,
+    }
+
+    #[async_trait]
+    impl Removeable for TestRemoveable {
+        async fn remove(&mut self) -> Result<String, anyhow::Error> {
+            self.is_removed = true;
+            Ok("success".to_owned())
+        }
+    }
 }

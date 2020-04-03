@@ -147,7 +147,7 @@ pub async fn delete_from_index(
 mod test {
     use super::*;
     use crate::{
-        models::DeleteMessage, service_bus_client::TestRemoveable,
+        models::DeleteMessage, service_bus_client::test::TestRemoveable,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;

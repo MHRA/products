@@ -161,7 +161,7 @@ mod test {
     use super::*;
     use crate::{
         models::{get_test_create_message, CreateMessage},
-        service_bus_client::TestRemoveable,
+        service_bus_client::test::TestRemoveable,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;
