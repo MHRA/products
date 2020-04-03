@@ -16,7 +16,7 @@ pub struct StateManager {
 }
 
 #[async_trait]
-pub trait JobStatusClient {
+pub trait JobStatusClient: Sync + Send {
     async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError>;
     async fn set_status(
         &self,
