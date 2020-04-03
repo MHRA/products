@@ -160,7 +160,7 @@ pub struct Blob {
 mod test {
     use super::*;
     use crate::{
-        models::{get_test_create_message, CreateMessage},
+        models::{test::get_test_create_message, CreateMessage},
         service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };

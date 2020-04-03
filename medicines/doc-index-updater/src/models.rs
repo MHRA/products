@@ -177,30 +177,6 @@ pub struct CreateMessage {
     pub document: Document,
 }
 
-#[cfg(test)]
-pub fn get_test_document() -> Document {
-    Document {
-        id: "id".to_string(),
-        name: "name".to_string(),
-        document_type: DocumentType::Pil,
-        author: "author".to_string(),
-        products: vec!["products".to_string()],
-        keywords: Some(vec!["keywords".to_string()]),
-        pl_number: "pl_number".to_string(),
-        active_substances: vec!["active_substances".to_string()],
-        file_source: FileSource::Sentinel,
-        file_path: "file_path".to_string(),
-    }
-}
-
-#[cfg(test)]
-pub fn get_test_create_message(id: Uuid) -> CreateMessage {
-    CreateMessage {
-        job_id: id,
-        document: get_test_document(),
-    }
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
@@ -261,10 +237,34 @@ impl Message for DeleteMessage {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use serde_xml_rs::from_reader;
     use test_case::test_case;
+
+    #[cfg(test)]
+    pub fn get_test_document() -> Document {
+        Document {
+            id: "id".to_string(),
+            name: "name".to_string(),
+            document_type: DocumentType::Pil,
+            author: "author".to_string(),
+            products: vec!["products".to_string()],
+            keywords: Some(vec!["keywords".to_string()]),
+            pl_number: "pl_number".to_string(),
+            active_substances: vec!["active_substances".to_string()],
+            file_source: FileSource::Sentinel,
+            file_path: "file_path".to_string(),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn get_test_create_message(id: Uuid) -> CreateMessage {
+        CreateMessage {
+            job_id: id,
+            document: get_test_document(),
+        }
+    }
 
     #[test_case("Accepted", Ok(JobStatus::Accepted))]
     #[test_case("Done", Ok(JobStatus::Done))]
