@@ -80,54 +80,6 @@ where
     Ok(())
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::{
-        models::{get_test_create_message, CreateMessage},
-        service_bus_client::ShouldRemove,
-        state_manager::TestJobStatusClient,
-    };
-    use tokio_test::block_on;
-
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
-    }
-
-    fn given_we_have_a_create_message() -> CreateMessage {
-        get_test_create_message(Uuid::new_v4())
-    }
-
-    fn when_we_handle_the_error(
-        message: CreateMessage,
-        error: anyhow::Error,
-        state_manager: TestJobStatusClient,
-        removeable: &mut ShouldRemove,
-    ) -> Result<(), anyhow::Error> {
-        block_on(handle_processing_error_for_create_message(
-            removeable,
-            message,
-            error,
-            &state_manager,
-        ))
-        .map_err(|e| {
-            println!("{:#?}", e.to_string());
-            e
-        })
-    }
-
-    #[test]
-    fn test_an_unknown_error_does_not_remove_create_message() {
-        let message = given_we_have_a_create_message();
-        let error = given_an_error_has_occurred();
-        let state_manager = TestJobStatusClient {};
-        let mut removeable = ShouldRemove { is_removed: false };
-        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
-        assert!(result.is_ok());
-        assert_eq!(removeable.is_removed, false);
-    }
-}
-
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
     tracing::debug!("Message received: {:?} ", message);
 
@@ -202,4 +154,54 @@ pub struct Blob {
     name: String,
     size: usize,
     path: String,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{
+        models::{get_test_create_message, CreateMessage},
+        service_bus_client::ShouldRemove,
+        state_manager::TestJobStatusClient,
+    };
+    use tokio_test::block_on;
+
+    fn given_an_error_has_occurred() -> anyhow::Error {
+        anyhow!("literally any error")
+    }
+
+    fn given_we_have_a_create_message() -> CreateMessage {
+        get_test_create_message(Uuid::new_v4())
+    }
+
+    fn when_we_handle_the_error(
+        message: CreateMessage,
+        error: anyhow::Error,
+        state_manager: TestJobStatusClient,
+        removeable: &mut ShouldRemove,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_create_message(
+            removeable,
+            message,
+            error,
+            &state_manager,
+        ))
+        .map_err(|e| {
+            println!("{:#?}", e.to_string());
+            e
+        })
+    }
+
+    #[test]
+    fn test_an_unknown_error_does_not_remove_create_message() {
+        let state_manager = TestJobStatusClient {};
+        let mut removeable = ShouldRemove { is_removed: false };
+        let message = given_we_have_a_create_message();
+        let error = given_an_error_has_occurred();
+
+        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
+
+        assert!(result.is_ok());
+        assert_eq!(removeable.is_removed, false);
+    }
 }

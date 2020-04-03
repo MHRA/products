@@ -69,55 +69,6 @@ where
     Ok(())
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::{
-        models::DeleteMessage, service_bus_client::ShouldRemove, state_manager::TestJobStatusClient,
-    };
-    use tokio_test::block_on;
-
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
-    }
-
-    fn given_we_have_a_delete_message() -> DeleteMessage {
-        DeleteMessage {
-            document_content_id: "our_id".to_owned(),
-            job_id: Uuid::new_v4(),
-        }
-    }
-
-    fn when_we_handle_the_error(
-        message: DeleteMessage,
-        error: anyhow::Error,
-        state_manager: TestJobStatusClient,
-        removeable: &mut ShouldRemove,
-    ) -> Result<(), anyhow::Error> {
-        block_on(handle_processing_error_for_delete_message(
-            removeable,
-            message,
-            error,
-            &state_manager,
-        ))
-        .map_err(|e| {
-            println!("{:#?}", e.to_string());
-            e
-        })
-    }
-
-    #[test]
-    fn test_an_error_removes_delete_message() {
-        let message = given_we_have_a_delete_message();
-        let error = given_an_error_has_occurred();
-        let state_manager = TestJobStatusClient {};
-        let mut removeable = ShouldRemove { is_removed: false };
-        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
-        assert!(result.is_ok());
-        assert!(removeable.is_removed);
-    }
-}
-
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
     tracing::info!("Message received: {:?} ", message);
 
@@ -190,4 +141,51 @@ pub async fn delete_from_index(
         .delete(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{
+        models::DeleteMessage, service_bus_client::ShouldRemove, state_manager::TestJobStatusClient,
+    };
+    use tokio_test::block_on;
+
+    fn given_an_error_has_occurred() -> anyhow::Error {
+        anyhow!("literally any error")
+    }
+
+    fn given_we_have_a_delete_message() -> DeleteMessage {
+        DeleteMessage {
+            document_content_id: "our_id".to_owned(),
+            job_id: Uuid::new_v4(),
+        }
+    }
+
+    fn when_we_handle_the_error(
+        message: DeleteMessage,
+        error: anyhow::Error,
+        state_manager: TestJobStatusClient,
+        removeable: &mut ShouldRemove,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_delete_message(
+            removeable,
+            message,
+            error,
+            &state_manager,
+        ))
+    }
+
+    #[test]
+    fn test_an_error_removes_delete_message() {
+        let state_manager = TestJobStatusClient {};
+        let mut removeable = ShouldRemove { is_removed: false };
+        let message = given_we_have_a_delete_message();
+        let error = given_an_error_has_occurred();
+
+        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
+
+        assert!(result.is_ok());
+        assert!(removeable.is_removed);
+    }
 }
