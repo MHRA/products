@@ -2,7 +2,9 @@ use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     search_client,
-    service_bus_client::{create_factory, ProcessRetrievalError, Removeable, RetrievedMessage},
+    service_bus_client::{
+        create_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+    },
     state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
@@ -50,32 +52,30 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
         error: anyhow::Error,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
-        let message = self.message.clone();
-        handle_processing_error_for_create_message(self, message, error, state_manager).await
+        handle_processing_error_for_create_message(self, error, state_manager).await
     }
 }
 
 async fn handle_processing_error_for_create_message<T>(
-    removeable: &mut T,
-    message: CreateMessage,
+    removeable_message: &mut T,
     error: anyhow::Error,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
-    T: Removeable,
+    T: RemoveableMessage<CreateMessage>,
 {
     if error.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
         tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
         let _ = state_manager
             .set_status(
-                message.job_id,
+                removeable_message.get_message().job_id,
                 JobStatus::Error {
                     message: "Couldn't find file".to_string(),
                     code: "404".to_string(),
                 },
             )
             .await?;
-        let _ = removeable.remove().await?;
+        let _ = removeable_message.remove().await?;
     }
     Ok(())
 }
@@ -161,7 +161,7 @@ mod test {
     use super::*;
     use crate::{
         models::{get_test_create_message, CreateMessage},
-        service_bus_client::test::TestRemoveable,
+        service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;
@@ -170,19 +170,20 @@ mod test {
         anyhow!("literally any error")
     }
 
-    fn given_we_have_a_create_message() -> CreateMessage {
-        get_test_create_message(Uuid::new_v4())
+    fn given_we_have_a_create_message() -> TestRemoveableMessage<CreateMessage> {
+        TestRemoveableMessage::<CreateMessage> {
+            message: get_test_create_message(Uuid::new_v4()),
+            is_removed: false,
+        }
     }
 
     fn when_we_handle_the_error(
-        message: CreateMessage,
+        removeable_message: &mut TestRemoveableMessage<CreateMessage>,
         error: anyhow::Error,
         state_manager: TestJobStatusClient,
-        removeable: &mut TestRemoveable,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
-            removeable,
-            message,
+            removeable_message,
             error,
             &state_manager,
         ))
@@ -195,13 +196,12 @@ mod test {
     #[test]
     fn test_an_unknown_error_does_not_remove_create_message() {
         let state_manager = TestJobStatusClient {};
-        let mut removeable = TestRemoveable { is_removed: false };
-        let message = given_we_have_a_create_message();
+        let removeable_message = &mut given_we_have_a_create_message();
         let error = given_an_error_has_occurred();
 
-        let result = when_we_handle_the_error(message, error, state_manager, &mut removeable);
+        let result = when_we_handle_the_error(removeable_message, error, state_manager);
 
         assert!(result.is_ok());
-        assert_eq!(removeable.is_removed, false);
+        assert_eq!(removeable_message.is_removed, false);
     }
 }

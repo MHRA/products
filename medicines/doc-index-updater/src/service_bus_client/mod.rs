@@ -69,7 +69,18 @@ pub struct RetrievedMessage<T: Message> {
     pub message: T,
     peek_lock: PeekLockResponse,
 }
+pub trait RemoveableMessage<T: Message>: Removeable {
+    fn get_message(&self) -> T;
+}
 
+impl<T> RemoveableMessage<T> for RetrievedMessage<T>
+where
+    T: Message + Sync + Send,
+{
+    fn get_message(&self) -> T {
+        self.message.clone()
+    }
+}
 #[async_trait]
 pub trait Removeable {
     async fn remove(&mut self) -> Result<String, anyhow::Error>;
@@ -215,15 +226,29 @@ where
 #[cfg(test)]
 pub mod test {
     use super::*;
-    pub struct TestRemoveable {
+    pub struct TestRemoveableMessage<T: Message> {
         pub is_removed: bool,
+        pub message: T,
     }
 
     #[async_trait]
-    impl Removeable for TestRemoveable {
+    impl<T> Removeable for TestRemoveableMessage<T>
+    where
+        T: Message + Send + Sync,
+    {
         async fn remove(&mut self) -> Result<String, anyhow::Error> {
             self.is_removed = true;
             Ok("success".to_owned())
+        }
+    }
+
+    #[async_trait]
+    impl<T> RemoveableMessage<T> for TestRemoveableMessage<T>
+    where
+        T: Message + Sync + Send,
+    {
+        fn get_message(&self) -> T {
+            self.message.clone()
         }
     }
 }
