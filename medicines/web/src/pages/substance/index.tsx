@@ -24,7 +24,7 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { query: queryQS },
+    query: { substance: queryQS },
   } = router;
 
   useEffect(() => {

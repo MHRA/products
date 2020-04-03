@@ -35,7 +35,7 @@ const App: NextPage = props => {
   const router = useRouter();
   const {
     query: {
-      query: queryQS,
+      search: queryQS,
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,

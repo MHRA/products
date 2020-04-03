@@ -47,10 +47,13 @@ const App: React.FC = () => {
       if (substanceQS.length === 1) {
         router.push({
           pathname: '/substance-index',
-          query: { query: substanceQS },
+          query: { substance: substanceQS },
         });
       } else {
-        router.push({ pathname: '/substance', query: { query: substanceQS } });
+        router.push({
+          pathname: '/substance',
+          query: { substance: substanceQS },
+        });
       }
     }
   }, [searchQS, pageQS, substanceQS, disclaimerQS, docQS, productQS]);

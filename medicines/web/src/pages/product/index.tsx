@@ -36,7 +36,7 @@ const App: NextPage = () => {
   const router = useRouter();
   const {
     query: {
-      query: queryQS,
+      product: queryQS,
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
@@ -96,7 +96,7 @@ const App: NextPage = () => {
     docTypes: DocType[],
   ) => {
     const query = {
-      query: productName,
+      productFilter: productName,
       page,
     };
     if (docTypes.length > 0) {
