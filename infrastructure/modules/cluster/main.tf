@@ -16,6 +16,35 @@ resource "azurerm_subnet" "cluster" {
   virtual_network_name = var.vnet_name
 }
 
+resource "azurerm_route_table" "cluster" {
+  name                = "cluster-route-table-${var.environment}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  dynamic "route" {
+    for_each = [for r in var.cluster_route_destination_cidr_blocks : {
+      name  = replace(replace(r, ".", "_"), "/", "__")
+      route = r
+    }]
+
+    content {
+      name                   = route.value.name
+      address_prefix         = route.value.route
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = var.cluster_route_next_hop
+    }
+  }
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+resource "azurerm_subnet_route_table_association" "cluster" {
+  subnet_id      = azurerm_subnet.cluster.id
+  route_table_id = azurerm_route_table.cluster.id
+}
+
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment
   location            = var.location

@@ -20,3 +20,12 @@ variable "ENVIRONMENT" {
   description = "Environment name"
   default     = "production"
 }
+
+variable "CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS" {
+  type        = list(string)
+  description = "CIDR block destination for default route"
+}
+
+variable "CLUSTER_ROUTE_NEXT_HOP" {
+  description = "Next hop for default route"
+}

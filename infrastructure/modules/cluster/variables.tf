@@ -26,7 +26,16 @@ variable "cluster_subnet_cidr" {
   description = "Cluster CIDR block"
 }
 
-variable "route_table_id" {
+variable "cluster_route_destination_cidr_blocks" {
+  type        = list(string)
+  description = "CIDR block destination for default route"
+}
+
+variable "cluster_route_next_hop" {
+  description = "Next hop for default route"
+}
+
+variable "lb_route_table_id" {
   description = "Route Table ID"
 }
 

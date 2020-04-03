@@ -55,18 +55,20 @@ data "azurerm_subnet" "load_balancer" {
 module cluster {
   source = "../../modules/cluster"
 
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  resource_group_name = data.azurerm_resource_group.products.name
-  vnet_name           = data.azurerm_virtual_network.cluster.name
-  vnet_resource_group = data.azurerm_virtual_network.cluster.resource_group_name
-  lb_subnet_id        = data.azurerm_subnet.load_balancer.id
-  cluster_subnet_name = "aparz-spoke-products-sn-02"
-  cluster_subnet_cidr = "10.5.66.64/26"
-  route_table_id      = data.azurerm_route_table.load_balancer.id
-  default_node_count  = "3"
+  client_id                             = var.CLIENT_ID
+  client_secret                         = var.CLIENT_SECRET
+  environment                           = var.ENVIRONMENT
+  location                              = var.REGION
+  resource_group_name                   = data.azurerm_resource_group.products.name
+  vnet_name                             = data.azurerm_virtual_network.cluster.name
+  vnet_resource_group                   = data.azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_id                          = data.azurerm_subnet.load_balancer.id
+  cluster_subnet_name                   = "aparz-spoke-products-sn-02"
+  cluster_subnet_cidr                   = "10.5.66.64/26"
+  cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS
+  cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
+  lb_route_table_id                     = data.azurerm_route_table.load_balancer.id
+  default_node_count                    = "3"
 }
 
 # Service Bus

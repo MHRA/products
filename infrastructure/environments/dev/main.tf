@@ -30,6 +30,12 @@ resource "azurerm_resource_group" "products" {
   }
 }
 
+resource "azurerm_subnet_route_table_association" "load_balancer" {
+  subnet_id      = azurerm_subnet.load_balancer.id
+  route_table_id = azurerm_route_table.load_balancer.id
+}
+
+
 # website
 module "products" {
   source = "../../modules/products"
@@ -67,9 +73,8 @@ resource "azurerm_virtual_network" "cluster" {
   address_space       = ["10.5.65.128/25"]
 }
 
-
 resource "azurerm_subnet" "load_balancer" {
-  name                 = "adarz-spoke-products-sn-01"
+  name                 = "adarz-spoke-products-dev-sn-01"
   address_prefix       = "10.5.65.128/26"
   resource_group_name  = azurerm_virtual_network.cluster.resource_group_name
   virtual_network_name = azurerm_virtual_network.cluster.name
@@ -79,17 +84,19 @@ resource "azurerm_subnet" "load_balancer" {
 module cluster {
   source = "../../modules/cluster"
 
-  client_id           = var.CLIENT_ID
-  client_secret       = var.CLIENT_SECRET
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  resource_group_name = azurerm_resource_group.products.name
-  vnet_name           = azurerm_virtual_network.cluster.name
-  vnet_resource_group = azurerm_virtual_network.cluster.resource_group_name
-  lb_subnet_id        = azurerm_subnet.load_balancer.id
-  cluster_subnet_name = "adarz-spoke-products-dev-sn-02"
-  cluster_subnet_cidr = "10.5.65.192/26"
-  route_table_id      = azurerm_route_table.load_balancer.id
+  client_id                             = var.CLIENT_ID
+  client_secret                         = var.CLIENT_SECRET
+  environment                           = var.ENVIRONMENT
+  location                              = var.REGION
+  resource_group_name                   = azurerm_resource_group.products.name
+  vnet_name                             = azurerm_virtual_network.cluster.name
+  vnet_resource_group                   = azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_id                          = azurerm_subnet.load_balancer.id
+  cluster_subnet_name                   = "adarz-spoke-products-dev-sn-02"
+  cluster_subnet_cidr                   = "10.5.65.192/26"
+  cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS
+  cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
+  lb_route_table_id                     = azurerm_route_table.load_balancer.id
 }
 
 # Service Bus
