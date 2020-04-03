@@ -2,25 +2,24 @@ use crate::{
     azure_rest,
     env::{get_from_env, API_ADMIN_KEY, INDEX_NAME, SEARCH_SERVICE},
 };
-use actix_web::client;
 
-pub fn create_index() -> Result<(), client::SendRequestError> {
+pub async fn create_index() -> Result<(), reqwest::Error> {
     let search_service = get_from_env(SEARCH_SERVICE);
     let index_name = get_from_env(INDEX_NAME);
     let api_key = get_from_env(API_ADMIN_KEY);
     let index_definition = get_index_definition(get_raw_index_definition(), &index_name);
     let url = get_base_url(&search_service);
 
-    azure_rest::make_post_request_with_body(index_definition, &url, &api_key)
+    azure_rest::make_post_request_with_body(index_definition, &url, &api_key).await
 }
 
-pub fn delete_index() -> Result<(), client::SendRequestError> {
+pub async fn delete_index() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let index_name = get_from_env(INDEX_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &index_name);
 
-    azure_rest::make_delete_request(&url, &api_key)
+    azure_rest::make_delete_request(&url, &api_key).await
 }
 
 fn get_base_url(search_service: &str) -> String {
