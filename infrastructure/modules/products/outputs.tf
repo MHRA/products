@@ -25,3 +25,7 @@ output "search_service_name" {
 output "storage_account_name" {
   value = azurerm_storage_account.products.name
 }
+
+output "storage_account_primary_web_host" {
+  value = azurerm_storage_account.products.primary_web_host
+}

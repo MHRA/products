@@ -39,7 +39,7 @@ output "cpd_static_web_url" {
 }
 
 output "products_hostname_cdn" {
-  value = module.products.products_hostname_cdn
+  value = module.products_web.products_hostname_cdn
 }
 
 output "cpd_hostname_cdn" {

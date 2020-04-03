@@ -21,14 +21,19 @@ locals {
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
-data "azurerm_resource_group" "products" {
-  name = var.RESOURCE_GROUP_PRODUCTS
+resource "azurerm_resource_group" "products" {
+  name     = var.RESOURCE_GROUP_PRODUCTS
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
 }
 
 
 resource "azurerm_subnet_route_table_association" "load_balancer" {
-  subnet_id      = var.lb_subnet_id
-  route_table_id = var.route_table_id
+  subnet_id      = azurerm_subnet.load_balancer.id
+  route_table_id = data.azurerm_route_table.load_balancer.id
 }
 
 
@@ -39,21 +44,17 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
-  resource_group_name = data.azurerm_resource_group.products.name
+  resource_group_name = azurerm_resource_group.products.name
 }
 
 # website
 module "products_web" {
   source = "../../modules/products-web"
 
+  environment          = var.ENVIRONMENT
   storage_account_name = module.products.storage_account_name
-  resource_group_name  = data.azurerm_resource_group.products.name
-  origin_host_name=
-  cdn_region="westeurope" # uksouth is not a valid option currently for cdn profiles
-
-  environment = var.ENVIRONMENT
-  location    = var.REGION
-  namespace   = local.namespace
+  resource_group_name  = azurerm_resource_group.products.name
+  origin_host_name     = module.products.storage_account_primary_web_host
 }
 
 data "azurerm_route_table" "load_balancer" {
@@ -66,6 +67,13 @@ data "azurerm_virtual_network" "cluster" {
   resource_group_name = "adazr-rg-1001"
 }
 
+resource "azurerm_subnet" "load_balancer" {
+  name                 = "adarz-spoke-products-sn-01"
+  address_prefix       = "10.5.65.0/26"
+  resource_group_name  = data.azurerm_virtual_network.cluster.resource_group_name
+  virtual_network_name = data.azurerm_virtual_network.cluster.name
+}
+
 # AKS
 module cluster {
   source = "../../modules/cluster"
@@ -74,10 +82,10 @@ module cluster {
   client_secret       = var.CLIENT_SECRET
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = data.azurerm_resource_group.products.name
+  resource_group_name = azurerm_resource_group.products.name
   vnet_name           = data.azurerm_virtual_network.cluster.name
-  lb_subnet_name      = "adarz-spoke-products-sn-01"
-  lb_subnet_cidr      = "10.5.65.0/26"
+  vnet_resource_group = data.azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_id        = azurerm_subnet.load_balancer.id
   cluster_subnet_name = "adarz-spoke-products-sn-02"
   cluster_subnet_cidr = "10.5.65.64/26"
   route_table_id      = data.azurerm_route_table.load_balancer.id
