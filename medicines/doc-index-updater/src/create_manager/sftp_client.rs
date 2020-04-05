@@ -88,10 +88,10 @@ async fn retrieve_file_from_sftp(
     };
     tracing::info!("{:?}", path);
 
-    let dir = path.parent();
-    if let Some(d_path) = dir {
-        tracing::info!("Finding contents of {:?}", &d_path);
-        let files_result = sftp.readdir(d_path);
+    let parent_dir = path.parent();
+    if let Some(parnet_dir_path) = parent_dir {
+        tracing::info!("Finding contents of {:?}", &parnet_dir_path);
+        let files_result = sftp.readdir(parnet_dir_path);
         if let Ok(file_stats) = files_result {
             for (path_buf, file_stat) in file_stats {
                 tracing::info!("{:?}", path_buf.to_str());
