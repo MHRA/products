@@ -87,6 +87,23 @@ async fn retrieve_file_from_sftp(
         Err(_) => path,
     };
     tracing::info!("{:?}", path);
+
+    // Additional logging to debug observed sftp issue
+    // in nonprod environment
+    let parent_dir = path.parent();
+    if let Some(parent_dir_path) = parent_dir {
+        tracing::debug!("Finding contents of {:?}", &parent_dir_path);
+        if let Ok(file_stats) = sftp.readdir(parent_dir_path) {
+            for (path_buf, file_stat) in file_stats {
+                tracing::debug!("{:?}", path_buf.to_str());
+                tracing::debug!("File stats: {:#?}", file_stat);
+            }
+        }
+        else {
+            tracing::debug!("Couldn't find dir contents");
+        }
+    }
+
     Ok(sftp.open(path).map_err(|e| {
         tracing::error!("{:?}", e);
         e
