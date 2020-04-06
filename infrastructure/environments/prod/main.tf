@@ -33,6 +33,7 @@ module "products" {
   location            = var.REGION
   namespace           = local.namespace
   resource_group_name = data.azurerm_resource_group.products.name
+  search_sku          = "standard"
 }
 
 data "azurerm_route_table" "load_balancer" {

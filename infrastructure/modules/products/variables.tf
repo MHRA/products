@@ -13,3 +13,8 @@ variable "environment" {
 variable "namespace" {
   description = "Namespace to use on cluster and storage"
 }
+
+variable "search_sku" {
+  description = "Search Service SKU (e.g. basic/standard)"
+  default     = "basic"
+}
