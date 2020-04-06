@@ -100,7 +100,7 @@ async fn retrieve_file_from_sftp(
             }
         }
         else {
-            tracing::debug!("Couldn't find dir contents", file_stat);
+            tracing::debug!("Couldn't find dir contents");
         }
     }
 
