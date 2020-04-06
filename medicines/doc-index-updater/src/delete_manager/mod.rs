@@ -184,10 +184,10 @@ mod test {
     fn test_an_error_removes_delete_message() {
         let state_manager = TestJobStatusClient {};
 
-        let removable_message = &mut given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let error = given_an_error_has_occurred();
 
-        let result = when_we_handle_the_error(removable_message, error, state_manager);
+        let result = when_we_handle_the_error(&mut removable_message, error, state_manager);
 
         assert!(result.is_ok());
         assert!(removable_message.is_removed);

@@ -14,6 +14,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+
 use search_index::add_blob_to_search_index;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
@@ -191,11 +192,11 @@ mod test {
 
     #[test]
     fn test_an_unknown_error_does_not_remove_create_message() {
-        let state_manager = TestJobStatusClient {};
-        let removeable_message = &mut given_we_have_a_create_message();
+        let mut removeable_message = given_we_have_a_create_message();
         let error = given_an_error_has_occurred();
 
-        let result = when_we_handle_the_error(removeable_message, error, state_manager);
+        let result =
+            when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
 
         assert!(result.is_ok());
         assert_eq!(removeable_message.is_removed, false);
