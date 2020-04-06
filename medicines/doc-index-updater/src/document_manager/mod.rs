@@ -81,7 +81,10 @@ async fn delete_document_handler(
         };
 
         queue_job(&mut queue, &state_manager, message)
-            .instrument(tracing::info_span!("document_manager", correlation_id))
+            .instrument(tracing::info_span!(
+                "delete_document_handler::queue_job",
+                correlation_id
+            ))
             .await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
@@ -112,13 +115,20 @@ async fn check_in_document_handler(
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = create_factory().await {
         let id = accept_job(&state_manager).await?.id;
+        let correlation_id = id.to_string();
+        let correlation_id = correlation_id.as_str();
 
         let message = CreateMessage {
             job_id: id,
             document: doc,
         };
 
-        queue_job(&mut queue, &state_manager, message).await
+        queue_job(&mut queue, &state_manager, message)
+            .instrument(tracing::info_span!(
+                "check_in_document_handler::queue_job",
+                correlation_id
+            ))
+            .await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }
