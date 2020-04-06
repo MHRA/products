@@ -51,6 +51,7 @@ pub enum RetrieveFromQueueError {
     AzureError(AzureError),
     ParseError(String),
     NotFoundError,
+    ErrorReadingQueue,
 }
 
 impl std::fmt::Display for RetrieveFromQueueError {
@@ -136,6 +137,11 @@ impl DocIndexUpdaterQueue {
                 tracing::error!("{:?}", e);
                 RetrieveFromQueueError::AzureError(e)
             })?;
+
+        if !peek_lock.status().is_success() {
+            tracing::error!("{} when reading queue.", peek_lock.status(),);
+            return Err(RetrieveFromQueueError::ErrorReadingQueue);
+        }
 
         if peek_lock.status() == StatusCode::NO_CONTENT {
             tracing::debug!("No new messages found.");
