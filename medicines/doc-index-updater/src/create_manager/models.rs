@@ -32,7 +32,7 @@ impl BlobMetadata {
 impl Into<BlobMetadata> for Document {
     fn into(self) -> BlobMetadata {
         let title = SanitisedString::from(&self.name);
-        let pl_number = extract_product_licences(&self.pl_number.to_string());
+        let pl_number = extract_product_licences(&self.pl_number);
 
         BlobMetadata {
             file_name: SanitisedString::from(&self.id),

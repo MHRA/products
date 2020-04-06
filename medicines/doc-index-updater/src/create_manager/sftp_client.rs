@@ -1,30 +1,17 @@
 use crate::models::FileSource;
+use anyhow::anyhow;
 use ssh2::{File, Session, Sftp};
-use std::{fmt::Display, io::Read, net::TcpStream};
+use std::{io::Read, net::TcpStream};
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 enum SentinelSftpError {
+    #[error("A TCP error connecting to server. ({0:?})")]
     TcpError(std::io::Error),
+    #[error("An SSH error connecting to server. ({0:?})")]
     Ssh2Error(ssh2::Error),
-}
-
-impl Display for SentinelSftpError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SentinelSftpError::TcpError(e) => {
-                write!(f, "A TCP error connecting to server. ({:?})", e)
-            }
-            SentinelSftpError::Ssh2Error(e) => {
-                write!(f, "An SSH error connecting to server. ({:?})", e)
-            }
-        }
-    }
-}
-
-impl std::error::Error for SentinelSftpError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        None
-    }
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }
 
 impl From<ssh2::Error> for SentinelSftpError {
@@ -63,13 +50,14 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
 
     ssh_session.userauth_password(&user, &password)?;
 
-    assert!(ssh_session.authenticated());
-
-    tracing::debug!(message = "SFTP session authenticated");
-
-    let sftp = ssh_session.sftp()?;
-
-    Ok(sftp)
+    if ssh_session.authenticated() {
+        tracing::debug!(message = "SFTP session authenticated");
+        ssh_session.sftp().map_err(Into::into)
+    } else {
+        let message = "SFTP session authentication failed";
+        tracing::debug!(message);
+        Err(SentinelSftpError::Other(anyhow!(message)))
+    }
 }
 
 pub async fn get_env_fail_fast(name: &str) -> String {
@@ -98,8 +86,7 @@ async fn retrieve_file_from_sftp(
                 tracing::debug!("{:?}", path_buf.to_str());
                 tracing::debug!("File stats: {:#?}", file_stat);
             }
-        }
-        else {
+        } else {
             tracing::debug!("Couldn't find dir contents");
         }
     }
