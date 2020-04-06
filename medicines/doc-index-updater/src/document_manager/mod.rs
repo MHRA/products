@@ -54,6 +54,7 @@ where
                     },
                 )
                 .await?;
+            tracing::error!("Failed to dispatch to queue. Check API keys");
             Ok(state)
         }
     }
