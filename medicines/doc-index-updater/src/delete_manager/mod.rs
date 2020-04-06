@@ -1,8 +1,10 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
-    service_bus_client::{delete_factory, ProcessRetrievalError, RetrievedMessage},
-    state_manager::StateManager,
+    service_bus_client::{
+        delete_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+    },
+    state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
 use anyhow::anyhow;
@@ -37,23 +39,34 @@ pub async fn delete_service_worker(
 #[async_trait]
 impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     async fn handle_processing_error(
-        self,
-        e: anyhow::Error,
-        state_manager: &StateManager,
+        &mut self,
+        error: anyhow::Error,
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
-        tracing::info!("Setting error state in state manager");
-        state_manager
-            .set_status(
-                self.message.job_id,
-                JobStatus::Error {
-                    message: e.to_string(),
-                    code: "".to_string(),
-                },
-            )
-            .await?;
-        let _ = self.remove().await?;
-        Ok(())
+        handle_processing_error_for_delete_message(self, error, state_manager).await
     }
+}
+
+async fn handle_processing_error_for_delete_message<T>(
+    removeable_message: &mut T,
+    error: anyhow::Error,
+    state_manager: &impl JobStatusClient,
+) -> anyhow::Result<()>
+where
+    T: RemoveableMessage<DeleteMessage>,
+{
+    tracing::info!("Setting error state in state manager");
+    state_manager
+        .set_status(
+            removeable_message.get_message().job_id,
+            JobStatus::Error {
+                message: error.to_string(),
+                code: "".to_string(),
+            },
+        )
+        .await?;
+    let _ = removeable_message.remove().await?;
+    Ok(())
 }
 
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
@@ -128,4 +141,55 @@ pub async fn delete_from_index(
         .delete(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{
+        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
+        state_manager::TestJobStatusClient,
+    };
+    use tokio_test::block_on;
+
+    fn given_an_error_has_occurred() -> anyhow::Error {
+        anyhow!("literally any error")
+    }
+
+    fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
+        let delete_message = DeleteMessage {
+            document_content_id: "our_id".to_owned(),
+            job_id: Uuid::new_v4(),
+        };
+
+        TestRemoveableMessage::<DeleteMessage> {
+            is_removed: false,
+            message: delete_message,
+        }
+    }
+
+    fn when_we_handle_the_error(
+        removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
+        error: anyhow::Error,
+        state_manager: TestJobStatusClient,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_delete_message(
+            removeable_message,
+            error,
+            &state_manager,
+        ))
+    }
+
+    #[test]
+    fn test_an_error_removes_delete_message() {
+        let state_manager = TestJobStatusClient {};
+
+        let mut removable_message = given_we_have_a_delete_message();
+        let error = given_an_error_has_occurred();
+
+        let result = when_we_handle_the_error(&mut removable_message, error, state_manager);
+
+        assert!(result.is_ok());
+        assert!(removable_message.is_removed);
+    }
 }

@@ -5,6 +5,7 @@ use crate::{
     models::{JobStatus, JobStatusResponse, XMLJobStatusResponse},
 };
 use ::redis::Client;
+use async_trait::async_trait;
 use uuid::Uuid;
 use warp::{http::StatusCode, reply::Json, Filter, Rejection, Reply};
 mod redis;
@@ -14,18 +15,52 @@ pub struct StateManager {
     pub client: Client,
 }
 
+#[async_trait]
+pub trait JobStatusClient: Sync + Send {
+    async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError>;
+    async fn set_status(
+        &self,
+        id: Uuid,
+        status: JobStatus,
+    ) -> Result<JobStatusResponse, MyRedisError>;
+}
+
+#[cfg(test)]
+pub struct TestJobStatusClient {}
+
+#[cfg(test)]
+#[async_trait]
+impl JobStatusClient for TestJobStatusClient {
+    async fn get_status(
+        &self,
+        _id: Uuid,
+    ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+        unimplemented!()
+    }
+    async fn set_status(
+        &self,
+        id: Uuid,
+        status: JobStatus,
+    ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+        Ok(JobStatusResponse { id, status })
+    }
+}
+
 impl StateManager {
     pub fn new(client: Client) -> Self {
         StateManager { client }
     }
+}
 
-    pub async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
+#[async_trait::async_trait]
+impl JobStatusClient for StateManager {
+    async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
         let status = get_from_redis(self.client.clone(), id).await?;
 
         Ok(JobStatusResponse { id, status })
     }
 
-    pub async fn set_status(
+    async fn set_status(
         &self,
         id: Uuid,
         status: JobStatus,

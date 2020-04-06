@@ -1,7 +1,7 @@
 use crate::{
     get_env_or_default,
     models::{JobStatus, Message},
-    state_manager::StateManager,
+    state_manager::{JobStatusClient, StateManager},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -69,9 +69,29 @@ pub struct RetrievedMessage<T: Message> {
     pub message: T,
     peek_lock: PeekLockResponse,
 }
+pub trait RemoveableMessage<T: Message>: Removeable {
+    fn get_message(&self) -> T;
+}
 
-impl<T: Message> RetrievedMessage<T> {
-    pub async fn remove(&self) -> Result<String, anyhow::Error> {
+impl<T> RemoveableMessage<T> for RetrievedMessage<T>
+where
+    T: Message + Sync + Send,
+{
+    fn get_message(&self) -> T {
+        self.message.clone()
+    }
+}
+#[async_trait]
+pub trait Removeable {
+    async fn remove(&mut self) -> Result<String, anyhow::Error>;
+}
+
+#[async_trait]
+impl<T> Removeable for RetrievedMessage<T>
+where
+    T: Message + Send + Sync,
+{
+    async fn remove(&mut self) -> Result<String, anyhow::Error> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
@@ -84,9 +104,9 @@ impl<T: Message> RetrievedMessage<T> {
 #[async_trait]
 pub trait ProcessRetrievalError {
     async fn handle_processing_error(
-        self,
+        &mut self,
         e: anyhow::Error,
-        state_manager: &StateManager,
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()>;
 }
 
@@ -159,7 +179,7 @@ impl DocIndexUpdaterQueue {
     ) -> anyhow::Result<()>
     where
         T: Message,
-        RetrievedMessage<T>: ProcessRetrievalError,
+        RetrievedMessage<T>: ProcessRetrievalError + Removeable,
     {
         tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
@@ -181,12 +201,12 @@ impl DocIndexUpdaterQueue {
 }
 
 async fn process<T>(
-    retrieval: RetrievedMessage<T>,
-    state_manager: &StateManager,
+    mut retrieval: RetrievedMessage<T>,
+    state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
     T: Message,
-    RetrievedMessage<T>: ProcessRetrievalError,
+    RetrievedMessage<T>: ProcessRetrievalError + Removeable,
 {
     let processing_result = retrieval.message.clone().process().await;
 
@@ -197,8 +217,38 @@ where
         }
         Err(e) => {
             tracing::error!(message = format!("Error {:?}", e).as_str());
-            retrieval.handle_processing_error(e, &state_manager).await?;
+            retrieval.handle_processing_error(e, state_manager).await?;
         }
     };
     Ok(())
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+    pub struct TestRemoveableMessage<T: Message> {
+        pub is_removed: bool,
+        pub message: T,
+    }
+
+    #[async_trait]
+    impl<T> Removeable for TestRemoveableMessage<T>
+    where
+        T: Message + Send + Sync,
+    {
+        async fn remove(&mut self) -> Result<String, anyhow::Error> {
+            self.is_removed = true;
+            Ok("success".to_owned())
+        }
+    }
+
+    #[async_trait]
+    impl<T> RemoveableMessage<T> for TestRemoveableMessage<T>
+    where
+        T: Message + Sync + Send,
+    {
+        fn get_message(&self) -> T {
+            self.message.clone()
+        }
+    }
 }
