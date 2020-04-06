@@ -46,7 +46,7 @@ where
         Ok(_) => Ok(state_manager.get_status(message.get_id()).await?),
         Err(e) => {
             tracing::error!(
-                "{:?}. Failed to dispatch to queue. Check API Keys or Policy values in environment variables.",
+                "Failed to dispatch to queue. Check environment variables align for queue names, policies and keys. Error: ({:?})",
                 e
             );
             let state = state_manager
