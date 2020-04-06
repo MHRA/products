@@ -55,27 +55,35 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
-# data "azurerm_subnet" "cluster" {
-#   name                 = split("/", azurerm_kubernetes_cluster.cluster.default_node_pool[0].vnet_subnet_id)[10]
-#   resource_group_name  = var.resource_group_name
-#   virtual_network_name = var.vnet_name
-# }
+provider "external" {
+  version = "=1.1.0"
+}
 
-# data "azurerm_route_table" "cluster" {
-#   name                = split("/", data.azurerm_subnet.cluster.route_table_id)[8]
-#   resource_group_name = var.resource_group_name
-# }
+data "external" "cluster_vnet_name" {
+  program = ["bash", "${path.module}/scripts/get_vnet_name.sh", "${azurerm_kubernetes_cluster.cluster.node_resource_group}"]
+}
 
-# resource "azurerm_route" "example" {
-#   for_each = var.cluster_route_destination_cidr_blocks
+data "azurerm_subnet" "cluster_nodes" {
+  name                 = "aks-subnet"
+  resource_group_name  = azurerm_kubernetes_cluster.cluster.node_resource_group
+  virtual_network_name = data.external.cluster_vnet_name.result.name
+}
 
-#   name                   = replace(replace(each.value, ".", "_"), "/", "__")
-#   resource_group_name    = var.resource_group_name
-#   route_table_name       = data.azurerm_route_table.cluster.name
-#   address_prefix         = each.value
-#   next_hop_type          = "VirtualAppliance"
-#   next_hop_in_ip_address = var.cluster_route_next_hop
-# }
+data "azurerm_route_table" "cluster_nodes" {
+  name                = split("/", data.azurerm_subnet.cluster_nodes.route_table_id)[8]
+  resource_group_name = azurerm_kubernetes_cluster.cluster.node_resource_group
+}
+
+resource "azurerm_route" "cluster_nodes" {
+  for_each = toset(var.cluster_route_destination_cidr_blocks)
+
+  name                   = replace(replace(each.value, ".", "_"), "/", "__")
+  resource_group_name    = azurerm_kubernetes_cluster.cluster.node_resource_group
+  route_table_name       = data.azurerm_route_table.cluster_nodes.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.cluster_route_next_hop
+}
 
 resource "random_string" "cluster_analytics" {
   length  = 4
