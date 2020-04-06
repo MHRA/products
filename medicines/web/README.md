@@ -30,5 +30,13 @@ Next, start the service:
 
 ```sh
 yarn
-yarn run dev
+yarn dev
+```
+
+## Testing
+
+To run the end-to-end tests, run
+
+```sh
+yarn cypress run
 ```
