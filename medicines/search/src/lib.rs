@@ -1,5 +1,5 @@
 mod azure_rest;
-mod env;
 pub mod datasource;
+mod env;
 pub mod index;
 pub mod indexer;

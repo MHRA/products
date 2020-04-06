@@ -5,9 +5,8 @@ use crate::{
         STORAGE_CONTAINER, STORAGE_MASTER_KEY,
     },
 };
-use actix_web::client;
 
-pub fn create_datasource() -> Result<(), client::SendRequestError> {
+pub async fn create_datasource() -> Result<(), reqwest::Error> {
     let search_service = get_from_env(SEARCH_SERVICE);
     let api_key = get_from_env(API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
@@ -24,16 +23,16 @@ pub fn create_datasource() -> Result<(), client::SendRequestError> {
         &storage_master_key,
     );
 
-    azure_rest::make_post_request_with_body(datasource_definition, &url, &api_key)
+    azure_rest::make_post_request_with_body(datasource_definition, &url, &api_key).await
 }
 
-pub fn delete_datasource() -> Result<(), client::SendRequestError> {
+pub async fn delete_datasource() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &datasource_name);
 
-    azure_rest::make_delete_request(&url, &api_key)
+    azure_rest::make_delete_request(&url, &api_key).await
 }
 
 fn get_base_url(search_service: &str) -> String {
