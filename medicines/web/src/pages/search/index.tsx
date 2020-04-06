@@ -93,7 +93,7 @@ const App: NextPage = props => {
     docTypes: DocType[],
   ) => {
     const query = {
-      query: searchTerm,
+      search: searchTerm,
       page,
     };
     if (docTypes.length > 0) {
