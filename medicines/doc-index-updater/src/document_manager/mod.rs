@@ -44,7 +44,11 @@ where
 
     match queue.send(message.clone(), duration).await {
         Ok(_) => Ok(state_manager.get_status(message.get_id()).await?),
-        Err(_) => {
+        Err(e) => {
+            tracing::error!(
+                "{:?}. Failed to dispatch to queue. Check API Keys or Policy values in environment variables.",
+                e
+            );
             let state = state_manager
                 .set_status(
                     message.get_id(),
@@ -54,7 +58,7 @@ where
                     },
                 )
                 .await?;
-            tracing::error!("Failed to dispatch to queue. Check API keys");
+
             Ok(state)
         }
     }
@@ -66,12 +70,16 @@ async fn delete_document_handler(
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
         let id = accept_job(&state_manager).await?.id;
+        let correlation_id = id.to_string();
+        let correlation_id = correlation_id.as_str();
 
         let message = DeleteMessage {
             job_id: id,
             document_content_id,
         };
-        queue_job(&mut queue, state_manager, message).await
+        queue_job(&mut queue, state_manager, message)
+            .instrument(tracing::info_span!("document_manager", correlation_id))
+            .await
     } else {
         Err(warp::reject::custom(FailedToDispatchToQueue))
     }
