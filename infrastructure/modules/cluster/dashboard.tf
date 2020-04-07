@@ -1,3 +1,5 @@
+data "azurerm_subscription" "current" {}
+
 resource "azurerm_dashboard" "doc-index-updater-dashboard" {
   name                = "doc-index-updater-dashboard"
   resource_group_name = var.resource_group_name
@@ -25,10 +27,10 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               {
                 "name": "ComponentId",
                 "value": {
-                  "SubscriptionId": "bec11470-1346-4cdd-af2e-ce1f360671a1",
+                  "SubscriptionId": "${data.azurerm_subscription.current.subscription_id}",
                   "ResourceGroup": "mhra-products-development",
                   "Name": "mhra-products-cluster-analytics-gv55",
-                  "ResourceId": "/subscriptions/bec11470-1346-4cdd-af2e-ce1f360671a1/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
+                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
                 }
               },
               {
@@ -119,10 +121,10 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               {
                 "name": "ComponentId",
                 "value": {
-                  "SubscriptionId": "bec11470-1346-4cdd-af2e-ce1f360671a1",
+                  "SubscriptionId": "${data.azurerm_subscription.current.subscription_id}",
                   "ResourceGroup": "mhra-products-development",
                   "Name": "mhra-products-cluster-analytics-gv55",
-                  "ResourceId": "/subscriptions/bec11470-1346-4cdd-af2e-ce1f360671a1/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
+                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
                 }
               },
               {
