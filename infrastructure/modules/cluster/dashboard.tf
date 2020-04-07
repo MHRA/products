@@ -1,4 +1,4 @@
-resource "azurerm_dashboard" "doc-index-updater-dashbaord" {
+resource "azurerm_dashboard" "doc-index-updater-dashboard" {
   name                = "doc-index-updater-dashboard"
   resource_group_name = var.resource_group_name
   location            = var.location
