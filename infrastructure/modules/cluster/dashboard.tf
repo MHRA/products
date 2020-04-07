@@ -28,9 +28,9 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
                 "name": "ComponentId",
                 "value": {
                   "SubscriptionId": "${data.azurerm_subscription.current.subscription_id}",
-                  "ResourceGroup": "mhra-products-development",
-                  "Name": "mhra-products-cluster-analytics-gv55",
-                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
+                  "ResourceGroup": "${var.resource_group_name}",
+                  "Name": "${azurerm_log_analytics_workspace.cluster.name}",
+                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/${var.resource_group_name}/providers/microsoft.operationalinsights/workspaces/${azurerm_log_analytics_workspace.cluster.name}"
                 }
               },
               {
@@ -77,7 +77,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               },
               {
                 "name": "PartSubTitle",
-                "value": "mhra-products-cluster-analytics-gv55"
+                "value": "${azurerm_log_analytics_workspace.cluster.name}"
               },
               {
                 "name": "resourceTypeMode",
@@ -100,7 +100,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
             "settings": {
               "content": {
                 "PartTitle": "Request error rate",
-                "PartSubTitle": "mhra-products-cluster-analytics-gv55"
+                "PartSubTitle": "${azurerm_log_analytics_workspace.cluster.name}"
               }
             },
             "asset": {
@@ -122,9 +122,9 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
                 "name": "ComponentId",
                 "value": {
                   "SubscriptionId": "${data.azurerm_subscription.current.subscription_id}",
-                  "ResourceGroup": "mhra-products-development",
-                  "Name": "mhra-products-cluster-analytics-gv55",
-                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/mhra-products-development/providers/microsoft.operationalinsights/workspaces/mhra-products-cluster-analytics-gv55"
+                  "ResourceGroup": "${var.resource_group_name}",
+                  "Name": "${azurerm_log_analytics_workspace.cluster.name}",
+                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/${var.resource_group_name}/providers/microsoft.operationalinsights/workspaces/${azurerm_log_analytics_workspace.cluster.name}"
                 }
               },
               {
@@ -171,7 +171,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               },
               {
                 "name": "PartSubTitle",
-                "value": "mhra-products-cluster-analytics-gv55"
+                "value": "${azurerm_log_analytics_workspace.cluster.name}"
               },
               {
                 "name": "resourceTypeMode",
@@ -194,7 +194,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
             "settings": {
               "content": {
                 "PartTitle": "Request latency milliseconds",
-                "PartSubTitle": "mhra-products-cluster-analytics-gv55"
+                "PartSubTitle": "${azurerm_log_analytics_workspace.cluster.name}"
               }
             },
             "asset": {
