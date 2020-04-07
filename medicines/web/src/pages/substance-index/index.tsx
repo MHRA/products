@@ -17,11 +17,11 @@ const App: NextPage = () => {
     false,
   );
   const [results, setResults] = React.useState<ISubstance[]>([]);
-  const [substanceIndex, setSubstanceIndex] = React.useState();
+  const [substanceIndex, setSubstanceIndex] = React.useState('');
 
   const router = useRouter();
   const {
-    query: { query: queryQS },
+    query: { letter: queryQS },
   } = router;
 
   useEffect(() => {

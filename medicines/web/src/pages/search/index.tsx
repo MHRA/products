@@ -26,16 +26,16 @@ const App: NextPage = props => {
   );
   const [results, setResults] = React.useState<IDocument[]>([]);
   const [query, setQuery] = React.useState('');
-  const [count, setCount] = React.useState();
-  const [pageNumber, setPageNumber] = React.useState();
+  const [count, setCount] = React.useState(0);
+  const [pageNumber, setPageNumber] = React.useState(1);
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
-  const [disclaimerAgree, setDisclaimerAgree] = React.useState();
+  const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const router = useRouter();
   const {
     query: {
-      query: queryQS,
+      search: queryQS,
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
@@ -93,7 +93,7 @@ const App: NextPage = props => {
     docTypes: DocType[],
   ) => {
     const query = {
-      query: searchTerm,
+      search: searchTerm,
       page,
     };
     if (docTypes.length > 0) {

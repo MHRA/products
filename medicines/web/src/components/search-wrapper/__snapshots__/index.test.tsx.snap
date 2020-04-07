@@ -423,10 +423,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="A"
                     >
                       <Link
-                        href="/substance-index?query=A"
+                        href="/substance-index?letter=A"
                       >
                         <a
-                          href="/substance-index?query=A"
+                          href="/substance-index?letter=A"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -440,10 +440,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="B"
                     >
                       <Link
-                        href="/substance-index?query=B"
+                        href="/substance-index?letter=B"
                       >
                         <a
-                          href="/substance-index?query=B"
+                          href="/substance-index?letter=B"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -457,10 +457,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="C"
                     >
                       <Link
-                        href="/substance-index?query=C"
+                        href="/substance-index?letter=C"
                       >
                         <a
-                          href="/substance-index?query=C"
+                          href="/substance-index?letter=C"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -474,10 +474,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="D"
                     >
                       <Link
-                        href="/substance-index?query=D"
+                        href="/substance-index?letter=D"
                       >
                         <a
-                          href="/substance-index?query=D"
+                          href="/substance-index?letter=D"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -491,10 +491,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="E"
                     >
                       <Link
-                        href="/substance-index?query=E"
+                        href="/substance-index?letter=E"
                       >
                         <a
-                          href="/substance-index?query=E"
+                          href="/substance-index?letter=E"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -508,10 +508,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="F"
                     >
                       <Link
-                        href="/substance-index?query=F"
+                        href="/substance-index?letter=F"
                       >
                         <a
-                          href="/substance-index?query=F"
+                          href="/substance-index?letter=F"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -525,10 +525,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="G"
                     >
                       <Link
-                        href="/substance-index?query=G"
+                        href="/substance-index?letter=G"
                       >
                         <a
-                          href="/substance-index?query=G"
+                          href="/substance-index?letter=G"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -542,10 +542,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="H"
                     >
                       <Link
-                        href="/substance-index?query=H"
+                        href="/substance-index?letter=H"
                       >
                         <a
-                          href="/substance-index?query=H"
+                          href="/substance-index?letter=H"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -559,10 +559,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="I"
                     >
                       <Link
-                        href="/substance-index?query=I"
+                        href="/substance-index?letter=I"
                       >
                         <a
-                          href="/substance-index?query=I"
+                          href="/substance-index?letter=I"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -576,10 +576,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="J"
                     >
                       <Link
-                        href="/substance-index?query=J"
+                        href="/substance-index?letter=J"
                       >
                         <a
-                          href="/substance-index?query=J"
+                          href="/substance-index?letter=J"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -593,10 +593,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="K"
                     >
                       <Link
-                        href="/substance-index?query=K"
+                        href="/substance-index?letter=K"
                       >
                         <a
-                          href="/substance-index?query=K"
+                          href="/substance-index?letter=K"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -610,10 +610,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="L"
                     >
                       <Link
-                        href="/substance-index?query=L"
+                        href="/substance-index?letter=L"
                       >
                         <a
-                          href="/substance-index?query=L"
+                          href="/substance-index?letter=L"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -627,10 +627,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="M"
                     >
                       <Link
-                        href="/substance-index?query=M"
+                        href="/substance-index?letter=M"
                       >
                         <a
-                          href="/substance-index?query=M"
+                          href="/substance-index?letter=M"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -644,10 +644,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="N"
                     >
                       <Link
-                        href="/substance-index?query=N"
+                        href="/substance-index?letter=N"
                       >
                         <a
-                          href="/substance-index?query=N"
+                          href="/substance-index?letter=N"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -661,10 +661,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="O"
                     >
                       <Link
-                        href="/substance-index?query=O"
+                        href="/substance-index?letter=O"
                       >
                         <a
-                          href="/substance-index?query=O"
+                          href="/substance-index?letter=O"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -678,10 +678,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="P"
                     >
                       <Link
-                        href="/substance-index?query=P"
+                        href="/substance-index?letter=P"
                       >
                         <a
-                          href="/substance-index?query=P"
+                          href="/substance-index?letter=P"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -695,10 +695,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="Q"
                     >
                       <Link
-                        href="/substance-index?query=Q"
+                        href="/substance-index?letter=Q"
                       >
                         <a
-                          href="/substance-index?query=Q"
+                          href="/substance-index?letter=Q"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -712,10 +712,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="R"
                     >
                       <Link
-                        href="/substance-index?query=R"
+                        href="/substance-index?letter=R"
                       >
                         <a
-                          href="/substance-index?query=R"
+                          href="/substance-index?letter=R"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -729,10 +729,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="S"
                     >
                       <Link
-                        href="/substance-index?query=S"
+                        href="/substance-index?letter=S"
                       >
                         <a
-                          href="/substance-index?query=S"
+                          href="/substance-index?letter=S"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -746,10 +746,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="T"
                     >
                       <Link
-                        href="/substance-index?query=T"
+                        href="/substance-index?letter=T"
                       >
                         <a
-                          href="/substance-index?query=T"
+                          href="/substance-index?letter=T"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -763,10 +763,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="U"
                     >
                       <Link
-                        href="/substance-index?query=U"
+                        href="/substance-index?letter=U"
                       >
                         <a
-                          href="/substance-index?query=U"
+                          href="/substance-index?letter=U"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -780,10 +780,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="V"
                     >
                       <Link
-                        href="/substance-index?query=V"
+                        href="/substance-index?letter=V"
                       >
                         <a
-                          href="/substance-index?query=V"
+                          href="/substance-index?letter=V"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -797,10 +797,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="W"
                     >
                       <Link
-                        href="/substance-index?query=W"
+                        href="/substance-index?letter=W"
                       >
                         <a
-                          href="/substance-index?query=W"
+                          href="/substance-index?letter=W"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -814,10 +814,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="X"
                     >
                       <Link
-                        href="/substance-index?query=X"
+                        href="/substance-index?letter=X"
                       >
                         <a
-                          href="/substance-index?query=X"
+                          href="/substance-index?letter=X"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -831,10 +831,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="Y"
                     >
                       <Link
-                        href="/substance-index?query=Y"
+                        href="/substance-index?letter=Y"
                       >
                         <a
-                          href="/substance-index?query=Y"
+                          href="/substance-index?letter=Y"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -848,10 +848,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="Z"
                     >
                       <Link
-                        href="/substance-index?query=Z"
+                        href="/substance-index?letter=Z"
                       >
                         <a
-                          href="/substance-index?query=Z"
+                          href="/substance-index?letter=Z"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -865,10 +865,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="0"
                     >
                       <Link
-                        href="/substance-index?query=0"
+                        href="/substance-index?letter=0"
                       >
                         <a
-                          href="/substance-index?query=0"
+                          href="/substance-index?letter=0"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -882,10 +882,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="1"
                     >
                       <Link
-                        href="/substance-index?query=1"
+                        href="/substance-index?letter=1"
                       >
                         <a
-                          href="/substance-index?query=1"
+                          href="/substance-index?letter=1"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -899,10 +899,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="2"
                     >
                       <Link
-                        href="/substance-index?query=2"
+                        href="/substance-index?letter=2"
                       >
                         <a
-                          href="/substance-index?query=2"
+                          href="/substance-index?letter=2"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -916,10 +916,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="3"
                     >
                       <Link
-                        href="/substance-index?query=3"
+                        href="/substance-index?letter=3"
                       >
                         <a
-                          href="/substance-index?query=3"
+                          href="/substance-index?letter=3"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -933,10 +933,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="4"
                     >
                       <Link
-                        href="/substance-index?query=4"
+                        href="/substance-index?letter=4"
                       >
                         <a
-                          href="/substance-index?query=4"
+                          href="/substance-index?letter=4"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -950,10 +950,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="5"
                     >
                       <Link
-                        href="/substance-index?query=5"
+                        href="/substance-index?letter=5"
                       >
                         <a
-                          href="/substance-index?query=5"
+                          href="/substance-index?letter=5"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -967,10 +967,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="6"
                     >
                       <Link
-                        href="/substance-index?query=6"
+                        href="/substance-index?letter=6"
                       >
                         <a
-                          href="/substance-index?query=6"
+                          href="/substance-index?letter=6"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -984,10 +984,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="7"
                     >
                       <Link
-                        href="/substance-index?query=7"
+                        href="/substance-index?letter=7"
                       >
                         <a
-                          href="/substance-index?query=7"
+                          href="/substance-index?letter=7"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -1001,10 +1001,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="8"
                     >
                       <Link
-                        href="/substance-index?query=8"
+                        href="/substance-index?letter=8"
                       >
                         <a
-                          href="/substance-index?query=8"
+                          href="/substance-index?letter=8"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >
@@ -1018,10 +1018,10 @@ exports[`SearchWrapper should render 1`] = `
                       key="9"
                     >
                       <Link
-                        href="/substance-index?query=9"
+                        href="/substance-index?letter=9"
                       >
                         <a
-                          href="/substance-index?query=9"
+                          href="/substance-index?letter=9"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                         >

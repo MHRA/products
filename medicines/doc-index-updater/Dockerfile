@@ -55,6 +55,14 @@ COPY --from=build /usr/src/doc-index-updater/target/release/doc_index_updater /
 
 RUN chown -R svc /doc_index_updater
 
+RUN (cd $HOME && \
+  mkdir -p .ssh && \
+  chown svc .ssh && \
+  cd .ssh && \
+  echo "GSSAPIAuthentication no" >>config && \
+  echo "GSSAPIDelegateCredentials yes" >>config && \
+  chown svc config)
+
 USER svc
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
