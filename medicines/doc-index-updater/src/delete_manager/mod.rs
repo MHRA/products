@@ -147,6 +147,8 @@ pub async fn delete_from_index(
 #[cfg(test)]
 mod test {
     use super::*;
+    use pretty_assertions::assert_eq;
+
     use crate::{
         models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
