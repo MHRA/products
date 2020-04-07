@@ -48,7 +48,7 @@ export const SubstanceListStructuredData: React.FC<ISubstanceListStructuredDataP
               '@type': 'Substance',
               name: substanceName,
               url:
-                'https://products.mhra.gov.uk/substance?query=' +
+                'https://products.mhra.gov.uk/substance?substance=' +
                 encodeURIComponent(substanceName),
             },
           };
@@ -88,7 +88,7 @@ export const DrugListStructuredData: React.FC<IDrugListStructuredDataProps> = ({
               '@type': 'Drug',
               name: drugName,
               url:
-                'https://products.mhra.gov.uk/product?query=' +
+                'https://products.mhra.gov.uk/product?product=' +
                 encodeURIComponent(drugName),
             },
           };
