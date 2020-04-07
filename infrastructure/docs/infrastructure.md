@@ -11,13 +11,19 @@ To run the following steps, first you should:
 
 1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
 2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
-3. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
+3. Install [jq](https://stedolan.github.io/jq/)
+
+   ```sh
+   brew install jq
+   ```
+
+4. [Authenticate](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) with Azure
 
    ```sh
    az login
    ```
 
-4. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from previous command:
+5. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from previous command:
 
    ```sh
    az account set --subscription="SUBSCRIPTION_ID"

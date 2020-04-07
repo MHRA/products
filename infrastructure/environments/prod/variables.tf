@@ -5,7 +5,7 @@ variable "REGION" {
 
 variable "RESOURCE_GROUP_PRODUCTS" {
   description = "Products resource group name"
-  default     = "mpazr-rg-1023"
+  default     = "apazr-rg-1001"
 }
 
 variable "CLIENT_ID" {
@@ -18,5 +18,14 @@ variable "CLIENT_SECRET" {
 
 variable "ENVIRONMENT" {
   description = "Environment name"
-  default     = "prod"
+  default     = "production"
+}
+
+variable "CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS" {
+  type        = list(string)
+  description = "CIDR block destination for default route"
+}
+
+variable "CLUSTER_ROUTE_NEXT_HOP" {
+  description = "Next hop for default route"
 }

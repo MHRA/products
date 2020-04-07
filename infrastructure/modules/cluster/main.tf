@@ -9,32 +9,6 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
-resource "azurerm_virtual_network" "cluster" {
-  name                = var.vnet_name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  address_space       = [var.vnet_cidr]
-}
-
-resource "azurerm_subnet" "load_balancer" {
-  name                 = var.lb_subnet_name
-  resource_group_name  = var.resource_group_name
-  address_prefix       = var.lb_subnet_cidr
-  virtual_network_name = azurerm_virtual_network.cluster.name
-}
-
-resource "azurerm_subnet_route_table_association" "load_balancer" {
-  subnet_id      = azurerm_subnet.load_balancer.id
-  route_table_id = var.route_table_id
-}
-
-resource "azurerm_subnet" "cluster" {
-  name                 = var.cluster_subnet_name
-  resource_group_name  = var.resource_group_name
-  address_prefix       = var.cluster_subnet_cidr
-  virtual_network_name = azurerm_virtual_network.cluster.name
-}
-
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment
   location            = var.location
@@ -42,10 +16,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   resource_group_name = var.resource_group_name
 
   default_node_pool {
-    name           = "default"
-    node_count     = "2"
-    vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_subnet.cluster.id
+    name               = "default"
+    node_count         = var.default_node_count
+    vm_size            = "Standard_D2_v2"
+    availability_zones = ["1", "2", "3"]
   }
 
   service_principal {
@@ -79,6 +53,36 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   tags = {
     Environment = var.environment
   }
+}
+
+provider "external" {
+  version = "=1.1.0"
+}
+
+data "external" "cluster_vnet_name" {
+  program = ["bash", "${path.module}/scripts/get_vnet_name.sh", "${azurerm_kubernetes_cluster.cluster.node_resource_group}"]
+}
+
+data "azurerm_subnet" "cluster_nodes" {
+  name                 = "aks-subnet"
+  resource_group_name  = azurerm_kubernetes_cluster.cluster.node_resource_group
+  virtual_network_name = data.external.cluster_vnet_name.result.name
+}
+
+data "azurerm_route_table" "cluster_nodes" {
+  name                = split("/", data.azurerm_subnet.cluster_nodes.route_table_id)[8]
+  resource_group_name = azurerm_kubernetes_cluster.cluster.node_resource_group
+}
+
+resource "azurerm_route" "cluster_nodes" {
+  for_each = toset(var.cluster_route_destination_cidr_blocks)
+
+  name                   = replace(replace(each.value, ".", "_"), "/", "__")
+  resource_group_name    = azurerm_kubernetes_cluster.cluster.node_resource_group
+  route_table_name       = data.azurerm_route_table.cluster_nodes.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.cluster_route_next_hop
 }
 
 resource "random_string" "cluster_analytics" {

@@ -1,0 +1,43 @@
+name: infrastructure
+
+on:
+  push:
+    paths:
+      - infrastructure/**
+      - .github/workflows/infrastructure.yaml
+
+env:
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
+
+jobs:
+  validate:
+    name: Validate Terraform config
+
+    container:
+      image: hashicorp/terraform:light
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Validate prod environment
+        working-directory: ./products/infrastructure/environments/prod
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate non-prod environment
+        working-directory: ./products/infrastructure/environments/non-prod
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate dev environment
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform init -backend=false
+          terraform validate
