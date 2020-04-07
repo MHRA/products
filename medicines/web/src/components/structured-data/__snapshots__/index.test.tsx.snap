@@ -24,7 +24,7 @@ exports[`should render 2`] = `
           "item": Object {
             "@type": "Substance",
             "name": "First cool substance",
-            "url": "https://products.mhra.gov.uk/substance?query=First%20cool%20substance",
+            "url": "https://products.mhra.gov.uk/substance?substance=First%20cool%20substance",
           },
           "position": 0,
         },
@@ -33,7 +33,7 @@ exports[`should render 2`] = `
           "item": Object {
             "@type": "Substance",
             "name": "Second cool substance",
-            "url": "https://products.mhra.gov.uk/substance?query=Second%20cool%20substance",
+            "url": "https://products.mhra.gov.uk/substance?substance=Second%20cool%20substance",
           },
           "position": 1,
         },
@@ -67,7 +67,7 @@ exports[`should render 4`] = `
           "item": Object {
             "@type": "Drug",
             "name": "First cool drug",
-            "url": "https://products.mhra.gov.uk/product?query=First%20cool%20drug",
+            "url": "https://products.mhra.gov.uk/product?product=First%20cool%20drug",
           },
           "position": 0,
         },
@@ -76,7 +76,7 @@ exports[`should render 4`] = `
           "item": Object {
             "@type": "Drug",
             "name": "Second cool drug",
-            "url": "https://products.mhra.gov.uk/product?query=Second%20cool%20drug",
+            "url": "https://products.mhra.gov.uk/product?product=Second%20cool%20drug",
           },
           "position": 1,
         },
