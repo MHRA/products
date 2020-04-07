@@ -64,10 +64,6 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
-provider "external" {
-  version = "=1.1.0"
-}
-
 data "azurerm_subnet" "cluster_nodes" {
   name                 = var.cluster_subnet_name
   resource_group_name  = var.resource_group_name
