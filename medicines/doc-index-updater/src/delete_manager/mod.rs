@@ -67,7 +67,6 @@ where
             },
         )
         .await?;
-    let _remove = removeable_message.remove().await?;
     Ok(())
 }
 
@@ -155,8 +154,12 @@ mod test {
     };
     use tokio_test::block_on;
 
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
+    fn given_an_error_has_occurred(error: anyhow::Error) -> anyhow::Error {
+        error
+    }
+
+    fn given_a_state_manager() -> impl JobStatusClient {
+        TestJobStatusClient {}
     }
 
     fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
@@ -174,7 +177,7 @@ mod test {
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
         error: anyhow::Error,
-        state_manager: TestJobStatusClient,
+        state_manager: impl JobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(
             removeable_message,
@@ -184,15 +187,14 @@ mod test {
     }
 
     #[test]
-    fn test_an_error_removes_delete_message() {
-        let state_manager = TestJobStatusClient {};
+    fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_error_has_occurred(anyhow!("Any other error"));
 
-        let mut removable_message = given_we_have_a_delete_message();
-        let error = given_an_error_has_occurred();
-
-        let result = when_we_handle_the_error(&mut removable_message, error, state_manager);
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
 
         assert!(result.is_ok());
-        assert!(removable_message.is_removed);
+        assert_eq!(removeable_message.is_removed, false);
     }
 }
