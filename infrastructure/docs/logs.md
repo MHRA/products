@@ -28,8 +28,6 @@ InsightsMetrics
 
 ## Viewing container logs
 
-[`stern`][2] is the best way to view container logs, (although you can view the container logs in the Logs Analytics workspace if you wish).
-
 ### Using stern
 
 To view all of the logs for the doc-index-updater:
@@ -39,6 +37,10 @@ stern -n doc-index-updater doc-index-updater
 ```
 
 See the [stern docs][2] for more info.
+
+### Viewing container logs in Azure
+
+[`stern`][2] is the best way to view container logs, although you can view the container logs in the Logs Analytics workspace if you wish.
 
 [1]: ../scripts/update-kubernetes-config.sh
 [2]: https://github.com/wercker/stern
