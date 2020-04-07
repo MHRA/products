@@ -60,6 +60,7 @@ RUN (cd $HOME && \
   chown svc .ssh && \
   cd .ssh && \
   echo "GSSAPIAuthentication no" >>config && \
+  echo "GSSAPIDelegateCredentials yes" >>config && \
   chown svc config)
 
 USER svc
