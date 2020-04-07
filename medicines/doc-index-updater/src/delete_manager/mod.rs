@@ -67,6 +67,10 @@ where
             },
         )
         .await?;
+    if error.is::<errors::DocumentNotFoundInIndex>() {
+        tracing::info!("Document wasn't found during delete, removing message");
+        let _remove = removeable_message.remove().await?;
+    }
     Ok(())
 }
 
@@ -187,6 +191,20 @@ mod test {
     }
 
     #[test]
+    fn not_found_error_during_delete_removes_message_since_no_need_to_retry() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_error_has_occurred(anyhow!(
+            errors::DocumentNotFoundInIndex::for_content_id(String::from("any id"))
+        ));
+
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+
+        assert!(result.is_ok());
+        assert_eq!(removeable_message.is_removed, true, "Didn't remove message");
+    }
+
+    #[test]
     fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
@@ -195,6 +213,9 @@ mod test {
         let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
 
         assert!(result.is_ok());
-        assert_eq!(removeable_message.is_removed, false);
+        assert_eq!(
+            removeable_message.is_removed, false,
+            "Removed message and shouldn't have"
+        );
     }
 }
