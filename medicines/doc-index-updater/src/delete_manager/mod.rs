@@ -1,3 +1,5 @@
+mod errors;
+
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
@@ -55,7 +57,7 @@ async fn handle_processing_error_for_delete_message<T>(
 where
     T: RemoveableMessage<DeleteMessage>,
 {
-    tracing::info!("Setting error state in state manager");
+    tracing::info!("Handling processing error. Setting error state in state manager");
     state_manager
         .set_status(
             removeable_message.get_message().job_id,
@@ -65,7 +67,7 @@ where
             },
         )
         .await?;
-    let _ = removeable_message.remove().await?;
+    let _remove = removeable_message.remove().await?;
     Ok(())
 }
 
@@ -112,8 +114,7 @@ pub async fn get_blob_name_from_content_id(
             return Ok(result.metadata_storage_name);
         }
     }
-    Err(anyhow!(format!(
-        "Cannot find document with content ID {}",
+    Err(anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
         content_id
     )))
 }
