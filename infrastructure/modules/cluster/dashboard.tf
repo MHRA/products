@@ -6,7 +6,8 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
   location            = var.location
 
   tags = {
-    Environment = var.environment
+    hidden-title = "Doc index updater ${var.environment}"
+    Environment  = var.environment
   }
 
   dashboard_properties = <<DASH
