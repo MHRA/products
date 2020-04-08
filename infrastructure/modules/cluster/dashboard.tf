@@ -382,7 +382,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
             "type": "Extension/AppInsightsExtension/PartType/AnalyticsPart",
             "settings": {
               "content": {
-                "PartTitle": "HTTP request error rate (%)",
+                "PartTitle": "HTTP request error rate (% of 5xx response codes)",
                 "PartSubTitle": "${azurerm_log_analytics_workspace.cluster.name}"
               }
             },
