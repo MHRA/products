@@ -9,6 +9,14 @@ resource "azurerm_public_ip" "products_ip" {
   }
 }
 
+resource "azurerm_subnet" "cluster" {
+  name                 = var.cluster_subnet_name
+  resource_group_name  = var.vnet_resource_group
+  address_prefix       = var.cluster_subnet_cidr
+  virtual_network_name = var.vnet_name
+}
+
+
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment
   location            = var.location
@@ -19,6 +27,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     name               = "default"
     node_count         = var.default_node_count
     vm_size            = "Standard_D2_v2"
+    vnet_subnet_id     = azurerm_subnet.cluster.id
     availability_zones = ["1", "2", "3"]
   }
 
@@ -55,18 +64,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
-provider "external" {
-  version = "=1.1.0"
-}
-
-data "external" "cluster_vnet_name" {
-  program = ["bash", "${path.module}/scripts/get_vnet_name.sh", "${azurerm_kubernetes_cluster.cluster.node_resource_group}"]
-}
-
 data "azurerm_subnet" "cluster_nodes" {
-  name                 = "aks-subnet"
-  resource_group_name  = azurerm_kubernetes_cluster.cluster.node_resource_group
-  virtual_network_name = data.external.cluster_vnet_name.result.name
+  name                 = var.cluster_subnet_name
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.vnet_name
 }
 
 data "azurerm_route_table" "cluster_nodes" {
