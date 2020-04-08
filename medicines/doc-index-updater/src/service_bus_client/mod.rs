@@ -73,6 +73,7 @@ where
         self.message.clone()
     }
 }
+
 #[async_trait]
 pub trait Removeable {
     async fn remove(&mut self) -> Result<String, anyhow::Error>;
