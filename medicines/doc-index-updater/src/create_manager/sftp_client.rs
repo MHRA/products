@@ -10,8 +10,8 @@ pub enum SftpError {
     TcpError(#[from] std::io::Error),
     #[error("An SSH error connecting to server. ({0:?})")]
     Ssh2Error(#[from] ssh2::Error),
-    #[error("File could not be retrieved on server. ({0:?})")]
-    CouldNotRetrieveFile(ssh2::Error),
+    #[error("File could not be retrieved on server")]
+    CouldNotRetrieveFile,
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
@@ -83,8 +83,8 @@ async fn retrieve_file_from_sftp(
 
     Ok(sftp.open(path).map_err(|e| {
         tracing::error!("{:?}", e);
-        match e.to_string().as_str() {
-            "[-31] Failed opening remote file" => SftpError::CouldNotRetrieveFile(e),
+        match e.code() {
+            -31 => SftpError::CouldNotRetrieveFile,
             _ => SftpError::Ssh2Error(e),
         }
     })?)

@@ -65,7 +65,7 @@ async fn handle_processing_error_for_create_message<T>(
 where
     T: RemoveableMessage<CreateMessage>,
 {
-    if let ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile(_)) = error {
+    if let ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile) = error {
         tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
         let _ = state_manager
             .set_status(
@@ -166,8 +166,12 @@ mod test {
     };
     use tokio_test::block_on;
 
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
+    fn given_an_error_has_occurred() -> ProcessMessageError {
+        anyhow!("literally any error").into()
+    }
+
+    fn given_file_not_found() -> ProcessMessageError {
+        ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile)
     }
 
     fn given_we_have_a_create_message() -> TestRemoveableMessage<CreateMessage> {
@@ -179,12 +183,12 @@ mod test {
 
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<CreateMessage>,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: TestJobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
             removeable_message,
-            ProcessMessageError::Generic(error),
+            error,
             &state_manager,
         ))
     }
@@ -199,5 +203,17 @@ mod test {
 
         assert!(result.is_ok());
         assert_eq!(removeable_message.is_removed, false);
+    }
+
+    #[test]
+    fn test_file_not_found_removes_create_message() {
+        let mut removeable_message = given_we_have_a_create_message();
+        let error = given_file_not_found();
+
+        let result =
+            when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
+
+        assert!(result.is_ok());
+        assert!(removeable_message.is_removed, "Message should be removed");
     }
 }
