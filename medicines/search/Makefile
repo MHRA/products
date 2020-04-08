@@ -1,16 +1,16 @@
 .PHONY: get-env-dev
 get-env-dev: ## Gets the development environment variables from azure keyvault into .env file
 	az keyvault secret show \
-	--vault-name mhra-non-prod-02 \
-	--name search-index-creator-development-env \
+	--vault-name mhra-dev \
+	--name search-env \
 	--query value \
 	--output tsv > .env
 
 .PHONY: set-env-dev
 set-env-dev: ## Replaces the keyvault value for development with your current .env file
 	az keyvault secret set \
-	--vault-name mhra-non-prod-02 \
-	--name search-index-creator-development-env \
+	--vault-name mhra-dev \
+	--name search-env \
 	--file .env
 
 .PHONY: get-env-non-prod
