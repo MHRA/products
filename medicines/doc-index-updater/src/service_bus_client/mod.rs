@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
-use std::{error::Error, fmt::Display};
+use thiserror::Error;
 use time::Duration;
 use tracing_futures::Instrument;
 
@@ -46,23 +46,14 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum RetrieveFromQueueError {
+    #[error(transparent)]
     AzureError(AzureError),
+    #[error("Parsing error: {0}")]
     ParseError(String),
+    #[error("No Messages Found In Queue")]
     NotFoundError,
-}
-
-impl std::fmt::Display for RetrieveFromQueueError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "A")
-    }
-}
-
-impl Error for RetrieveFromQueueError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
 }
 
 pub struct RetrievedMessage<T: Message> {
@@ -101,14 +92,10 @@ where
     }
 }
 
+#[derive(Error, Debug)]
 pub enum ProcessMessageError {
+    #[error("None")]
     None,
-}
-
-impl Display for ProcessMessageError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ProcessMessageError, who cares")
-    }
 }
 
 #[async_trait]
