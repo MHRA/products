@@ -55,6 +55,7 @@ pub enum RetrieveFromQueueError {
     ParseError(String),
     #[error("No Messages Found In Queue")]
     NotFoundError,
+    #[error("Error reading Queue")]
     ErrorReadingQueue,
 }
 
