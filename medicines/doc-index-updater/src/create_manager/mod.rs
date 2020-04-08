@@ -174,7 +174,7 @@ mod test {
     fn given_we_have_a_create_message() -> TestRemoveableMessage<CreateMessage> {
         TestRemoveableMessage::<CreateMessage> {
             message: get_test_create_message(Uuid::new_v4()),
-            is_removed: false,
+            remove_was_called: false,
         }
     }
 
@@ -199,6 +199,6 @@ mod test {
             when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
 
         assert!(result.is_ok());
-        assert_eq!(removeable_message.is_removed, false);
+        assert_eq!(removeable_message.remove_was_called, false);
     }
 }
