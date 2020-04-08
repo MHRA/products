@@ -1,4 +1,5 @@
 use crate::create_manager::models::IndexEntry;
+use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
 use serde_derive::Deserialize;
@@ -37,9 +38,9 @@ pub struct AzureSearchResults {
     #[serde(rename = "value")]
     pub search_results: Vec<AzureResult>,
     #[serde(rename = "@odata.context")]
-    context: String,
+    pub context: String,
     #[serde(rename = "@odata.count")]
-    count: Option<i32>,
+    pub count: Option<i32>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -93,11 +94,19 @@ pub fn factory() -> AzureSearchClient {
     }
 }
 
-impl AzureSearchClient {
-    pub async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
+#[async_trait]
+pub trait Searchable {
+    async fn search(&self, &mut search_term: String) -> Result<AzureSearchResults, reqwest::Error>;
+}
+
+#[async_trait]
+impl Searchable for AzureSearchClient {
+    async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
         search(search_term, &self.client, self.config.clone()).await
     }
+}
 
+impl AzureSearchClient {
     pub async fn delete(
         &self,
         key_name: &str,

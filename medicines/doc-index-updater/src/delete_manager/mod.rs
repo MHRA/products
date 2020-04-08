@@ -1,6 +1,7 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
+    search_client::{AzureSearchClient, Searchable},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -112,7 +113,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
 
 pub async fn get_blob_name_from_content_id(
     content_id: String,
-    search_client: &search_client::AzureSearchClient,
+    search_client: &impl Searchable,
 ) -> Result<String, ProcessMessageError> {
     let search_results = search_client
         .search(content_id.to_owned())
@@ -142,7 +143,7 @@ async fn delete_blob(
 }
 
 pub async fn delete_from_index(
-    search_client: &search_client::AzureSearchClient,
+    search_client: &AzureSearchClient,
     blob_name: &str,
 ) -> Result<(), anyhow::Error> {
     search_client
@@ -157,7 +158,9 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
+        models::DeleteMessage,
+        search_client::{AzureSearchResults, Searchable},
+        service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;
@@ -236,5 +239,46 @@ mod test {
             removeable_message.remove_was_called, false,
             "Removed message, but shouldn't"
         );
+    }
+
+    #[test]
+    fn get_blob_name_from_content_id_raises_document_not_found_in_index_error_when_not_there() {
+        let search_client = TestAzureSearchClientWithNoResults {};
+
+        let result = when_getting_blob_name_from_content_id(search_client);
+
+        then_document_not_found_in_index_error_raised(result);
+    }
+
+    fn when_getting_blob_name_from_content_id(
+        search_client: impl Searchable,
+    ) -> Result<String, anyhow::Error> {
+        block_on(get_blob_name_from_content_id(
+            String::from("non existent content id"),
+            &search_client,
+        ))
+    }
+
+    fn then_document_not_found_in_index_error_raised(result: Result<String, anyhow::Error>) {
+        assert_eq!(result.is_err(), true);
+
+        println!("{:?}", result);
+
+        match result {
+            Ok(_) => assert!(false, "Should have been an error"),
+            Err(e) => assert_eq!(e.is::<errors::DocumentNotFoundInIndex>(), true),
+        }
+    }
+    struct TestAzureSearchClientWithNoResults {}
+
+    #[async_trait]
+    impl Searchable for TestAzureSearchClientWithNoResults {
+        async fn search(&self, _search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
+            Ok(AzureSearchResults {
+                search_results: vec![],
+                context: String::from(""),
+                count: None,
+            })
+        }
     }
 }
