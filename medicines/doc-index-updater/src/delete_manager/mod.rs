@@ -70,14 +70,14 @@ where
     Ok(())
 }
 
-pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
+pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
-    let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
+    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
     let blob_name =
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
 

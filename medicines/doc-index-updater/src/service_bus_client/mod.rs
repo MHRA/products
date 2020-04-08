@@ -1,4 +1,5 @@
 use crate::{
+    create_manager::SftpError,
     get_env_or_default,
     models::{JobStatus, Message},
     state_manager::{JobStatusClient, StateManager},
@@ -95,7 +96,9 @@ where
 #[derive(Error, Debug)]
 pub enum ProcessMessageError {
     #[error(transparent)]
-    Generic(anyhow::Error),
+    SftpError(#[from] SftpError),
+    #[error(transparent)]
+    Generic(#[from] anyhow::Error),
 }
 
 #[async_trait]
@@ -214,9 +217,7 @@ where
         }
         Err(e) => {
             tracing::error!(message = format!("Error {:?}", e).as_str());
-            retrieval
-                .handle_processing_error(ProcessMessageError::Generic(e), state_manager)
-                .await?;
+            retrieval.handle_processing_error(e, state_manager).await?;
         }
     };
     Ok(())
