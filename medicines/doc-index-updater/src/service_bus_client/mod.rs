@@ -94,8 +94,8 @@ where
 
 #[derive(Error, Debug)]
 pub enum ProcessMessageError {
-    #[error("None")]
-    None,
+    #[error(transparent)]
+    Generic(anyhow::Error),
 }
 
 #[async_trait]
@@ -215,7 +215,7 @@ where
         Err(e) => {
             tracing::error!(message = format!("Error {:?}", e).as_str());
             retrieval
-                .handle_processing_error(ProcessMessageError::None, state_manager)
+                .handle_processing_error(ProcessMessageError::Generic(e), state_manager)
                 .await?;
         }
     };

@@ -186,7 +186,7 @@ mod test {
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
             removeable_message,
-            ProcessMessageError::None,
+            ProcessMessageError::Generic(error),
             &state_manager,
         ))
     }
