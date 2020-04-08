@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
-use std::error::Error;
+use std::{error::Error, fmt::Display};
 use time::Duration;
 use tracing_futures::Instrument;
 
@@ -101,11 +101,21 @@ where
     }
 }
 
+pub enum ProcessMessageError {
+    None,
+}
+
+impl Display for ProcessMessageError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ProcessMessageError, who cares")
+    }
+}
+
 #[async_trait]
 pub trait ProcessRetrievalError {
     async fn handle_processing_error(
         &mut self,
-        e: anyhow::Error,
+        e: ProcessMessageError,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()>;
 }
@@ -217,7 +227,9 @@ where
         }
         Err(e) => {
             tracing::error!(message = format!("Error {:?}", e).as_str());
-            retrieval.handle_processing_error(e, state_manager).await?;
+            retrieval
+                .handle_processing_error(ProcessMessageError::None, state_manager)
+                .await?;
         }
     };
     Ok(())

@@ -3,7 +3,8 @@ use crate::{
     models::{CreateMessage, JobStatus},
     search_client,
     service_bus_client::{
-        create_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+        create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
     storage_client,
@@ -50,7 +51,7 @@ pub async fn create_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
         &mut self,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
         handle_processing_error_for_create_message(self, error, state_manager).await
@@ -59,7 +60,7 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 
 async fn handle_processing_error_for_create_message<T>(
     removeable_message: &mut T,
-    error: anyhow::Error,
+    error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
@@ -185,7 +186,7 @@ mod test {
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
             removeable_message,
-            error,
+            ProcessMessageError::None,
             &state_manager,
         ))
     }

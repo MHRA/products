@@ -2,7 +2,8 @@ use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
     service_bus_client::{
-        delete_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+        delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
     storage_client,
@@ -40,7 +41,7 @@ pub async fn delete_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     async fn handle_processing_error(
         &mut self,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
         handle_processing_error_for_delete_message(self, error, state_manager).await
@@ -49,7 +50,7 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 
 async fn handle_processing_error_for_delete_message<T>(
     removeable_message: &mut T,
-    error: anyhow::Error,
+    error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
@@ -175,7 +176,7 @@ mod test {
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(
             removeable_message,
-            error,
+            ProcessMessageError::None,
             &state_manager,
         ))
     }
