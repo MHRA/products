@@ -13,7 +13,7 @@ test: ## Run tests [TEST=test_name (optional)]
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
-	  --vault-name mhra-non-prod-02 \
+	  --vault-name mhra-dev \
 	  --name doc-index-updater-env \
 	  --query value \
 	  --output tsv > .env
@@ -21,7 +21,7 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-non-prod-02 \
+	--vault-name mhra-dev \
 	--name doc-index-updater-env \
 	--file .env
 
