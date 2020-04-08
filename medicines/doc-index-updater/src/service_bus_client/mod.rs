@@ -227,7 +227,7 @@ where
 pub mod test {
     use super::*;
     pub struct TestRemoveableMessage<T: Message> {
-        pub is_removed: bool,
+        pub remove_was_called: bool,
         pub message: T,
     }
 
@@ -237,7 +237,7 @@ pub mod test {
         T: Message + Send + Sync,
     {
         async fn remove(&mut self) -> Result<String, anyhow::Error> {
-            self.is_removed = true;
+            self.remove_was_called = true;
             Ok("success".to_owned())
         }
     }

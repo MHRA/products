@@ -15,3 +15,5 @@
 - [Security](./security.md)
 
 - [Testing](./testing.md)
+
+- [Configuration](./config.md)

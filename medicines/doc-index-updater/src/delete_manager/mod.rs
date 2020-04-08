@@ -1,3 +1,5 @@
+mod errors;
+
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
@@ -56,7 +58,7 @@ async fn handle_processing_error_for_delete_message<T>(
 where
     T: RemoveableMessage<DeleteMessage>,
 {
-    tracing::info!("Setting error state in state manager");
+    tracing::info!("Handling processing error. Setting error state in state manager");
     state_manager
         .set_status(
             removeable_message.get_message().job_id,
@@ -66,7 +68,11 @@ where
             },
         )
         .await?;
-    let _ = removeable_message.remove().await?;
+
+    if error.is::<errors::DocumentNotFoundInIndex>() {
+        tracing::info!("Document wasn't found during delete, removing message");
+        let _remove = removeable_message.remove().await?;
+    }
     Ok(())
 }
 
@@ -113,8 +119,7 @@ pub async fn get_blob_name_from_content_id(
             return Ok(result.metadata_storage_name);
         }
     }
-    Err(anyhow!(format!(
-        "Cannot find document with content ID {}",
+    Err(anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
         content_id
     )))
 }
@@ -147,14 +152,44 @@ pub async fn delete_from_index(
 #[cfg(test)]
 mod test {
     use super::*;
+    use pretty_assertions::assert_eq;
+
     use crate::{
         models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
     use tokio_test::block_on;
 
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
+    #[test]
+    fn not_found_error_during_delete_removes_message_since_no_need_to_retry() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_document_not_found_in_index();
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        then_message_is_removed(result, removeable_message);
+    }
+
+    #[test]
+    fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_unknown_error();
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        then_message_is_not_removed(result, removeable_message);
+    }
+
+    fn given_document_not_found_in_index() -> anyhow::Error {
+        anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
+            String::from("any id")
+        ))
+    }
+
+    fn given_an_unknown_error() -> anyhow::Error {
+        anyhow!("Any other error")
+    }
+
+    fn given_a_state_manager() -> impl JobStatusClient {
+        TestJobStatusClient {}
     }
 
     fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
@@ -164,7 +199,7 @@ mod test {
         };
 
         TestRemoveableMessage::<DeleteMessage> {
-            is_removed: false,
+            remove_was_called: false,
             message: delete_message,
         }
     }
@@ -172,7 +207,7 @@ mod test {
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
         error: anyhow::Error,
-        state_manager: TestJobStatusClient,
+        state_manager: impl JobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(
             removeable_message,
@@ -181,16 +216,25 @@ mod test {
         ))
     }
 
-    #[test]
-    fn test_an_error_removes_delete_message() {
-        let state_manager = TestJobStatusClient {};
-
-        let mut removable_message = given_we_have_a_delete_message();
-        let error = given_an_error_has_occurred();
-
-        let result = when_we_handle_the_error(&mut removable_message, error, state_manager);
-
+    fn then_message_is_removed(
+        result: Result<(), anyhow::Error>,
+        removeable_message: TestRemoveableMessage<DeleteMessage>,
+    ) {
         assert!(result.is_ok());
-        assert!(removable_message.is_removed);
+        assert_eq!(
+            removeable_message.remove_was_called, true,
+            "Didn't remove message, but should"
+        );
+    }
+
+    fn then_message_is_not_removed(
+        result: Result<(), anyhow::Error>,
+        removeable_message: TestRemoveableMessage<DeleteMessage>,
+    ) {
+        assert!(result.is_ok());
+        assert_eq!(
+            removeable_message.remove_was_called, false,
+            "Removed message, but shouldn't"
+        );
     }
 }

@@ -60,10 +60,7 @@ async fn retrieve_file_from_sftp(
     filepath: String,
 ) -> Result<File, anyhow::Error> {
     let path = std::path::Path::new(&filepath);
-    let path = match path.strip_prefix("/") {
-        Ok(p) => p,
-        Err(_) => path,
-    };
+
     tracing::info!("{:?}", path);
 
     // Additional logging to debug observed sftp issue

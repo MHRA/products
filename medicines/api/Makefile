@@ -1,7 +1,3 @@
-app := doc-index-updater
-image := mhraproductsnonprodregistry.azurecr.io/products/$(app)
-tag := latest
-
 .PHONY: default
 default: ## Run locally
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
@@ -14,7 +10,7 @@ test: ## Run tests [TEST=test_name (optional)]
 get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
 	  --vault-name mhra-dev \
-	  --name doc-index-updater-env \
+	  --name api-env \
 	  --query value \
 	  --output tsv > .env
 
@@ -22,36 +18,8 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
 	--vault-name mhra-dev \
-	--name doc-index-updater-env \
+	--name api-env \
 	--file .env
-
-.PHONY: ci-branch
-ci-branch: docker-build ## Build branch in CI
-
-.PHONY: ci-master
-ci-master: ci-branch docker-push ## Build master in CI
-
-.PHONY: docker-build
-docker-build: ## Build and tag Docker image
-	docker build \
-		--progress plain \
-		--tag $(app) \
-		--tag $(image) \
-		--tag $(image):$(tag) \
-		.
-
-.PHONY: docker-run
-docker-run: ## Run Docker image
-	docker run -it --env-file=.env $(image)
-
-.PHONY: docker-pull
-docker-pull: ## Pull Docker image
-	docker pull $(image)
-
-.PHONY: docker-push
-docker-push: ## Push Docker image
-	docker push $(image)
-	docker push $(image):$(tag)
 
 .PHONY: help
 help: ## Display this help screen

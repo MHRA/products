@@ -62,7 +62,7 @@ data "azurerm_route_table" "load_balancer" {
 }
 
 data "azurerm_virtual_network" "cluster" {
-  name                = "aparz-spoke-pd-products"
+  name                = "aparz-spoke-np-products"
   resource_group_name = "adazr-rg-1001"
 }
 
