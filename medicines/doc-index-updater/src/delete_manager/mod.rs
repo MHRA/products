@@ -254,22 +254,27 @@ mod test {
 
     fn when_getting_blob_name_from_content_id(
         search_client: impl Searchable,
-    ) -> Result<String, anyhow::Error> {
+    ) -> Result<String, ProcessMessageError> {
         block_on(get_blob_name_from_content_id(
             String::from("non existent content id"),
             &search_client,
         ))
     }
 
-    fn then_document_not_found_in_index_error_raised(result: Result<String, anyhow::Error>) {
+    fn then_document_not_found_in_index_error_raised(result: Result<String, ProcessMessageError>) {
         assert_eq!(result.is_err(), true);
 
-        println!("{:?}", result);
-
-        match result {
-            Ok(_) => assert!(false, "Should have been an error"),
-            Err(e) => assert_eq!(e.is::<errors::DocumentNotFoundInIndex>(), true),
-        }
+        assert!(
+            if let Err(ProcessMessageError::DocumentNotFoundInIndex(_)) = result {
+                true
+            } else {
+                false
+            },
+            format!(
+                "Should have been an error with type: DocumentNotFoundInIndex, but was {:?}",
+                result
+            )
+        );
     }
 
     struct TestAzureSearchClientWithNoResults {}
