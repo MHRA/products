@@ -159,6 +159,24 @@ mod test {
     };
     use tokio_test::block_on;
 
+    #[test]
+    fn not_found_error_during_delete_removes_message_since_no_need_to_retry() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_document_not_found_in_index();
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        then_message_is_removed(result, removeable_message);
+    }
+
+    #[test]
+    fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_unknown_error();
+        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        then_message_is_not_removed(result, removeable_message);
+    }
+
     fn given_document_not_found_in_index() -> anyhow::Error {
         anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
             String::from("any id")
@@ -217,23 +235,5 @@ mod test {
             removeable_message.remove_was_called, false,
             "Removed message, but shouldn't"
         );
-    }
-
-    #[test]
-    fn not_found_error_during_delete_removes_message_since_no_need_to_retry() {
-        let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
-        let error = given_document_not_found_in_index();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
-        then_message_is_removed(result, removeable_message);
-    }
-
-    #[test]
-    fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
-        let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
-        let error = given_an_unknown_error();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
-        then_message_is_not_removed(result, removeable_message);
     }
 }
