@@ -3,21 +3,21 @@ use crate::{
     models::{CreateMessage, JobStatus},
     search_client,
     service_bus_client::{
-        create_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+        create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
-use uuid::Uuid;
-
 use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-
 use search_index::add_blob_to_search_index;
+pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
+use uuid::Uuid;
 
 mod hash;
 pub mod models;
@@ -50,7 +50,7 @@ pub async fn create_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
         &mut self,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
         handle_processing_error_for_create_message(self, error, state_manager).await
@@ -59,13 +59,13 @@ impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
 
 async fn handle_processing_error_for_create_message<T>(
     removeable_message: &mut T,
-    error: anyhow::Error,
+    error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
     T: RemoveableMessage<CreateMessage>,
 {
-    if error.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
+    if let ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile) = error {
         tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
         let _ = state_manager
             .set_status(
@@ -81,7 +81,7 @@ where
     Ok(())
 }
 
-pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
+pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::debug!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
@@ -92,8 +92,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Err
         message.document.file_source.clone(),
         message.document.file_path.clone(),
     )
-    .await
-    .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
+    .await?;
 
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
@@ -167,8 +166,12 @@ mod test {
     };
     use tokio_test::block_on;
 
-    fn given_an_error_has_occurred() -> anyhow::Error {
-        anyhow!("literally any error")
+    fn given_an_error_has_occurred() -> ProcessMessageError {
+        anyhow!("literally any error").into()
+    }
+
+    fn given_file_not_found() -> ProcessMessageError {
+        ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile)
     }
 
     fn given_we_have_a_create_message() -> TestRemoveableMessage<CreateMessage> {
@@ -180,7 +183,7 @@ mod test {
 
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<CreateMessage>,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: TestJobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_create_message(
@@ -200,5 +203,20 @@ mod test {
 
         assert!(result.is_ok());
         assert_eq!(removeable_message.remove_was_called, false);
+    }
+
+    #[test]
+    fn test_file_not_found_removes_create_message() {
+        let mut removeable_message = given_we_have_a_create_message();
+        let error = given_file_not_found();
+
+        let result =
+            when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
+
+        assert!(result.is_ok());
+        assert!(
+            removeable_message.remove_was_called,
+            "Message should be removed"
+        );
     }
 }

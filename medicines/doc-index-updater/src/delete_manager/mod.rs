@@ -1,10 +1,9 @@
-mod errors;
-
 use crate::{
     models::{DeleteMessage, JobStatus},
     search_client,
     service_bus_client::{
-        delete_factory, ProcessRetrievalError, RemoveableMessage, RetrievedMessage,
+        delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
     storage_client,
@@ -42,7 +41,7 @@ pub async fn delete_service_worker(
 impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     async fn handle_processing_error(
         &mut self,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
         handle_processing_error_for_delete_message(self, error, state_manager).await
@@ -51,7 +50,7 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 
 async fn handle_processing_error_for_delete_message<T>(
     removeable_message: &mut T,
-    error: anyhow::Error,
+    error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
@@ -68,21 +67,24 @@ where
         )
         .await?;
 
-    if error.is::<errors::DocumentNotFoundInIndex>() {
-        tracing::info!("Document wasn't found during delete, removing message");
+    if let ProcessMessageError::DocumentNotFoundInIndex(id) = error {
+        tracing::info!(
+            "Document {} wasn't found during delete, removing message",
+            id
+        );
         let _remove = removeable_message.remove().await?;
     }
     Ok(())
 }
 
-pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Error> {
+pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
-    let storage_container_name = std::env::var("STORAGE_CONTAINER")?;
+    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
     let blob_name =
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
 
@@ -111,16 +113,17 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, anyhow::Err
 pub async fn get_blob_name_from_content_id(
     content_id: String,
     search_client: &search_client::AzureSearchClient,
-) -> Result<String, anyhow::Error> {
-    let search_results = search_client.search(content_id.to_owned()).await?;
+) -> Result<String, ProcessMessageError> {
+    let search_results = search_client
+        .search(content_id.to_owned())
+        .await
+        .map_err(anyhow::Error::from)?;
     for result in search_results.search_results {
         if result.file_name == content_id {
             return Ok(result.metadata_storage_name);
         }
     }
-    Err(anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
-        content_id
-    )))
+    Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
 }
 
 async fn delete_blob(
@@ -177,14 +180,12 @@ mod test {
         then_message_is_not_removed(result, removeable_message);
     }
 
-    fn given_document_not_found_in_index() -> anyhow::Error {
-        anyhow!(errors::DocumentNotFoundInIndex::for_content_id(
-            String::from("any id")
-        ))
+    fn given_document_not_found_in_index() -> ProcessMessageError {
+        ProcessMessageError::DocumentNotFoundInIndex("any id".to_owned())
     }
 
-    fn given_an_unknown_error() -> anyhow::Error {
-        anyhow!("Any other error")
+    fn given_an_unknown_error() -> ProcessMessageError {
+        anyhow!("Any other error").into()
     }
 
     fn given_a_state_manager() -> impl JobStatusClient {
@@ -205,7 +206,7 @@ mod test {
 
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
-        error: anyhow::Error,
+        error: ProcessMessageError,
         state_manager: impl JobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(

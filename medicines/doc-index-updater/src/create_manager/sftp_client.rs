@@ -5,28 +5,18 @@ use std::{io::Read, net::TcpStream};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-enum SentinelSftpError {
+pub enum SftpError {
     #[error("A TCP error connecting to server. ({0:?})")]
-    TcpError(std::io::Error),
+    TcpError(#[from] std::io::Error),
     #[error("An SSH error connecting to server. ({0:?})")]
-    Ssh2Error(ssh2::Error),
+    Ssh2Error(#[from] ssh2::Error),
+    #[error("File could not be retrieved on server")]
+    CouldNotRetrieveFile,
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
-impl From<ssh2::Error> for SentinelSftpError {
-    fn from(e: ssh2::Error) -> Self {
-        SentinelSftpError::Ssh2Error(e)
-    }
-}
-
-impl From<std::io::Error> for SentinelSftpError {
-    fn from(e: std::io::Error) -> Self {
-        SentinelSftpError::TcpError(e)
-    }
-}
-
-async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
+async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
     let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
     let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
     let password = get_env_fail_fast("SENTINEL_SFTP_PASSWORD").await;
@@ -56,7 +46,7 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SentinelSftpError> {
     } else {
         let message = "SFTP session authentication failed";
         tracing::debug!(message);
-        Err(SentinelSftpError::Other(anyhow!(message)))
+        Err(SftpError::Other(anyhow!(message)))
     }
 }
 
@@ -90,11 +80,14 @@ async fn retrieve_file_from_sftp(
 
     Ok(sftp.open(path).map_err(|e| {
         tracing::error!("{:?}", e);
-        e
+        match e.code() {
+            -31 => SftpError::CouldNotRetrieveFile,
+            _ => SftpError::Ssh2Error(e),
+        }
     })?)
 }
 
-pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, SftpError> {
     let mut sentinel_sftp_client = match source {
         FileSource::Sentinel => sentinel_sftp_factory().await?,
     };
