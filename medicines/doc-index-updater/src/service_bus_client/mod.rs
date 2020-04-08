@@ -97,6 +97,8 @@ where
 pub enum ProcessMessageError {
     #[error(transparent)]
     SftpError(#[from] SftpError),
+    #[error("Cannot find document with ID {0}")]
+    DocumentNotFoundInIndex(String),
     #[error(transparent)]
     Generic(#[from] anyhow::Error),
 }

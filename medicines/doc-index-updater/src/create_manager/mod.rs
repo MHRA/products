@@ -214,6 +214,9 @@ mod test {
             when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
 
         assert!(result.is_ok());
-        assert!(removeable_message.is_removed, "Message should be removed");
+        assert!(
+            removeable_message.remove_was_called,
+            "Message should be removed"
+        );
     }
 }
