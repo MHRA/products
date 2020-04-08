@@ -243,11 +243,13 @@ mod test {
 
     #[test]
     fn get_blob_name_from_content_id_raises_document_not_found_in_index_error_when_not_there() {
-        let search_client = TestAzureSearchClientWithNoResults {};
-
+        let search_client = given_a_search_client_that_returns_no_results();
         let result = when_getting_blob_name_from_content_id(search_client);
-
         then_document_not_found_in_index_error_raised(result);
+    }
+
+    fn given_a_search_client_that_returns_no_results() -> impl Searchable {
+        TestAzureSearchClientWithNoResults {}
     }
 
     fn when_getting_blob_name_from_content_id(
@@ -269,6 +271,7 @@ mod test {
             Err(e) => assert_eq!(e.is::<errors::DocumentNotFoundInIndex>(), true),
         }
     }
+
     struct TestAzureSearchClientWithNoResults {}
 
     #[async_trait]
