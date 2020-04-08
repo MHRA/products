@@ -8,7 +8,7 @@ A React web application.
 
 The site is configured to run locally at [`http://localhost:3000/`](http://localhost:3000/)
 
-You will need to get the local environment variables by running `make get-env`.
+[You will need to get the local environment variables by running make get-env](../../docs/principles/config.md).
 
 Next, start the service:
 

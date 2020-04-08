@@ -24,7 +24,7 @@ You should also have installed:
 ## Running locally 🦀
 
 1. Navigate to this directory, `/medicines/api`
-2. Run `make get-env` to get a copy of environment variables
+2. Run `make get-env` to get a copy of [environment variables](../../docs/principles/config.md)
 3. Run `make` to build and run the server
 4. Once compiled, open a browser tab and go to http://127.0.0.1:8000/healthz
 5. You should see **OK** rendered on the page
