@@ -1,6 +1,7 @@
 pub mod models;
 
 use crate::models::{AzureIndexChangedResults, AzureSearchResults, IndexEntry};
+use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
 use std::collections::HashMap;
@@ -39,11 +40,19 @@ pub fn factory() -> AzureSearchClient {
     }
 }
 
-impl AzureSearchClient {
-    pub async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
+#[async_trait]
+pub trait Searchable {
+    async fn search(&self, &mut search_term: String) -> Result<AzureSearchResults, reqwest::Error>;
+}
+
+#[async_trait]
+impl Searchable for AzureSearchClient {
+    async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
         search(search_term, &self.client, self.config.clone()).await
     }
+}
 
+impl AzureSearchClient {
     pub async fn delete(
         &self,
         key_name: &str,
@@ -69,6 +78,21 @@ async fn search(
     client: &reqwest::Client,
     config: AzureConfig,
 ) -> Result<AzureSearchResults, reqwest::Error> {
+    let req = build_search(search_term, &client, config)?;
+    tracing::debug!("Requesting from URL: {}", &req.url());
+    client
+        .execute(req)
+        .await?
+        .error_for_status()?
+        .json::<AzureSearchResults>()
+        .await
+}
+
+fn build_search(
+    search_term: String,
+    client: &reqwest::Client,
+    config: AzureConfig,
+) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
         search_service = config.search_service,
@@ -90,14 +114,7 @@ async fn search(
         .header("api-key", &config.api_key)
         .build()?;
 
-    tracing::debug!("Requesting from URL: {}", &req.url());
-
-    client
-        .execute(req)
-        .await?
-        .error_for_status()?
-        .json::<AzureSearchResults>()
-        .await
+    Ok(req)
 }
 
 async fn update_index<T>(
@@ -138,5 +155,56 @@ where
     } else {
         let error_message = h.text().await?;
         Err(anyhow::anyhow!(error_message))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    fn given_we_have_a_search_client() -> reqwest::Client {
+        reqwest::Client::new()
+    }
+
+    fn given_we_have_a_search_term() -> String {
+        "cool beans".to_string()
+    }
+
+    fn given_we_have_a_config() -> AzureConfig {
+        AzureConfig {
+            api_key: "api_key".to_string(),
+            search_index: "search_index".to_string(),
+            search_service: "search_service".to_string(),
+            api_version: "api_version".to_string(),
+        }
+    }
+
+    fn when_we_build_a_search_request(
+        client: reqwest::Client,
+        search_term: String,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_search(search_term, &client, config)
+    }
+
+    fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&%40count=true&%40top=10&%40skip=0&search=cool+beans&scoringProfile=preferKeywords"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            assert!(false, "Provided search request is an error");
+        }
+    }
+
+    #[test]
+    fn test_build_search() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_a_search_term();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_request(client, search_term, config);
+        then_search_url_is_as_expected(actual);
     }
 }
