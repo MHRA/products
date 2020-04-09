@@ -23,7 +23,7 @@ pub fn get_env(key: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
 }
 
-pub fn factory() -> AzureSearchClient {
+pub fn factory() -> impl Searchable + Deletable + Createable {
     let api_key = get_env("AZURE_API_ADMIN_KEY");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
@@ -76,8 +76,17 @@ impl Deletable for AzureSearchClient {
     }
 }
 
-impl AzureSearchClient {
-    pub async fn create(
+#[async_trait]
+pub trait Createable {
+    async fn create(
+        &self,
+        key_values: IndexEntry,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error>;
+}
+
+#[async_trait]
+impl Createable for AzureSearchClient {
+    async fn create(
         &self,
         key_values: IndexEntry,
     ) -> Result<AzureIndexChangedResults, anyhow::Error> {

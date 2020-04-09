@@ -100,7 +100,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::debug!("Uploaded blob {}.", &name);
 
-    add_blob_to_search_index(&search_client, blob).await?;
+    add_blob_to_search_index(search_client, blob).await?;
 
     tracing::info!("Successfully added {} to index.", &name);
 
