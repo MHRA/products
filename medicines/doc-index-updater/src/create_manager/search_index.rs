@@ -1,8 +1,8 @@
 use crate::create_manager::Blob;
-use mhra_products_search_client::{models::IndexEntry, AzureSearchClient};
+use mhra_products_search_client_temp::{models::IndexEntry, Createable};
 
 pub async fn add_blob_to_search_index(
-    search_client: impl search_client::Createable,
+    search_client: impl Createable,
     blob: Blob,
 ) -> Result<(), anyhow::Error> {
     let entry: IndexEntry = blob.into();

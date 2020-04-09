@@ -409,7 +409,7 @@ dependencies = [
  "hyper",
  "lazy_static",
  "md5",
- "mhra_products_search_client",
+ "mhra_products_search_client_temp",
  "net2",
  "pretty_assertions",
  "redis",
@@ -927,10 +927,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
 
 [[package]]
-name = "mhra_products_search_client"
-version = "0.0.1"
+name = "mhra_products_search_client_temp"
+version = "0.0.2-rc2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "899373e0b92af23c8d904ba5a5cbd3feb3e3fc7d4ea2129c223b6acbf2a4b84e"
+checksum = "431a4863167c130a8a1847d9a855111f7243fa4b2265cf842afd6d4caace3693"
 dependencies = [
  "anyhow",
  "async-trait",
