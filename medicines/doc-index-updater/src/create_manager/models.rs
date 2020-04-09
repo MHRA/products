@@ -4,8 +4,8 @@ use crate::{
     models::{Document, DocumentType},
 };
 use chrono::{SecondsFormat, Utc};
+use mhra_products_search_client::models::IndexEntry;
 use regex::Regex;
-use search_client::models::IndexEntry;
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]

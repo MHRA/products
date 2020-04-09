@@ -409,12 +409,12 @@ dependencies = [
  "hyper",
  "lazy_static",
  "md5",
+ "mhra_products_search_client",
  "net2",
  "pretty_assertions",
  "redis",
  "regex",
  "reqwest",
- "search_client",
  "serde",
  "serde-xml-rs 0.4.0",
  "serde_derive",
@@ -925,6 +925,21 @@ name = "memchr"
 version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
+
+[[package]]
+name = "mhra_products_search_client"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "899373e0b92af23c8d904ba5a5cbd3feb3e3fc7d4ea2129c223b6acbf2a4b84e"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tracing",
+]
 
 [[package]]
 name = "mime"
@@ -1628,19 +1643,6 @@ checksum = "e3042af939fca8c3453b7af0f1c66e533a15a86169e39de2657310ade8f98d3c"
 dependencies = [
  "ring",
  "untrusted",
-]
-
-[[package]]
-name = "search_client"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "tracing",
 ]
 
 [[package]]
