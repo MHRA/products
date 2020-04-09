@@ -1,8 +1,11 @@
 [package]
-name = "search_client"
-version = "0.1.0"
+name = "mhra_products_search_client"
+version = "0.0.1"
 authors = ["Matt Doughty <matt.doughty@mhra.gov.uk>", "Craig Anderson <craig.anderson@red-badger.com>"]
 edition = "2018"
+license = "MIT"
+description = "MHRA Products Search Client"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
