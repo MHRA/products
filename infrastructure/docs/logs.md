@@ -1,6 +1,6 @@
 # Logs
 
-For an overview of this repository and the services in it, go to [the top-level](../..).
+For an overview of this repository and the services in it, go to [the top-level README](../../README.md).
 To view logs from deployed services, follow this guide.
 
 We have the following types of logs:
