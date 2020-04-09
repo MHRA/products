@@ -21,6 +21,10 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v2
 
+      - name: Test for RC release
+        working-directory: ./medicines/doc-index-updater
+        run: cmd=`cat Cargo.toml | grep mhra_products_search_client | sed -e 's/"//' | sed -e 's/"//'` && if [[ $cmd == *"-rc"* ]];then echo rc dependencies not allowed for this package; exit 1; fi
+
       - name: Build and test Docker image
         working-directory: ./medicines/doc-index-updater
         run: |
