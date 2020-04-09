@@ -12,7 +12,7 @@ More background on the infrastructure as a whole can be found at [`./infrastruct
 
 ## Prometheus Logs
 
-Prometheus gathers logs from a [kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [istio][istio], which we use to manage ingress and egress from our [kubernetes][kubernetes] cluster.
+[Prometheus][prometheus] gathers logs from a [kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [istio][istio], which we use to manage ingress and egress from our [kubernetes][kubernetes] cluster.
 
 To view the logs, use one of the following means:
 
@@ -29,7 +29,7 @@ istioctl dashboard prometheus
 
 ### Viewing Prometheus logs in Azure
 
-Alternatively, to see Prometheus logs, you can run a query in the Azure Log Analytics workspace.
+Alternatively, to see [Prometheus][prometheus] logs, you can run a query in the Azure Log Analytics workspace.
 
 1. Open the "Log Analytics workspaces" area in the Azure portal.
 2. Open the analytics workspace which is in the same resource group as your cluster.
@@ -61,3 +61,4 @@ See the [stern docs][stern] for more info.
 [stern]: https://github.com/wercker/stern
 [kubernetes]: https://kubernetes.io/
 [istio]: https://istio.io/
+[prometheus]: https://prometheus.io/
