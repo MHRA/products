@@ -38,7 +38,9 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
 
     tracing::debug!(message = "SFTP server handshake complete");
 
+    tracing::debug!(message = "Trying authentication");
     ssh_session.userauth_password(&user, &password)?;
+    tracing::debug!(message = "Finished trying authentication");
 
     if ssh_session.authenticated() {
         tracing::debug!(message = "SFTP session authenticated");
