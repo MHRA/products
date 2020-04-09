@@ -1,10 +1,9 @@
-use crate::{
-    create_manager::{models::IndexEntry, Blob},
-    search_client,
-};
+use crate::create_manager::Blob;
+use search_client::models::IndexEntry;
+use search_client::AzureSearchClient
 
 pub async fn add_blob_to_search_index(
-    search_client: &search_client::AzureSearchClient,
+    search_client: &AzureSearchClient,
     blob: Blob,
 ) -> Result<(), anyhow::Error> {
     let entry: IndexEntry = blob.into();

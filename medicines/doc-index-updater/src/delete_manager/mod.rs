@@ -1,7 +1,5 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
-    search_client,
-    search_client::{AzureSearchClient, Searchable},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -13,6 +11,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
+use search_client::{self, AzureSearchClient, Searchable};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -158,11 +157,10 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage,
-        search_client::{AzureSearchResults, Searchable},
-        service_bus_client::test::TestRemoveableMessage,
+        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
+    use search_client::{models::AzureSearchResults, Searchable};
     use tokio_test::block_on;
 
     #[test]
@@ -245,7 +243,7 @@ mod test {
     fn get_blob_name_from_content_id_raises_document_not_found_in_index_error_when_not_there() {
         let search_client = given_a_search_client_that_returns_no_results();
         let result = when_getting_blob_name_from_content_id(search_client);
-        then_document_not_found_in_index_error_raised(result);
+        then_document_not_found_in_index_error_is_raised(result);
     }
 
     fn given_a_search_client_that_returns_no_results() -> impl Searchable {
@@ -261,7 +259,9 @@ mod test {
         ))
     }
 
-    fn then_document_not_found_in_index_error_raised(result: Result<String, ProcessMessageError>) {
+    fn then_document_not_found_in_index_error_is_raised(
+        result: Result<String, ProcessMessageError>,
+    ) {
         assert_eq!(result.is_err(), true);
 
         assert!(

@@ -1,5 +1,5 @@
 [package]
-name = "search-client"
+name = "search_client"
 version = "0.1.0"
 authors = ["Matt Doughty <matt.doughty@mhra.gov.uk>", "Craig Anderson <craig.anderson@red-badger.com>"]
 edition = "2018"
