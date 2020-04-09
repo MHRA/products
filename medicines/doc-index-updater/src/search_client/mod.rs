@@ -106,8 +106,18 @@ impl Searchable for AzureSearchClient {
     }
 }
 
-impl AzureSearchClient {
-    pub async fn delete(
+#[async_trait]
+pub trait Deletable {
+    async fn delete(
+        &self,
+        key_name: &str,
+        value: &str,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error>;
+}
+
+#[async_trait]
+impl Deletable for AzureSearchClient {
+    async fn delete(
         &self,
         key_name: &str,
         value: &str,
@@ -118,7 +128,9 @@ impl AzureSearchClient {
 
         update_index(key_values, &self.client, &self.config).await
     }
+}
 
+impl AzureSearchClient {
     pub async fn create(
         &self,
         key_values: IndexEntry,
