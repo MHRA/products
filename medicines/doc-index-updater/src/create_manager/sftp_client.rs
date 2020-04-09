@@ -88,7 +88,7 @@ async fn retrieve_file_from_sftp(
                 -31 => SftpError::CouldNotRetrieveFile,
                 _ => SftpError::Ssh2Error(e.into()),
             },
-            _ => SftpError::Ssh2Error(e.into()),
+            _ => SftpError::Ssh2Error(e),
         }
     })?)
 }
