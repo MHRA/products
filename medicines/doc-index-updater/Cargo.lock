@@ -37,6 +37,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
 
 [[package]]
+name = "async-ssh2"
+version = "0.1.0"
+source = "git+https://github.com/spebern/async-ssh2.git#e001733c388076554641dfcf66b55995c8cdf2a5"
+dependencies = [
+ "mio",
+ "ssh2",
+ "tokio",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -398,6 +408,7 @@ name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-ssh2",
  "async-trait",
  "azure_sdk_core",
  "azure_sdk_service_bus",
@@ -419,7 +430,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sha1",
- "ssh2",
  "test-case",
  "thiserror",
  "time",
@@ -848,8 +858,7 @@ checksum = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
 [[package]]
 name = "libssh2-sys"
 version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bb70f29dc7c31d32c97577f13f41221af981b31248083e347b7f2c39225a6bc"
+source = "git+https://github.com/alexcrichton/ssh2-rs#5c5bf32fe985e8a39e267ac31348764abf1e207c"
 dependencies = [
  "cc",
  "libc",
@@ -1796,8 +1805,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 [[package]]
 name = "ssh2"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1a0bdfb47e1fa1eb80f67c7909cfddab49d4262025aa9e4f6e9c39ad77b482"
+source = "git+https://github.com/alexcrichton/ssh2-rs#5c5bf32fe985e8a39e267ac31348764abf1e207c"
 dependencies = [
  "bitflags",
  "libc",
