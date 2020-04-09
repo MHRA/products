@@ -14,6 +14,11 @@ More background on the infrastructure as a whole can be found at [`./infrastruct
 
 Prometheus gathers logs from a [kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [istio][istio], which we use to manage ingress and egress from our [kubernetes][kubernetes] cluster.
 
+To view the logs, use one of the following means:
+
+- [local Prometheus dashboard](#viewing-a-cluster-prometheus-dashboard-locally)
+- [Azure Log Analytics workspace](#viewing-prometheus-logs-in-azure)
+
 ### Viewing a cluster Prometheus dashboard locally
 
 After [targeting your favourite kubernetes cluster][1], run
