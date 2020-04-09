@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub async fn add_blob_to_search_index(
-    search_client: &search_client::AzureSearchClient,
+    search_client: impl search_client::Createable,
     blob: Blob,
 ) -> Result<(), anyhow::Error> {
     let entry: IndexEntry = blob.into();
