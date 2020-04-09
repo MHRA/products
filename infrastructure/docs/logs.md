@@ -1,8 +1,16 @@
 # Logs
 
+This document explains how to get the logs we use to monitor running services from this monorepo.
+We have the following types of logs:
+
+- [Prometheus logs](#prometheus-logs)
+- [Container logs](#container-logs)
+
+More background on the infrastructure as a whole can be found at [`./infrastructure.md`](./infrastructure.md).
+
 ## Prometheus Logs
 
-Prometheus is a pod automatically included with istio.
+Prometheus gathers logs from a [kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [istio][istio], which we use to manage ingress and egress from our [kubernetes][kubernetes] cluster.
 
 ### Viewing a cluster Prometheus dashboard locally
 
@@ -26,7 +34,7 @@ InsightsMetrics
 | where Namespace == "prometheus"
 ```
 
-## Viewing container logs
+## Container logs
 
 ### Using stern
 
@@ -36,11 +44,13 @@ To view all of the logs for the doc-index-updater:
 stern -n doc-index-updater doc-index-updater
 ```
 
-See the [stern docs][2] for more info.
+See the [stern docs][stern] for more info.
 
 ### Viewing container logs in Azure
 
-[`stern`][2] is the best way to view container logs, although you can view the container logs in the Logs Analytics workspace if you wish.
+[`stern`][stern] is the best way to view container logs, although you can view the container logs in the Logs Analytics workspace if you wish.
 
 [1]: ../scripts/update-kubernetes-config.sh
-[2]: https://github.com/wercker/stern
+[stern]: https://github.com/wercker/stern
+[kubernetes]: https://kubernetes.io/
+[istio]: https://istio.io/
