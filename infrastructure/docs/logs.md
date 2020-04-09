@@ -1,6 +1,8 @@
 # Logs
 
-This document explains how to get the logs we use to monitor running services from this monorepo.
+For an overview of this repository and the services in it, go to [the top-level](../..).
+To view logs from deployed services, follow this guide.
+
 We have the following types of logs:
 
 - [Prometheus logs](#prometheus-logs)
