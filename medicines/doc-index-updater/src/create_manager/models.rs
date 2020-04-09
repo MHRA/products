@@ -67,7 +67,7 @@ impl Into<HashMap<String, String>> for BlobMetadata {
         metadata.insert("file_name".to_string(), self.file_name.to_string());
         metadata.insert("doc_type".to_string(), self.doc_type.to_string());
         metadata.insert("title".to_string(), self.title.to_string());
-        metadata.insert("product_name".to_string(), self.product_names.to_json());
+        metadata.insert("product_name".to_string(), self.product_names.join(", "));
         metadata.insert(
             "substance_name".to_string(),
             self.active_substances.to_json(),
@@ -226,7 +226,7 @@ mod test {
         let expected_doc_type = "Spc".to_string();
         let expected_title = "Paracetamol Plus PL 12345/6789".to_string();
         let expected_author = "JRR Tolkien".to_string();
-        let expected_product_name = "[\"EFFECTIVE PRODUCT 1\",\"EFFECTIVE PRODUCT 2\"]".to_string();
+        let expected_product_name = "EFFECTIVE PRODUCT 1, EFFECTIVE PRODUCT 2".to_string();
         let expected_substance_name = "[\"PARACETAMOL\",\"CAFFEINE\"]".to_string();
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
@@ -349,7 +349,7 @@ mod test {
             name: "Some SPC".to_string(),
             document_type: DocumentType::Spc,
             author: "test".to_string(),
-            products: vec!["Generic Paracetamol".to_string()],
+            products: vec!["Generic Paracetamol".to_string(), "Special Paracetamol".to_string()],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
             active_substances: vec!["paracetamol".to_string()],
@@ -366,7 +366,7 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
-                product_names: VecSanitisedString::from(vec!["GENERIC PARACETAMOL".to_string()]),
+                product_names: VecSanitisedString::from(vec!["GENERIC PARACETAMOL".to_string(), "SPECIAL PARACETAMOL".to_string()]),
                 active_substances: VecSanitisedString::from(vec!["PARACETAMOL".to_string()]),
                 author: SanitisedString::from("test".to_string()),
                 keywords: None,
