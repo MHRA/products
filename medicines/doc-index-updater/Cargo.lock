@@ -928,9 +928,9 @@ checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
 
 [[package]]
 name = "mhra_products_search_client"
-version = "0.0.1"
+version = "0.0.2-rc1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "899373e0b92af23c8d904ba5a5cbd3feb3e3fc7d4ea2129c223b6acbf2a4b84e"
+checksum = "b3f6fc0de4b91f8a5bf192217cbca347d3535b3e80461e4628d4d1974c7a88a1"
 dependencies = [
  "anyhow",
  "async-trait",
