@@ -5,8 +5,6 @@ RUN apt-get update && apt-get install -y \
   redis \
   ;
 
-ADD ../search-client /usr/src/search-client
-
 RUN rustup component add rustfmt clippy
 
 WORKDIR /usr/src/doc-index-updater
