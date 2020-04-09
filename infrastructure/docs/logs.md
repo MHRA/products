@@ -21,7 +21,10 @@ To view the logs, use one of the following means:
 
 ### Viewing a cluster Prometheus dashboard locally
 
-After [targeting your favourite kubernetes cluster][1], run
+You will need to target a specific kubernetes cluster for which you'd like to see logs.
+See our [docs on connection to a kubernetes cluster](./kubernetes.md#connecting-to-a-kubernetes-cluster).
+
+Once you're targeting a kubernetes cluster, run the following command to see its logs.
 
 ```
 istioctl dashboard prometheus
