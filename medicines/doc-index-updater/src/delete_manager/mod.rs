@@ -50,12 +50,12 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
     }
 }
 
+#[throws(anyhow::Error)]
 async fn handle_processing_error_for_delete_message<T>(
     removeable_message: &mut T,
     error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
-) -> anyhow::Result<()>
-where
+) where
     T: RemoveableMessage<DeleteMessage>,
 {
     tracing::info!("Handling processing error. Setting error state in state manager");
@@ -75,8 +75,7 @@ where
             id
         );
         let _remove = removeable_message.remove().await?;
-    }
-    Ok(())
+    };
 }
 
 #[throws(ProcessMessageError)]

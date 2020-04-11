@@ -1,7 +1,9 @@
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::Client;
+use fehler::{throw, throws};
 
-pub fn factory() -> Result<Client, AzureError> {
+#[throws(AzureError)]
+pub fn factory() -> Client {
     let storage_account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
 
@@ -9,7 +11,7 @@ pub fn factory() -> Result<Client, AzureError> {
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
     match base64::decode(&master_key) {
-        Ok(_) => Client::new(&storage_account, &master_key),
-        Err(e) => Err(AzureError::Base64DecodeError(e)),
+        Ok(_) => Client::new(&storage_account, &master_key)?,
+        Err(e) => throw!(AzureError::Base64DecodeError(e)),
     }
 }

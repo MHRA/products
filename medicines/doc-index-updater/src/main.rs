@@ -1,15 +1,18 @@
 use doc_index_updater::{
     create_manager, delete_manager, document_manager, get_env_or_default, health, state_manager,
 };
+use fehler::throws;
 use state_manager::get_client;
 use std::{error, net::SocketAddr, time::Duration};
 use tracing::Level;
+
 use warp::Filter;
 
 const PORT: u16 = 8000;
 
+#[throws(Box<dyn error::Error>)]
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn error::Error>> {
+async fn main() {
     if get_env_or_default("JSON_LOGS", true) {
         use_json_log_subscriber()
     } else {
@@ -59,7 +62,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             create_state
         )),
     );
-    Ok(())
 }
 
 fn use_json_log_subscriber() {

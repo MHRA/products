@@ -176,14 +176,11 @@ impl DocIndexUpdaterQueue {
         }
     }
 
-    pub async fn send<T: Message>(
-        &mut self,
-        message: T,
-        duration: Duration,
-    ) -> Result<(), AzureError> {
+    #[throws(AzureError)]
+    pub async fn send<T: Message>(&mut self, message: T, duration: Duration) {
         self.service_bus
             .send_event(message.to_json_string()?.as_str(), duration)
-            .await
+            .await?
     }
 
     pub async fn try_process_from_queue<T>(
