@@ -6,6 +6,7 @@ use crate::{
 };
 use ::redis::Client;
 use async_trait::async_trait;
+use fehler::{throw, throws};
 use uuid::Uuid;
 use warp::{http::StatusCode, reply::Json, Filter, Rejection, Reply};
 mod redis;
@@ -52,7 +53,7 @@ impl StateManager {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl JobStatusClient for StateManager {
     async fn get_status(&self, id: Uuid) -> Result<JobStatusResponse, MyRedisError> {
         let status = get_from_redis(self.client.clone(), id).await?;
@@ -92,15 +93,16 @@ pub fn get_job_status_xml(
         .and_then(get_status_handler_xml)
 }
 
-fn handle_known_errors(id: Uuid, e: MyRedisError) -> Result<JobStatusResponse, MyRedisError> {
+#[throws(MyRedisError)]
+fn handle_known_errors(id: Uuid, e: MyRedisError) -> JobStatusResponse {
     tracing::error!("{}", e);
     if let MyRedisError::IncompatibleType(_) = e {
-        Ok(JobStatusResponse {
+        JobStatusResponse {
             id,
             status: JobStatus::NotFound,
-        })
+        }
     } else {
-        Err(e)
+        throw!(e)
     }
 }
 
@@ -122,24 +124,26 @@ fn to_response_with_status_xml(response: JobStatusResponse) -> impl Reply {
     }
 }
 
+#[throws(Rejection)]
 #[tracing::instrument]
-async fn get_status_handler(id: Uuid, mgr: StateManager) -> Result<JobStatusResponse, Rejection> {
+async fn get_status_handler(id: Uuid, mgr: StateManager) -> JobStatusResponse {
     mgr.get_status(id)
         .await
-        .or_else(|e| handle_known_errors(id, e))
-        .map_err(Into::into)
+        .or_else(|e| handle_known_errors(id, e))?
 }
 
-async fn get_status_handler_json(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+#[throws(Rejection)]
+async fn get_status_handler_json(id: Uuid, mgr: StateManager) -> impl Reply {
     get_status_handler(id, mgr)
         .await
-        .map(to_response_with_status)
+        .map(to_response_with_status)?
 }
 
-async fn get_status_handler_xml(id: Uuid, mgr: StateManager) -> Result<impl Reply, Rejection> {
+#[throws(Rejection)]
+async fn get_status_handler_xml(id: Uuid, mgr: StateManager) -> impl Reply {
     get_status_handler(id, mgr)
         .await
-        .map(to_response_with_status_xml)
+        .map(to_response_with_status_xml)?
 }
 
 pub fn set_job_status(
@@ -152,20 +156,16 @@ pub fn set_job_status(
         .and_then(set_status_handler)
 }
 
+#[throws(Rejection)]
 #[tracing::instrument]
-async fn set_status_handler(
-    id: Uuid,
-    status: JobStatus,
-    mgr: StateManager,
-) -> Result<Json, Rejection> {
+async fn set_status_handler(id: Uuid, status: JobStatus, mgr: StateManager) -> Json {
     mgr.set_status(id, status)
         .await
         .or_else(|e: MyRedisError| {
             tracing::error!("{}", e);
             Err(e)
         })
-        .map_err(Into::into)
-        .map(|r| warp::reply::json(&r))
+        .map(|r| warp::reply::json(&r))?
 }
 
 pub fn with_state(

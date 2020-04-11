@@ -1,6 +1,7 @@
 use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
 use core::fmt;
+use fehler::{throw, throws};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -28,24 +29,26 @@ impl std::fmt::Display for JobStatus {
 
 impl FromStr for JobStatus {
     type Err = String;
-    fn from_str(s: &str) -> Result<JobStatus, Self::Err> {
+
+    #[throws(Self::Err)]
+    fn from_str(s: &str) -> JobStatus {
         match s {
-            "Accepted" => Ok(JobStatus::Accepted),
-            "Done" => Ok(JobStatus::Done),
+            "Accepted" => JobStatus::Accepted,
+            "Done" => JobStatus::Done,
             status => {
                 // If this message is in the format "Error(error code: error message)",
                 // reconstruct it into JobStatus::Error.
                 let error_re = Regex::new(r"^Error\((?P<code>[^:]*): (?P<message>.*)\)$")
                     .expect("Regex failed to compile");
                 match error_re.captures(status) {
-                    Some(capture) => Ok(JobStatus::Error {
+                    Some(capture) => JobStatus::Error {
                         message: capture
                             .name("message")
                             .map_or("", |m| m.as_str())
                             .to_string(),
                         code: capture.name("code").map_or("", |m| m.as_str()).to_string(),
-                    }),
-                    None => Err(format!("Status unknown: {}", status)),
+                    },
+                    None => throw!(format!("Status unknown: {}", status)),
                 }
             }
         }
@@ -194,16 +197,18 @@ pub trait Message: Sized + FromStr + Clone {
 impl FromStr for CreateMessage {
     type Err = serde_json::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(serde_json::from_slice::<CreateMessage>(s.as_bytes())?)
+    #[throws(Self::Err)]
+    fn from_str(s: &str) -> Self {
+        serde_json::from_slice::<CreateMessage>(s.as_bytes())?
     }
 }
 
 impl FromStr for DeleteMessage {
     type Err = serde_json::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(serde_json::from_slice::<DeleteMessage>(s.as_bytes())?)
+    #[throws(Self::Err)]
+    fn from_str(s: &str) -> Self {
+        serde_json::from_slice::<DeleteMessage>(s.as_bytes())?
     }
 }
 

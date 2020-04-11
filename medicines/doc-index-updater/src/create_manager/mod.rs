@@ -13,12 +13,12 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+use fehler::throws;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
-
 mod hash;
 pub mod models;
 mod sanitiser;
@@ -81,7 +81,8 @@ where
     Ok(())
 }
 
-pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMessageError> {
+#[throws(ProcessMessageError)]
+pub async fn process_message(message: CreateMessage) -> Uuid {
     tracing::debug!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
@@ -104,14 +105,15 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::info!("Successfully added {} to index.", &name);
 
-    Ok(message.job_id)
+    message.job_id
 }
 
+#[throws(anyhow::Error)]
 async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
     metadata: BlobMetadata,
-) -> Result<Blob, anyhow::Error> {
+) -> Blob {
     let name = hash::sha1(&file_data);
     let file_digest = md5::compute(&file_data[..]);
     let container_name =
@@ -141,12 +143,12 @@ async fn create_blob(
         &storage_account, &container_name, &name
     );
 
-    Ok(Blob {
+    Blob {
         metadata,
         name,
         size: file_data.len(),
         path,
-    })
+    }
 }
 
 pub struct Blob {
@@ -181,16 +183,17 @@ mod test {
         }
     }
 
+    #[throws(anyhow::Error)]
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<CreateMessage>,
         error: ProcessMessageError,
         state_manager: TestJobStatusClient,
-    ) -> Result<(), anyhow::Error> {
+    ) {
         block_on(handle_processing_error_for_create_message(
             removeable_message,
             error,
             &state_manager,
-        ))
+        ))?;
     }
 
     #[test]

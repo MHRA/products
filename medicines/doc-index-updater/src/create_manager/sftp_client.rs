@@ -1,6 +1,7 @@
 use crate::models::FileSource;
 use anyhow::anyhow;
 use async_ssh2::{Session, Sftp};
+use fehler::{throw, throws};
 use std::net::TcpStream;
 use thiserror::Error;
 use tokio::io::AsyncReadExt;
@@ -17,7 +18,8 @@ pub enum SftpError {
     Other(#[from] anyhow::Error),
 }
 
-async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
+#[throws(SftpError)]
+async fn sentinel_sftp_factory() -> Sftp {
     let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
     let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
     let password = get_env_fail_fast("SENTINEL_SFTP_PASSWORD").await;
@@ -45,11 +47,11 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
 
     if ssh_session.authenticated() {
         tracing::debug!(message = "SFTP session authenticated");
-        ssh_session.sftp().await.map_err(Into::into)
+        ssh_session.sftp().await?
     } else {
         let message = "SFTP session authentication failed";
         tracing::debug!(message);
-        Err(SftpError::Other(anyhow!(message)))
+        throw!(SftpError::Other(anyhow!(message)))
     }
 }
 
@@ -58,10 +60,8 @@ pub async fn get_env_fail_fast(name: &str) -> String {
     std::env::var(name).expect(&failure_message)
 }
 
-async fn retrieve_file_from_sftp(
-    sftp: &mut Sftp,
-    filepath: String,
-) -> Result<async_ssh2::File, anyhow::Error> {
+#[throws(anyhow::Error)]
+async fn retrieve_file_from_sftp(sftp: &mut Sftp, filepath: String) -> async_ssh2::File {
     let path = std::path::Path::new(&filepath);
 
     tracing::info!("{:?}", path);
@@ -81,7 +81,7 @@ async fn retrieve_file_from_sftp(
         }
     }
 
-    Ok(sftp.open(path).await.map_err(|e| {
+    sftp.open(path).await.map_err(|e| {
         tracing::error!("{:?}", e);
         match e {
             async_ssh2::Error::SSH2(e) => match e.code() {
@@ -90,10 +90,11 @@ async fn retrieve_file_from_sftp(
             },
             _ => SftpError::Ssh2Error(e),
         }
-    })?)
+    })?
 }
 
-pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, SftpError> {
+#[throws(SftpError)]
+pub async fn retrieve(source: FileSource, filepath: String) -> Vec<u8> {
     let mut sentinel_sftp_client = match source {
         FileSource::Sentinel => sentinel_sftp_factory().await?,
     };
@@ -101,5 +102,5 @@ pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, S
     let mut bytes = Vec::<u8>::new();
     let size = file.read_to_end(&mut bytes).await?;
     tracing::info!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
-    Ok(bytes)
+    bytes
 }

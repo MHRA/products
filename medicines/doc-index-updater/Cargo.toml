@@ -14,6 +14,7 @@ azure_sdk_storage_blob = { git = "https://github.com/MindFlavor/AzureSDKForRust"
 azure_sdk_storage_core = { git = "https://github.com/MindFlavor/AzureSDKForRust", branch = "master" }
 base64 = "0.11.0"
 chrono = "0.4.11"
+fehler = "1.0.0"
 futures = "0.3.4"
 hyper = "0.13"
 lazy_static = "1.4.0"

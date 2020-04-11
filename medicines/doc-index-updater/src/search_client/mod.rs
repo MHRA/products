@@ -1,6 +1,7 @@
 use crate::create_manager::models::IndexEntry;
 use async_trait::async_trait;
 use core::fmt::Debug;
+use fehler::{throw, throws};
 use serde::ser::Serialize;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
@@ -107,31 +108,27 @@ impl Searchable for AzureSearchClient {
 }
 
 impl AzureSearchClient {
-    pub async fn delete(
-        &self,
-        key_name: &str,
-        value: &str,
-    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+    #[throws(anyhow::Error)]
+    pub async fn delete(&self, key_name: &str, value: &str) -> AzureIndexChangedResults {
         let mut key_values = HashMap::new();
         key_values.insert(key_name.to_string(), value.to_string());
         key_values.insert("@search.action".to_string(), "delete".to_string());
 
-        update_index(key_values, &self.client, &self.config).await
+        update_index(key_values, &self.client, &self.config).await?
     }
 
-    pub async fn create(
-        &self,
-        key_values: IndexEntry,
-    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
-        update_index(key_values, &self.client, &self.config).await
+    #[throws(anyhow::Error)]
+    pub async fn create(&self, key_values: IndexEntry) -> AzureIndexChangedResults {
+        update_index(key_values, &self.client, &self.config).await?
     }
 }
 
+#[throws(reqwest::Error)]
 async fn search(
     search_term: String,
     client: &reqwest::Client,
     config: AzureConfig,
-) -> Result<AzureSearchResults, reqwest::Error> {
+) -> AzureSearchResults {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
         search_service = config.search_service,
@@ -160,14 +157,15 @@ async fn search(
         .await?
         .error_for_status()?
         .json::<AzureSearchResults>()
-        .await
+        .await?
 }
 
+#[throws(anyhow::Error)]
 async fn update_index<T>(
     key_values: T,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<AzureIndexChangedResults, anyhow::Error>
+) -> AzureIndexChangedResults
 where
     T: Serialize + Sized + Debug,
 {
@@ -197,9 +195,9 @@ where
     if h.status() == reqwest::StatusCode::OK {
         h.json::<AzureIndexChangedResults>()
             .await
-            .map_err(|e| anyhow::anyhow!(e))
+            .map_err(anyhow::Error::from)?
     } else {
         let error_message = h.text().await?;
-        Err(anyhow::anyhow!(error_message))
+        throw!(anyhow::anyhow!(error_message))
     }
 }

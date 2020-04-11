@@ -13,6 +13,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
+use fehler::{throw, throws};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -78,7 +79,8 @@ where
     Ok(())
 }
 
-pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMessageError> {
+#[throws(ProcessMessageError)]
+pub async fn process_message(message: DeleteMessage) -> Uuid {
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
@@ -108,30 +110,34 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
         &storage_container_name
     );
 
-    Ok(message.job_id)
+    message.job_id
 }
 
+#[throws(ProcessMessageError)]
 pub async fn get_blob_name_from_content_id(
     content_id: String,
     search_client: &impl Searchable,
-) -> Result<String, ProcessMessageError> {
-    let search_results = search_client
+) -> String {
+    if let Some(result) = search_client
         .search(content_id.to_owned())
         .await
-        .map_err(anyhow::Error::from)?;
-    for result in search_results.search_results {
-        if result.file_name == content_id {
-            return Ok(result.metadata_storage_name);
-        }
+        .map_err(anyhow::Error::from)?
+        .search_results
+        .into_iter()
+        .find(|result| result.file_name == content_id)
+    {
+        result.metadata_storage_name
+    } else {
+        throw!(ProcessMessageError::DocumentNotFoundInIndex(content_id))
     }
-    Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
 }
 
+#[throws(AzureError)]
 async fn delete_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     container_name: &str,
     blob_name: &str,
-) -> Result<(), AzureError> {
+) {
     storage_client
         .delete_blob()
         .with_container_name(&container_name)
@@ -139,17 +145,13 @@ async fn delete_blob(
         .with_delete_snapshots_method(DeleteSnapshotsMethod::Include)
         .finalize()
         .await?;
-    Ok(())
 }
 
-pub async fn delete_from_index(
-    search_client: &AzureSearchClient,
-    blob_name: &str,
-) -> Result<(), anyhow::Error> {
+#[throws(anyhow::Error)]
+pub async fn delete_from_index(search_client: &AzureSearchClient, blob_name: &str) {
     search_client
         .delete(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
-    Ok(())
 }
 
 #[cfg(test)]
@@ -163,6 +165,7 @@ mod test {
         service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
+    use fehler::throws;
     use tokio_test::block_on;
 
     #[test]
@@ -207,16 +210,17 @@ mod test {
         }
     }
 
+    #[throws(anyhow::Error)]
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
         error: ProcessMessageError,
         state_manager: impl JobStatusClient,
-    ) -> Result<(), anyhow::Error> {
+    ) {
         block_on(handle_processing_error_for_delete_message(
             removeable_message,
             error,
             &state_manager,
-        ))
+        ))?;
     }
 
     fn then_message_is_removed(
@@ -252,13 +256,12 @@ mod test {
         TestAzureSearchClientWithNoResults {}
     }
 
-    fn when_getting_blob_name_from_content_id(
-        search_client: impl Searchable,
-    ) -> Result<String, ProcessMessageError> {
+    #[throws(ProcessMessageError)]
+    fn when_getting_blob_name_from_content_id(search_client: impl Searchable) -> String {
         block_on(get_blob_name_from_content_id(
             String::from("non existent content id"),
             &search_client,
-        ))
+        ))?
     }
 
     fn then_document_not_found_in_index_error_raised(result: Result<String, ProcessMessageError>) {

@@ -1,7 +1,8 @@
 use crate::models::JobStatus;
 use ::redis::Client;
-use anyhow::{anyhow, Result};
-use redis::{self, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value};
+use anyhow::anyhow;
+use fehler::throws;
+use redis::{self, FromRedisValue, RedisError, RedisWrite, ToRedisArgs, Value};
 use thiserror::Error;
 use uuid::Uuid;
 use warp::reject;
@@ -36,8 +37,11 @@ impl From<MyRedisError> for warp::Rejection {
 }
 
 impl FromRedisValue for JobStatus {
-    fn from_redis_value(t: &Value) -> Result<JobStatus, RedisError> {
-        String::from_redis_value(t)?.parse().map_err(to_redis_error)
+    #[throws(RedisError)]
+    fn from_redis_value(t: &Value) -> JobStatus {
+        String::from_redis_value(t)?
+            .parse()
+            .map_err(to_redis_error)?
     }
 }
 
@@ -56,20 +60,23 @@ impl ToRedisArgs for JobStatus {
     }
 }
 
-pub fn get_client(address: String) -> Result<Client> {
-    Ok(Client::open(address)?)
+#[throws(RedisError)]
+pub fn get_client(address: String) -> Client {
+    Client::open(address)?
 }
 
-pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> {
+#[throws(RedisError)]
+pub async fn get_from_redis(client: Client, id: Uuid) -> JobStatus {
     let mut con = client.get_async_connection().await?;
 
     redis::cmd("GET")
         .arg(id.to_string())
         .query_async(&mut con)
-        .await
+        .await?
 }
 
-pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
+#[throws(RedisError)]
+pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> JobStatus {
     let mut con = client.get_async_connection().await?;
 
     redis::cmd("SET")
@@ -78,7 +85,7 @@ pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisR
         .query_async(&mut con)
         .await?;
 
-    get_from_redis(client, id).await
+    get_from_redis(client, id).await?
 }
 
 #[cfg(test)]

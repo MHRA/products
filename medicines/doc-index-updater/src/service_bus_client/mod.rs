@@ -8,12 +8,14 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
+use fehler::{throw, throws};
 use hyper::StatusCode;
 use thiserror::Error;
 use time::Duration;
 use tracing_futures::Instrument;
 
-pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+#[throws(AzureError)]
+pub async fn delete_factory() -> DocIndexUpdaterQueue {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
 
@@ -27,10 +29,11 @@ pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
         .expect("Set env variable DELETE_QUEUE_POLICY_KEY first!");
 
     let service_bus = Client::new(service_bus_namespace, queue_name, policy_name, policy_key)?;
-    Ok(DocIndexUpdaterQueue::new(service_bus))
+    DocIndexUpdaterQueue::new(service_bus)
 }
 
-pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+#[throws(AzureError)]
+pub async fn create_factory() -> DocIndexUpdaterQueue {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
 
@@ -44,7 +47,7 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
         .expect("Set env variable CREATE_QUEUE_POLICY_KEY first!");
 
     let service_bus = Client::new(service_bus_namespace, queue_name, policy_name, policy_key)?;
-    Ok(DocIndexUpdaterQueue::new(service_bus))
+    DocIndexUpdaterQueue::new(service_bus)
 }
 
 #[derive(Error, Debug)]
@@ -130,9 +133,8 @@ impl DocIndexUpdaterQueue {
         }
     }
 
-    pub async fn receive<T: Message>(
-        &mut self,
-    ) -> Result<RetrievedMessage<T>, RetrieveFromQueueError> {
+    #[throws(RetrieveFromQueueError)]
+    pub async fn receive<T: Message>(&mut self) -> RetrievedMessage<T> {
         let peek_lock = self
             .service_bus
             .peek_lock_full(time::Duration::days(1), Some(self.lock_timeout))
@@ -144,12 +146,12 @@ impl DocIndexUpdaterQueue {
 
         if !peek_lock.status().is_success() {
             tracing::error!("{} when reading queue.", peek_lock.status(),);
-            return Err(RetrieveFromQueueError::ErrorReadingQueue);
+            throw!(RetrieveFromQueueError::ErrorReadingQueue);
         }
 
         if peek_lock.status() == StatusCode::NO_CONTENT {
             tracing::debug!("No new messages found.");
-            return Err(RetrieveFromQueueError::NotFoundError);
+            throw!(RetrieveFromQueueError::NotFoundError);
         }
 
         let body = peek_lock.body();
@@ -161,7 +163,7 @@ impl DocIndexUpdaterQueue {
                     body,
                     message.to_json_string()
                 );
-                Ok(RetrievedMessage { message, peek_lock })
+                RetrievedMessage { message, peek_lock }
             }
             Err(_) => {
                 tracing::error!(
@@ -169,7 +171,7 @@ impl DocIndexUpdaterQueue {
                     body
                 );
                 let _ = peek_lock.delete_message().await;
-                Err(RetrieveFromQueueError::ParseError(body))
+                throw!(RetrieveFromQueueError::ParseError(body))
             }
         }
     }
@@ -179,8 +181,9 @@ impl DocIndexUpdaterQueue {
         message: T,
         duration: Duration,
     ) -> Result<(), AzureError> {
-        let evt = message.to_json_string()?;
-        Ok(self.service_bus.send_event(evt.as_str(), duration).await?)
+        self.service_bus
+            .send_event(message.to_json_string()?.as_str(), duration)
+            .await
     }
 
     pub async fn try_process_from_queue<T>(
