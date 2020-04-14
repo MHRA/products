@@ -56,6 +56,16 @@ To view all of the logs for the doc-index-updater:
 stern -n doc-index-updater doc-index-updater
 ```
 
+A useful command for viewing the logs related to a specific correlation id
+would be to use the `-i` or `--include` parameter with a regex
+which looks for `INFO`, `WARN`, and `ERROR` messages matching that id.
+
+See here, for `b9912c04-325e-4f1b-8943-3ef319a88989`:
+
+```sh
+stern doc-index-updater -n doc-index-updater -i 'level.:.(INFO|WARN|ERROR).*b9912c04-325e-4f1b-8943-3ef319a88989'
+```
+
 See the [stern docs][stern] for more info.
 
 [1]: ../scripts/update-kubernetes-config.sh
