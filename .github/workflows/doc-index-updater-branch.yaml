@@ -21,9 +21,9 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v2
 
-      - name: Test for RC release
+      - name: Adjust Monorepo dependencies to use the current branch
         working-directory: ./medicines/doc-index-updater
-        run: cmd=`cat Cargo.toml | grep mhra_products_search_client | sed -e 's/"//' | sed -e 's/"//'` && if [[ $cmd == *"-rc"* ]];then echo rc dependencies not allowed for this package; exit 1; fi
+        run: branch=$(echo $GITHUB_REF | sed -e "s/refs\/heads\///"  && cat Cargo.toml | sed -e "s/{ git = \"https:\/\/github.com\/MHRA\/products.*}/{ git = \"https:\/\/github.com\/MHRA\/products\", branch = \"$branch\" }/" > Cargo.toml
 
       - name: Build and test Docker image
         working-directory: ./medicines/doc-index-updater
