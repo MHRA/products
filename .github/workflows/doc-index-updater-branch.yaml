@@ -21,10 +21,6 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v2
 
-      - name: Adjust Monorepo dependencies to use the current branch
-        working-directory: ./medicines/doc-index-updater
-        run: branch=$(echo $GITHUB_REF | sed -e "s/refs\/heads\///") && cat Cargo.toml | sed -e "s/{ git = \"https:\/\/github.com\/MHRA\/products.*}/{ git = \"https:\/\/github.com\/MHRA\/products\", branch = \"$branch\" }/" > Cargo.toml && cat Cargo.toml
-
       - name: Build and test Docker image
         working-directory: ./medicines/doc-index-updater
         run: |
