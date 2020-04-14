@@ -7,6 +7,7 @@ on:
       - "!master"
     paths:
       - medicines/doc-index-updater/**
+      - medicines/search-client/**
       - .github/workflows/doc-index-updater-branch.yaml
 
 env:
