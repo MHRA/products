@@ -1,10 +1,4 @@
 
-resource "azurerm_storage_container" "products_website" {
-  name                  = "$web"
-  storage_account_name  = var.storage_account_name
-  container_access_type = "container"
-}
-
 resource "azurerm_cdn_profile" "products" {
   name                = "mhraproducts${var.environment}"
   location            = var.cdn_region
