@@ -11,7 +11,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
-use search_client::{Deletable, Searchable};
+use search_client::{DeleteIndexEntry, Search};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -112,7 +112,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
 
 pub async fn get_blob_name_from_content_id(
     content_id: String,
-    search_client: &impl Searchable,
+    search_client: &impl Search,
 ) -> Result<String, ProcessMessageError> {
     let search_results = search_client
         .search(content_id.to_owned())
@@ -142,11 +142,11 @@ async fn delete_blob(
 }
 
 pub async fn delete_from_index(
-    search_client: impl Deletable,
+    search_client: impl DeleteIndexEntry,
     blob_name: &str,
 ) -> Result<(), anyhow::Error> {
     search_client
-        .delete(&"metadata_storage_name".to_string(), &blob_name)
+        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
     Ok(())
 }
@@ -160,7 +160,7 @@ mod test {
         models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
-    use search_client::{models::AzureSearchResults, Searchable};
+    use search_client::{models::AzureSearchResults, Search};
     use tokio_test::block_on;
 
     #[test]
@@ -246,12 +246,12 @@ mod test {
         then_document_not_found_in_index_error_is_raised(result);
     }
 
-    fn given_a_search_client_that_returns_no_results() -> impl Searchable {
+    fn given_a_search_client_that_returns_no_results() -> impl Search {
         TestAzureSearchClientWithNoResults {}
     }
 
     fn when_getting_blob_name_from_content_id(
-        search_client: impl Searchable,
+        search_client: impl Search,
     ) -> Result<String, ProcessMessageError> {
         block_on(get_blob_name_from_content_id(
             String::from("non existent content id"),
@@ -280,7 +280,7 @@ mod test {
     struct TestAzureSearchClientWithNoResults {}
 
     #[async_trait]
-    impl Searchable for TestAzureSearchClientWithNoResults {
+    impl Search for TestAzureSearchClientWithNoResults {
         async fn search(&self, _search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
             Ok(AzureSearchResults {
                 search_results: vec![],

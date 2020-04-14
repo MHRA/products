@@ -23,7 +23,7 @@ pub fn get_env(key: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
 }
 
-pub fn factory() -> impl Searchable + Deletable + Createable {
+pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
     let api_key = get_env("AZURE_API_ADMIN_KEY");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
@@ -41,20 +41,20 @@ pub fn factory() -> impl Searchable + Deletable + Createable {
 }
 
 #[async_trait]
-pub trait Searchable {
+pub trait Search {
     async fn search(&self, &mut search_term: String) -> Result<AzureSearchResults, reqwest::Error>;
 }
 
 #[async_trait]
-impl Searchable for AzureSearchClient {
+impl Search for AzureSearchClient {
     async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
         search(search_term, &self.client, self.config.clone()).await
     }
 }
 
 #[async_trait]
-pub trait Deletable {
-    async fn delete(
+pub trait DeleteIndexEntry {
+    async fn delete_index_entry(
         &self,
         key_name: &str,
         value: &str,
@@ -62,8 +62,8 @@ pub trait Deletable {
 }
 
 #[async_trait]
-impl Deletable for AzureSearchClient {
-    async fn delete(
+impl DeleteIndexEntry for AzureSearchClient {
+    async fn delete_index_entry(
         &self,
         key_name: &str,
         value: &str,
@@ -77,16 +77,16 @@ impl Deletable for AzureSearchClient {
 }
 
 #[async_trait]
-pub trait Createable {
-    async fn create(
+pub trait CreateIndexEntry {
+    async fn create_index_entry(
         &self,
         key_values: IndexEntry,
     ) -> Result<AzureIndexChangedResults, anyhow::Error>;
 }
 
 #[async_trait]
-impl Createable for AzureSearchClient {
-    async fn create(
+impl CreateIndexEntry for AzureSearchClient {
+    async fn create_index_entry(
         &self,
         key_values: IndexEntry,
     ) -> Result<AzureIndexChangedResults, anyhow::Error> {
