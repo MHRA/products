@@ -409,7 +409,6 @@ dependencies = [
  "hyper",
  "lazy_static",
  "md5",
- "mhra_products_search_client_temp",
  "net2",
  "pretty_assertions",
  "redis",
@@ -925,21 +924,6 @@ name = "memchr"
 version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3728d817d99e5ac407411fa471ff9800a778d88a24685968b36824eaf4bee400"
-
-[[package]]
-name = "mhra_products_search_client_temp"
-version = "0.0.2-rc2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "431a4863167c130a8a1847d9a855111f7243fa4b2265cf842afd6d4caace3693"
-dependencies = [
- "anyhow",
- "async-trait",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "tracing",
-]
 
 [[package]]
 name = "mime"

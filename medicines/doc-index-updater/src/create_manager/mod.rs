@@ -12,7 +12,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-use mhra_products_search_client_temp;
+use search_client;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
@@ -84,7 +84,7 @@ where
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::debug!("Message received: {:?} ", message);
 
-    let search_client = mhra_products_search_client_temp::factory();
+    let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 

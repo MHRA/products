@@ -1,5 +1,5 @@
 use crate::create_manager::Blob;
-use mhra_products_search_client_temp::{models::IndexEntry, Createable};
+use search_client::{models::IndexEntry, Createable};
 
 pub async fn add_blob_to_search_index(
     search_client: impl Createable,

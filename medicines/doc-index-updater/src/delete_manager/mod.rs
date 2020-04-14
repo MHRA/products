@@ -11,7 +11,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
-use mhra_products_search_client_temp::{self, Deletable, Searchable};
+use search_client::{Deletable, Searchable};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -80,7 +80,7 @@ where
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::info!("Message received: {:?} ", message);
 
-    let search_client = mhra_products_search_client_temp::factory();
+    let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
@@ -160,7 +160,7 @@ mod test {
         models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
-    use mhra_products_search_client_temp::{models::AzureSearchResults, Searchable};
+    use search_client::{models::AzureSearchResults, Searchable};
     use tokio_test::block_on;
 
     #[test]
