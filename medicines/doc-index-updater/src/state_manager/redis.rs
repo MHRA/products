@@ -74,7 +74,7 @@ pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisR
 
     let lua_script = match status {
         JobStatus::Accepted => include_str!("set_if_not_exists.lua"),
-        _ => include_str!("set_if_not_completed.lua"),
+        _ => include_str!("set_if_accepted_or_doesnt_exist.lua"),
     };
 
     redis::Script::new(lua_script)
