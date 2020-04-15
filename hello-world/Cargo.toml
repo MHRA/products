@@ -1,0 +1,9 @@
+[package]
+name = "hello-world"
+version = "0.1.0"
+authors = ["stuart.harris@red-badger.com"]
+edition = "2018"
+
+[dependencies]
+tokio = { version = "0.2", features = ["macros"] }
+warp = "0.2.2"

@@ -1,0 +1,68 @@
+name: hello-world
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - hello-world/**
+      - .github/workflows/hello-world.yaml
+
+env:
+  IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/hello-world
+
+jobs:
+  build-and-test:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Docker login
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsdevelopmentregistry.azurecr.io
+          username: mhraproductsdevelopmentregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build, test and push Docker image
+        working-directory: ./products/hello-world
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-master tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
+          echo ::set-env name=TAG::$TAG
+          echo ::set-env name=DIGEST::$DIGEST
+
+      - name: Clone Deployments repo
+        uses: actions/checkout@v2
+        with:
+          repository: MHRA/deployments
+          path: deployments
+          token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+
+      - name: Update image tag
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kustomize: 3.4.0
+          command: |
+            set -eux
+            cd deployments/hello-world/overlays/dev
+
+            kustomize edit set image $DIGEST
+
+            git config --local user.email "CD.no.reply@mhra.gov.uk"
+            git config --local user.name "MHRA CI/CD"
+            git diff-index --quiet HEAD || git commit -am "CI: Update image for $TAG"
+            declare -i n
+            n=0
+            until [ $n -ge 5 ]
+            do
+              git push && break
+              n+=1
+              git pull --rebase
+            done
