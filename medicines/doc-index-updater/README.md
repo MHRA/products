@@ -5,7 +5,7 @@
 ## To build a docker image:
 
 ```bash
-make docker
+make docker-build
 ```
 
 ## To push image to Azure container registry (ACR):

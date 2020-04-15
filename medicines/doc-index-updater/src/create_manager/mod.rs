@@ -1,7 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
-    search_client,
     service_bus_client::{
         create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -101,7 +100,7 @@ pub async fn process_message(message: CreateMessage) -> Uuid {
 
     tracing::debug!("Uploaded blob {}.", &name);
 
-    add_blob_to_search_index(&search_client, blob).await?;
+    add_blob_to_search_index(search_client, blob).await?;
 
     tracing::info!("Successfully added {} to index.", &name);
 

@@ -1,65 +1,11 @@
-use crate::create_manager::models::IndexEntry;
+pub mod models;
+
+use crate::models::{AzureIndexChangedResults, AzureSearchResults, IndexEntry};
 use async_trait::async_trait;
 use core::fmt::Debug;
 use fehler::{throw, throws};
 use serde::ser::Serialize;
-use serde_derive::Deserialize;
 use std::collections::HashMap;
-
-#[derive(Debug, Deserialize)]
-pub struct AzureHighlight {
-    #[serde(rename = "content")]
-    content: Vec<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AzureResult {
-    pub doc_type: String,
-    pub file_name: String,
-    pub metadata_storage_name: String,
-    pub metadata_storage_path: String,
-    pub product_name: Option<String>,
-    pub substance_name: Vec<String>,
-    pub title: String,
-    pub created: Option<String>,
-    pub facets: Vec<String>,
-    pub keywords: Option<String>,
-    pub metadata_storage_size: i32,
-    pub release_state: Option<String>,
-    pub rev_label: Option<String>,
-    pub suggestions: Vec<String>,
-    #[serde(rename = "@search.score")]
-    pub score: f32,
-    #[serde(rename = "@search.highlights")]
-    pub highlights: Option<AzureHighlight>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AzureSearchResults {
-    #[serde(rename = "value")]
-    pub search_results: Vec<AzureResult>,
-    #[serde(rename = "@odata.context")]
-    pub context: String,
-    #[serde(rename = "@odata.count")]
-    pub count: Option<i32>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AzureIndexChangedResults {
-    pub value: Vec<AzureIndexChangedResult>,
-    #[serde(rename = "@odata.context")]
-    context: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AzureIndexChangedResult {
-    pub key: String,
-    pub status: bool,
-    #[serde(rename = "errorMessage")]
-    pub error_message: Option<String>,
-    #[serde(rename = "statusCode")]
-    pub status_code: u16,
-}
 
 #[derive(Clone)]
 struct AzureConfig {
@@ -78,7 +24,7 @@ pub fn get_env(key: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
 }
 
-pub fn factory() -> AzureSearchClient {
+pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
     let api_key = get_env("AZURE_API_ADMIN_KEY");
     let search_index = get_env("AZURE_SEARCH_INDEX");
     let search_service = get_env("SEARCH_SERVICE");
@@ -96,30 +42,56 @@ pub fn factory() -> AzureSearchClient {
 }
 
 #[async_trait]
-pub trait Searchable {
+pub trait Search {
     async fn search(&self, &mut search_term: String) -> Result<AzureSearchResults, reqwest::Error>;
 }
 
 #[async_trait]
-impl Searchable for AzureSearchClient {
+impl Search for AzureSearchClient {
     async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
         search(search_term, &self.client, self.config.clone()).await
     }
 }
 
-impl AzureSearchClient {
-    #[throws(anyhow::Error)]
-    pub async fn delete(&self, key_name: &str, value: &str) -> AzureIndexChangedResults {
+#[async_trait]
+pub trait DeleteIndexEntry {
+    async fn delete_index_entry(
+        &self,
+        key_name: &str,
+        value: &str,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error>;
+}
+
+#[async_trait]
+impl DeleteIndexEntry for AzureSearchClient {
+    async fn delete_index_entry(
+        &self,
+        key_name: &str,
+        value: &str,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
         let mut key_values = HashMap::new();
         key_values.insert(key_name.to_string(), value.to_string());
         key_values.insert("@search.action".to_string(), "delete".to_string());
 
-        update_index(key_values, &self.client, &self.config).await?
+        update_index(key_values, &self.client, &self.config).await
     }
+}
 
-    #[throws(anyhow::Error)]
-    pub async fn create(&self, key_values: IndexEntry) -> AzureIndexChangedResults {
-        update_index(key_values, &self.client, &self.config).await?
+#[async_trait]
+pub trait CreateIndexEntry {
+    async fn create_index_entry(
+        &self,
+        key_values: IndexEntry,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error>;
+}
+
+#[async_trait]
+impl CreateIndexEntry for AzureSearchClient {
+    async fn create_index_entry(
+        &self,
+        key_values: IndexEntry,
+    ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+        update_index(key_values, &self.client, &self.config).await
     }
 }
 
@@ -129,6 +101,22 @@ async fn search(
     client: &reqwest::Client,
     config: AzureConfig,
 ) -> AzureSearchResults {
+    let req = build_search(search_term, &client, config)?;
+    tracing::debug!("Requesting from URL: {}", &req.url());
+    client
+        .execute(req)
+        .await?
+        .error_for_status()?
+        .json::<AzureSearchResults>()
+        .await?
+}
+
+#[throws(reqwest::Error)]
+fn build_search(
+    search_term: String,
+    client: &reqwest::Client,
+    config: AzureConfig,
+) -> reqwest::Request {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
         search_service = config.search_service,
@@ -150,14 +138,7 @@ async fn search(
         .header("api-key", &config.api_key)
         .build()?;
 
-    tracing::debug!("Requesting from URL: {}", &req.url());
-
-    client
-        .execute(req)
-        .await?
-        .error_for_status()?
-        .json::<AzureSearchResults>()
-        .await?
+    req
 }
 
 #[throws(anyhow::Error)]
@@ -199,5 +180,56 @@ where
     } else {
         let error_message = h.text().await?;
         throw!(anyhow::anyhow!(error_message))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    fn given_we_have_a_search_client() -> reqwest::Client {
+        reqwest::Client::new()
+    }
+
+    fn given_we_have_a_search_term() -> String {
+        "cool beans".to_string()
+    }
+
+    fn given_we_have_a_config() -> AzureConfig {
+        AzureConfig {
+            api_key: "api_key".to_string(),
+            search_index: "search_index".to_string(),
+            search_service: "search_service".to_string(),
+            api_version: "api_version".to_string(),
+        }
+    }
+
+    fn when_we_build_a_search_request(
+        client: reqwest::Client,
+        search_term: String,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_search(search_term, &client, config)
+    }
+
+    fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&%40count=true&%40top=10&%40skip=0&search=cool+beans&scoringProfile=preferKeywords"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            assert!(false, "Provided search request is an error");
+        }
+    }
+
+    #[test]
+    fn test_build_search() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_a_search_term();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_request(client, search_term, config);
+        then_search_url_is_as_expected(actual);
     }
 }

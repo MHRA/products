@@ -1,7 +1,5 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
-    search_client,
-    search_client::{AzureSearchClient, Searchable},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -14,6 +12,7 @@ use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
 use fehler::{throw, throws};
+use search_client::{DeleteIndexEntry, Search};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -95,7 +94,7 @@ pub async fn process_message(message: DeleteMessage) -> Uuid {
         &blob_name,
         &message.document_content_id
     );
-    delete_from_index(&search_client, &blob_name).await?;
+    delete_from_index(search_client, &blob_name).await?;
     tracing::info!("Deleted blob {} from index", &blob_name);
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
@@ -115,7 +114,7 @@ pub async fn process_message(message: DeleteMessage) -> Uuid {
 #[throws(ProcessMessageError)]
 pub async fn get_blob_name_from_content_id(
     content_id: String,
-    search_client: &impl Searchable,
+    search_client: &impl Search,
 ) -> String {
     if let Some(result) = search_client
         .search(content_id.to_owned())
@@ -147,9 +146,9 @@ async fn delete_blob(
 }
 
 #[throws(anyhow::Error)]
-pub async fn delete_from_index(search_client: &AzureSearchClient, blob_name: &str) {
+pub async fn delete_from_index(search_client: impl DeleteIndexEntry, blob_name: &str) {
     search_client
-        .delete(&"metadata_storage_name".to_string(), &blob_name)
+        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
 }
 
@@ -159,12 +158,11 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage,
-        search_client::{AzureSearchResults, Searchable},
-        service_bus_client::test::TestRemoveableMessage,
+        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::TestJobStatusClient,
     };
     use fehler::throws;
+    use search_client::{models::AzureSearchResults, Search};
     use tokio_test::block_on;
 
     #[test]
@@ -248,22 +246,24 @@ mod test {
     fn get_blob_name_from_content_id_raises_document_not_found_in_index_error_when_not_there() {
         let search_client = given_a_search_client_that_returns_no_results();
         let result = when_getting_blob_name_from_content_id(search_client);
-        then_document_not_found_in_index_error_raised(result);
+        then_document_not_found_in_index_error_is_raised(result);
     }
 
-    fn given_a_search_client_that_returns_no_results() -> impl Searchable {
+    fn given_a_search_client_that_returns_no_results() -> impl Search {
         TestAzureSearchClientWithNoResults {}
     }
 
     #[throws(ProcessMessageError)]
-    fn when_getting_blob_name_from_content_id(search_client: impl Searchable) -> String {
+    fn when_getting_blob_name_from_content_id(search_client: impl Search) -> String {
         block_on(get_blob_name_from_content_id(
             String::from("non existent content id"),
             &search_client,
         ))?
     }
 
-    fn then_document_not_found_in_index_error_raised(result: Result<String, ProcessMessageError>) {
+    fn then_document_not_found_in_index_error_is_raised(
+        result: Result<String, ProcessMessageError>,
+    ) {
         assert_eq!(result.is_err(), true);
 
         assert!(
@@ -282,7 +282,7 @@ mod test {
     struct TestAzureSearchClientWithNoResults {}
 
     #[async_trait]
-    impl Searchable for TestAzureSearchClientWithNoResults {
+    impl Search for TestAzureSearchClientWithNoResults {
         async fn search(&self, _search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
             Ok(AzureSearchResults {
                 search_results: vec![],

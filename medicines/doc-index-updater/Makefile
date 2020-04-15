@@ -53,13 +53,12 @@ ci-branch: docker-build ## Build branch in CI
 ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
-docker-build: ## Build and tag Docker image
-	docker build \
+docker-build: ## Build and tag Docker image (with search-client create as dependency)
+	tar cv --exclude=target Dockerfile -C .. ./doc-index-updater ./search-client | docker build - \
 		--progress plain \
 		--tag $(app) \
 		--tag $(image) \
-		--tag $(image):$(tag) \
-		.
+		--tag $(image):$(tag)
 
 .PHONY: docker-run
 docker-run: ## Run Docker image
