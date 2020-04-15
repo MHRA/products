@@ -72,32 +72,16 @@ pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> 
 pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
 
-    match status {
-        JobStatus::Accepted => {
-            let num_keys = 1;
+    let lua_script = match status {
+        JobStatus::Accepted => include_str!("set_if_not_exists.lua"),
+        _ => include_str!("set_if_not_completed.lua"),
+    };
 
-            redis::cmd("EVAL")
-                .arg(include_str!("set_if_not_exists.lua"))
-                .arg(num_keys)
-                .arg(id.to_string())
-                .arg(status.clone())
-                .query_async(&mut con)
-                .await?;
-        }
-        _ => {
-            let num_keys = 1;
-
-            redis::cmd("EVAL")
-                .arg(include_str!("set_if_not_completed.lua"))
-                .arg(num_keys)
-                .arg(id.to_string())
-                .arg(status.clone())
-                .query_async(&mut con)
-                .await?;
-        }
-    }
-
-    get_from_redis(client, id).await
+    redis::Script::new(lua_script)
+        .key(id.to_string())
+        .arg(status)
+        .invoke_async(&mut con)
+        .await
 }
 
 #[cfg(test)]
