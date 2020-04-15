@@ -5,7 +5,7 @@ use crate::{
 };
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
-use serde::Serialize;
+use search_client::models::IndexEntry;
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -81,31 +81,6 @@ impl Into<HashMap<String, String>> for BlobMetadata {
 
         metadata
     }
-}
-
-#[derive(Debug, Serialize)]
-pub struct IndexEntry {
-    content: String,
-    rev_label: String,
-    metadata_storage_path: String,
-    metadata_content_type: String,
-    product_name: String,
-    metadata_language: String,
-    created: String,
-    release_state: String,
-    keywords: String,
-    title: String,
-    pl_number: Vec<String>,
-    file_name: String,
-    metadata_storage_content_type: String,
-    metadata_storage_size: usize,
-    metadata_storage_last_modified: String,
-    metadata_storage_content_md5: String,
-    metadata_storage_name: String,
-    doc_type: String,
-    suggestions: Vec<String>,
-    substance_name: Vec<String>,
-    facets: Vec<String>,
 }
 
 impl From<Blob> for IndexEntry {

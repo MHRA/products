@@ -5,7 +5,7 @@
 ## To build a docker image:
 
 ```bash
-make docker
+make docker-build
 ```
 
 ## To push image to Azure container registry (ACR):
@@ -39,6 +39,16 @@ stunnel stunnel.conf
 ```bash
 make
 ```
+
+To get SFTP working locally, first set up a local user, with username and password, that you can use as a local SFTP server.
+
+Add this variables to an file `.env.overrides` using the env var `SENTINEL_SFTP_USERNAME`.
+
+Then run `make set-sftp-keys` to pull the public/private keys for development and install them in your home directory `.ssh` dir. This will also add entries to your `.env.overrides` file for the necessary environment variables.
+
+Navigate to `~/.ssh` dir and install the public key on your locahost server by running:
+`ssh-copy-id -f -i ./doc_index_updater <YOUR_SFTP_USERNAME>@localhost`
+This will add the public key to your localhost `~/.ssh/authorized_keys` file.
 
 ## Environment variables
 
