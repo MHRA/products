@@ -12,16 +12,25 @@ use time::Duration;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 use warp::{
+    reject,
     reply::{Json, Xml},
     Filter, Rejection, Reply,
 };
 
 #[derive(Debug)]
 pub struct FailedToDispatchToQueue;
+
+impl warp::reject::Reject for FailedToDispatchToQueue {}
+
 #[derive(Debug)]
 pub struct FailedToDeserialize;
-impl warp::reject::Reject for FailedToDispatchToQueue {}
+
 impl warp::reject::Reject for FailedToDeserialize {}
+
+#[derive(Debug)]
+pub struct FailedToAddToQueue;
+
+impl warp::reject::Reject for FailedToAddToQueue {}
 
 #[throws(MyRedisError)]
 async fn accept_job(state_manager: &impl JobStatusClient) -> JobStatusResponse {
@@ -43,25 +52,27 @@ async fn queue_job<T>(
 where
     T: Message,
 {
+    let id = message.get_id();
     let duration = Duration::days(1);
 
-    match queue.send(message.clone(), duration).await {
-        Ok(_) => state_manager.get_status(message.get_id()).await?,
+    match queue.send(message, duration).await {
+        Ok(_) => state_manager.get_status(id).await?,
         Err(e) => {
             tracing::error!(
                 "Failed to dispatch to queue. Check environment variables align for queue names, policies and keys. Error: ({:?})",
                 e
             );
-
-            state_manager
+            let _state = state_manager
                 .set_status(
-                    message.get_id(),
+                    id,
                     JobStatus::Error {
                         message: "Failed to dispatch to queue".to_owned(),
                         code: "".to_owned(),
                     },
                 )
-                .await?
+                .await?;
+
+            throw!(reject::custom(FailedToAddToQueue {}))
         }
     }
 }
