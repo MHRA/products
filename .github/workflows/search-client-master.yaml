@@ -1,0 +1,24 @@
+name: search-client-master
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - medicines/search-client-master/**
+      - .github/workflows/search-client-master.yaml
+
+jobs:
+  build-and-test:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./medicines/search-client
+        run: cargo test
