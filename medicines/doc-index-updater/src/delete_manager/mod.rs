@@ -94,8 +94,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
         &blob_name,
         &message.document_content_id
     );
-    delete_from_index(&search_client, &blob_name).await?;
-    tracing::info!("Deleted blob {} from index", &blob_name);
+
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
         .map_err(|e| {
@@ -107,6 +106,9 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
         &blob_name,
         &storage_container_name
     );
+
+    delete_from_index(&search_client, &blob_name).await?;
+    tracing::info!("Deleted blob {} from index", &blob_name);
 
     Ok(message.job_id)
 }
