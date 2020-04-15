@@ -16,6 +16,7 @@ use azure_sdk_storage_blob::prelude::*;
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
+use warp::http::StatusCode;
 
 pub async fn delete_service_worker(
     time_to_wait: Duration,
@@ -95,17 +96,33 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
         &message.document_content_id
     );
 
-    delete_blob(&storage_client, &storage_container_name, &blob_name)
-        .await
-        .map_err(|e| {
-            tracing::error!("Error deleting blob: {:?}", e);
-            anyhow!("Couldn't delete blob {}", &blob_name)
-        })?;
-    tracing::info!(
-        "Deleted blob {} from storage container {}",
-        &blob_name,
-        &storage_container_name
-    );
+    match delete_blob(&storage_client, &storage_container_name, &blob_name).await {
+        Ok(_) => {
+            tracing::info!(
+                "Deleted blob {} from storage container {}",
+                &blob_name,
+                &storage_container_name,
+            );
+            Ok(())
+        }
+        Err(e) => match e {
+            AzureError::UnexpectedHTTPResult(e) => {
+                if e.status_code() == StatusCode::NOT_FOUND {
+                    tracing::warn!(
+                        "Blob {} couldn't be found in storage container {}: {:?}",
+                        &blob_name,
+                        &storage_container_name,
+                        e
+                    );
+                    Ok(())
+                } else {
+                    tracing::error!("Error deleting blob: {:?}", e);
+                    Err(anyhow!("Couldn't delete blob {}: {:?}", &blob_name, e))
+                }
+            }
+            e => Err(anyhow!("Couldn't delete blob {}: {:?}", &blob_name, e)),
+        },
+    }?;
 
     delete_from_index(&search_client, &blob_name).await?;
     tracing::info!("Deleted blob {} from index", &blob_name);

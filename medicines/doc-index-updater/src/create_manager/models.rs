@@ -349,7 +349,10 @@ mod test {
             name: "Some SPC".to_string(),
             document_type: DocumentType::Spc,
             author: "test".to_string(),
-            products: vec!["Generic Paracetamol".to_string(), "Special Paracetamol".to_string()],
+            products: vec![
+                "Generic Paracetamol".to_string(),
+                "Special Paracetamol".to_string(),
+            ],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
             active_substances: vec!["paracetamol".to_string()],
@@ -366,7 +369,10 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
-                product_names: VecSanitisedString::from(vec!["GENERIC PARACETAMOL".to_string(), "SPECIAL PARACETAMOL".to_string()]),
+                product_names: VecSanitisedString::from(vec![
+                    "GENERIC PARACETAMOL".to_string(),
+                    "SPECIAL PARACETAMOL".to_string()
+                ]),
                 active_substances: VecSanitisedString::from(vec!["PARACETAMOL".to_string()]),
                 author: SanitisedString::from("test".to_string()),
                 keywords: None,
