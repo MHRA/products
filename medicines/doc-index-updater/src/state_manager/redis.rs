@@ -74,15 +74,22 @@ pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisR
 
     match status {
         JobStatus::Accepted => {
+            let num_keys = 1;
+
             redis::cmd("EVAL")
-                .arg(include_str!("script.lua"))
-                .arg(1)
+                .arg(include_str!("set_if_not_exists.lua"))
+                .arg(num_keys)
                 .arg(id.to_string())
+                .arg(status.clone())
                 .query_async(&mut con)
                 .await?;
         }
         _ => {
-            redis::cmd("SET")
+            let num_keys = 1;
+
+            redis::cmd("EVAL")
+                .arg(include_str!("set_if_not_completed.lua"))
+                .arg(num_keys)
                 .arg(id.to_string())
                 .arg(status.clone())
                 .query_async(&mut con)
