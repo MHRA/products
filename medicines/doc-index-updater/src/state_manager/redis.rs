@@ -72,11 +72,23 @@ pub async fn get_from_redis(client: Client, id: Uuid) -> RedisResult<JobStatus> 
 pub async fn set_in_redis(client: Client, id: Uuid, status: JobStatus) -> RedisResult<JobStatus> {
     let mut con = client.get_async_connection().await?;
 
-    redis::cmd("SET")
-        .arg(id.to_string())
-        .arg(status.clone())
-        .query_async(&mut con)
-        .await?;
+    match status {
+        JobStatus::Accepted => {
+            redis::cmd("EVAL")
+                .arg(include_str!("script.lua"))
+                .arg(1)
+                .arg(id.to_string())
+                .query_async(&mut con)
+                .await?;
+        }
+        _ => {
+            redis::cmd("SET")
+                .arg(id.to_string())
+                .arg(status.clone())
+                .query_async(&mut con)
+                .await?;
+        }
+    }
 
     get_from_redis(client, id).await
 }
