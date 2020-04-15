@@ -32,7 +32,7 @@ set-sftp-keys: ## Adds pub/private key for localhost to your .ssh dir
 		--name dev-sentinel-public-key \
 		--query value \
 		--output tsv > ~/.ssh/doc_index_updater.pub && \
-  az keyvault secret show \
+	az keyvault secret show \
 		--vault-name mhra-dev \
 		--name dev-sentinel-private-key \
 		--query value \
