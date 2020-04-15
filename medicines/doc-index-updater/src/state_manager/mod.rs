@@ -94,7 +94,7 @@ pub fn get_job_status_xml(
 
 fn handle_known_errors(id: Uuid, e: MyRedisError) -> Result<JobStatusResponse, MyRedisError> {
     tracing::error!("{}", e);
-    if let MyRedisError::IncompatibleType(_) = e {
+    if let MyRedisError::RedisIncompatibleTypeError(_) = e {
         Ok(JobStatusResponse {
             id,
             status: JobStatus::NotFound,

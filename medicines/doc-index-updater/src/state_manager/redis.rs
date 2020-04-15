@@ -1,6 +1,6 @@
 use crate::models::JobStatus;
 use ::redis::Client;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use redis::{self, FromRedisValue, RedisError, RedisResult, RedisWrite, ToRedisArgs, Value};
 use thiserror::Error;
 use uuid::Uuid;
@@ -8,12 +8,14 @@ use warp::reject;
 
 #[derive(Debug, Error)]
 pub enum MyRedisError {
-    #[error("Authentication Error ({0:?})")]
-    Auth(RedisError),
+    #[error("Redis Authentication Error ({0:?})")]
+    RedisAuthError(RedisError),
     #[error("Incompatible Type (maybe NOT FOUND) ({0:?})")]
-    IncompatibleType(RedisError),
+    RedisIncompatibleTypeError(RedisError),
+    #[error("Redis IO Error ({0:?})")]
+    RedisIoError(RedisError),
     #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    OtherError(#[from] anyhow::Error),
 }
 
 impl reject::Reject for MyRedisError {}
@@ -21,9 +23,10 @@ impl reject::Reject for MyRedisError {}
 impl From<RedisError> for MyRedisError {
     fn from(e: RedisError) -> Self {
         match e.kind() {
-            redis::ErrorKind::AuthenticationFailed => Self::Auth(e),
-            redis::ErrorKind::TypeError => Self::IncompatibleType(e),
-            _ => Self::Other(e.into()),
+            redis::ErrorKind::AuthenticationFailed => Self::RedisAuthError(e),
+            redis::ErrorKind::TypeError => Self::RedisIncompatibleTypeError(e),
+            redis::ErrorKind::IoError => Self::RedisIoError(e),
+            _ => Self::OtherError(e.into()),
         }
     }
 }
@@ -31,7 +34,7 @@ impl From<RedisError> for MyRedisError {
 impl From<MyRedisError> for warp::Rejection {
     fn from(e: MyRedisError) -> Self {
         tracing::error!("{:?}", e);
-        warp::reject::custom(MyRedisError::Other(anyhow!("Server Error")))
+        warp::reject::custom(e)
     }
 }
 
