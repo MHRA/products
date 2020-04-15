@@ -157,8 +157,9 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
-        state_manager::TestJobStatusClient,
+        models::DeleteMessage,
+        service_bus_client::test::TestRemoveableMessage,
+        state_manager::test::TestJobStatusClient,
     };
     use search_client::{models::AzureSearchResults, Search};
     use tokio_test::block_on;
@@ -168,8 +169,17 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        let result = when_we_handle_the_error(&mut removeable_message, error, &state_manager);
         then_message_is_removed(result, removeable_message);
+
+        assert_eq!(
+            state_manager.status,
+            JobStatus::Error {
+                message: String::from("404 not found, or something similar"),
+                code: String::from("")
+            }
+            .to_string()
+        );
     }
 
     #[test]
@@ -177,8 +187,13 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_an_unknown_error();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
+        let result = when_we_handle_the_error(&mut removeable_message, error, &state_manager);
         then_message_is_not_removed(result, removeable_message);
+        assert_eq!(
+            state_manager.status,
+            JobStatus::Accepted.to_string()
+        );
+        assert_eq!("the above assert is a false green since status on state_manager isn't set due to the problem marked TODO","")
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
@@ -189,8 +204,10 @@ mod test {
         anyhow!("Any other error").into()
     }
 
-    fn given_a_state_manager() -> impl JobStatusClient {
-        TestJobStatusClient {}
+    fn given_a_state_manager() -> TestJobStatusClient {
+        TestJobStatusClient {
+            status: JobStatus::Accepted.to_string(),
+        }
     }
 
     fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
@@ -208,12 +225,12 @@ mod test {
     fn when_we_handle_the_error(
         removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
         error: ProcessMessageError,
-        state_manager: impl JobStatusClient,
+        state_manager: &impl JobStatusClient,
     ) -> Result<(), anyhow::Error> {
         block_on(handle_processing_error_for_delete_message(
             removeable_message,
             error,
-            &state_manager,
+            state_manager,
         ))
     }
 
