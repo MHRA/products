@@ -9,7 +9,7 @@ on:
       - .github/workflows/hello-world.yaml
 
 env:
-  IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/hello-world
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/hello-world
 
 jobs:
   build-and-test:
@@ -25,8 +25,8 @@ jobs:
       - name: Docker login
         uses: azure/docker-login@v1
         with:
-          login-server: mhraproductsdevelopmentregistry.azurecr.io
-          username: mhraproductsdevelopmentregistry
+          login-server: mhraproductsnonprodregistry.azurecr.io
+          username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build, test and push Docker image
