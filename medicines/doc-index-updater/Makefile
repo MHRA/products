@@ -42,7 +42,7 @@ set-sftp-keys: ## Adds pub/private key for localhost to your .ssh dir
 		--name dev-sentinel-private-key-password \
 		--query value \
 		--output tsv) && \
-	echo "SENTINEL_PUB_KEY_PATH=\"$${HOME}/.ssh/doc_index_updater.pub\"" >> .env.overrides && \
+	echo "SENTINEL_PUBLIC_KEY_PATH=\"$${HOME}/.ssh/doc_index_updater.pub\"" >> .env.overrides && \
 	echo "SENTINEL_PRIVATE_KEY_PATH=\"$${HOME}/.ssh/doc_index_updater\"" >> .env.overrides && \
 	echo "SENTINEL_PRIVATE_KEY_PASSWORD=\"$${SENTINEL_PRIVATE_KEY_PASSWORD}\"" >> .env.overrides
 
