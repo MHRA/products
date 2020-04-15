@@ -40,21 +40,6 @@ fn sets_job_status_if_it_doesnt_exist(status: JobStatus) {
     assert_eq!(response.status, status);
 }
 
-#[test_case(JobStatus::Done)]
-#[test_case(JobStatus::Error{ message: "Bad error".into(), code: "".into() })]
-fn does_not_overwrite_job_status_to_accepted_if_already_done(original_status: JobStatus) {
-    let ctx = TestContext::default();
-
-    let state = StateManager::new(ctx.client);
-    let id = Uuid::new_v4();
-
-    get_ok(state.set_status(id, original_status.clone()));
-
-    let response = get_ok(state.set_status(id, JobStatus::Accepted));
-
-    assert_eq!(response.status, original_status);
-}
-
 #[test_case(JobStatus::Accepted)]
 #[test_case(JobStatus::Done)]
 #[test_case(JobStatus::Error{ message: "Bad error".into(), code: "".into() })]
