@@ -1,7 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
-    search_client,
     service_bus_client::{
         create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -13,6 +12,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+use search_client;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
@@ -100,7 +100,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::debug!("Uploaded blob {}.", &name);
 
-    add_blob_to_search_index(&search_client, blob).await?;
+    add_blob_to_search_index(search_client, blob).await?;
 
     tracing::info!("Successfully added {} to index.", &name);
 
