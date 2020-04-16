@@ -40,7 +40,7 @@ stunnel stunnel.conf
 make
 ```
 
-To get SFTP working locally, first set up a local user, with a username that you can use as a local SFTP server (e.g. localsftpuser).
+To get SFTP working locally, first set up a local user, with a username and password that you can use as a local SFTP server user (e.g. localsftpuser).
 
 Add `SENTINEL_SFTP_USERNAME=username` (where username is whatever you set in the step above, e.g. `SENTINEL_SFTP_USERNAME=localsftpuser`) to a file called `.env.overrides` which goes next to `.env` file (create the file if it doesn't exist).
 
