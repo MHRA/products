@@ -9,10 +9,9 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
-use azure_sdk_storage_blob::prelude::*;
-use search_client::{DeleteIndexEntry, Search};
+use search_client::{models::AzureResult, CreateIndexEntry, DeleteIndexEntry, Search};
 use std::time::Duration;
+use storage_client::DeleteBlob;
 use tokio::time::delay_for;
 use uuid::Uuid;
 
@@ -89,21 +88,39 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
+    process_message_int(message, storage_client, search_client).await
+}
+
+async fn process_message_int(
+    message: DeleteMessage,
+    mut storage_client: impl DeleteBlob,
+    search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
+) -> Result<Uuid, ProcessMessageError> {
     let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
-    let blob_name =
-        get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
+    let index_record: AzureResult =
+        get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
+            .await?;
+    let blob_name = index_record.metadata_storage_name.clone();
 
     tracing::info!(
         "Found blob name {} for document content ID {} from index",
         &blob_name,
         &message.document_content_id
     );
+
     delete_from_index(search_client, &blob_name).await?;
     tracing::info!("Deleted blob {} from index", &blob_name);
-    delete_blob(&storage_client, &storage_container_name, &blob_name)
+
+    storage_client
+        .delete_blob(&storage_container_name, &blob_name)
         .await
         .map_err(|e| {
-            tracing::error!("Error deleting blob: {:?}", e);
+            tracing::error!(
+                "Error deleting blob: {:?}, re-creating index: {:?}",
+                e,
+                &index_record
+            );
+
             anyhow!("Couldn't delete blob {}", &blob_name)
         })?;
     tracing::info!(
@@ -115,35 +132,20 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     Ok(message.job_id)
 }
 
-pub async fn get_blob_name_from_content_id(
+pub async fn get_index_record_from_content_id(
     content_id: String,
     search_client: &impl Search,
-) -> Result<String, ProcessMessageError> {
+) -> Result<AzureResult, ProcessMessageError> {
     let search_results = search_client
         .search(content_id.to_owned())
         .await
         .map_err(anyhow::Error::from)?;
     for result in search_results.search_results {
         if result.file_name == content_id {
-            return Ok(result.metadata_storage_name);
+            return Ok(result);
         }
     }
     Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
-}
-
-async fn delete_blob(
-    storage_client: &azure_sdk_storage_core::prelude::Client,
-    container_name: &str,
-    blob_name: &str,
-) -> Result<(), AzureError> {
-    storage_client
-        .delete_blob()
-        .with_container_name(&container_name)
-        .with_blob_name(&blob_name)
-        .with_delete_snapshots_method(DeleteSnapshotsMethod::Include)
-        .finalize()
-        .await?;
-    Ok(())
 }
 
 pub async fn delete_from_index(
@@ -285,7 +287,13 @@ mod test {
     fn when_getting_blob_name_from_content_id(
         search_client: impl Search,
     ) -> Result<String, ProcessMessageError> {
-        block_on(get_blob_name_from_content_id(
+        Ok(when_getting_index_record_from_content_id(search_client)?.metadata_storage_name)
+    }
+
+    fn when_getting_index_record_from_content_id(
+        search_client: impl Search,
+    ) -> Result<AzureResult, ProcessMessageError> {
+        block_on(get_index_record_from_content_id(
             String::from("non existent content id"),
             &search_client,
         ))

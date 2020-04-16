@@ -86,7 +86,8 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?
+        .azure_client;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
