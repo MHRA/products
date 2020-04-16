@@ -157,8 +157,7 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage,
-        service_bus_client::test::TestRemoveableMessage,
+        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::test::TestJobStatusClient,
     };
     use search_client::{models::AzureSearchResults, Search};
@@ -189,10 +188,7 @@ mod test {
         let error = given_an_unknown_error();
         let result = when_we_handle_the_error(&mut removeable_message, error, &state_manager);
         then_message_is_not_removed(result, removeable_message);
-        assert_eq!(
-            state_manager.status,
-            JobStatus::Accepted.to_string()
-        );
+        assert_eq!(state_manager.status, JobStatus::Accepted.to_string());
         assert_eq!("the above assert is a false green since status on state_manager isn't set due to the problem marked TODO","")
     }
 
