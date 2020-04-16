@@ -100,6 +100,7 @@ async fn process_delete_message(
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
     let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
+
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -161,6 +162,16 @@ pub async fn get_index_record_from_content_id(
         }
     }
     Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
+}
+
+pub async fn delete_from_index(
+    search_client: impl DeleteIndexEntry,
+    blob_name: &str,
+) -> Result<(), anyhow::Error> {
+    search_client
+        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
+        .await?;
+    Ok(())
 }
 
 #[cfg(test)]
