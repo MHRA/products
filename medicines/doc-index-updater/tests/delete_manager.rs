@@ -47,18 +47,19 @@ fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> {
     Ok(job_status_response)
 }
 
-fn create_document(document_id: String) -> Result<JobStatusResponse, Error> {
+fn create_document(document_id: String, file_path: String) -> Result<JobStatusResponse, Error> {
     let client = reqwest::Client::new();
-    let metadata = Document{ id: document_id,
+    let metadata = Document {
+        id: document_id,
         name: "Star Wars Trilogy".to_string(),
         document_type: DocumentType::Pil,
         author: "author".to_string(),
         products: vec!["products".to_string()],
         pl_number: "pl_number".to_string(),
         active_substances: vec!["active_substances".to_string()],
-        file_path: "sentinel/uat/batch/UATSPW10/SPCPILBatch/temp/PLPI 46420-0028/090003e98ec69895_leaflet MAH BRAND_PLPI 46420-0028.pdf".to_string(),
+        file_path,
         file_source: FileSource::Sentinel,
-        keywords:Some(vec!["keyword".to_string()])
+        keywords: Some(vec!["keyword".to_string()]),
     };
 
     println!("{:?}", metadata);
@@ -92,8 +93,8 @@ fn get_job_status(job_id: Uuid) -> JobStatus {
 
 #[test]
 fn document_not_found_error_sets_error_state() {
-    let document_id = "11111".to_string();
-    let job_status_response = delete_document(document_id.to_owned()).unwrap();
+    let document_id = Uuid::new_v4();
+    let job_status_response = delete_document(document_id.to_string()).unwrap();
 
     let job_id = job_status_response.id;
     println!("sleeping 5 seconds");
@@ -102,27 +103,47 @@ fn document_not_found_error_sets_error_state() {
     assert_eq!(
         status,
         JobStatus::Error {
-            message: format!("Cannot find document with ID {}", document_id.clone()).to_string(),
+            message: format!("Cannot find document with ID {}", document_id.to_string()),
             code: "".to_string()
         }
     );
 }
 
 #[test]
-fn delete_created_document_succeeds {
-    let document_id = "11111".to_string();
+fn delete_created_document_succeeds() {
+    let document_id = Uuid::new_v4();
 
-    let create_response = create_document(document_id.clone()).unwrap();
-    println!("sleeping 5 seconds");
-    std::thread::sleep(std::time::Duration::from_secs(10));
-    let status = get_job_status(create_response.id);
-    assert_eq!(status, JobStatus::Done);
+    let create_response = create_document(document_id.to_string(), "example.txt".into()).unwrap();
 
-    let job_status_response = delete_document(document_id.to_owned()).unwrap();
+    let mut i = 0;
+    loop {
+        let status = get_job_status(create_response.id);
+
+        if status == JobStatus::Done {
+            break;
+        } else if i > 10 {
+            panic!("Create job status is not Done after 10 seconds: {}", status);
+        }
+
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        i += 1;
+    }
+
+    let job_status_response = delete_document(document_id.to_string()).unwrap();
 
     let job_id = job_status_response.id;
-    println!("sleeping 5 seconds");
-    std::thread::sleep(std::time::Duration::from_secs(5));
-    let status = get_job_status(job_id);
-    assert_eq!(status, JobStatus::Done);
+
+    let mut i = 0;
+    loop {
+        let status = get_job_status(job_id);
+
+        if status == JobStatus::Done {
+            break;
+        } else if i > 10 {
+            panic!("Delete job status is not Done after 10 seconds: {}", status);
+        }
+
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        i += 1;
+    }
 }
