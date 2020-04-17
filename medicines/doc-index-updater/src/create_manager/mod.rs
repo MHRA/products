@@ -12,7 +12,6 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-use search_client;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};

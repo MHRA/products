@@ -90,23 +90,23 @@ impl From<IndexResult> for IndexEntry {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: match res.rev_label {
-                Some(rl) => rl.clone(),
+                Some(rl) => rl,
                 None => "1".to_owned(),
             },
             product_name: match res.product_name {
-                Some(pn) => pn.clone(),
+                Some(pn) => pn,
                 None => "".to_owned(),
             },
             created: match res.created {
-                Some(cr) => cr.clone(),
+                Some(cr) => cr,
                 None => Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             },
             release_state: match res.release_state {
-                Some(rs) => rs.clone(),
+                Some(rs) => rs,
                 None => "Y".to_owned(),
             },
             keywords: match res.keywords {
-                Some(k) => k.clone(),
+                Some(k) => k,
                 None => "".to_owned(),
             },
             title: res.title.clone(),
