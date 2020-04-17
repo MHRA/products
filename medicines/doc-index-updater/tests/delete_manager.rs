@@ -5,6 +5,7 @@ use doc_index_updater::{
     models::DeleteMessage,
     service_bus_client::{delete_factory, Removeable},
 };
+
 use support::{get_message_safely, get_ok, get_test_delete_message};
 use tokio_test::block_on;
 use uuid::Uuid;
