@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import DrugIndex from '../../components/drug-index/index';
+import ProductList from '../../components/product-list/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
 import {
@@ -19,7 +19,7 @@ const App: NextPage = () => {
     'allowStorage',
     false,
   );
-  const [results, setResults] = React.useState<IProduct[]>([]);
+  const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
 
   const router = useRouter();
@@ -33,14 +33,26 @@ const App: NextPage = () => {
     }
     (async () => {
       const substanceStr = queryQS.toString();
-      const firstLetter = substanceStr.charAt(0);
-      const substanceIndex = await substanceLoader.load(firstLetter);
-      const substanceMatch = substanceIndex.find(s => s.name === substanceStr);
-      if (substanceMatch) {
-        setResults(substanceMatch.products);
-      }
-      setSubstanceName(substanceStr);
-      Events.viewProductsForSubstance(substanceStr);
+      const query = `{
+        products(substanceName: "${substanceStr}") {
+          name
+          documentCount
+        }
+      }`;
+      const response = await fetch("http://localhost:8000/graphql", {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"query": query, "variables": null})
+      }).then((response) => {
+        return response.json();
+      }).then((responseData) => {
+        setProducts(responseData.data.products);
+        setSubstanceName(substanceStr);
+        Events.viewProductsForSubstance(substanceStr);
+      })
     })();
   }, [queryQS]);
 
@@ -57,10 +69,10 @@ const App: NextPage = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <DrugIndex title={`${substanceName || '...'}`} items={results} />
+        <ProductList title={substanceName} products={products} />
         <SubstanceStructuredData substanceName={substanceName} />
         <DrugListStructuredData
-          drugNames={results.map(product => product.name)}
+          drugNames={products.map(product => product.name)}
         />
       </SearchWrapper>
     </Page>
