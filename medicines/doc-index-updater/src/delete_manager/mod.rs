@@ -234,6 +234,7 @@ mod test {
     fn recoverable_error_during_delete_leaves_job_status_as_accepted() {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
+        given_the_delete_job_is_accepted(removeable_message.get_message().job_id, &state_manager);
         let error = given_an_unknown_error();
 
         block_on(handle_processing_error_for_delete_message(
@@ -270,6 +271,10 @@ mod test {
             remove_was_called: false,
             message: delete_message,
         }
+    }
+
+    fn given_the_delete_job_is_accepted(id: Uuid, state_manager: &TestJobStatusClient) {
+        let _ = block_on(state_manager.set_status(id, JobStatus::Accepted));
     }
 
     #[test]

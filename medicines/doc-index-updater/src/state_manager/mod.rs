@@ -156,21 +156,21 @@ pub fn with_state(
 #[cfg(test)]
 pub mod test {
     use super::*;
-    use std::sync::Mutex;
+    use std::{collections::HashMap, sync::Mutex};
 
     #[derive(Debug)]
     pub struct TestJobStatusClient {
-        status: Mutex<JobStatus>,
+        status: Mutex<HashMap<Uuid, JobStatus>>,
     }
 
     impl TestJobStatusClient {
         pub fn accepted() -> Self {
             Self {
-                status: Mutex::new(JobStatus::Accepted),
+                status: Mutex::new(HashMap::<Uuid, JobStatus>::new()),
             }
         }
 
-        fn get_most_recently_set_status(&self) -> JobStatus {
+        fn get_statuses(&self) -> HashMap<Uuid, JobStatus> {
             (*self.status.lock().unwrap()).clone()
         }
     }
@@ -181,9 +181,12 @@ pub mod test {
             &self,
             id: Uuid,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+            let s = self.get_statuses();
+            println!("{:?}", s);
+
             Ok(JobStatusResponse {
+                status: s[&id].clone(),
                 id,
-                status: self.get_most_recently_set_status(),
             })
         }
         async fn set_status(
@@ -192,7 +195,7 @@ pub mod test {
             status: JobStatus,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
             let mut s_status = self.status.lock().unwrap();
-            *s_status = status.clone();
+            s_status.insert(id, status.clone());
 
             Ok(JobStatusResponse { id, status })
         }
