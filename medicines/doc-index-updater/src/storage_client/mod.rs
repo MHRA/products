@@ -10,7 +10,7 @@ pub struct BlobClient {
 impl BlobClient {
     pub fn new(azure_client: Client) -> BlobClient {
         BlobClient {
-            azure_client: azure_client,
+            azure_client,
         }
     }
 }

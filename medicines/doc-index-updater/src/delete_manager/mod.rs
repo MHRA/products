@@ -62,23 +62,41 @@ where
 
     let error_message = error.to_string();
 
-    if let ProcessMessageError::DocumentNotFoundInIndex(id) = error {
-        tracing::info!(
-            "Document {} wasn't found during delete, removing message",
-            id
-        );
+    match error {
+        ProcessMessageError::DocumentNotFoundInIndex(id) => {
+            tracing::info!(
+                "Document {} wasn't found during delete, removing message",
+                id
+            );
 
-        state_manager
-            .set_status(
-                removeable_message.get_message().job_id,
-                JobStatus::Error {
-                    message: error_message,
-                    code: "".to_string(),
-                },
-            )
-            .await?;
-
-        let _remove = removeable_message.remove().await?;
+            state_manager
+                .set_status(
+                    removeable_message.get_message().job_id,
+                    JobStatus::Error {
+                        message: error_message,
+                        code: "".to_string(),
+                    },
+                )
+                .await?;
+            let _remove = removeable_message.remove().await?;
+        }
+        ProcessMessageError::FailedRestoringIndex(_, _) => {
+            tracing::error!("{}", error.to_string());
+            state_manager
+                .set_status(
+                    removeable_message.get_message().job_id,
+                    JobStatus::Error {
+                        message: error.to_string(),
+                        code: "".to_string(),
+                    },
+                )
+                .await?;
+            let _remove = removeable_message.remove().await?;
+        }
+        ProcessMessageError::FailedDeletingBlob(_, _) => {
+            tracing::error!("{}", error.to_string());
+        }
+        _ => {}
     }
 
     Ok(())
