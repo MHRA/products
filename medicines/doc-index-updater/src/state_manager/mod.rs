@@ -170,8 +170,8 @@ pub mod test {
             }
         }
 
-        pub fn get_most_recently_set_status(&mut self) -> JobStatus {
-            self.status.get_mut().unwrap().clone()
+        fn get_most_recently_set_status(&self) -> JobStatus {
+            (*self.status.lock().unwrap()).clone()
         }
     }
 
@@ -179,9 +179,12 @@ pub mod test {
     impl JobStatusClient for TestJobStatusClient {
         async fn get_status(
             &self,
-            _id: Uuid,
+            id: Uuid,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-            unimplemented!()
+            Ok(JobStatusResponse {
+                id,
+                status: self.get_most_recently_set_status(),
+            })
         }
         async fn set_status(
             &self,
