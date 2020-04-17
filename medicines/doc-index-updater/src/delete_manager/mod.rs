@@ -57,23 +57,28 @@ where
     T: RemoveableMessage<DeleteMessage>,
 {
     tracing::info!("Handling processing error. Setting error state in state manager");
-    state_manager
-        .set_status(
-            removeable_message.get_message().job_id,
-            JobStatus::Error {
-                message: error.to_string(),
-                code: "".to_string(),
-            },
-        )
-        .await?;
+
+    let error_message = error.to_string();
 
     if let ProcessMessageError::DocumentNotFoundInIndex(id) = error {
         tracing::info!(
             "Document {} wasn't found during delete, removing message",
             id
         );
+
+        state_manager
+            .set_status(
+                removeable_message.get_message().job_id,
+                JobStatus::Error {
+                    message: error_message,
+                    code: "".to_string(),
+                },
+            )
+            .await?;
+
         let _remove = removeable_message.remove().await?;
     }
+
     Ok(())
 }
 
@@ -168,16 +173,39 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
-        let result = when_we_handle_the_error(&mut removeable_message, error, &state_manager);
-        then_message_is_removed(result, removeable_message);
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
 
         assert_eq!(
-            state_manager.status,
+            removeable_message.remove_was_called, true,
+            "Didn't remove message, but should"
+        );
+    }
+
+    #[test]
+    fn not_found_error_during_delete_sets_job_status_as_error() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_document_not_found_in_index();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
             JobStatus::Error {
-                message: String::from("404 not found, or something similar"),
-                code: String::from("")
-            }
-            .to_string()
+                message: String::from("Cannot find document with ID any id"),
+                code: String::from(""),
+            },
         );
     }
 
@@ -186,10 +214,37 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_an_unknown_error();
-        let result = when_we_handle_the_error(&mut removeable_message, error, &state_manager);
-        then_message_is_not_removed(result, removeable_message);
-        assert_eq!(state_manager.status, JobStatus::Accepted.to_string());
-        assert_eq!("the above assert is a false green since status on state_manager isn't set due to the problem marked TODO","")
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            removeable_message.remove_was_called, false,
+            "Removed message, but shouldn't"
+        );
+    }
+
+    #[test]
+    fn recoverable_error_during_delete_leaves_job_status_as_accepted() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_unknown_error();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
+            JobStatus::Accepted
+        );
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
@@ -201,9 +256,7 @@ mod test {
     }
 
     fn given_a_state_manager() -> TestJobStatusClient {
-        TestJobStatusClient {
-            status: JobStatus::Accepted.to_string(),
-        }
+        TestJobStatusClient::accepted()
     }
 
     fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
@@ -216,40 +269,6 @@ mod test {
             remove_was_called: false,
             message: delete_message,
         }
-    }
-
-    fn when_we_handle_the_error(
-        removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
-        error: ProcessMessageError,
-        state_manager: &impl JobStatusClient,
-    ) -> Result<(), anyhow::Error> {
-        block_on(handle_processing_error_for_delete_message(
-            removeable_message,
-            error,
-            state_manager,
-        ))
-    }
-
-    fn then_message_is_removed(
-        result: Result<(), anyhow::Error>,
-        removeable_message: TestRemoveableMessage<DeleteMessage>,
-    ) {
-        assert!(result.is_ok());
-        assert_eq!(
-            removeable_message.remove_was_called, true,
-            "Didn't remove message, but should"
-        );
-    }
-
-    fn then_message_is_not_removed(
-        result: Result<(), anyhow::Error>,
-        removeable_message: TestRemoveableMessage<DeleteMessage>,
-    ) {
-        assert!(result.is_ok());
-        assert_eq!(
-            removeable_message.remove_was_called, false,
-            "Removed message, but shouldn't"
-        );
     }
 
     #[test]

@@ -91,7 +91,6 @@ fn get_job_status(job_id: Uuid) -> JobStatus {
 }
 
 #[test]
-
 fn document_not_found_error_sets_error_state() {
     let document_id = "11111".to_string();
     let job_status_response = delete_document(document_id.to_owned()).unwrap();

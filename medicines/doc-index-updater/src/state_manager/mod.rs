@@ -156,17 +156,22 @@ pub fn with_state(
 #[cfg(test)]
 pub mod test {
     use super::*;
+    use std::sync::Mutex;
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug)]
     pub struct TestJobStatusClient {
-        pub status: String,
+        status: Mutex<JobStatus>,
     }
 
     impl TestJobStatusClient {
         pub fn accepted() -> Self {
             Self {
-                status: JobStatus::Accepted.to_string(),
+                status: Mutex::new(JobStatus::Accepted),
             }
+        }
+
+        pub fn get_most_recently_set_status(&mut self) -> JobStatus {
+            self.status.get_mut().unwrap().clone()
         }
     }
 
@@ -183,8 +188,9 @@ pub mod test {
             id: Uuid,
             status: JobStatus,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-  //TODO: solve this.... 
-  //self.status = status.to_string();
+            let mut s_status = self.status.lock().unwrap();
+            *s_status = status.clone();
+
             Ok(JobStatusResponse { id, status })
         }
     }
