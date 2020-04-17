@@ -1,6 +1,7 @@
 use chrono::{SecondsFormat, Utc};
 use core::fmt::Debug;
 use serde_derive::{Deserialize, Serialize};
+use std::clone::Clone;
 
 #[derive(Debug, Deserialize)]
 pub struct AzureHighlight {
@@ -9,7 +10,7 @@ pub struct AzureHighlight {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct AzureResult {
+pub struct IndexResult {
     pub doc_type: String,
     pub file_name: String,
     pub metadata_storage_name: String,
@@ -33,7 +34,7 @@ pub struct AzureResult {
 #[derive(Debug, Deserialize)]
 pub struct AzureSearchResults {
     #[serde(rename = "value")]
-    pub search_results: Vec<AzureResult>,
+    pub search_results: Vec<IndexResult>,
     #[serde(rename = "@odata.context")]
     pub context: String,
     #[serde(rename = "@odata.count")]
@@ -84,8 +85,8 @@ pub struct IndexEntry {
 
 // The AzureResult model does not contain all of the information we want in the index,
 // however, the automatic index rebuild will populate the missing information.
-impl From<AzureResult> for IndexEntry {
-    fn from(res: AzureResult) -> Self {
+impl From<IndexResult> for IndexEntry {
+    fn from(res: IndexResult) -> Self {
         Self {
             content: "Content not yet available".to_owned(),
             rev_label: match res.rev_label {

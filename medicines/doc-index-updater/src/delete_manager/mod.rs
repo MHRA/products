@@ -9,7 +9,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use search_client::{models::AzureResult, CreateIndexEntry, DeleteIndexEntry, Search};
+use search_client::{models::IndexResult, CreateIndexEntry, DeleteIndexEntry, Search};
 use std::time::Duration;
 use storage_client::DeleteBlob;
 use tokio::time::delay_for;
@@ -88,16 +88,16 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
 
-    process_message_int(message, storage_client, search_client).await
+    process_delete_message(message, storage_client, search_client).await
 }
 
-async fn process_message_int(
+async fn process_delete_message(
     message: DeleteMessage,
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
     let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
-    let index_record: AzureResult =
+    let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
     let blob_name = index_record.metadata_storage_name.clone();
@@ -111,18 +111,32 @@ async fn process_message_int(
     delete_from_index(search_client, &blob_name).await?;
     tracing::info!("Deleted blob {} from index", &blob_name);
 
-    storage_client
+    if let Err(e) = storage_client
         .delete_blob(&storage_container_name, &blob_name)
         .await
-        .map_err(|e| {
+    {
+        tracing::error!(
+            "Error deleting blob: {:?}, re-creating index: {:?}",
+            e,
+            &index_record
+        );
+
+        if let Err(er) = insert_index_entry_from_index_result(search_client, index_record).await {
             tracing::error!(
-                "Error deleting blob: {:?}, re-creating index: {:?}",
-                e,
+                "Failed to insert index entry {:?}, manual intervention required!",
                 &index_record
             );
 
+            anyhow!(
+                "Couldn't delete blob {} and failed to re-insert index: {:?}.",
+                &blob_name,
+                er
+            )
+        } else {
             anyhow!("Couldn't delete blob {}", &blob_name)
-        })?;
+        }
+    }
+
     tracing::info!(
         "Deleted blob {} from storage container {}",
         &blob_name,
@@ -135,7 +149,7 @@ async fn process_message_int(
 pub async fn get_index_record_from_content_id(
     content_id: String,
     search_client: &impl Search,
-) -> Result<AzureResult, ProcessMessageError> {
+) -> Result<IndexResult, ProcessMessageError> {
     let search_results = search_client
         .search(content_id.to_owned())
         .await
@@ -154,6 +168,16 @@ pub async fn delete_from_index(
 ) -> Result<(), anyhow::Error> {
     search_client
         .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
+        .await?;
+    Ok(())
+}
+
+pub async fn insert_index_entry_from_index_result(
+    search_client: impl CreateIndexEntry,
+    index_result: IndexResult,
+) -> Result<(), anyhow::Error> {
+    search_client
+        .create_index_entry(index_result.into())
         .await?;
     Ok(())
 }
@@ -292,7 +316,7 @@ mod test {
 
     fn when_getting_index_record_from_content_id(
         search_client: impl Search,
-    ) -> Result<AzureResult, ProcessMessageError> {
+    ) -> Result<IndexResult, ProcessMessageError> {
         block_on(get_index_record_from_content_id(
             String::from("non existent content id"),
             &search_client,
