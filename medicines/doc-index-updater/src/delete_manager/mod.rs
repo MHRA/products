@@ -130,14 +130,11 @@ async fn process_delete_message(
             .create_index_entry(IndexEntry::from(index_record.clone()))
             .await
             .map_err(|err| {
-                ProcessMessageError::FailedRestoringIndex(
-                    blob_name.clone(),
-                    err.to_string()
-                )
+                ProcessMessageError::FailedRestoringIndex(blob_name.clone(), err.to_string())
             })?;
         return Err(ProcessMessageError::FailedDeletingBlob(
             blob_name.clone(),
-            e.to_string()
+            e.to_string(),
         ));
     }
 
