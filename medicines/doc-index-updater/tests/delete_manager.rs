@@ -109,7 +109,7 @@ fn document_not_found_error_sets_error_state() {
 }
 
 #[test]
-fn document_found_but_blob_not_found_remains_as_accepted() {
+fn delete_created_document_succeeds {
     let document_id = "11111".to_string();
 
     let create_response = create_document(document_id.clone()).unwrap();
@@ -118,13 +118,11 @@ fn document_found_but_blob_not_found_remains_as_accepted() {
     let status = get_job_status(create_response.id);
     assert_eq!(status, JobStatus::Done);
 
-    //remove blob so that delete fails to complete
-
     let job_status_response = delete_document(document_id.to_owned()).unwrap();
 
     let job_id = job_status_response.id;
     println!("sleeping 5 seconds");
     std::thread::sleep(std::time::Duration::from_secs(5));
     let status = get_job_status(job_id);
-    assert_eq!(status, JobStatus::Accepted);
+    assert_eq!(status, JobStatus::Done);
 }
