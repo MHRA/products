@@ -68,7 +68,7 @@ where
         .await?;
 
     if let ProcessMessageError::DocumentNotFoundInIndex(id) = error {
-        tracing::info!(
+        tracing::warn!(
             "Document {} wasn't found during delete, removing message",
             id
         );
@@ -88,13 +88,13 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     let blob_name =
         get_blob_name_from_content_id(message.document_content_id.clone(), &search_client).await?;
 
-    tracing::info!(
+    tracing::debug!(
         "Found blob name {} for document content ID {} from index",
         &blob_name,
         &message.document_content_id
     );
     delete_from_index(search_client, &blob_name).await?;
-    tracing::info!("Deleted blob {} from index", &blob_name);
+    tracing::debug!("Deleted blob {} from index", &blob_name);
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
         .map_err(|e| {
@@ -102,7 +102,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
             anyhow!("Couldn't delete blob {}", &blob_name)
         })?;
     tracing::info!(
-        "Deleted blob {} from storage container {}",
+        "Successfully deleted blob {} from storage container {}",
         &blob_name,
         &storage_container_name
     );
