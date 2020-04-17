@@ -1,3 +1,4 @@
+use chrono::{SecondsFormat, Utc};
 use core::fmt::Debug;
 use serde_derive::{Deserialize, Serialize};
 
@@ -79,4 +80,49 @@ pub struct IndexEntry {
     pub suggestions: Vec<String>,
     pub substance_name: Vec<String>,
     pub facets: Vec<String>,
+}
+
+// The AzureResult model does not contain all of the information we want in the index,
+// however, the automatic index rebuild will populate the missing information.
+impl From<AzureResult> for IndexEntry {
+    fn from(res: AzureResult) -> Self {
+        Self {
+            content: "Content not yet available".to_owned(),
+            rev_label: match res.rev_label {
+                Some(rl) => rl.clone(),
+                None => "1".to_owned(),
+            },
+            product_name: match res.product_name {
+                Some(pn) => pn.clone(),
+                None => "".to_owned(),
+            },
+            created: match res.created {
+                Some(cr) => cr.clone(),
+                None => Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+            },
+            release_state: match res.release_state {
+                Some(rs) => rs.clone(),
+                None => "Y".to_owned(),
+            },
+            keywords: match res.keywords {
+                Some(k) => k.clone(),
+                None => "".to_owned(),
+            },
+            title: res.title.clone(),
+            pl_number: vec![],
+            file_name: res.file_name.clone(),
+            doc_type: res.doc_type.clone(),
+            suggestions: res.suggestions.clone(),
+            substance_name: res.substance_name.clone(),
+            facets: res.facets.clone(),
+            metadata_storage_content_type: String::default(),
+            metadata_storage_size: res.metadata_storage_size as usize,
+            metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
+            metadata_storage_content_md5: String::default(),
+            metadata_storage_name: res.metadata_storage_name.clone(),
+            metadata_storage_path: res.metadata_storage_path.clone(),
+            metadata_content_type: String::default(),
+            metadata_language: String::default(),
+        }
+    }
 }
