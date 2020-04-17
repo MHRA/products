@@ -181,11 +181,8 @@ pub mod test {
             &self,
             id: Uuid,
         ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-            let s = self.get_statuses();
-            println!("{:?}", s);
-
             Ok(JobStatusResponse {
-                status: s[&id].clone(),
+                status: self.get_statuses()[&id].clone(),
                 id,
             })
         }
