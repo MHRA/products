@@ -9,10 +9,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use search_client::{
-    models::{IndexEntry, IndexResult},
-    CreateIndexEntry, DeleteIndexEntry, Search,
-};
+use search_client::{models::IndexResult, CreateIndexEntry, DeleteIndexEntry, Search};
 use std::time::Duration;
 use storage_client::DeleteBlob;
 use tokio::time::delay_for;
@@ -121,7 +118,7 @@ async fn process_delete_message(
         .delete_blob(&storage_container_name, &blob_name)
         .await
     {
-        tracing::debug!(
+        tracing::error!(
             "Error deleting blob: {:?}, re-creating index: {:?}",
             e,
             &index_record
@@ -170,6 +167,16 @@ pub async fn delete_from_index(
 ) -> Result<(), anyhow::Error> {
     search_client
         .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
+        .await?;
+    Ok(())
+}
+
+pub async fn insert_index_entry_from_index_result(
+    search_client: impl CreateIndexEntry,
+    index_result: IndexResult,
+) -> Result<(), anyhow::Error> {
+    search_client
+        .create_index_entry(index_result.into())
         .await?;
     Ok(())
 }
