@@ -3,13 +3,13 @@ use core::fmt::Debug;
 use serde_derive::{Deserialize, Serialize};
 use std::clone::Clone;
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct AzureHighlight {
     #[serde(rename = "content")]
     content: Vec<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct IndexResult {
     pub doc_type: String,
     pub file_name: String,

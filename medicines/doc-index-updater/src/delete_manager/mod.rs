@@ -9,7 +9,10 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use search_client::{models::IndexResult, CreateIndexEntry, DeleteIndexEntry, Search};
+use search_client::{
+    models::{IndexEntry, IndexResult},
+    CreateIndexEntry, DeleteIndexEntry, Search,
+};
 use std::time::Duration;
 use storage_client::DeleteBlob;
 use tokio::time::delay_for;
@@ -108,33 +111,34 @@ async fn process_delete_message(
         &message.document_content_id
     );
 
-    delete_from_index(search_client, &blob_name).await?;
+    search_client
+        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
+        .await?;
     tracing::info!("Deleted blob {} from index", &blob_name);
 
     if let Err(e) = storage_client
         .delete_blob(&storage_container_name, &blob_name)
         .await
     {
-        tracing::error!(
+        tracing::debug!(
             "Error deleting blob: {:?}, re-creating index: {:?}",
             e,
             &index_record
         );
 
-        if let Err(er) = insert_index_entry_from_index_result(search_client, index_record).await {
-            tracing::error!(
-                "Failed to insert index entry {:?}, manual intervention required!",
-                &index_record
-            );
-
-            anyhow!(
-                "Couldn't delete blob {} and failed to re-insert index: {:?}.",
-                &blob_name,
-                er
-            )
-        } else {
-            anyhow!("Couldn't delete blob {}", &blob_name)
-        }
+        search_client
+            .create_index_entry(IndexEntry::from(index_record.clone()))
+            .await
+            .map_err(|err| {
+                ProcessMessageError::FailedRestoringIndex(
+                    blob_name.clone(),
+                    err.to_string()
+                )
+            })?;
+        return Err(ProcessMessageError::FailedDeletingBlob(
+            blob_name.clone(),
+            e.to_string()
+        ));
     }
 
     tracing::info!(
@@ -160,26 +164,6 @@ pub async fn get_index_record_from_content_id(
         }
     }
     Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
-}
-
-pub async fn delete_from_index(
-    search_client: impl DeleteIndexEntry,
-    blob_name: &str,
-) -> Result<(), anyhow::Error> {
-    search_client
-        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
-        .await?;
-    Ok(())
-}
-
-pub async fn insert_index_entry_from_index_result(
-    search_client: impl CreateIndexEntry,
-    index_result: IndexResult,
-) -> Result<(), anyhow::Error> {
-    search_client
-        .create_index_entry(index_result.into())
-        .await?;
-    Ok(())
 }
 
 #[cfg(test)]
