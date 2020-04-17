@@ -85,3 +85,9 @@ make test TEST=<arguments>
 ```
 
 [azure portal]: https://portal.azure.com/
+
+## Monitoring
+
+There's a dashboard set up in Azure to monitor latency, traffic, errors and saturation.
+
+To find it, go to [Shared Dashboards in the Azure Portal](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Portal%2Fdashboards).
