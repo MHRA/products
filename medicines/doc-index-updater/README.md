@@ -40,11 +40,11 @@ stunnel stunnel.conf
 make
 ```
 
-To get SFTP working locally, first set up a local user, with username and password, that you can use as a local SFTP server.
-
-Add this variables to an file `.env.overrides` using the env var `SENTINEL_SFTP_USERNAME`.
+To get SFTP working locally, first set up a local user, with a username and password that you can use as a local SFTP server user (e.g. localsftpuser).
 
 Then run `make set-sftp-keys` to pull the public/private keys for development and install them in your home directory `.ssh` dir. This will also add entries to your `.env.overrides` file for the necessary environment variables.
+
+Add `SENTINEL_SFTP_USERNAME=username` (where username is whatever you set in the step above, e.g. `SENTINEL_SFTP_USERNAME=localsftpuser`) to `.env.overrides`.
 
 Navigate to `~/.ssh` dir and install the public key on your locahost server by running:
 `ssh-copy-id -f -i ./doc_index_updater <YOUR_SFTP_USERNAME>@localhost`
