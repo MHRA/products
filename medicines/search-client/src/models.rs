@@ -32,7 +32,7 @@ pub struct IndexResult {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct AzureSearchResults {
+pub struct IndexResults {
     #[serde(rename = "value")]
     pub search_results: Vec<IndexResult>,
     #[serde(rename = "@odata.context")]
@@ -46,6 +46,15 @@ pub struct AzureIndexChangedResults {
     pub value: Vec<AzureIndexChangedResult>,
     #[serde(rename = "@odata.context")]
     context: String,
+}
+
+impl AzureIndexChangedResults {
+    pub fn new(index_changed_result: AzureIndexChangedResult) -> AzureIndexChangedResults {
+        AzureIndexChangedResults {
+            context: "context".to_string(),
+            value: vec![index_changed_result],
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]

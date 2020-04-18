@@ -185,13 +185,17 @@ pub async fn get_index_record_from_content_id(
 #[cfg(test)]
 mod test {
     use super::*;
+    use azure_sdk_core::errors::AzureError;
     use pretty_assertions::assert_eq;
 
     use crate::{
         models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
         state_manager::test::TestJobStatusClient,
     };
-    use search_client::{models::AzureSearchResults, Search};
+    use search_client::{
+        models::{AzureIndexChangedResult, AzureIndexChangedResults, IndexResult, IndexResults},
+        Search,
+    };
     use tokio_test::block_on;
 
     #[test]
@@ -273,12 +277,192 @@ mod test {
         );
     }
 
+    #[test]
+    fn failure_to_delete_blob_leaves_job_status_as_accepted() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_a_delete_blob_error();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
+            JobStatus::Accepted
+        );
+    }
+
+    #[test]
+    fn failure_to_delete_blob_does_not_remove_message_from_service_bus() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_a_delete_blob_error();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            removeable_message.remove_was_called, false,
+            "Removed message, but shouldn't"
+        );
+    }
+
+    #[test]
+    fn failure_to_restore_index_removes_message_since_cannot_be_retried() {
+        let state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_failure_to_restore_index();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            removeable_message.remove_was_called, true,
+            "Didn't remove message, but should"
+        );
+    }
+
+    #[test]
+    fn failure_to_restore_index_leaves_job_status_as_error() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_failure_to_restore_index();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
+            JobStatus::Error {
+                message: String::from("Cannot restore index for blob Blob Id: Error message"),
+                code: String::from(""),
+            },
+        );
+    }
+
+    #[test]
+    fn index_with_doc_returns_success() {
+        let removeable_message = given_we_have_a_delete_message().message;
+        let search_client = given_a_search_client_that_returns_results();
+        let storage_client = given_a_storage_client();
+
+        let result = block_on(process_delete_message(
+            removeable_message,
+            storage_client,
+            search_client,
+        ));
+
+        assert_eq!(result.is_err(), false);
+    }
+
+    #[test]
+    fn failure_to_delete_blob_returns_expected_error() {
+        let removeable_message = given_we_have_a_delete_message().message;
+        let search_client = given_a_search_client_that_returns_results();
+        let storage_client = given_a_storage_client_that_errors_when_deleting_blob();
+
+        let result = block_on(process_delete_message(
+            removeable_message,
+            storage_client,
+            search_client,
+        ));
+
+        match result {
+            Ok(_) => panic!("Error expected"),
+            Err(e) => {
+                assert_eq!(
+                    e.to_string(),
+                    ProcessMessageError::FailedDeletingBlob(
+                        "storage_name".to_string(),
+                        "Generic error: blob could not be deleted".to_string()
+                    )
+                    .to_string()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn failure_to_restore_index_returns_expected_error() {
+        let removeable_message = given_we_have_a_delete_message().message;
+        let search_client = given_a_search_client_that_cannot_restore_index();
+        let storage_client = given_a_storage_client_that_errors_when_deleting_blob();
+
+        let result = block_on(process_delete_message(
+            removeable_message,
+            storage_client,
+            search_client,
+        ));
+
+        match result {
+            Ok(_) => panic!("Error expected"),
+            Err(e) => {
+                assert_eq!(
+                    e.to_string(),
+                    ProcessMessageError::FailedRestoringIndex(
+                        "storage_name".to_string(),
+                        "Index could not be deleted".to_string()
+                    )
+                    .to_string()
+                );
+            }
+        }
+    }
+
     fn given_document_not_found_in_index() -> ProcessMessageError {
         ProcessMessageError::DocumentNotFoundInIndex("any id".to_owned())
     }
 
     fn given_an_unknown_error() -> ProcessMessageError {
         anyhow!("Any other error").into()
+    }
+
+    fn given_a_delete_blob_error() -> ProcessMessageError {
+        ProcessMessageError::FailedDeletingBlob("Blob Id".to_string(), "Error message".to_string())
+    }
+
+    fn given_failure_to_restore_index() -> ProcessMessageError {
+        ProcessMessageError::FailedRestoringIndex(
+            "Blob Id".to_string(),
+            "Error message".to_string(),
+        )
+    }
+
+    fn given_an_index_search_result() -> IndexResult {
+        IndexResult {
+            doc_type: "Spc".to_string(),
+            file_name: "our_id".to_string(),
+            metadata_storage_name: "storage_name".to_string(),
+            metadata_storage_path: "test/path".to_string(),
+            product_name: Some("product".to_string()),
+            substance_name: vec!["substance".to_string()],
+            title: "title".to_string(),
+            created: None,
+            facets: vec!["facet".to_string()],
+            keywords: None,
+            metadata_storage_size: 300,
+            release_state: None,
+            rev_label: None,
+            suggestions: vec!["suggestion".to_string()],
+            score: 1.0,
+            highlights: None,
+        }
     }
 
     fn given_a_state_manager() -> TestJobStatusClient {
@@ -306,6 +490,24 @@ mod test {
 
     fn given_a_search_client_that_returns_no_results() -> impl Search {
         TestAzureSearchClientWithNoResults {}
+    }
+
+    fn given_a_search_client_that_returns_results(
+    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+        TestWorkingAzureSearchClientWithResults {}
+    }
+
+    fn given_a_search_client_that_cannot_restore_index(
+    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+        TestAzureSearchClientThatCannotRestoreIndex {}
+    }
+
+    fn given_a_storage_client() -> impl DeleteBlob {
+        TestWorkingAzureStorageClient {}
+    }
+
+    fn given_a_storage_client_that_errors_when_deleting_blob() -> impl DeleteBlob {
+        TestFailingAzureStorageClient {}
     }
 
     fn when_getting_blob_name_from_content_id(
@@ -345,12 +547,129 @@ mod test {
 
     #[async_trait]
     impl Search for TestAzureSearchClientWithNoResults {
-        async fn search(&self, _search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
-            Ok(AzureSearchResults {
+        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
+            Ok(IndexResults {
                 search_results: vec![],
                 context: String::from(""),
                 count: None,
             })
+        }
+    }
+
+    struct TestWorkingAzureSearchClientWithResults {}
+
+    #[async_trait]
+    impl Search for TestWorkingAzureSearchClientWithResults {
+        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
+            Ok(IndexResults {
+                search_results: vec![given_an_index_search_result()],
+                context: String::from(""),
+                count: None,
+            })
+        }
+    }
+
+    #[async_trait]
+    impl DeleteIndexEntry for TestWorkingAzureSearchClientWithResults {
+        async fn delete_index_entry(
+            &self,
+            key_name: &str,
+            _value: &str,
+        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            let index_changed_result = AzureIndexChangedResult {
+                key: key_name.to_string(),
+                status: true,
+                error_message: None,
+                status_code: 200,
+            };
+
+            Ok(AzureIndexChangedResults::new(index_changed_result))
+        }
+    }
+
+    #[async_trait]
+    impl CreateIndexEntry for TestWorkingAzureSearchClientWithResults {
+        async fn create_index_entry(
+            &self,
+            _key_values: IndexEntry,
+        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            let index_changed_result = AzureIndexChangedResult {
+                key: "key".to_string(),
+                status: true,
+                error_message: None,
+                status_code: 200,
+            };
+
+            Ok(AzureIndexChangedResults::new(index_changed_result))
+        }
+    }
+
+    struct TestAzureSearchClientThatCannotRestoreIndex {}
+
+    #[async_trait]
+    impl Search for TestAzureSearchClientThatCannotRestoreIndex {
+        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
+            Ok(IndexResults {
+                search_results: vec![given_an_index_search_result()],
+                context: String::from(""),
+                count: None,
+            })
+        }
+    }
+
+    #[async_trait]
+    impl DeleteIndexEntry for TestAzureSearchClientThatCannotRestoreIndex {
+        async fn delete_index_entry(
+            &self,
+            key_name: &str,
+            _value: &str,
+        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            let index_changed_result = AzureIndexChangedResult {
+                key: key_name.to_string(),
+                status: true,
+                error_message: None,
+                status_code: 200,
+            };
+
+            Ok(AzureIndexChangedResults::new(index_changed_result))
+        }
+    }
+
+    #[async_trait]
+    impl CreateIndexEntry for TestAzureSearchClientThatCannotRestoreIndex {
+        async fn create_index_entry(
+            &self,
+            _key_values: IndexEntry,
+        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            Err(anyhow!("Index could not be deleted"))
+        }
+    }
+
+    struct TestWorkingAzureStorageClient {}
+
+    #[async_trait]
+    impl DeleteBlob for TestWorkingAzureStorageClient {
+        async fn delete_blob(
+            &mut self,
+            _container_name: &str,
+            _blob_name: &str,
+        ) -> Result<(), AzureError> {
+            Ok(())
+        }
+    }
+
+    struct TestFailingAzureStorageClient {}
+
+    #[async_trait]
+    impl DeleteBlob for TestFailingAzureStorageClient {
+        async fn delete_blob(
+            &mut self,
+            _container_name: &str,
+            _blob_name: &str,
+        ) -> Result<(), AzureError> {
+            Err(AzureError::GenericErrorWithText(
+                "blob could not be deleted".to_string(),
+            ))
         }
     }
 }
