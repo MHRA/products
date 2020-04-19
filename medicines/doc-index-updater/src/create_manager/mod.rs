@@ -1,7 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
-    search_client,
     service_bus_client::{
         create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -13,6 +12,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
+use search_client;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
@@ -100,7 +100,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::debug!("Uploaded blob {}.", &name);
 
-    add_blob_to_search_index(&search_client, blob).await?;
+    add_blob_to_search_index(search_client, blob).await?;
 
     tracing::info!("Successfully added {} to index.", &name);
 
@@ -162,7 +162,7 @@ mod test {
     use crate::{
         models::{test::get_test_create_message, CreateMessage},
         service_bus_client::test::TestRemoveableMessage,
-        state_manager::TestJobStatusClient,
+        state_manager::test::TestJobStatusClient,
     };
     use tokio_test::block_on;
 
@@ -198,8 +198,11 @@ mod test {
         let mut removeable_message = given_we_have_a_create_message();
         let error = given_an_error_has_occurred();
 
-        let result =
-            when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
+        let result = when_we_handle_the_error(
+            &mut removeable_message,
+            error,
+            TestJobStatusClient::accepted(),
+        );
 
         assert!(result.is_ok());
         assert_eq!(removeable_message.remove_was_called, false);
@@ -210,8 +213,11 @@ mod test {
         let mut removeable_message = given_we_have_a_create_message();
         let error = given_file_not_found();
 
-        let result =
-            when_we_handle_the_error(&mut removeable_message, error, TestJobStatusClient {});
+        let result = when_we_handle_the_error(
+            &mut removeable_message,
+            error,
+            TestJobStatusClient::accepted(),
+        );
 
         assert!(result.is_ok());
         assert!(

@@ -1,7 +1,5 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
-    search_client,
-    search_client::{AzureSearchClient, Searchable},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
         RetrievedMessage,
@@ -13,6 +11,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::prelude::*;
+use search_client::{DeleteIndexEntry, Search};
 use std::time::Duration;
 use tokio::time::delay_for;
 use uuid::Uuid;
@@ -58,23 +57,28 @@ where
     T: RemoveableMessage<DeleteMessage>,
 {
     tracing::info!("Handling processing error. Setting error state in state manager");
-    state_manager
-        .set_status(
-            removeable_message.get_message().job_id,
-            JobStatus::Error {
-                message: error.to_string(),
-                code: "".to_string(),
-            },
-        )
-        .await?;
+
+    let error_message = error.to_string();
 
     if let ProcessMessageError::DocumentNotFoundInIndex(id) = error {
         tracing::info!(
             "Document {} wasn't found during delete, removing message",
             id
         );
+
+        state_manager
+            .set_status(
+                removeable_message.get_message().job_id,
+                JobStatus::Error {
+                    message: error_message,
+                    code: "".to_string(),
+                },
+            )
+            .await?;
+
         let _remove = removeable_message.remove().await?;
     }
+
     Ok(())
 }
 
@@ -94,7 +98,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
         &blob_name,
         &message.document_content_id
     );
-    delete_from_index(&search_client, &blob_name).await?;
+    delete_from_index(search_client, &blob_name).await?;
     tracing::info!("Deleted blob {} from index", &blob_name);
     delete_blob(&storage_client, &storage_container_name, &blob_name)
         .await
@@ -113,7 +117,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
 
 pub async fn get_blob_name_from_content_id(
     content_id: String,
-    search_client: &impl Searchable,
+    search_client: &impl Search,
 ) -> Result<String, ProcessMessageError> {
     let search_results = search_client
         .search(content_id.to_owned())
@@ -143,11 +147,11 @@ async fn delete_blob(
 }
 
 pub async fn delete_from_index(
-    search_client: &AzureSearchClient,
+    search_client: impl DeleteIndexEntry,
     blob_name: &str,
 ) -> Result<(), anyhow::Error> {
     search_client
-        .delete(&"metadata_storage_name".to_string(), &blob_name)
+        .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
     Ok(())
 }
@@ -158,11 +162,10 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage,
-        search_client::{AzureSearchResults, Searchable},
-        service_bus_client::test::TestRemoveableMessage,
-        state_manager::TestJobStatusClient,
+        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
+        state_manager::test::TestJobStatusClient,
     };
+    use search_client::{models::AzureSearchResults, Search};
     use tokio_test::block_on;
 
     #[test]
@@ -170,8 +173,40 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
-        then_message_is_removed(result, removeable_message);
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            removeable_message.remove_was_called, true,
+            "Didn't remove message, but should"
+        );
+    }
+
+    #[test]
+    fn not_found_error_during_delete_sets_job_status_as_error() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_document_not_found_in_index();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
+            JobStatus::Error {
+                message: String::from("Cannot find document with ID any id"),
+                code: String::from(""),
+            },
+        );
     }
 
     #[test]
@@ -179,8 +214,37 @@ mod test {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_an_unknown_error();
-        let result = when_we_handle_the_error(&mut removeable_message, error, state_manager);
-        then_message_is_not_removed(result, removeable_message);
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            removeable_message.remove_was_called, false,
+            "Removed message, but shouldn't"
+        );
+    }
+
+    #[test]
+    fn recoverable_error_during_delete_leaves_job_status_as_accepted() {
+        let mut state_manager = given_a_state_manager();
+        let mut removeable_message = given_we_have_a_delete_message();
+        let error = given_an_unknown_error();
+
+        block_on(handle_processing_error_for_delete_message(
+            &mut removeable_message,
+            error,
+            &state_manager,
+        ))
+        .unwrap();
+
+        assert_eq!(
+            state_manager.get_most_recently_set_status(),
+            JobStatus::Accepted
+        );
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
@@ -191,8 +255,8 @@ mod test {
         anyhow!("Any other error").into()
     }
 
-    fn given_a_state_manager() -> impl JobStatusClient {
-        TestJobStatusClient {}
+    fn given_a_state_manager() -> TestJobStatusClient {
+        TestJobStatusClient::accepted()
     }
 
     fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
@@ -207,53 +271,19 @@ mod test {
         }
     }
 
-    fn when_we_handle_the_error(
-        removeable_message: &mut TestRemoveableMessage<DeleteMessage>,
-        error: ProcessMessageError,
-        state_manager: impl JobStatusClient,
-    ) -> Result<(), anyhow::Error> {
-        block_on(handle_processing_error_for_delete_message(
-            removeable_message,
-            error,
-            &state_manager,
-        ))
-    }
-
-    fn then_message_is_removed(
-        result: Result<(), anyhow::Error>,
-        removeable_message: TestRemoveableMessage<DeleteMessage>,
-    ) {
-        assert!(result.is_ok());
-        assert_eq!(
-            removeable_message.remove_was_called, true,
-            "Didn't remove message, but should"
-        );
-    }
-
-    fn then_message_is_not_removed(
-        result: Result<(), anyhow::Error>,
-        removeable_message: TestRemoveableMessage<DeleteMessage>,
-    ) {
-        assert!(result.is_ok());
-        assert_eq!(
-            removeable_message.remove_was_called, false,
-            "Removed message, but shouldn't"
-        );
-    }
-
     #[test]
     fn get_blob_name_from_content_id_raises_document_not_found_in_index_error_when_not_there() {
         let search_client = given_a_search_client_that_returns_no_results();
         let result = when_getting_blob_name_from_content_id(search_client);
-        then_document_not_found_in_index_error_raised(result);
+        then_document_not_found_in_index_error_is_raised(result);
     }
 
-    fn given_a_search_client_that_returns_no_results() -> impl Searchable {
+    fn given_a_search_client_that_returns_no_results() -> impl Search {
         TestAzureSearchClientWithNoResults {}
     }
 
     fn when_getting_blob_name_from_content_id(
-        search_client: impl Searchable,
+        search_client: impl Search,
     ) -> Result<String, ProcessMessageError> {
         block_on(get_blob_name_from_content_id(
             String::from("non existent content id"),
@@ -261,7 +291,9 @@ mod test {
         ))
     }
 
-    fn then_document_not_found_in_index_error_raised(result: Result<String, ProcessMessageError>) {
+    fn then_document_not_found_in_index_error_is_raised(
+        result: Result<String, ProcessMessageError>,
+    ) {
         assert_eq!(result.is_err(), true);
 
         assert!(
@@ -280,7 +312,7 @@ mod test {
     struct TestAzureSearchClientWithNoResults {}
 
     #[async_trait]
-    impl Searchable for TestAzureSearchClientWithNoResults {
+    impl Search for TestAzureSearchClientWithNoResults {
         async fn search(&self, _search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
             Ok(AzureSearchResults {
                 search_results: vec![],

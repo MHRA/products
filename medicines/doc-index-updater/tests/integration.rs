@@ -15,22 +15,6 @@ use uuid::Uuid;
 
 #[test_case(JobStatus::Done)]
 #[test_case(JobStatus::Accepted)]
-fn set_get_compatibility_on_state_manager(status: JobStatus) {
-    let ctx = TestContext::default();
-
-    let state = StateManager::new(ctx.client);
-    let id = Uuid::new_v4();
-
-    let response = get_ok(state.set_status(id, status.clone()));
-
-    assert_eq!(response.status, status);
-
-    let response = get_ok(state.get_status(id));
-    assert_eq!(response.status, status);
-}
-
-#[test_case(JobStatus::Done)]
-#[test_case(JobStatus::Accepted)]
 fn set_get_on_state_manager_endpoints(status: JobStatus) {
     let ctx = TestContext::default();
 
