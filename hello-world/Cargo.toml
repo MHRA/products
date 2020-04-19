@@ -5,5 +5,5 @@ authors = ["stuart.harris@red-badger.com"]
 edition = "2018"
 
 [dependencies]
-tokio = { version = "0.2", features = ["macros"] }
-warp = "0.2.2"
+async-std = { version = "1.5.0", features = ["unstable", "attributes"] }
+tide = { git = "https://github.com/http-rs/tide", branch = "errors" }
