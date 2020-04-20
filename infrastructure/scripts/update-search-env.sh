@@ -35,18 +35,15 @@ OUTPUT=$(terraform output -json)
 popd
 
 {
-    echo "API_ADMIN_KEY=$(echo "$OUTPUT" | jq .search_admin_key.value --raw-output)"
+    echo "API_ADMIN_KEY=\"$(echo "$OUTPUT" | jq .search_admin_key.value --raw-output)\""
     echo "DATASOURCE_NAME=products-datasource"
     echo "INDEX_NAME=products-index"
     echo "INDEXER_NAME=products-indexer"
-    echo "SEARCH_SERVICE=$(echo "$OUTPUT" | jq .search_service_name.value --raw-output)"
-    echo "STORAGE_ACCOUNT=$(echo "$OUTPUT" | jq .storage_account_name.value --raw-output)"
+    echo "SEARCH_SERVICE=\"$(echo "$OUTPUT" | jq .search_service_name.value --raw-output)\""
+    echo "STORAGE_ACCOUNT=\"$(echo "$OUTPUT" | jq .storage_account_name.value --raw-output)\""
     echo "STORAGE_CONTAINER=docs"
-    echo "STORAGE_MASTER_KEY=$(echo "$OUTPUT" | jq .storage_master_key.value --raw-output)"
+    echo "STORAGE_MASTER_KEY=\"$(echo "$OUTPUT" | jq .storage_master_key.value --raw-output)\""
 } >../../medicines/search/.env
 
 echo
 echo "Updated medicines/search/.env"
-
-echo
-echo "Don't forget to run make set-env to save the new variables!"

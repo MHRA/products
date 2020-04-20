@@ -1,6 +1,6 @@
 pub mod models;
 
-use crate::models::{AzureIndexChangedResults, AzureSearchResults, IndexEntry};
+use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
 use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
@@ -42,12 +42,12 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 
 #[async_trait]
 pub trait Search {
-    async fn search(&self, &mut search_term: String) -> Result<AzureSearchResults, reqwest::Error>;
+    async fn search(&self, &mut search_term: String) -> Result<IndexResults, reqwest::Error>;
 }
 
 #[async_trait]
 impl Search for AzureSearchClient {
-    async fn search(&self, search_term: String) -> Result<AzureSearchResults, reqwest::Error> {
+    async fn search(&self, search_term: String) -> Result<IndexResults, reqwest::Error> {
         search(search_term, &self.client, self.config.clone()).await
     }
 }
@@ -98,14 +98,14 @@ async fn search(
     search_term: String,
     client: &reqwest::Client,
     config: AzureConfig,
-) -> Result<AzureSearchResults, reqwest::Error> {
+) -> Result<IndexResults, reqwest::Error> {
     let req = build_search(search_term, &client, config)?;
     tracing::debug!("Requesting from URL: {}", &req.url());
     client
         .execute(req)
         .await?
         .error_for_status()?
-        .json::<AzureSearchResults>()
+        .json::<IndexResults>()
         .await
 }
 

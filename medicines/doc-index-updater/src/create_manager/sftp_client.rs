@@ -76,8 +76,6 @@ async fn retrieve_file_from_sftp(
 ) -> Result<async_ssh2::File, anyhow::Error> {
     let path = std::path::Path::new(&filepath);
 
-    tracing::info!("{:?}", path);
-
     // Additional logging to debug observed sftp issue
     // in nonprod environment
     let parent_dir = path.parent();
@@ -112,6 +110,6 @@ pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, S
     let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
     let mut bytes = Vec::<u8>::new();
     let size = file.read_to_end(&mut bytes).await?;
-    tracing::info!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
+    tracing::debug!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
     Ok(bytes)
 }
