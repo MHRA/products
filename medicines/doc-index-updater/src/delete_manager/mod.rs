@@ -282,8 +282,9 @@ mod test {
 
     #[test]
     fn failure_to_delete_blob_leaves_job_status_as_accepted() {
-        let mut state_manager = given_a_state_manager();
+        let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
+        given_the_delete_job_is_accepted(removeable_message.get_message().job_id, &state_manager);
         let error = given_a_delete_blob_error();
 
         block_on(handle_processing_error_for_delete_message(
@@ -293,10 +294,9 @@ mod test {
         ))
         .unwrap();
 
-        assert_eq!(
-            state_manager.get_most_recently_set_status(),
-            JobStatus::Accepted
-        );
+        let result =
+            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+        assert_eq!(result.status, JobStatus::Accepted);
     }
 
     #[test]
@@ -340,7 +340,7 @@ mod test {
 
     #[test]
     fn failure_to_restore_index_leaves_job_status_as_error() {
-        let mut state_manager = given_a_state_manager();
+        let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let blob_id = "Blob Id".to_string();
         let error = given_failure_to_restore_index(blob_id);
@@ -352,15 +352,17 @@ mod test {
         ))
         .unwrap();
 
-        assert_eq!(
-            state_manager.get_most_recently_set_status(),
-            JobStatus::Error {
-                message: String::from(
-                    "Cannot restore index for blob with ID Blob Id: Error message"
-                ),
-                code: String::from(""),
-            },
-        );
+        let result =
+            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+        
+        let expected = JobStatus::Error {
+            message: String::from(
+                "Cannot restore index for blob with ID Blob Id: Error message"
+            ),
+            code: String::from(""),
+        };
+
+        assert_eq!(result.status, expected);
     }
 
     #[test]
