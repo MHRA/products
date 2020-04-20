@@ -36,7 +36,8 @@ fn delete_queue_works() {
 #[test]
 #[ignore]
 /*
-    For this test to work, place a file called example.txt in the root of you sftp user folder
+    For this test to work, follow the README to setup your local environment as it needs to connect to you local sftp server with pub/priv key method.
+    Also, place a file called example.txt in the root of you sftp user folder.
 */
 fn document_not_found_error_sets_error_state() {
     let document_id = Uuid::new_v4();
@@ -57,7 +58,8 @@ fn document_not_found_error_sets_error_state() {
 #[test]
 #[ignore]
 /*
-    For this test to work, place a file called example.txt in the root of you sftp user folder
+    For this test to work, follow the README to setup your local environment as it needs to connect to you local sftp server with pub/priv key method.
+    Also, place a file called example.txt in the root of you sftp user folder.
 */
 fn delete_created_document_succeeds() {
     let document_id = Uuid::new_v4();
