@@ -27,7 +27,7 @@ docker-build: ## Build and tag Docker image
 
 .PHONY: docker-run
 docker-run: ## Run Docker image
-	docker run -it $(image)
+	docker run -it -p 3030:3030 $(image)
 
 .PHONY: docker-pull
 docker-pull: ## Pull Docker image
