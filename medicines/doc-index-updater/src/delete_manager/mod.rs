@@ -375,7 +375,7 @@ mod test {
     fn failure_to_delete_blob_returns_expected_error() {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
-        let storage_client = given_a_storage_client_that_errors_when_deleting_blob();
+        let storage_client = given_a_storage_client_that_cannot_delete_blob();
 
         let result = block_on(process_delete_message(
             removeable_message,
@@ -402,7 +402,7 @@ mod test {
     fn failure_to_restore_index_returns_expected_error() {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_restore_index();
-        let storage_client = given_a_storage_client_that_errors_when_deleting_blob();
+        let storage_client = given_a_storage_client_that_cannot_delete_blob();
 
         let result = block_on(process_delete_message(
             removeable_message,
@@ -417,9 +417,32 @@ mod test {
                     e.to_string(),
                     ProcessMessageError::FailedRestoringIndex(
                         "storage_name".to_string(),
-                        "Index could not be deleted".to_string()
+                        "Index could not be created".to_string()
                     )
                     .to_string()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn failure_to_delete_index_returns_expected_error() {
+        let removeable_message = given_we_have_a_delete_message().message;
+        let search_client = given_a_search_client_that_cannot_delete_index();
+        let storage_client = given_a_storage_client();
+
+        let result = block_on(process_delete_message(
+            removeable_message,
+            storage_client,
+            search_client,
+        ));
+
+        match result {
+            Ok(_) => panic!("Error expected"),
+            Err(e) => {
+                assert_eq!(
+                    e.to_string(),
+                    ProcessMessageError::Generic(anyhow!("Index could not be deleted")).to_string()
                 );
             }
         }
@@ -489,25 +512,50 @@ mod test {
     }
 
     fn given_a_search_client_that_returns_no_results() -> impl Search {
-        TestAzureSearchClientWithNoResults {}
+        TestAzureSearchClient {
+            can_insert_index: true,
+            can_delete_index: true,
+            search_results: vec![],
+        }
     }
 
     fn given_a_search_client_that_returns_results(
     ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
-        TestWorkingAzureSearchClientWithResults {}
+        TestAzureSearchClient {
+            can_insert_index: true,
+            can_delete_index: true,
+            search_results: vec![given_an_index_search_result()],
+        }
     }
 
     fn given_a_search_client_that_cannot_restore_index(
     ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
-        TestAzureSearchClientThatCannotRestoreIndex {}
+        TestAzureSearchClient {
+            can_insert_index: false,
+            can_delete_index: true,
+            search_results: vec![given_an_index_search_result()],
+        }
+    }
+
+    fn given_a_search_client_that_cannot_delete_index(
+    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+        TestAzureSearchClient {
+            can_insert_index: true,
+            can_delete_index: false,
+            search_results: vec![given_an_index_search_result()],
+        }
     }
 
     fn given_a_storage_client() -> impl DeleteBlob {
-        TestWorkingAzureStorageClient {}
+        TestAzureStorageClient {
+            can_delete_blob: true,
+        }
     }
 
-    fn given_a_storage_client_that_errors_when_deleting_blob() -> impl DeleteBlob {
-        TestFailingAzureStorageClient {}
+    fn given_a_storage_client_that_cannot_delete_blob() -> impl DeleteBlob {
+        TestAzureStorageClient {
+            can_delete_blob: false,
+        }
     }
 
     fn when_getting_blob_name_from_content_id(
@@ -543,26 +591,17 @@ mod test {
         );
     }
 
-    struct TestAzureSearchClientWithNoResults {}
-
-    #[async_trait]
-    impl Search for TestAzureSearchClientWithNoResults {
-        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
-            Ok(IndexResults {
-                search_results: vec![],
-                context: String::from(""),
-                count: None,
-            })
-        }
+    struct TestAzureSearchClient {
+        pub search_results: Vec<IndexResult>,
+        pub can_insert_index: bool,
+        pub can_delete_index: bool,
     }
 
-    struct TestWorkingAzureSearchClientWithResults {}
-
     #[async_trait]
-    impl Search for TestWorkingAzureSearchClientWithResults {
+    impl Search for TestAzureSearchClient {
         async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
-                search_results: vec![given_an_index_search_result()],
+                search_results: self.search_results.clone(),
                 context: String::from(""),
                 count: None,
             })
@@ -570,12 +609,16 @@ mod test {
     }
 
     #[async_trait]
-    impl DeleteIndexEntry for TestWorkingAzureSearchClientWithResults {
+    impl DeleteIndexEntry for TestAzureSearchClient {
         async fn delete_index_entry(
             &self,
             key_name: &str,
             _value: &str,
         ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            if !&self.can_delete_index {
+                return Err(anyhow!("Index could not be deleted"));
+            }
+
             let index_changed_result = AzureIndexChangedResult {
                 key: key_name.to_string(),
                 status: true,
@@ -588,11 +631,15 @@ mod test {
     }
 
     #[async_trait]
-    impl CreateIndexEntry for TestWorkingAzureSearchClientWithResults {
+    impl CreateIndexEntry for TestAzureSearchClient {
         async fn create_index_entry(
             &self,
             _key_values: IndexEntry,
         ) -> Result<AzureIndexChangedResults, anyhow::Error> {
+            if !&self.can_insert_index {
+                return Err(anyhow!("Index could not be created"));
+            }
+
             let index_changed_result = AzureIndexChangedResult {
                 key: "key".to_string(),
                 status: true,
@@ -604,72 +651,23 @@ mod test {
         }
     }
 
-    struct TestAzureSearchClientThatCannotRestoreIndex {}
-
-    #[async_trait]
-    impl Search for TestAzureSearchClientThatCannotRestoreIndex {
-        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
-            Ok(IndexResults {
-                search_results: vec![given_an_index_search_result()],
-                context: String::from(""),
-                count: None,
-            })
-        }
+    struct TestAzureStorageClient {
+        pub can_delete_blob: bool,
     }
 
     #[async_trait]
-    impl DeleteIndexEntry for TestAzureSearchClientThatCannotRestoreIndex {
-        async fn delete_index_entry(
-            &self,
-            key_name: &str,
-            _value: &str,
-        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
-            let index_changed_result = AzureIndexChangedResult {
-                key: key_name.to_string(),
-                status: true,
-                error_message: None,
-                status_code: 200,
-            };
-
-            Ok(AzureIndexChangedResults::new(index_changed_result))
-        }
-    }
-
-    #[async_trait]
-    impl CreateIndexEntry for TestAzureSearchClientThatCannotRestoreIndex {
-        async fn create_index_entry(
-            &self,
-            _key_values: IndexEntry,
-        ) -> Result<AzureIndexChangedResults, anyhow::Error> {
-            Err(anyhow!("Index could not be deleted"))
-        }
-    }
-
-    struct TestWorkingAzureStorageClient {}
-
-    #[async_trait]
-    impl DeleteBlob for TestWorkingAzureStorageClient {
+    impl DeleteBlob for TestAzureStorageClient {
         async fn delete_blob(
             &mut self,
             _container_name: &str,
             _blob_name: &str,
         ) -> Result<(), AzureError> {
-            Ok(())
-        }
-    }
-
-    struct TestFailingAzureStorageClient {}
-
-    #[async_trait]
-    impl DeleteBlob for TestFailingAzureStorageClient {
-        async fn delete_blob(
-            &mut self,
-            _container_name: &str,
-            _blob_name: &str,
-        ) -> Result<(), AzureError> {
-            Err(AzureError::GenericErrorWithText(
-                "blob could not be deleted".to_string(),
-            ))
+            match self.can_delete_blob {
+                true => Ok(()),
+                false => Err(AzureError::GenericErrorWithText(
+                            "blob could not be deleted".to_string(),
+                        ))
+            }
         }
     }
 }
