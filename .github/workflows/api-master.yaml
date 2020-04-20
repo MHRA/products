@@ -21,8 +21,11 @@ jobs:
         working-directory: ./medicines/search-client
         run: cargo test
 
-      - name: Build docker image
+      - name: Build, test and push Docker image
         working-directory: ./medicines/api
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          docker build . -t "mhraproductsdevregistry.azurecr.io/products/api:$TAG"
+          make ci-master tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
+          echo ::set-env name=TAG::$TAG
+          echo ::set-env name=DIGEST::$DIGEST

@@ -24,4 +24,6 @@ jobs:
 
       - name: Build docker image
         working-directory: ./medicines/api
-        run: docker build .
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-branch tag=$TAG

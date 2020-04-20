@@ -1,6 +1,5 @@
 use juniper::GraphQLObject;
-use search_client::models::AzureResult;
-use search_client::Search;
+use search_client::{models::IndexResult, Search};
 
 #[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A medical product containing active ingredients")]
@@ -9,7 +8,7 @@ pub struct Product {
     document_count: i32,
 }
 
-pub fn handle_doc(document: &AzureResult, products: &mut Vec<Product>) {
+pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
     match &document.product_name {
         Some(document_product_name) => {
             // Try to find an existing product.
@@ -61,8 +60,8 @@ pub async fn get_products_by_substance_name(
 mod test {
     use super::*;
 
-    fn azure_result_factory(product_name: Option<String>) -> AzureResult {
-        AzureResult {
+    fn azure_result_factory(product_name: Option<String>) -> IndexResult {
+        IndexResult {
             product_name: product_name,
             doc_type: "dummy".to_string(),
             created: Some("yes".to_string()),

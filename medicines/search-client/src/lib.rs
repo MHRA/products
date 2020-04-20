@@ -19,6 +19,12 @@ pub struct AzureSearchClient {
     config: AzureConfig,
 }
 
+impl Default for AzureSearchClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AzureSearchClient {
     pub fn new() -> Self {
         let api_key = get_env("AZURE_API_ADMIN_KEY");
@@ -54,7 +60,7 @@ pub trait Search {
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<AzureSearchResults, reqwest::Error>;
+    ) -> Result<IndexResults, reqwest::Error>;
 }
 
 #[async_trait]
@@ -67,7 +73,7 @@ impl Search for AzureSearchClient {
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<AzureSearchResults, reqwest::Error> {
+    ) -> Result<IndexResults, reqwest::Error> {
         let request = build_filter_by_collection_request(
             field_name,
             field_value,
@@ -79,7 +85,7 @@ impl Search for AzureSearchClient {
         self.client
             .execute(request)
             .await?
-            .json::<AzureSearchResults>()
+            .json::<IndexResults>()
             .await
     }
 }
