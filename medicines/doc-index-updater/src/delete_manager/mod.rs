@@ -81,12 +81,12 @@ where
             let _remove = removeable_message.remove().await?;
         }
         ProcessMessageError::FailedRestoringIndex(_, _) => {
-            tracing::error!("{}", error.to_string());
+            tracing::error!("{}", error_message);
             state_manager
                 .set_status(
                     removeable_message.get_message().job_id,
                     JobStatus::Error {
-                        message: error.to_string(),
+                        message: error_message,
                         code: "".to_string(),
                     },
                 )
@@ -94,7 +94,7 @@ where
             let _remove = removeable_message.remove().await?;
         }
         ProcessMessageError::FailedDeletingBlob(_, _) => {
-            tracing::error!("{}", error.to_string());
+            tracing::error!("{}", error_message);
         }
         _ => {}
     }
