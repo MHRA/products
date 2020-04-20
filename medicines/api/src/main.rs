@@ -1,5 +1,6 @@
 const PORT: u16 = 8000;
-use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer};
+use actix_cors::Cors;
+use actix_web::{http, middleware, web, App, Error, HttpResponse, HttpServer};
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
 use std::{io, sync::Arc};
@@ -38,9 +39,16 @@ async fn healthz() -> impl actix_web::Responder {
     "OK"
 }
 
+fn cors_middleware() -> actix_cors::CorsFactory {
+    Cors::new()
+        .allowed_methods(vec!["POST"])
+        .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT, http::header::CONTENT_TYPE])
+        .max_age(3600)
+        .finish()
+}
+
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info, actix_server=info");
     env_logger::init();
 
     let mut listenfd = ListenFd::from_env();
@@ -55,6 +63,7 @@ async fn main() -> io::Result<()> {
             .data(schema.clone())
             .data(context.clone())
             .wrap(middleware::Logger::default())
+            .wrap(cors_middleware())
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
             .service(web::resource("/healthz").route(web::get().to(healthz)))

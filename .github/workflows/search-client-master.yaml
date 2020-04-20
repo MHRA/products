@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Clone Repo
         uses: actions/checkout@v2
-        with:
-          path: products
 
       - name: Test
         working-directory: ./medicines/search-client
