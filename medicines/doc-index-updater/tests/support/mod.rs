@@ -9,6 +9,8 @@ use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
 use uuid::Uuid;
 
+pub mod document_api;
+
 #[derive(PartialEq)]
 enum ServerType {
     Tcp,
@@ -219,5 +221,28 @@ pub async fn get_message_safely<T: Message>(
                 panic!("bad error: {:?}", e);
             }
         }
+    }
+}
+
+pub fn repeatedly_check_until_result_is<T>(
+    expected: T,
+    mut perform_check: impl FnMut() -> T,
+    max_attempts: u8,
+) where
+    T: PartialEq + std::fmt::Debug,
+{
+    let mut i = 0;
+    loop {
+        let result = perform_check();
+        if result == expected {
+            break;
+        } else if i > max_attempts {
+            panic!(
+                "[{:?}] wasn't [{:?}] after {} seconds.",
+                result, expected, max_attempts
+            );
+        }
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        i += 1;
     }
 }
