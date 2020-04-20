@@ -108,16 +108,17 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
         .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
-    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
-    process_delete_message(message, storage_client, search_client, storage_container_name).await
+
+    process_delete_message(message, storage_client, search_client).await
 }
 
 async fn process_delete_message(
     message: DeleteMessage,
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
-    storage_container_name: String,
 ) -> Result<Uuid, ProcessMessageError> {
+    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
+
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -195,6 +196,7 @@ mod test {
         models::{AzureIndexChangedResult, AzureIndexChangedResults, IndexResult, IndexResults},
         Search,
     };
+    use std::env;
     use tokio_test::block_on;
 
     #[test]
@@ -360,13 +362,14 @@ mod test {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client();
-        let storage_container_name = "storage_container_name".to_string();
+        given_the_necessary_env_vars_are_initialised();
+        
         let result = block_on(process_delete_message(
             removeable_message,
             storage_client,
             search_client,
-            storage_container_name,
         ));
+        unset_process_delete_message_env_vars();
 
         assert_eq!(result.is_err(), false);
     }
@@ -376,14 +379,14 @@ mod test {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
-        let storage_container_name = "storage_container_name".to_string();
+        given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removeable_message,
             storage_client,
             search_client,
-            storage_container_name,
         ));
+        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -405,14 +408,14 @@ mod test {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_restore_index();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
-        let storage_container_name = "storage_container_name".to_string();
+        given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removeable_message,
             storage_client,
             search_client,
-            storage_container_name,
         ));
+        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -434,14 +437,14 @@ mod test {
         let removeable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_delete_index();
         let storage_client = given_a_storage_client();
-        let storage_container_name = "storage_container_name".to_string();
+        given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removeable_message,
             storage_client,
             search_client,
-            storage_container_name,
         ));
+        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -452,6 +455,14 @@ mod test {
                 );
             }
         }
+    }
+
+    fn given_the_necessary_env_vars_are_initialised() {
+        env::set_var("STORAGE_CONTAINER", "storage_container");
+    }
+
+    fn unset_process_delete_message_env_vars() {
+        env::set_var("STORAGE_CONTAINER", "");
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
