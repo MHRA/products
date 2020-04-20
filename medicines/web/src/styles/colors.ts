@@ -9,7 +9,7 @@ export const mhraGray = 'rgb(154, 155, 156)';
 export const mhraGray30 = 'rgba(154, 155, 156, 0.3)';
 
 export const primaryColor = mhraBlue;
-export const anchorColour = '#1d70b8';
+export const anchorColour = mhraGray;
 
 export const agency10 = '#e5f7f4';
 export const agency20 = '#ccefe9';
