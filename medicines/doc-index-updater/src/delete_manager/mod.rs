@@ -64,7 +64,7 @@ where
 
     match error {
         ProcessMessageError::DocumentNotFoundInIndex(id) => {
-            tracing::info!(
+            tracing::warn!(
                 "Document {} wasn't found during delete, removing message",
                 id
             );
@@ -124,7 +124,7 @@ async fn process_delete_message(
             .await?;
     let blob_name = index_record.metadata_storage_name.clone();
 
-    tracing::info!(
+    tracing::debug!(
         "Found blob name {} for document content ID {} from index",
         &blob_name,
         &message.document_content_id
@@ -133,7 +133,7 @@ async fn process_delete_message(
     search_client
         .delete_index_entry(&"metadata_storage_name".to_string(), &blob_name)
         .await?;
-    tracing::info!("Deleted blob {} from index", &blob_name);
+    tracing::debug!("Deleted blob {} from index", &blob_name);
 
     if let Err(e) = storage_client
         .delete_blob(&storage_container_name, &blob_name)
@@ -158,7 +158,7 @@ async fn process_delete_message(
     }
 
     tracing::info!(
-        "Deleted blob {} from storage container {}",
+        "Successfully deleted blob {} from storage container {}",
         &blob_name,
         &storage_container_name
     );

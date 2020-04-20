@@ -7,7 +7,7 @@ pub async fn add_blob_to_search_index(
 ) -> Result<(), anyhow::Error> {
     let entry: IndexEntry = blob.into();
 
-    tracing::info!("Creating index entry ({:?})", entry);
+    tracing::debug!("Creating index entry ({:?})", entry);
     search_client.create_index_entry(entry).await.map_err(|e| {
         tracing::error!("Error creating index entry ({:?})", e);
         e
