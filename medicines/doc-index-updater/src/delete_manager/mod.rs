@@ -320,7 +320,8 @@ mod test {
     fn failure_to_restore_index_removes_message_since_cannot_be_retried() {
         let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
-        let error = given_failure_to_restore_index();
+        let blob_id = "Blob Id".to_string();
+        let error = given_failure_to_restore_index(blob_id);
 
         block_on(handle_processing_error_for_delete_message(
             &mut removeable_message,
@@ -339,7 +340,8 @@ mod test {
     fn failure_to_restore_index_leaves_job_status_as_error() {
         let mut state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
-        let error = given_failure_to_restore_index();
+        let blob_id = "Blob Id".to_string();
+        let error = given_failure_to_restore_index(blob_id);
 
         block_on(handle_processing_error_for_delete_message(
             &mut removeable_message,
@@ -351,7 +353,9 @@ mod test {
         assert_eq!(
             state_manager.get_most_recently_set_status(),
             JobStatus::Error {
-                message: String::from("Cannot restore index for blob Blob Id: Error message"),
+                message: String::from(
+                    "Cannot restore index for blob with ID Blob Id: Error message"
+                ),
                 code: String::from(""),
             },
         );
@@ -363,7 +367,7 @@ mod test {
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client();
         given_the_necessary_env_vars_are_initialised();
-        
+
         let result = block_on(process_delete_message(
             removeable_message,
             storage_client,
@@ -462,7 +466,7 @@ mod test {
     }
 
     fn unset_process_delete_message_env_vars() {
-        env::set_var("STORAGE_CONTAINER", "");
+        env::remove_var("STORAGE_CONTAINER");
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
@@ -477,11 +481,8 @@ mod test {
         ProcessMessageError::FailedDeletingBlob("Blob Id".to_string(), "Error message".to_string())
     }
 
-    fn given_failure_to_restore_index() -> ProcessMessageError {
-        ProcessMessageError::FailedRestoringIndex(
-            "Blob Id".to_string(),
-            "Error message".to_string(),
-        )
+    fn given_failure_to_restore_index(blob_id: String) -> ProcessMessageError {
+        ProcessMessageError::FailedRestoringIndex(blob_id, "Error message".to_string())
     }
 
     fn given_an_index_search_result() -> IndexResult {

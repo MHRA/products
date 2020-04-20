@@ -92,7 +92,7 @@ pub struct IndexEntry {
     pub facets: Vec<String>,
 }
 
-// The AzureResult model does not contain all of the information we want in the index,
+// The IndexResult model does not contain all of the information we want in the index,
 // however, the automatic index rebuild will populate the missing information.
 impl From<IndexResult> for IndexEntry {
     fn from(res: IndexResult) -> Self {

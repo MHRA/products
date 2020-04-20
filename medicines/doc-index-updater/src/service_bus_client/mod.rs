@@ -104,7 +104,7 @@ pub enum ProcessMessageError {
     DocumentNotFoundInIndex(String),
     #[error("Cannot delete blob with ID {0}: {1}")]
     FailedDeletingBlob(String, String),
-    #[error("Cannot restore index for blob {0}: {1}")]
+    #[error("Cannot restore index for blob with ID {0}: {1}")]
     FailedRestoringIndex(String, String),
     #[error(transparent)]
     Generic(#[from] anyhow::Error),
