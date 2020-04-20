@@ -71,8 +71,9 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 
 [[package]]
 name = "azure_sdk_core"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13e21ee06d328376fb11cadc053d82b81033b71b7f4e2f5659c403c44c458cca"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -101,8 +102,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_service_bus"
-version = "0.42.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.43.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8e6f239bcfe291a7ca51a3b29ce494953e8b3fdc3d26905e3fdb8129c7d3a17"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -129,8 +131,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_storage_blob"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1f650b8535b168aa401e3dd714607568408760e00baa90f70449d1626b091ae"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -160,8 +163,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_storage_core"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8314c70916ff631873ca35e4e08ca92d1ac1c1c8c57adb78ef90eaa5ac42824"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -1645,6 +1649,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "async-trait",
+ "chrono",
  "reqwest",
  "serde",
  "serde_derive",

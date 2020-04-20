@@ -25,27 +25,6 @@ pub trait JobStatusClient: Sync + Send {
     ) -> Result<JobStatusResponse, MyRedisError>;
 }
 
-#[cfg(test)]
-pub struct TestJobStatusClient {}
-
-#[cfg(test)]
-#[async_trait]
-impl JobStatusClient for TestJobStatusClient {
-    async fn get_status(
-        &self,
-        _id: Uuid,
-    ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-        unimplemented!()
-    }
-    async fn set_status(
-        &self,
-        id: Uuid,
-        status: JobStatus,
-    ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
-        Ok(JobStatusResponse { id, status })
-    }
-}
-
 impl StateManager {
     pub fn new(client: Client) -> Self {
         StateManager { client }
@@ -172,4 +151,50 @@ pub fn with_state(
     mgr: StateManager,
 ) -> impl Filter<Extract = (StateManager,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || mgr.clone())
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+    use std::{collections::HashMap, sync::Mutex};
+
+    #[derive(Debug)]
+    pub struct TestJobStatusClient {
+        status: Mutex<HashMap<Uuid, JobStatus>>,
+    }
+
+    impl TestJobStatusClient {
+        pub fn accepted() -> Self {
+            Self {
+                status: Mutex::new(HashMap::<Uuid, JobStatus>::new()),
+            }
+        }
+
+        fn get_statuses(&self) -> HashMap<Uuid, JobStatus> {
+            (*self.status.lock().unwrap()).clone()
+        }
+    }
+
+    #[async_trait]
+    impl JobStatusClient for TestJobStatusClient {
+        async fn get_status(
+            &self,
+            id: Uuid,
+        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+            Ok(JobStatusResponse {
+                status: self.get_statuses()[&id].clone(),
+                id,
+            })
+        }
+        async fn set_status(
+            &self,
+            id: Uuid,
+            status: JobStatus,
+        ) -> Result<crate::models::JobStatusResponse, crate::state_manager::MyRedisError> {
+            let mut s_status = self.status.lock().unwrap();
+            s_status.insert(id, status.clone());
+
+            Ok(JobStatusResponse { id, status })
+        }
+    }
 }
