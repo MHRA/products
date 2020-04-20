@@ -36,7 +36,6 @@ const StyledProductList = styled.nav`
   }
 `;
 
-
 interface IIndex {
   title: string;
   products: IProduct[];
@@ -57,10 +56,10 @@ const ProductList: React.FC<IIndex> = ({ title, products }) => {
       <ul>
         {products.map(product => {
           return (
-            <li key={product.name} className='product-name'>
+            <li key={product.name} className="product-name">
               <Link href={searchLink(product.name)}>
                 <a>
-                  {product.name} {product.documentCount && <>({product.documentCount} files)</>}
+                  {product.name} {product.count && <>({product.count} files)</>}
                 </a>
               </Link>
             </li>

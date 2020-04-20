@@ -481,3 +481,91 @@ exports[`DrugIndex should render 1`] = `
   </ul>
 </styled.nav>
 `;
+
+exports[`ProductList should render 1`] = `
+<styled.nav>
+  <h3>
+    Coffee
+  </h3>
+  <ul>
+    <li
+      className="product-name"
+      key="Caffe Latte"
+    >
+      <Link
+        href="/product?product=Caffe%20Latte"
+      >
+        <a>
+          Caffe Latte
+           
+          0
+        </a>
+      </Link>
+    </li>
+    <li
+      className="product-name"
+      key="Americano"
+    >
+      <Link
+        href="/product?product=Americano"
+      >
+        <a>
+          Americano
+           
+          (
+          1
+           files)
+        </a>
+      </Link>
+    </li>
+    <li
+      className="product-name"
+      key="Flat White"
+    >
+      <Link
+        href="/product?product=Flat%20White"
+      >
+        <a>
+          Flat White
+           
+          (
+          -1
+           files)
+        </a>
+      </Link>
+    </li>
+    <li
+      className="product-name"
+      key="Mocha"
+    >
+      <Link
+        href="/product?product=Mocha"
+      >
+        <a>
+          Mocha
+           
+          (
+          9999999
+           files)
+        </a>
+      </Link>
+    </li>
+    <li
+      className="product-name"
+      key="Cafe Creme"
+    >
+      <Link
+        href="/product?product=Cafe%20Creme"
+      >
+        <a>
+          Cafe Creme
+           
+          (
+          -9999999
+           files)
+        </a>
+      </Link>
+    </li>
+  </ul>
+</styled.nav>
+`;

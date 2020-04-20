@@ -8,11 +8,11 @@ describe(ProductList, () => {
       <ProductList
         title={'Coffee'}
         products={[
-          { name: 'Caffe Latte', documentCount: 0 },
-          { name: 'Americano', documentCount: 1 },
-          { name: 'Flat White', documentCount: -1 },
-          { name: 'Mocha', documentCount: 9999999 },
-          { name: 'Cafe Creme', documentCount: -9999999 },
+          { name: 'Caffe Latte', count: 0 },
+          { name: 'Americano', count: 1 },
+          { name: 'Flat White', count: -1 },
+          { name: 'Mocha', count: 9999999 },
+          { name: 'Cafe Creme', count: -9999999 },
         ]}
       />,
     );

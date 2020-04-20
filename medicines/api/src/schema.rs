@@ -2,22 +2,17 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_search::AzureContext,
-    product::{get_products_by_substance_name, Product},
-    substance::{get_substances, Substances},
+    product::get_substance_with_products,
+    substance::{get_substances, Substance, Substances},
 };
 
 pub struct QueryRoot;
 
 #[juniper::graphql_object(Context = AzureContext)]
 impl QueryRoot {
-    async fn products(
-        context: &AzureContext,
-        substance_name: Option<String>,
-    ) -> FieldResult<Vec<Product>> {
-        if substance_name.is_some() {
-            return Ok(
-                get_products_by_substance_name(substance_name.unwrap(), &context.client).await,
-            );
+    async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
+        if let Some(name) = name {
+            return Ok(get_substance_with_products(name, &context.client).await);
         }
 
         Err(juniper::FieldError::new(

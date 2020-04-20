@@ -1,4 +1,7 @@
-use crate::azure_search::{AzureResult, AzureSearchClient};
+use crate::{
+    azure_search::{AzureResult, AzureSearchClient},
+    substance::Substance,
+};
 use juniper::GraphQLObject;
 
 #[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
@@ -33,18 +36,11 @@ pub fn handle_doc(document: &AzureResult, products: &mut Vec<Product>) {
     }
 }
 
-pub async fn get_products_by_substance_name(
-    substance_name: String,
-    client: &AzureSearchClient,
-) -> Vec<Product> {
+pub async fn get_substance_with_products(name: String, client: &AzureSearchClient) -> Substance {
     // Get a list of documents from Azure which are about products containing the
     // substance name.
     let azure_result = client
-        .filter_by_collection(
-            "substance_name".to_string(),
-            substance_name,
-            "eq".to_string(),
-        )
+        .filter_by_collection("substance_name".to_string(), name.clone(), "eq".to_string())
         .await
         .unwrap();
 
@@ -57,7 +53,7 @@ pub async fn get_products_by_substance_name(
 
     products.sort();
 
-    products
+    Substance::new(name, Some(products))
 }
 
 #[cfg(test)]
