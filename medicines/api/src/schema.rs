@@ -16,7 +16,7 @@ impl QueryRoot {
     ) -> FieldResult<Vec<Product>> {
         if substance_name.is_some() {
             return Ok(
-                get_products_by_substance_name(substance_name.unwrap(), &context.client).await,
+                get_products_by_substance_name(&substance_name.unwrap(), &context.client).await,
             );
         }
 

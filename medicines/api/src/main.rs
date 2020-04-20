@@ -12,9 +12,10 @@ mod schema;
 mod substance;
 
 use crate::{
-    azure_search::{create_context, AzureContext},
+    azure_search::AzureContext,
     schema::{create_schema, Schema},
 };
+use azure_search::create_context;
 
 async fn graphiql() -> HttpResponse {
     let html = graphiql_source("/graphql");
