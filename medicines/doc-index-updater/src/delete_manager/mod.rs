@@ -373,7 +373,6 @@ mod test {
             storage_client,
             search_client,
         ));
-        unset_process_delete_message_env_vars();
 
         assert_eq!(result.is_err(), false);
     }
@@ -390,7 +389,6 @@ mod test {
             storage_client,
             search_client,
         ));
-        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -419,7 +417,6 @@ mod test {
             storage_client,
             search_client,
         ));
-        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -448,7 +445,6 @@ mod test {
             storage_client,
             search_client,
         ));
-        unset_process_delete_message_env_vars();
 
         match result {
             Ok(_) => panic!("Error expected"),
@@ -463,10 +459,6 @@ mod test {
 
     fn given_the_necessary_env_vars_are_initialised() {
         env::set_var("STORAGE_CONTAINER", "storage_container");
-    }
-
-    fn unset_process_delete_message_env_vars() {
-        env::remove_var("STORAGE_CONTAINER");
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {

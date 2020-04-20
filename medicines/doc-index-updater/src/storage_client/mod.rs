@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
 use azure_sdk_storage_blob::Blob;
-use azure_sdk_storage_core::prelude::*;
+use azure_sdk_storage_core::prelude::Client;
 
 pub struct BlobClient {
     pub azure_client: Client,
