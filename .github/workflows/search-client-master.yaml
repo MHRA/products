@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - medicines/search-client-master/**
+      - medicines/search-client/**
       - .github/workflows/search-client-master.yaml
 
 jobs:
