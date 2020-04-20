@@ -42,7 +42,11 @@ async fn healthz() -> impl actix_web::Responder {
 fn cors_middleware() -> actix_cors::CorsFactory {
     Cors::new()
         .allowed_methods(vec!["POST"])
-        .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT, http::header::CONTENT_TYPE])
+        .allowed_headers(vec![
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+        ])
         .max_age(3600)
         .finish()
 }
