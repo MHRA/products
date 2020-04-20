@@ -102,6 +102,10 @@ pub enum ProcessMessageError {
     SftpError(#[from] SftpError),
     #[error("Cannot find document with ID {0}")]
     DocumentNotFoundInIndex(String),
+    #[error("Cannot delete blob with ID {0}: {1}")]
+    FailedDeletingBlob(String, String),
+    #[error("Cannot restore index for blob with ID {0}: {1}")]
+    FailedRestoringIndex(String, String),
     #[error(transparent)]
     Generic(#[from] anyhow::Error),
 }

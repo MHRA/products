@@ -12,7 +12,6 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-use search_client;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
@@ -86,7 +85,8 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?
+        .azure_client;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
