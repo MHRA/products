@@ -1,9 +1,8 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-
-import ProductList from '../../components/product-list/index';
 import Page from '../../components/page';
+import ProductList from '../../components/product-list/index';
 import SearchWrapper from '../../components/search-wrapper';
 import {
   DrugListStructuredData,
@@ -12,7 +11,7 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
-import substanceLoader from '../../services/substance-loader';
+import graphQl from '../../services/graphql-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -33,26 +32,11 @@ const App: NextPage = () => {
     }
     (async () => {
       const substanceStr = queryQS.toString();
-      const query = `{
-        products(substanceName: "${substanceStr}") {
-          name
-          documentCount
-        }
-      }`;
-      const response = await fetch("http://localhost:8000/graphql", {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({"query": query, "variables": null})
-      }).then((response) => {
-        return response.json();
-      }).then((responseData) => {
-        setProducts(responseData.data.products);
+      graphQl.products.load(substanceStr).then(responseData => {
+        setProducts(responseData);
         setSubstanceName(substanceStr);
         Events.viewProductsForSubstance(substanceStr);
-      })
+      });
     })();
   }, [queryQS]);
 
