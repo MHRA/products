@@ -189,7 +189,7 @@ mod test {
 
     #[test]
     fn not_found_error_during_delete_sets_job_status_as_error() {
-        let mut state_manager = given_a_state_manager();
+        let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
 
@@ -200,8 +200,10 @@ mod test {
         ))
         .unwrap();
 
+        let result =
+            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
         assert_eq!(
-            state_manager.get_most_recently_set_status(),
+            result.status,
             JobStatus::Error {
                 message: String::from("Cannot find document with ID any id"),
                 code: String::from(""),
@@ -230,8 +232,9 @@ mod test {
 
     #[test]
     fn recoverable_error_during_delete_leaves_job_status_as_accepted() {
-        let mut state_manager = given_a_state_manager();
+        let state_manager = given_a_state_manager();
         let mut removeable_message = given_we_have_a_delete_message();
+        given_the_delete_job_is_accepted(removeable_message.get_message().job_id, &state_manager);
         let error = given_an_unknown_error();
 
         block_on(handle_processing_error_for_delete_message(
@@ -241,10 +244,9 @@ mod test {
         ))
         .unwrap();
 
-        assert_eq!(
-            state_manager.get_most_recently_set_status(),
-            JobStatus::Accepted
-        );
+        let result =
+            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+        assert_eq!(result.status, JobStatus::Accepted);
     }
 
     fn given_document_not_found_in_index() -> ProcessMessageError {
@@ -269,6 +271,10 @@ mod test {
             remove_was_called: false,
             message: delete_message,
         }
+    }
+
+    fn given_the_delete_job_is_accepted(id: Uuid, state_manager: &TestJobStatusClient) {
+        let _ = block_on(state_manager.set_status(id, JobStatus::Accepted));
     }
 
     #[test]
