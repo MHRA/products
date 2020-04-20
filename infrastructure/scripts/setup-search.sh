@@ -5,7 +5,9 @@ set -euo pipefail
 
 pushd ../../medicines/search
 
+set -a
 source .env
+set +a
 
 echo "Creating datasource..."
 cargo run create_datasource
