@@ -1,4 +1,3 @@
-const PORT: u16 = 8000;
 use actix_cors::Cors;
 use actix_web::{http, middleware, web, App, Error, HttpResponse, HttpServer};
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
@@ -10,6 +9,8 @@ mod pagination;
 mod product;
 mod schema;
 mod substance;
+
+const PORT: u16 = 8000;
 
 use crate::{
     azure_search::AzureContext,
