@@ -16,3 +16,7 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--vault-name mhra-dev \
 	--name web-env \
 	--file .env
+
+.PHONY: cypress
+cypress: ## Launch Cypress
+	yarn run cypress open --env $$(cat .env 2> /dev/null | tr "\n", "," | sed 's/,$$/ /g')
