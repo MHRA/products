@@ -1,8 +1,6 @@
-use crate::{
-    azure_search::{AzureResult, AzureSearchClient},
-    substance::Substance,
-};
 use juniper::GraphQLObject;
+use search_client::{models::IndexResult, Search};
+use crate::substance::Substance;
 
 #[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A medical product containing active ingredients")]
@@ -11,7 +9,7 @@ pub struct Product {
     document_count: i32,
 }
 
-pub fn handle_doc(document: &AzureResult, products: &mut Vec<Product>) {
+pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
     match &document.product_name {
         Some(document_product_name) => {
             // Try to find an existing product.
@@ -36,35 +34,38 @@ pub fn handle_doc(document: &AzureResult, products: &mut Vec<Product>) {
     }
 }
 
-pub async fn get_substance_with_products(name: String, client: &AzureSearchClient) -> Substance {
+pub async fn get_substance_with_products(
+    name: &str,
+    client: &impl Search,
+) -> Substance {
     // Get a list of documents from Azure which are about products containing the
     // substance name.
     let azure_result = client
-        .filter_by_collection("substance_name".to_string(), name.clone(), "eq".to_string())
+        .filter_by_field("substance_name", name)
         .await
         .unwrap();
 
     // Extract a list of products while keeping track of the number of documents that
     // product has.
     let mut products = Vec::<Product>::new();
-    for document in azure_result.value {
+    for document in azure_result.search_results {
         handle_doc(&document, &mut products);
     }
 
     products.sort();
 
-    Substance::new(name, Some(products))
+    Substance::new(name.to_string(), Some(products))
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
 
-    fn azure_result_factory(product_name: Option<String>) -> AzureResult {
-        AzureResult {
+    fn azure_result_factory(product_name: Option<String>) -> IndexResult {
+        IndexResult {
             product_name: product_name,
             doc_type: "dummy".to_string(),
-            created: "yes".to_string(),
+            created: Some("yes".to_string()),
             facets: Vec::new(),
             file_name: "README.markdown".to_string(),
             highlights: None,
@@ -72,7 +73,7 @@ mod test {
             metadata_storage_name: "dummy".to_string(),
             metadata_storage_path: "/".to_string(),
             metadata_storage_size: 0,
-            release_state: "solid".to_string(),
+            release_state: Some("solid".to_string()),
             rev_label: None,
             score: -0.0,
             substance_name: Vec::new(),

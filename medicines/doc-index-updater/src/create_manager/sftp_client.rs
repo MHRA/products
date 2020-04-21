@@ -20,7 +20,9 @@ pub enum SftpError {
 async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
     let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
     let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
-    let password = get_env_fail_fast("SENTINEL_SFTP_PASSWORD").await;
+    let public_key_path = get_env_fail_fast("SENTINEL_PUBLIC_KEY_PATH").await;
+    let private_key_path = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PATH").await;
+    let private_key_password = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PASSWORD").await;
 
     tracing::debug!(
         message = format!(
@@ -40,7 +42,17 @@ async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
     tracing::debug!(message = "SFTP server handshake complete");
 
     tracing::debug!(message = "Trying authentication");
-    ssh_session.userauth_password(&user, &password).await?;
+
+    let public_key_path = std::path::Path::new(&public_key_path);
+    let private_key_path = std::path::Path::new(&private_key_path);
+    ssh_session
+        .userauth_pubkey_file(
+            &user,
+            Some(&public_key_path),
+            &private_key_path,
+            Some(&private_key_password),
+        )
+        .await?;
     tracing::debug!(message = "Finished trying authentication");
 
     if ssh_session.authenticated() {
@@ -63,8 +75,6 @@ async fn retrieve_file_from_sftp(
     filepath: String,
 ) -> Result<async_ssh2::File, anyhow::Error> {
     let path = std::path::Path::new(&filepath);
-
-    tracing::info!("{:?}", path);
 
     // Additional logging to debug observed sftp issue
     // in nonprod environment
@@ -100,6 +110,6 @@ pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, S
     let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
     let mut bytes = Vec::<u8>::new();
     let size = file.read_to_end(&mut bytes).await?;
-    tracing::info!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
+    tracing::debug!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
     Ok(bytes)
 }

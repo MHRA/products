@@ -66,8 +66,12 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
 data "azurerm_subnet" "cluster_nodes" {
   name                 = var.cluster_subnet_name
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = var.vnet_resource_group
   virtual_network_name = var.vnet_name
+
+  depends_on = [
+    azurerm_kubernetes_cluster.cluster
+  ]
 }
 
 data "azurerm_route_table" "cluster_nodes" {

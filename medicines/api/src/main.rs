@@ -12,9 +12,10 @@ mod schema;
 mod substance;
 
 use crate::{
-    azure_search::{create_context, AzureContext},
+    azure_search::AzureContext,
     schema::{create_schema, Schema},
 };
+use azure_search::create_context;
 
 async fn graphiql() -> HttpResponse {
     let html = graphiql_source("/graphql");
@@ -42,8 +43,11 @@ async fn healthz() -> impl actix_web::Responder {
 fn cors_middleware() -> actix_cors::CorsFactory {
     Cors::new()
         .allowed_methods(vec!["POST"])
-        .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-        .allowed_header(http::header::CONTENT_TYPE)
+        .allowed_headers(vec![
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+        ])
         .max_age(3600)
         .finish()
 }

@@ -1,3 +1,7 @@
+app := api
+image := mhraproductsnonprodregistry.azurecr.io/products/api/$(app)
+tag := latest
+
 .PHONY: default
 default: ## Run locally
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
@@ -20,6 +24,33 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--vault-name mhra-dev \
 	--name api-env \
 	--file .env
+
+.PHONY: ci-branch
+ci-branch: docker-build ## Build branch in CI
+
+.PHONY: ci-master
+ci-master: ci-branch docker-push ## Build master in CI
+
+.PHONY: docker-build
+docker-build: ## Build and tag Docker image (with search-client create as dependency)
+	tar cv --exclude=target Dockerfile -C .. ./api ./search-client | docker build - \
+	--progress plain \
+	--tag $(app) \
+	--tag $(image) \
+	--tag $(image):$(tag)
+
+.PHONY: docker-run
+docker-run: ## Run Docker image
+	docker run -it --env-file=.env $(image)
+
+.PHONY: docker-pull
+docker-pull: ## Pull Docker image
+	docker pull $(image)
+
+.PHONY: docker-push
+docker-push: ## Push Docker image
+	docker push $(image)
+	docker push $(image):$(tag)
 
 .PHONY: help
 help: ## Display this help screen

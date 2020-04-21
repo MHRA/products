@@ -1,4 +1,5 @@
 use juniper::GraphQLObject;
+
 #[derive(GraphQLObject)]
 pub struct PageInfo {
     pub has_previous_page: bool,

@@ -15,6 +15,7 @@ futures = "0.3.1"
 juniper = { git = "https://github.com/graphql-rust/juniper", features = ["async"], rev="211737cee0c6b79ad86246d69ed39e2725fc2110" }
 listenfd = "0.3.3"
 reqwest = { version = "0.10.1", features = ["json"] }
+search_client =  { path = "../search-client" }
 serde = "1.0.103"
 serde_derive = "1.0.103"
 serde_json = "1.0.44"
