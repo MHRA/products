@@ -1,4 +1,4 @@
-name: api-branch
+name: medicines-api-branch
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - "!master"
     paths:
       - medicines/api/**
-      - .github/workflows/api-branch.yaml
+      - .github/workflows/medicines-api-branch.yaml
 
 jobs:
   build-and-test:

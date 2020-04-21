@@ -34,11 +34,10 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
     }
 }
 
-pub async fn get_substance_with_products(name: &str, client: &impl Search) -> Substance {
+pub async fn get_substance_with_products(name: &str, client: &impl Search) -> Result<Substance, reqwest::Error> {
     let azure_result = client
         .filter_by_field("substance_name", name)
-        .await
-        .unwrap();
+        .await?;
 
     let mut products = Vec::<Product>::new();
     for document in azure_result.search_results {
@@ -47,7 +46,7 @@ pub async fn get_substance_with_products(name: &str, client: &impl Search) -> Su
 
     products.sort();
 
-    Substance::new(name.to_string(), Some(products))
+    Ok(Substance::new(name.to_string(), Some(products)))
 }
 
 #[cfg(test)]

@@ -1,7 +1,7 @@
 use juniper::{FieldResult, RootNode};
 
 use crate::{
-    azure_search::AzureContext,
+    azure_context::AzureContext,
     product::get_substance_with_products,
     substance::{get_substances, Substance, Substances},
 };
@@ -15,9 +15,14 @@ impl QueryRoot {
         name: Option<String>,
     ) -> FieldResult<Substance> {
         match name {
-            Some(name) => Ok(
-                get_substance_with_products(&name, &context.client).await,
-            ),
+            Some(name) =>
+                get_substance_with_products(&name, &context.client).await.map_err(|e| {
+                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                    juniper::FieldError::new(
+                        "Error fetching search results",
+                        juniper::Value::null()
+                    )
+                }),
             None =>
                 Err(juniper::FieldError::new(
                     "Getting a substance without providing a substance name is not supported.",
