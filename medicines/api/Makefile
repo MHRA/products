@@ -1,5 +1,6 @@
-app := api
-image := mhraproductsnonprodregistry.azurecr.io/products/api/$(app)
+app := medicines-api
+registry := mhraproductsnonprodregistry
+image := $(registry).azurecr.io/products/$(app)
 tag := latest
 
 .PHONY: default
