@@ -14,16 +14,16 @@ impl QueryRoot {
         context: &AzureContext,
         substance_name: Option<String>,
     ) -> FieldResult<Vec<Product>> {
-        if substance_name.is_some() {
-            return Ok(
-                get_products_by_substance_name(substance_name.unwrap(), &context.client).await,
-            );
+        match substance_name {
+            Some(name) => Ok(
+                get_products_by_substance_name(&name, &context.client).await,
+            ),
+            None =>
+                Err(juniper::FieldError::new(
+                    "Getting a list of products without providing a substance name is not currently supported.",
+                    juniper::Value::null()
+                ))
         }
-
-        Err(juniper::FieldError::new(
-            "Getting a list of products without providing a substance name is not currently supported.",
-            juniper::Value::null()
-        ))
     }
 
     async fn substances(first: i32) -> FieldResult<Substances> {

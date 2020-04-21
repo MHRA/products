@@ -171,7 +171,7 @@ pub async fn get_index_record_from_content_id(
     search_client: &impl Search,
 ) -> Result<IndexResult, ProcessMessageError> {
     let search_results = search_client
-        .search(content_id.to_owned())
+        .search(&content_id)
         .await
         .map_err(anyhow::Error::from)?;
     for result in search_results.search_results {
@@ -354,11 +354,9 @@ mod test {
 
         let result =
             block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
-        
+
         let expected = JobStatus::Error {
-            message: String::from(
-                "Cannot restore index for blob with ID Blob Id: Error message"
-            ),
+            message: String::from("Cannot restore index for blob with ID Blob Id: Error message"),
             code: String::from(""),
         };
 
@@ -617,12 +615,19 @@ mod test {
 
     #[async_trait]
     impl Search for TestAzureSearchClient {
-        async fn search(&self, _search_term: String) -> Result<IndexResults, reqwest::Error> {
+        async fn search(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
                 context: String::from(""),
                 count: None,
             })
+        }
+        async fn filter_by_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<IndexResults, reqwest::Error> {
+            unimplemented!()
         }
     }
 

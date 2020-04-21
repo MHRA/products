@@ -19,37 +19,109 @@ pub struct AzureSearchClient {
     config: AzureConfig,
 }
 
+impl Default for AzureSearchClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AzureSearchClient {
+    // Unfortunately this method is required by the API project.
+    // We can't rely on the `factory` below which returns `impl Search + ...` because we need a concrete type for the [juniper context](../../api/src/schema.rs:11).
+    //
+    // There might be a way around this but I think it would probably take a fair bit of effort so in the interests of time we're just having `AzureContext` depend on `AzureSearchClient` directly in api/src/azure_search.rs.
+    pub fn new() -> Self {
+        let api_key = get_env("AZURE_API_ADMIN_KEY");
+        let search_index = get_env("AZURE_SEARCH_INDEX");
+        let search_service = get_env("SEARCH_SERVICE");
+        let api_version = get_env("AZURE_SEARCH_API_VERSION");
+
+        AzureSearchClient {
+            client: reqwest::Client::new(),
+            config: AzureConfig {
+                api_key,
+                search_index,
+                search_service,
+                api_version,
+            },
+        }
+    }
+}
+
 pub fn get_env(key: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
 }
 
 pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
-    let api_key = get_env("AZURE_API_ADMIN_KEY");
-    let search_index = get_env("AZURE_SEARCH_INDEX");
-    let search_service = get_env("SEARCH_SERVICE");
-    let api_version = get_env("AZURE_SEARCH_API_VERSION");
-
-    AzureSearchClient {
-        client: reqwest::Client::new(),
-        config: AzureConfig {
-            api_key,
-            search_index,
-            search_service,
-            api_version,
-        },
-    }
+    AzureSearchClient::new()
 }
 
 #[async_trait]
 pub trait Search {
-    async fn search(&self, &mut search_term: String) -> Result<IndexResults, reqwest::Error>;
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
+
+    async fn filter_by_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<IndexResults, reqwest::Error>;
 }
 
 #[async_trait]
 impl Search for AzureSearchClient {
-    async fn search(&self, search_term: String) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, &self.client, self.config.clone()).await
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        search(search_term, &self.client, &self.config).await
     }
+
+    async fn filter_by_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<IndexResults, reqwest::Error> {
+        let request = build_filter_by_collection_request(
+            field_name,
+            field_value,
+            "eq",
+            &self.client,
+            &self.config,
+        )?;
+
+        self.client
+            .execute(request)
+            .await?
+            .json::<IndexResults>()
+            .await
+    }
+}
+
+fn build_filter_by_collection_request(
+    field_name: &str,
+    value: &str,
+    operator: &str,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<reqwest::Request, reqwest::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    let filter = format!(
+        "{field_name}/any(value: value {operator} '{value}')",
+        field_name = field_name,
+        value = value,
+        operator = operator,
+    );
+
+    client
+        .get(&base_url)
+        .query(&[
+            ("api-version", &config.api_version),
+            ("api-key", &config.api_key),
+            ("$filter", &filter),
+        ])
+        .build()
 }
 
 #[async_trait]
@@ -69,8 +141,8 @@ impl DeleteIndexEntry for AzureSearchClient {
         value: &str,
     ) -> Result<AzureIndexChangedResults, anyhow::Error> {
         let mut key_values = HashMap::new();
-        key_values.insert(key_name.to_string(), value.to_string());
-        key_values.insert("@search.action".to_string(), "delete".to_string());
+        key_values.insert(key_name, value);
+        key_values.insert("@search.action", "delete");
 
         update_index(key_values, &self.client, &self.config).await
     }
@@ -95,11 +167,11 @@ impl CreateIndexEntry for AzureSearchClient {
 }
 
 async fn search(
-    search_term: String,
+    search_term: &str,
     client: &reqwest::Client,
-    config: AzureConfig,
+    config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
-    let req = build_search(search_term, &client, config)?;
+    let req = build_search(search_term, &client, &config)?;
     tracing::debug!("Requesting from URL: {}", &req.url());
     client
         .execute(req)
@@ -110,9 +182,9 @@ async fn search(
 }
 
 fn build_search(
-    search_term: String,
+    search_term: &str,
     client: &reqwest::Client,
-    config: AzureConfig,
+    config: &AzureConfig,
 ) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
@@ -123,14 +195,14 @@ fn build_search(
     let req = client
         .get(&base_url)
         .query(&[
-            ("api-version", config.api_version),
-            ("highlight", "content".to_string()),
-            ("queryType", "full".to_string()),
-            ("@count", "true".to_string()),
-            ("@top", "10".to_string()),
-            ("@skip", "0".to_string()),
+            ("api-version", config.api_version.as_str()),
+            ("highlight", "content"),
+            ("queryType", "full"),
+            ("@count", "true"),
+            ("@top", "10"),
+            ("@skip", "0"),
             ("search", search_term),
-            ("scoringProfile", "preferKeywords".to_string()),
+            ("scoringProfile", "preferKeywords"),
         ])
         .header("api-key", &config.api_key)
         .build()?;
@@ -205,7 +277,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(search_term, &client, config)
+        build_search(&search_term, &client, &config)
     }
 
     fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
@@ -227,5 +299,53 @@ mod test {
         let config = given_we_have_a_config();
         let actual = when_we_build_a_search_request(client, search_term, config);
         then_search_url_is_as_expected(actual);
+    }
+
+    #[test]
+    fn test_build_filter_by_collection_request() {
+        let client = reqwest::Client::new();
+        let config = AzureConfig {
+            search_service: "my_cool_service".to_string(),
+            search_index: "my_cool_search_index".to_string(),
+            api_key: "my_cool_api_key".to_string(),
+            api_version: "2017-11-11".to_string(),
+        };
+
+        let req = build_filter_by_collection_request(
+            &"my_cool_field".to_string(),
+            &"my cool value".to_string(),
+            &"cooler_than".to_string(),
+            &client,
+            &config,
+        )
+        .unwrap();
+
+        let url = req.url();
+        assert_eq!(url.scheme(), "https");
+        assert_eq!(url.host_str(), Some("my_cool_service.search.windows.net"));
+        assert_eq!(url.path(), "/indexes/my_cool_search_index/docs");
+
+        let mut query = url.query_pairs();
+        assert_eq!(
+            query
+                .find(|query_pair| query_pair.0 == "api-version")
+                .unwrap()
+                .1,
+            "2017-11-11"
+        );
+        assert_eq!(
+            query
+                .find(|query_pair| query_pair.0 == "api-key")
+                .unwrap()
+                .1,
+            "my_cool_api_key"
+        );
+        assert_eq!(
+            query
+                .find(|query_pair| query_pair.0 == "$filter")
+                .unwrap()
+                .1,
+            "my_cool_field/any(value: value cooler_than 'my cool value')"
+        );
     }
 }
