@@ -1,0 +1,14 @@
+[package]
+name = "hello-world"
+version = "0.1.0"
+authors = ["stuart.harris@red-badger.com"]
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0.28"
+async-std = { version = "1.5.0", features = ["unstable", "attributes"] }
+tide = { git = "https://github.com/http-rs/tide" }
+
+[dev-dependencies]
+http-types = "1.2.0"
+surf = "1.0.3"
