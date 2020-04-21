@@ -25,7 +25,7 @@ pub async fn get_substances(first: i32) -> Substances {
     let edges = substances
         .iter()
         .take(first as usize)
-        .map(|x| Substance::new(x, Some(vec![])))
+        .map(|x| Substance::new(x.into(), Some(vec![])))
         .map(|y| SubstanceEdge {
             node: y,
             cursor: "cursor".to_owned(),
