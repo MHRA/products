@@ -26,6 +26,10 @@ impl Default for AzureSearchClient {
 }
 
 impl AzureSearchClient {
+    // Unfortunately this method is required by the API project.
+    // We can't rely on the `factory` below which returns `impl Search + ...` because we need a concrete type for the [juniper context](../../api/src/schema.rs:11).
+    //
+    // There might be a way around this but I think it would probably take a fair bit of effort so in the interests of time we're just having `AzureContext` depend on `AzureSearchClient` directly in api/src/azure_search.rs.
     pub fn new() -> Self {
         let api_key = get_env("AZURE_API_ADMIN_KEY");
         let search_index = get_env("AZURE_SEARCH_INDEX");
