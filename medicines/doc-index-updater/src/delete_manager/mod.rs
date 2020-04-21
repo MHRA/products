@@ -685,11 +685,12 @@ mod test {
             _container_name: &str,
             _blob_name: &str,
         ) -> Result<(), AzureError> {
-            match self.can_delete_blob {
-                true => Ok(()),
-                false => Err(AzureError::GenericErrorWithText(
+            if self.can_delete_blob {
+                Ok(())
+            } else {
+                Err(AzureError::GenericErrorWithText(
                     "blob could not be deleted".to_string(),
-                )),
+                ))
             }
         }
     }
