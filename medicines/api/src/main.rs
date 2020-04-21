@@ -8,7 +8,7 @@ use std::{env, str::FromStr};
 use std::{io, sync::Arc};
 use tracing::Level;
 
-mod azure_search;
+mod azure_context;
 mod pagination;
 mod product;
 mod schema;
@@ -17,10 +17,9 @@ mod substance;
 const PORT: u16 = 8000;
 
 use crate::{
-    azure_search::AzureContext,
+    azure_context::{create_context, AzureContext},
     schema::{create_schema, Schema},
 };
-use azure_search::create_context;
 
 async fn graphiql() -> HttpResponse {
     let html = graphiql_source("/graphql");
