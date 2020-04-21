@@ -13,6 +13,7 @@ module.exports = {
     GOOGLE_TRACKING_ID: process.env.GOOGLE_TRACKING_ID,
     GOOGLE_USE_DEBUG: process.env.GOOGLE_USE_DEBUG,
     ROOT_URL_DOMAIN: process.env.ROOT_URL_DOMAIN,
+    GRAPHQL_URL: process.env.GRAPHQL_URL,
   },
   webpack: config => {
     config.module.rules.push({

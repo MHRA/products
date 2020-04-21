@@ -6,13 +6,6 @@
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
 let polyfill;
-const baseUrl = `https://${Cypress.env(
-  'AZURE_SEARCH_SERVICE',
-)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
-const apiKey = `api-key=${Cypress.env(
-  'AZURE_SEARCH_KEY',
-)}&api-version=2017-11-11`;
-const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package
 before(() => {
@@ -33,6 +26,16 @@ Cypress.on('window:before:load', win => {
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
 });
+
+
+const baseUrl = `https://${Cypress.env(
+  'AZURE_SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
+const apiKey = `api-key=${Cypress.env(
+  'AZURE_SEARCH_KEY',
+)}&api-version=2017-11-11`;
+const genericSearchParams = 'highlight=content&queryType=full&$count=true';
+const graphQlUrl = Cypress.env('GRAPHQL_URL');
 
 const mockParacetamolResults = () =>
   cy.route(
@@ -75,7 +78,6 @@ const mockIbuprofenSpcPilResults = () =>
     `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc'+or+doc_type+eq+'Pil')`,
     'fixture:search_results.spcpil.json',
   );
-
 
 const longerTimeout = 20000;
 
@@ -182,7 +184,7 @@ describe('A-Z Index', function() {
     // Mock out GraphQL response.
     cy.route(
       'POST',
-      `http://localhost:8000/graphql`,
+      graphQlUrl,
       'fixture:graphql-substances.json',
     );
 
