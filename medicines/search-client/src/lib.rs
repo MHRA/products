@@ -54,7 +54,7 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 
 #[async_trait]
 pub trait Search {
-    async fn search(&self, &mut search_term: String) -> Result<IndexResults, reqwest::Error>;
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
 
     async fn filter_by_field(
         &self,
@@ -65,8 +65,8 @@ pub trait Search {
 
 #[async_trait]
 impl Search for AzureSearchClient {
-    async fn search(&self, search_term: String) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, &self.client, self.config.clone()).await
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        search(search_term, &self.client, &self.config).await
     }
 
     async fn filter_by_field(
@@ -79,7 +79,7 @@ impl Search for AzureSearchClient {
             field_value,
             "eq",
             &self.client,
-            &self.config.clone(),
+            &self.config,
         )?;
 
         self.client
@@ -137,8 +137,8 @@ impl DeleteIndexEntry for AzureSearchClient {
         value: &str,
     ) -> Result<AzureIndexChangedResults, anyhow::Error> {
         let mut key_values = HashMap::new();
-        key_values.insert(key_name.to_string(), value.to_string());
-        key_values.insert("@search.action".to_string(), "delete".to_string());
+        key_values.insert(key_name, value);
+        key_values.insert("@search.action", "delete");
 
         update_index(key_values, &self.client, &self.config).await
     }
@@ -163,11 +163,11 @@ impl CreateIndexEntry for AzureSearchClient {
 }
 
 async fn search(
-    search_term: String,
+    search_term: &str,
     client: &reqwest::Client,
-    config: AzureConfig,
+    config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
-    let req = build_search(search_term, &client, config)?;
+    let req = build_search(search_term, &client, &config)?;
     tracing::debug!("Requesting from URL: {}", &req.url());
     client
         .execute(req)
@@ -178,9 +178,9 @@ async fn search(
 }
 
 fn build_search(
-    search_term: String,
+    search_term: &str,
     client: &reqwest::Client,
-    config: AzureConfig,
+    config: &AzureConfig,
 ) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
@@ -191,14 +191,14 @@ fn build_search(
     let req = client
         .get(&base_url)
         .query(&[
-            ("api-version", config.api_version),
-            ("highlight", "content".to_string()),
-            ("queryType", "full".to_string()),
-            ("@count", "true".to_string()),
-            ("@top", "10".to_string()),
-            ("@skip", "0".to_string()),
+            ("api-version", config.api_version.as_str()),
+            ("highlight", "content"),
+            ("queryType", "full"),
+            ("@count", "true"),
+            ("@top", "10"),
+            ("@skip", "0"),
             ("search", search_term),
-            ("scoringProfile", "preferKeywords".to_string()),
+            ("scoringProfile", "preferKeywords"),
         ])
         .header("api-key", &config.api_key)
         .build()?;
@@ -273,7 +273,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(search_term, &client, config)
+        build_search(&search_term, &client, &config)
     }
 
     fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
