@@ -89,6 +89,7 @@ impl Search for AzureSearchClient {
         self.client
             .execute(request)
             .await?
+            .error_for_status()?
             .json::<IndexResults>()
             .await
     }

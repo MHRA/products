@@ -36,13 +36,12 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
 pub async fn get_products_by_substance_name(
     substance_name: &str,
     client: &impl Search,
-) -> Vec<Product> {
+) -> Result<Vec<Product>, reqwest::Error> {
     // Get a list of documents from Azure which are about products containing the
     // substance name.
     let azure_result = client
         .filter_by_field("substance_name", substance_name)
-        .await
-        .unwrap();
+        .await?;
 
     // Extract a list of products while keeping track of the number of documents that
     // product has.
@@ -53,7 +52,7 @@ pub async fn get_products_by_substance_name(
 
     products.sort();
 
-    products
+    Ok(products)
 }
 
 #[cfg(test)]
