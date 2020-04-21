@@ -354,11 +354,9 @@ mod test {
 
         let result =
             block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
-        
+
         let expected = JobStatus::Error {
-            message: String::from(
-                "Cannot restore index for blob with ID Blob Id: Error message"
-            ),
+            message: String::from("Cannot restore index for blob with ID Blob Id: Error message"),
             code: String::from(""),
         };
 
@@ -623,6 +621,13 @@ mod test {
                 context: String::from(""),
                 count: None,
             })
+        }
+        async fn filter_by_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<IndexResults, reqwest::Error> {
+            unimplemented!()
         }
     }
 
