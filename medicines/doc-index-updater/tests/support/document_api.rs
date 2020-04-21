@@ -36,7 +36,7 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
 
     let response = get_ok(
         client
-            .post(format!("http://localhost:8000/documents").as_str())
+            .post("http://localhost:8000/documents")
             .basic_auth("username".to_string(), Some("password".to_string()))
             .header("Content-Type", "application/json")
             .body(serde_json::to_string(&metadata).unwrap())

@@ -103,7 +103,7 @@ fn create_endpoint_sets_state() {
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
     assert_eq!(response.status, JobStatus::Accepted);
     let id = response.id;
-    let response = get_ok(state.get_status(id.clone()));
+    let response = get_ok(state.get_status(id));
     assert_eq!(response.status, JobStatus::Accepted);
 
     let mut create_client = get_ok(create_factory());
