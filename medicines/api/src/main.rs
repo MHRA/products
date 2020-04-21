@@ -1,8 +1,12 @@
 use actix_cors::Cors;
 use actix_web::{http, middleware, web, App, Error, HttpResponse, HttpServer};
+use anyhow::anyhow;
+use core::fmt::Display;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
+use std::{env, str::FromStr};
 use std::{io, sync::Arc};
+use tracing::Level;
 
 mod azure_search;
 mod pagination;
@@ -55,7 +59,11 @@ fn cors_middleware() -> actix_cors::CorsFactory {
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-    env_logger::init();
+    if get_env_or_default("JSON_LOGS", true) {
+        use_json_log_subscriber()
+    } else {
+        use_unstructured_log_subscriber()
+    }
 
     let mut listenfd = ListenFd::from_env();
 
@@ -91,4 +99,44 @@ async fn main() -> io::Result<()> {
     };
 
     server.run().await
+}
+
+fn use_json_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .json()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::INFO)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
+
+fn use_unstructured_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::DEBUG)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
+
+pub fn get_env_or_default<T>(key: &str, default: T) -> T
+where
+    T: FromStr + Display,
+{
+    get_env(key).unwrap_or_else(|e| {
+        tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
+        default
+    })
+}
+
+pub fn get_env<T>(key: &str) -> anyhow::Result<T>
+where
+    T: FromStr,
+{
+    env::var(key)?
+        .parse::<T>()
+        .map_err(|_| anyhow!("failed to parse for {}", key))
 }
