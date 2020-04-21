@@ -1,0 +1,17 @@
+{
+  "data": {
+    "substance": {
+      "name": "PARACETAMOL",
+      "products": [
+        {
+          "name": "PARACETAMOL TABLETS",
+          "documentCount": 1438
+        },
+        {
+          "name": "PARACETAMOL CAPSULES",
+          "documentCount": 1438
+        }
+      ]
+    }
+  }
+}

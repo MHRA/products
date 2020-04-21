@@ -76,6 +76,7 @@ const mockIbuprofenSpcPilResults = () =>
     'fixture:search_results.spcpil.json',
   );
 
+
 const longerTimeout = 20000;
 
 describe('Search', function() {
@@ -172,11 +173,19 @@ describe('Search', function() {
 describe('A-Z Index', function() {
   it('Navigate to Paracetamol via A-Z index', function() {
     cy.server();
-    // Mock out list of substances and medcines.
+    // Mock out list of substances.
     cy.route(
       `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
       'fixture:facets.json',
     );
+
+    // Mock out GraphQL response.
+    cy.route(
+      'POST',
+      `http://localhost:8000/graphql`,
+      'fixture:graphql-substances.json',
+    );
+
     // Mock out first page of search results.
     cy.route(
       `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
