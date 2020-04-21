@@ -27,7 +27,6 @@ Cypress.on('window:before:load', win => {
   win.sessionStorage.clear();
 });
 
-
 const baseUrl = `https://${Cypress.env(
   'AZURE_SEARCH_SERVICE',
 )}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
@@ -182,11 +181,7 @@ describe('A-Z Index', function() {
     );
 
     // Mock out GraphQL response.
-    cy.route(
-      'POST',
-      graphQlUrl,
-      'fixture:graphql-substances.json',
-    );
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
 
     // Mock out first page of search results.
     cy.route(
