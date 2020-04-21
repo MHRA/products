@@ -21,14 +21,11 @@ impl Substance {
 pagination! {Substances, SubstanceEdge, Substance}
 
 pub async fn get_substances(first: i32) -> Substances {
-    let substances: [&str; 1000] = ["Ibuprofen"; 1000];
+    let substances: [String; 1000] = ["Ibuprofen".to_owned(); 1000];
     let edges = substances
         .iter()
         .take(first as usize)
-        .map(|x| Substance {
-            name: x.to_owned().to_owned(),
-            products: Some(vec![]),
-        })
+        .map(|x| Substance::new(x, Some(vec![])))
         .map(|y| SubstanceEdge {
             node: y,
             cursor: "cursor".to_owned(),

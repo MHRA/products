@@ -1,6 +1,6 @@
+use crate::substance::Substance;
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
-use crate::substance::Substance;
 
 #[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A medical product containing active ingredients")]
@@ -34,19 +34,12 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
     }
 }
 
-pub async fn get_substance_with_products(
-    name: &str,
-    client: &impl Search,
-) -> Substance {
-    // Get a list of documents from Azure which are about products containing the
-    // substance name.
+pub async fn get_substance_with_products(name: &str, client: &impl Search) -> Substance {
     let azure_result = client
         .filter_by_field("substance_name", name)
         .await
         .unwrap();
 
-    // Extract a list of products while keeping track of the number of documents that
-    // product has.
     let mut products = Vec::<Product>::new();
     for document in azure_result.search_results {
         handle_doc(&document, &mut products);
