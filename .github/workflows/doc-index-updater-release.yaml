@@ -1,0 +1,61 @@
+name: doc-index-updater-master
+
+on:
+  push:
+    tags:
+      - web.v*
+
+env:
+  IMAGE: mhraproductsproductionregistry.azurecr.io/products/doc-index-updater
+
+jobs:
+  build-and-test:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create release
+
+      - name: Docker login
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsproductionregistry.azurecr.io
+          username: mhraproductsproductionregistry
+          password: ${{ secrets.PRODUCTION_REGISTRY_PASSWORD }}
+
+      - name: Fetch image for tagged commit
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-master tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
+          echo ::set-env name=TAG::$TAG
+          echo ::set-env name=DIGEST::$DIGEST
+
+      - name: Clone Deployments repo
+        uses: actions/checkout@v2
+        with:
+          repository: MHRA/deployments
+          path: deployments
+          token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+
+      - name: Update image tag
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kustomize: 3.4.0
+          command: |
+            set -eux
+            cd deployments/doc-index-updater/overlays/prod
+
+            kustomize edit set image $DIGEST
+
+            git config --local user.email "CD.no.reply@mhra.gov.uk"
+            git config --local user.name "MHRA CI/CD"
+            git diff-index --quiet HEAD || git commit -am "CI: Update production image for $TAG"
+            declare -i n
+            n=0
+            until [ $n -ge 5 ]
+            do
+              git push && break
+              n+=1
+              git pull --rebase
+            done
