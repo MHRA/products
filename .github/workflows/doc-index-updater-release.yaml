@@ -1,0 +1,89 @@
+name: doc-index-updater-release
+
+on:
+  push:
+    tags:
+      - diu.v*
+
+env:
+  NONPROD_IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
+  PROD_IMAGE: mhraproductsproductionregistry.azurecr.io/products/doc-index-updater
+
+jobs:
+  build-and-test:
+    name: Create release and deploy to production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Docker login to nonprod
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsnonprodregistry.azurecr.io
+          username: mhraproductsnonprodregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Fetch image for tagged commit
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make docker-pull image=$NONPROD_IMAGE tag=$TAG
+          echo ::set-env name=TAG::$TAG
+
+      - name: Docker login to prod
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsproductionregistry.azurecr.io
+          username: mhraproductsproductionregistry
+          password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
+
+      - name: Push image for tagged commit
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          make docker-push image=$PROD_IMAGE tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${PROD_IMAGE}:${TAG})"
+          echo ::set-env name=DIGEST::$DIGEST
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Doc-Index-Updater release ${{ github.ref }}
+          body: |
+            Release of Document Index Updater
+          draft: false
+          prerelease: false
+
+      - name: Clone Deployments repo
+        uses: actions/checkout@v2
+        with:
+          repository: MHRA/deployments
+          path: deployments
+          token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+
+      - name: Update image tag
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kustomize: 3.4.0
+          command: |
+            set -eux
+            cd deployments/doc-index-updater/overlays/prod
+
+            kustomize edit set image $DIGEST
+
+            git config --local user.email "CD.no.reply@mhra.gov.uk"
+            git config --local user.name "MHRA CI/CD"
+            git diff-index --quiet HEAD || git commit -am "CI: Update production image for $TAG"
+            declare -i n
+            n=0
+            until [ $n -ge 5 ]
+            do
+              git push && break
+              n+=1
+              git pull --rebase
+            done
