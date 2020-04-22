@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - medicines/api/**
+      - medicines/search-client/**
       - .github/workflows/medicines-api-master.yaml
 
 jobs:
