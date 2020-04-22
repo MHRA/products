@@ -35,7 +35,8 @@ RUN cargo build --release && \
 # Build real binaries now
 COPY ./api/src ./src
 
-RUN cargo build --release
+RUN cargo test --release && \
+  cargo build --release
 
 # ---------------------------------
 FROM debian:buster-slim AS release
