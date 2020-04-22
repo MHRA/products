@@ -172,16 +172,13 @@ describe('Search', function() {
 });
 
 describe('A-Z Index', function() {
-  it('Navigate to Paracetamol via A-Z index', function() {
+  it('can navigate to Paracetamol via A-Z index', function() {
     cy.server();
     // Mock out list of substances.
     cy.route(
       `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
       'fixture:facets.json',
     );
-
-    // Mock out GraphQL response.
-    cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
 
     // Mock out first page of search results.
     cy.route(
@@ -200,6 +197,36 @@ describe('A-Z Index', function() {
       .click();
     cy.contains('PARACETAMOL').click();
     cy.contains('PARACETAMOL TABLETS').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
+
+  it('can navigate to Paracetamol Tablets with GraphQL feature on', function() {
+    cy.server();
+    // Mock out list of substances.
+    cy.route(
+      `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
+      'fixture:facets.json',
+    );
+
+    // Mock out GraphQL response.
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
+
+    // Mock out first page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS+FROM+GRAPHQL'`,
+      'fixture:search_results.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS+FROM+GRAPHQL`,
+      'fixture:search_results.json',
+    );
+
+    cy.visit('/substance?substance=PARACETAMOL&useGraphQl=true');
+    cy.contains('PARACETAMOL TABLETS FROM GRAPHQL').click();
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Next').click();

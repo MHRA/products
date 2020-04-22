@@ -12,6 +12,21 @@ import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
 import graphQl from '../../services/graphql-loader';
+import substanceLoader from '../../services/substance-loader';
+
+const azureProductsLoader = async (substance: string) => {
+  const firstLetter = substance.charAt(0);
+  const substanceIndex = await substanceLoader.load(firstLetter);
+  const substanceMatch = substanceIndex.find(s => s.name === substance);
+  if (substanceMatch) {
+    return substanceMatch.products;
+  }
+  return [];
+};
+
+const graphQlProductsLoader = async (substance: string) => {
+  return graphQl.products.load(substance);
+};
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -23,7 +38,7 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { substance: queryQS },
+    query: { substance: queryQS, useGraphQl: graphQlFeatureFlag },
   } = router;
 
   useEffect(() => {
@@ -31,11 +46,17 @@ const App: NextPage = () => {
       return;
     }
     (async () => {
-      const substanceStr = queryQS.toString();
-      graphQl.products.load(substanceStr).then(responseData => {
-        setProducts(responseData);
-        setSubstanceName(substanceStr);
-        Events.viewProductsForSubstance(substanceStr);
+      const substanceName = queryQS.toString();
+      const loader: (
+        substance: string,
+      ) => Promise<IProduct[]> = graphQlFeatureFlag
+        ? graphQlProductsLoader
+        : azureProductsLoader;
+
+      loader(substanceName).then(products => {
+        setProducts(products);
+        setSubstanceName(substanceName);
+        Events.viewProductsForSubstance(substanceName);
       });
     })();
   }, [queryQS]);
