@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
       - name: Push image for tagged commit
-        working-directory: ./products/medicines/doc-index-updater
+        working-directory: ./
         run: |
           make docker-push image=$PROD_IMAGE tag=$TAG
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${PROD_IMAGE}:${TAG})"
