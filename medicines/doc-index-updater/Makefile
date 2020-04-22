@@ -73,6 +73,10 @@ docker-push: ## Push Docker image
 	docker push $(image)
 	docker push $(image):$(tag)
 
+.PHONY: docker-retag
+docker-retag: ## Update tag of Docker image
+	docker tag ${image}:${tag} ${new_image}:${tag}
+
 .PHONY: help
 help: ## Display this help screen
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

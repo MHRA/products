@@ -44,6 +44,7 @@ jobs:
       - name: Push image for tagged commit
         working-directory: ./products/medicines/doc-index-updater
         run: |
+          make docker-retag image=$NONPROD_IMAGE new_image=$PROD_IMAGE tag=$TAG
           make docker-push image=$PROD_IMAGE tag=$TAG
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${PROD_IMAGE}:${TAG})"
           echo ::set-env name=DIGEST::$DIGEST
