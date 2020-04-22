@@ -46,17 +46,17 @@ const App: NextPage = () => {
       return;
     }
     (async () => {
-      const substanceStr = queryQS.toString();
+      const substanceName = queryQS.toString();
       const loader: (
         substance: string,
       ) => Promise<IProduct[]> = graphQlFeatureFlag
         ? graphQlProductsLoader
         : azureProductsLoader;
 
-      loader(substanceStr).then(responseData => {
-        setProducts(responseData);
-        setSubstanceName(substanceStr);
-        Events.viewProductsForSubstance(substanceStr);
+      loader(substanceName).then(products => {
+        setProducts(products);
+        setSubstanceName(substanceName);
+        Events.viewProductsForSubstance(substanceName);
       });
     })();
   }, [queryQS]);
