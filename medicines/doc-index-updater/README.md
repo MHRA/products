@@ -91,3 +91,7 @@ make test TEST=<arguments>
 There's a dashboard set up in Azure to monitor latency, traffic, errors and saturation.
 
 To find it, go to [Shared Dashboards in the Azure Portal](https://portal.azure.com/#blade/HubsExtension/BrowseResourceBlade/resourceType/Microsoft.Portal%2Fdashboards).
+
+## Releasing
+
+To create a new release and deployment to production, create and push a new tag of the form `diu.v0.0.0` (e.g. `diu.v1.3.0`), incrementing as required from the most recent . The `doc-index-updater-release` workflow will then automate the creation of a new deployment in Github, add the image for the tagged commit to the production container registry and update the image for production in the `deployments` repo. This will trigger ArgoCD to update the image in production. You can then update the release notes with any useful detail in Github.

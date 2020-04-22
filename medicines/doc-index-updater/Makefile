@@ -66,7 +66,7 @@ docker-run: ## Run Docker image
 
 .PHONY: docker-pull
 docker-pull: ## Pull Docker image
-	docker pull image $(image):$(tag)
+	docker pull $(image):$(tag)
 
 .PHONY: docker-push
 docker-push: ## Push Docker image
