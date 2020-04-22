@@ -63,6 +63,10 @@ async fn main() -> io::Result<()> {
         use_unstructured_log_subscriber()
     }
 
+    server()
+}
+
+async fn server() -> io::Result<()> {
     let mut listenfd = ListenFd::from_env();
 
     // Create Juniper schema
