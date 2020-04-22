@@ -15,12 +15,12 @@ pub fn get_basic_auth_credentials() -> (String, String) {
     (username, password)
 }
 
-pub trait BasicAuthFromEnv {
-    fn with_auth(self) -> RequestBuilder;
+pub trait WithBasicAuthFromEnvironmentVars {
+    fn with_basic_auth_from_environment_vars(self) -> RequestBuilder;
 }
 
-impl BasicAuthFromEnv for RequestBuilder {
-    fn with_auth(self) -> RequestBuilder {
+impl WithBasicAuthFromEnvironmentVars for RequestBuilder {
+    fn with_basic_auth_from_environment_vars(self) -> Self {
         let (username, password) = get_basic_auth_credentials();
         self.basic_auth(username, Some(password))
     }
@@ -32,7 +32,7 @@ pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> 
     let response = get_ok(
         client
             .delete(format!("http://localhost:8000/documents/{}", document_id).as_str())
-            .with_auth()
+            .with_basic_auth_from_environment_vars()
             .send(),
     );
 
@@ -60,7 +60,7 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
     let response = get_ok(
         client
             .post("http://localhost:8000/documents")
-            .with_auth()
+            .with_basic_auth_from_environment_vars()
             .header("Content-Type", "application/json")
             .body(serde_json::to_string(&metadata).unwrap())
             .send(),
@@ -76,7 +76,7 @@ pub fn get_job_status(job_id: Uuid) -> JobStatus {
     let response = get_ok(
         client
             .get(format!("http://localhost:8000/jobs/{}", job_id).as_str())
-            .with_auth()
+            .with_basic_auth_from_environment_vars()
             .send(),
     );
     let job_status_response: JobStatusResponse = get_ok(response.json());
