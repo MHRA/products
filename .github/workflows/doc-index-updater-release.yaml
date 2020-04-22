@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v2
+        with:
+          path: products
 
       - name: Docker login to nonprod
         uses: azure/docker-login@v1
