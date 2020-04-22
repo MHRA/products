@@ -21,6 +21,7 @@ env:
   GOOGLE_TRACKING_ID: UA-6838115-11
   GOOGLE_USE_DEBUG: true
   ROOT_URL_DOMAIN: .windows.net
+  GRAPHQL_URL: https://does-not-matter/this-gets-mocked
 
 jobs:
   build:

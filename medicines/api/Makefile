@@ -17,12 +17,12 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --vault-name mhra-dev \
 	  --name api-env \
 	  --query value \
-	  --output tsv > .env
+	  --output tsv | sort | sed '/^$$/d' > .env
 	az keyvault secret show \
 	  --vault-name mhra-dev \
 	  --name api-build-env \
 	  --query value \
-	  --output tsv > .env.build
+	  --output tsv | sort | sed '/^$$/d' > .env.build
 
 .PHONY: set-env
 set-env: ## Takes your current .env and .env.build files and replaces the keyvault value with the contents of the files

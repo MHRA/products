@@ -8,7 +8,7 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --vault-name mhra-dev \
 	  --name web-env \
 	  --query value \
-	  --output tsv > .env
+	  --output tsv | sort | sed '/^$$/d' > .env
 
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
@@ -16,3 +16,7 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--vault-name mhra-dev \
 	--name web-env \
 	--file .env
+
+.PHONY: cypress
+cypress: ## Launch Cypress
+	yarn run cypress open --env $$(cat .env | sed '/^$$/d' | tr "\n", "," | sed 's/,$$/ /g')

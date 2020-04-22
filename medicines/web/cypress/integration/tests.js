@@ -6,13 +6,6 @@
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
 let polyfill;
-const baseUrl = `https://${Cypress.env(
-  'AZURE_SEARCH_SERVICE',
-)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
-const apiKey = `api-key=${Cypress.env(
-  'AZURE_SEARCH_KEY',
-)}&api-version=2017-11-11`;
-const genericSearchParams = 'highlight=content&queryType=full&$count=true';
 
 // grab fetch polyfill from remote URL, could be also from a local package
 before(() => {
@@ -33,6 +26,15 @@ Cypress.on('window:before:load', win => {
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
 });
+
+const baseUrl = `https://${Cypress.env(
+  'AZURE_SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('AZURE_SEARCH_INDEX')}/docs`;
+const apiKey = `api-key=${Cypress.env(
+  'AZURE_SEARCH_KEY',
+)}&api-version=2017-11-11`;
+const genericSearchParams = 'highlight=content&queryType=full&$count=true';
+const graphQlUrl = Cypress.env('GRAPHQL_URL');
 
 const mockParacetamolResults = () =>
   cy.route(
@@ -170,13 +172,14 @@ describe('Search', function() {
 });
 
 describe('A-Z Index', function() {
-  it('Navigate to Paracetamol via A-Z index', function() {
+  it('can navigate to Paracetamol via A-Z index', function() {
     cy.server();
-    // Mock out list of substances and medcines.
+    // Mock out list of substances.
     cy.route(
       `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
       'fixture:facets.json',
     );
+
     // Mock out first page of search results.
     cy.route(
       `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
@@ -194,6 +197,36 @@ describe('A-Z Index', function() {
       .click();
     cy.contains('PARACETAMOL').click();
     cy.contains('PARACETAMOL TABLETS').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
+
+  it('can navigate to Paracetamol Tablets with GraphQL feature on', function() {
+    cy.server();
+    // Mock out list of substances.
+    cy.route(
+      `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
+      'fixture:facets.json',
+    );
+
+    // Mock out GraphQL response.
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
+
+    // Mock out first page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS+FROM+GRAPHQL'`,
+      'fixture:search_results.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS+FROM+GRAPHQL`,
+      'fixture:search_results.json',
+    );
+
+    cy.visit('/substance?substance=PARACETAMOL&useGraphQl=true');
+    cy.contains('PARACETAMOL TABLETS FROM GRAPHQL').click();
     cy.contains('I have read and understand the disclaimer').click();
     cy.contains('Agree').click();
     cy.contains('Next').click();

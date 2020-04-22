@@ -1,3 +1,4 @@
+use crate::substance::Substance;
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 
@@ -33,18 +34,14 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
     }
 }
 
-pub async fn get_products_by_substance_name(
+pub async fn get_substance_with_products(
     substance_name: &str,
     client: &impl Search,
-) -> Result<Vec<Product>, reqwest::Error> {
-    // Get a list of documents from Azure which are about products containing the
-    // substance name.
+) -> Result<Substance, reqwest::Error> {
     let azure_result = client
         .filter_by_field("substance_name", substance_name)
         .await?;
 
-    // Extract a list of products while keeping track of the number of documents that
-    // product has.
     let mut products = Vec::<Product>::new();
     for document in azure_result.search_results {
         handle_doc(&document, &mut products);
@@ -52,7 +49,7 @@ pub async fn get_products_by_substance_name(
 
     products.sort();
 
-    Ok(products)
+    Ok(Substance::new(substance_name.to_string(), Some(products)))
 }
 
 #[cfg(test)]

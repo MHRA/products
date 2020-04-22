@@ -1,30 +1,26 @@
-name: medicines-web-master
+name: medicines-web-release
 
 on:
   push:
-    branches:
-      - master
-    paths:
-      - medicines/web/**
-      - .github/workflows/medicines-web-master.yaml
+    tags:
+      - medicinesweb.v*
 
 env:
   AZURE_SEARCH_API_VERSION: 2017-11-11
   AZURE_SEARCH_EXACTNESS_BOOST: 4
   AZURE_SEARCH_INDEX: products-index
-  AZURE_SEARCH_KEY: EB09FBB43EBD24C1C8D5983A9C00B497
+  AZURE_SEARCH_KEY: 650538997E243D9CE334050D9119BA90
   AZURE_SEARCH_SCORING_PROFILE: preferKeywords
-  AZURE_SEARCH_SERVICE: mhraproductsnonprod
+  AZURE_SEARCH_SERVICE: mhraproductsproduction
   AZURE_SEARCH_WORD_FUZZINESS: 1
   GOOGLE_GTM_CONTAINER_ID: GTM-WJ5TW34
-  GOOGLE_TRACKING_ID: UA-6838115-11
-  GOOGLE_USE_DEBUG: true
+  GOOGLE_TRACKING_ID: UA-6838115-13
+  GOOGLE_USE_DEBUG: false
   ROOT_URL_DOMAIN: .windows.net
-  GRAPHQL_URL: https://will-be-replaced/with-real-url
 
 jobs:
   build:
-    name: Build, test and deploy
+    name: Build, test, create release and deploy to production
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
@@ -73,9 +69,22 @@ jobs:
         env:
           ROOT_URL_DOMAIN: localhost
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Medicines website release ${{ github.ref }}
+          body: |
+            Release of Medicines website
+          draft: false
+          prerelease: false
+
       - name: Deploy products web to static site in azure storage
         uses: lauchacarro/Azure-Storage-Action@master
         with:
           enabled-static-website: true
           folder: medicines/web/dist
-          connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}
+          connection-string: ${{ secrets. AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}
