@@ -10,24 +10,21 @@ pub struct QueryRoot;
 
 #[juniper::graphql_object(Context = AzureContext)]
 impl QueryRoot {
-    async fn substance(
-        context: &AzureContext,
-        name: Option<String>,
-    ) -> FieldResult<Substance> {
+    async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
         match name {
-            Some(name) =>
-                get_substance_with_products(&name, &context.client).await.map_err(|e| {
+            Some(name) => get_substance_with_products(&name, &context.client)
+                .await
+                .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
                     juniper::FieldError::new(
                         "Error fetching search results",
-                        juniper::Value::null()
+                        juniper::Value::null(),
                     )
                 }),
-            None =>
-                Err(juniper::FieldError::new(
-                    "Getting a substance without providing a substance name is not supported.",
-                    juniper::Value::null()
-                ))
+            None => Err(juniper::FieldError::new(
+                "Getting a substance without providing a substance name is not supported.",
+                juniper::Value::null(),
+            )),
         }
     }
 
