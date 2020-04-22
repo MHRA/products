@@ -2,33 +2,29 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_context::AzureContext,
-    product::{get_products_by_substance_name, Product},
-    substance::{get_substances, Substances},
+    product::get_substance_with_products,
+    substance::{get_substances, Substance, Substances},
 };
 
 pub struct QueryRoot;
 
 #[juniper::graphql_object(Context = AzureContext)]
 impl QueryRoot {
-    async fn products(
-        context: &AzureContext,
-        substance_name: Option<String>,
-    ) -> FieldResult<Vec<Product>> {
-        match substance_name {
-            Some(name) =>
-                get_products_by_substance_name(&name, &context.client).await.map_err(|e| {
+    async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
+        match name {
+            Some(name) => get_substance_with_products(&name, &context.client)
+                .await
+                .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
-
                     juniper::FieldError::new(
                         "Error fetching search results",
-                        juniper::Value::null()
+                        juniper::Value::null(),
                     )
                 }),
-            None =>
-                Err(juniper::FieldError::new(
-                    "Getting a list of products without providing a substance name is not currently supported.",
-                    juniper::Value::null()
-                ))
+            None => Err(juniper::FieldError::new(
+                "Getting a substance without providing a substance name is not supported.",
+                juniper::Value::null(),
+            )),
         }
     }
 

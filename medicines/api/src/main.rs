@@ -4,8 +4,7 @@ use anyhow::anyhow;
 use core::fmt::Display;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
-use std::{env, str::FromStr};
-use std::{io, sync::Arc};
+use std::{env, io, str::FromStr, sync::Arc};
 use tracing::Level;
 
 mod azure_context;
