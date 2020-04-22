@@ -1,7 +1,30 @@
 use super::get_ok;
-use doc_index_updater::models::{Document, DocumentType, FileSource, JobStatus, JobStatusResponse};
+use reqwest::RequestBuilder;
+
+use doc_index_updater::{
+    get_env,
+    models::{Document, DocumentType, FileSource, JobStatus, JobStatusResponse},
+};
 use reqwest::Error;
 use uuid::Uuid;
+
+pub fn get_basic_auth_credentials() -> (String, String) {
+    let username: String = get_env("BASIC_AUTH_USERNAME").unwrap();
+    let password: String = get_env("BASIC_AUTH_PASSWORD").unwrap();
+
+    (username, password)
+}
+
+pub trait BasicAuthFromEnv {
+    fn with_auth(self) -> RequestBuilder;
+}
+
+impl BasicAuthFromEnv for RequestBuilder {
+    fn with_auth(self) -> RequestBuilder {
+        let (username, password) = get_basic_auth_credentials();
+        self.basic_auth(username, Some(password))
+    }
+}
 
 pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> {
     let client = reqwest::Client::new();
@@ -9,7 +32,7 @@ pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> 
     let response = get_ok(
         client
             .delete(format!("http://localhost:8000/documents/{}", document_id).as_str())
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .with_auth()
             .send(),
     );
 
@@ -37,7 +60,7 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
     let response = get_ok(
         client
             .post("http://localhost:8000/documents")
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .with_auth()
             .header("Content-Type", "application/json")
             .body(serde_json::to_string(&metadata).unwrap())
             .send(),
@@ -49,10 +72,11 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
 
 pub fn get_job_status(job_id: Uuid) -> JobStatus {
     let client = reqwest::Client::new();
+
     let response = get_ok(
         client
             .get(format!("http://localhost:8000/jobs/{}", job_id).as_str())
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .with_auth()
             .send(),
     );
     let job_status_response: JobStatusResponse = get_ok(response.json());
