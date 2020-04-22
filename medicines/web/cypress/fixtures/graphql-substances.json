@@ -4,11 +4,11 @@
       "name": "PARACETAMOL",
       "products": [
         {
-          "name": "PARACETAMOL TABLETS",
+          "name": "PARACETAMOL TABLETS FROM GRAPHQL",
           "documentCount": 1438
         },
         {
-          "name": "PARACETAMOL CAPSULES",
+          "name": "PARACETAMOL CAPSULES FROM GRAPHQL",
           "documentCount": 1438
         }
       ]
