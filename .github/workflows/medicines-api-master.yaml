@@ -9,6 +9,9 @@ on:
       - medicines/search-client/**
       - .github/workflows/medicines-api-master.yaml
 
+env:
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
+
 jobs:
   build-and-test:
     name: Build, Test and Deploy
