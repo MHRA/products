@@ -16,7 +16,7 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --vault-name mhra-dev \
 	  --name doc-index-updater-env \
 	  --query value \
-	  --output tsv | sed '/^$$/d' > .env
+	  --output tsv | sort | sed '/^$$/d' > .env
 
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
