@@ -34,11 +34,13 @@ ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
 docker-build: ## Build and tag Docker image (with search-client create as dependency)
+	export $$(cat .env.build 2> /dev/null | xargs) && \
 	tar cv --exclude=target Dockerfile -C .. ./api ./search-client | docker build - \
-	--progress plain \
-	--tag $(app) \
-	--tag $(image) \
-	--tag $(image):$(tag)
+		--build-arg SCCACHE_AZURE_CONNECTION_STRING \
+		--progress plain \
+		--tag $(app) \
+		--tag $(image) \
+		--tag $(image):$(tag)
 
 .PHONY: docker-run
 docker-run: ## Run Docker image

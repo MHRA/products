@@ -34,6 +34,12 @@ jobs:
         working-directory: products/medicines/api
         run: cargo test
 
+      - name: Set .env.build
+        working-directory: products/medicines/api
+        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
+        env:
+          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
+
       - name: Build, test and push Docker image
         working-directory: products/medicines/api
         run: |
