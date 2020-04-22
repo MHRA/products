@@ -1,35 +1,63 @@
-name: doc-index-updater-master
+name: doc-index-updater-release
 
 on:
   push:
     tags:
-      - web.v*
+      - diu.v*
 
 env:
-  IMAGE: mhraproductsproductionregistry.azurecr.io/products/doc-index-updater
+  NONPROD_IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
+  PROD_IMAGE: mhraproductsproductionregistry.azurecr.io/products/doc-index-updater
 
 jobs:
   build-and-test:
-    name: Build, Test and Deploy
+    name: Create release and deploy to production
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create release
+      - name: Clone repo
+        uses: actions/checkout@v2
 
-      - name: Docker login
+      - name: Docker login to nonprod
+        uses: azure/docker-login@v1
+        with:
+          login-server: mhraproductsnonprodregistry.azurecr.io
+          username: mhraproductsnonprodregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Fetch image for tagged commit
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make docker-pull image=$NONPROD_IMAGE tag=$TAG
+          echo ::set-env name=TAG::$TAG
+
+      - name: Docker login to prod
         uses: azure/docker-login@v1
         with:
           login-server: mhraproductsproductionregistry.azurecr.io
           username: mhraproductsproductionregistry
-          password: ${{ secrets.PRODUCTION_REGISTRY_PASSWORD }}
+          password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
-      - name: Fetch image for tagged commit
+      - name: Push image for tagged commit
+        working-directory: ./products/medicines/doc-index-updater
         run: |
-          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci-master tag=$TAG
-          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo ::set-env name=TAG::$TAG
+          make docker-push image=$PROD_IMAGE tag=$TAG
+          DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${PROD_IMAGE}:${TAG})"
           echo ::set-env name=DIGEST::$DIGEST
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Doc-Index-Updater release ${{ github.ref }}
+          body: |
+            Release of Document Index Updater
+          draft: false
+          prerelease: false
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
