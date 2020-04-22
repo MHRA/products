@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::delete_document(state.clone()))
                     .with(warp::log("doc_index_updater")),
             )
-            .run(addr.clone())
+            .run(addr)
             .await;
         }),
         tokio::spawn(delete_manager::delete_service_worker(

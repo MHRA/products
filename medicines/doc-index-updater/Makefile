@@ -16,7 +16,7 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --vault-name mhra-dev \
 	  --name doc-index-updater-env \
 	  --query value \
-	  --output tsv > .env
+	  --output tsv | sort | sed '/^$$/d' > .env
 
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
@@ -66,7 +66,7 @@ docker-run: ## Run Docker image
 
 .PHONY: docker-pull
 docker-pull: ## Pull Docker image
-	docker pull $(image)
+	docker pull $(image):$(tag)
 
 .PHONY: docker-push
 docker-push: ## Push Docker image

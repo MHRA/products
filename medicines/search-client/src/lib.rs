@@ -117,11 +117,8 @@ fn build_filter_by_collection_request(
 
     client
         .get(&base_url)
-        .query(&[
-            ("api-version", &config.api_version),
-            ("api-key", &config.api_key),
-            ("$filter", &filter),
-        ])
+        .query(&[("api-version", &config.api_version), ("$filter", &filter)])
+        .header("api-key", &config.api_key)
         .build()
 }
 
@@ -321,6 +318,9 @@ mod test {
         )
         .unwrap();
 
+        let api_key = req.headers().get("api-key").unwrap().to_str().unwrap();
+        assert_eq!(api_key, config.api_key);
+
         let url = req.url();
         assert_eq!(url.scheme(), "https");
         assert_eq!(url.host_str(), Some("my_cool_service.search.windows.net"));
@@ -333,13 +333,6 @@ mod test {
                 .unwrap()
                 .1,
             "2017-11-11"
-        );
-        assert_eq!(
-            query
-                .find(|query_pair| query_pair.0 == "api-key")
-                .unwrap()
-                .1,
-            "my_cool_api_key"
         );
         assert_eq!(
             query
