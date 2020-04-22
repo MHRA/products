@@ -17,13 +17,22 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --name doc-index-updater-env \
 	  --query value \
 	  --output tsv > .env
+	az keyvault secret show \
+	  --vault-name mhra-dev \
+	  --name doc-index-updater-build-env \
+	  --query value \
+	  --output tsv > .env.build
 
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-dev \
-	--name doc-index-updater-env \
-	--file .env
+		--vault-name mhra-dev \
+		--name doc-index-updater-env \
+		--file .env
+	az keyvault secret set \
+		--vault-name mhra-dev \
+		--name doc-index-updater-build-env \
+		--file .env.build
 
 .PHONY: set-sftp-keys
 set-sftp-keys: ## Adds pub/private key for localhost to your .ssh dir
