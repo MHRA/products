@@ -20,7 +20,7 @@ env:
   GOOGLE_TRACKING_ID: UA-6838115-11
   GOOGLE_USE_DEBUG: true
   ROOT_URL_DOMAIN: .windows.net
-  GRAPHQL_URL: http://medicines-api-dev.test.mhra.gov.uk/graphql
+  GRAPHQL_URL: https://medicines-api.test.mhra.gov.uk/graphql
 
 jobs:
   build:
