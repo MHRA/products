@@ -22,6 +22,12 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v2
 
+      - name: Set .env.build
+        working-directory: ./medicines/doc-index-updater
+        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
+        env:
+          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
+
       - name: Build and test Docker image
         working-directory: ./medicines/doc-index-updater
         run: |
