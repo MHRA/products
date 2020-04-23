@@ -43,11 +43,6 @@ variable "environment" {
   description = "Environment name to use as a tag"
 }
 
-variable "node_count" {
-  description = "Initial number of worker nodes"
-  default     = 2
-}
-
 variable "client_id" {
   description = "Service Principal Client ID"
 }
