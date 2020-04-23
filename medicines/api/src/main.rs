@@ -26,7 +26,7 @@ pub fn healthz() -> impl Filter<Extract = impl Reply, Error = Rejection> + Copy 
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if get_env_or_default("JSON_LOGS", true) {
         use_json_log_subscriber()
     } else {
@@ -53,20 +53,23 @@ async fn main() {
     let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
         .parse::<SocketAddr>()?;
 
-    warp::serve(
-        healthz()
-            .or(warp::path("graphiql").and(juniper_warp::graphiql_filter("/graphql", None)))
-            .or(warp::path("graphql").and(
-                warp::options()
-                    .map(warp::reply)
-                    .with(cors)
-                    .with(warp::log("cors-only")),
-            ))
-            .or(warp::path("graphql").and(graphql_filter))
-            .with(log),
-    )
-    .run(addr)
-    .await
+    let _ = tokio::join!(tokio::spawn(async move {
+        warp::serve(
+            healthz()
+                .or(warp::path("graphiql").and(juniper_warp::graphiql_filter("/graphql", None)))
+                .or(warp::path("graphql").and(
+                    warp::options()
+                        .map(warp::reply)
+                        .with(cors)
+                        .with(warp::log("cors-only")),
+                ))
+                .or(warp::path("graphql").and(graphql_filter))
+                .with(log),
+        )
+        .run(addr)
+        .await;
+    }));
+    Ok(())
 }
 
 fn use_json_log_subscriber() {
