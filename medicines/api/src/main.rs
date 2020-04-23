@@ -35,8 +35,6 @@ async fn main() {
 
     let log = warp::log("medicines-api");
 
-    tracing::info!("hi");
-
     let schema = create_schema();
     let context = warp::any().map(create_context);
 
