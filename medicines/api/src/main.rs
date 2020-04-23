@@ -1,11 +1,8 @@
-use actix_cors::Cors;
-use actix_web::{http, middleware, web, App, Error, HttpResponse, HttpServer};
 use anyhow::anyhow;
 use core::fmt::Display;
-use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
-use listenfd::ListenFd;
-use std::{env, io, str::FromStr, sync::Arc};
+use std::{env, str::FromStr};
 use tracing::Level;
+use warp::{self, http::StatusCode, Filter, Rejection, Reply};
 
 mod azure_context;
 mod pagination;
@@ -15,92 +12,41 @@ mod substance;
 
 const PORT: u16 = 8000;
 
-use crate::{
-    azure_context::{create_context, AzureContext},
-    schema::{create_schema, Schema},
-};
+use crate::{azure_context::create_context, schema::create_schema};
 
-async fn graphiql() -> HttpResponse {
-    let html = graphiql_source("/graphql");
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(html)
+pub fn healthz() -> impl Filter<Extract = impl Reply, Error = Rejection> + Copy {
+    warp::path!("healthz")
+        .and(warp::get())
+        .map(warp::reply)
+        .map(|reply| warp::reply::with_status(reply, StatusCode::NO_CONTENT))
 }
 
-async fn graphql(
-    st: web::Data<Arc<Schema>>,
-    data: web::Json<GraphQLRequest>,
-    context: web::Data<Arc<AzureContext>>,
-) -> Result<HttpResponse, Error> {
-    let res = data.execute_async(&st, &context).await;
-    let body = serde_json::to_string(&res)?;
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(body))
-}
-
-async fn healthz() -> impl actix_web::Responder {
-    "OK"
-}
-
-fn cors_middleware() -> actix_cors::CorsFactory {
-    Cors::new()
-        .allowed_methods(vec!["POST"])
-        .allowed_headers(vec![
-            http::header::AUTHORIZATION,
-            http::header::ACCEPT,
-            http::header::CONTENT_TYPE,
-        ])
-        .max_age(3600)
-        .finish()
-}
-
-#[actix_rt::main]
-async fn main() -> io::Result<()> {
+#[tokio::main]
+async fn main() {
     if get_env_or_default("JSON_LOGS", true) {
         use_json_log_subscriber()
     } else {
         use_unstructured_log_subscriber()
     }
 
-    server()
-}
+    let log = warp::log("medicines-api");
 
-async fn server() -> io::Result<()> {
-    let mut listenfd = ListenFd::from_env();
+    tracing::info!("hi");
 
-    // Create Juniper schema
-    let schema = std::sync::Arc::new(create_schema());
-    let context = std::sync::Arc::new(create_context());
+    let schema = create_schema();
+    let context = warp::any().map(create_context);
 
-    // Start http server
-    let mut server = HttpServer::new(move || {
-        App::new()
-            .data(schema.clone())
-            .data(context.clone())
-            .wrap(middleware::Logger::default())
-            .wrap(cors_middleware())
-            .service(web::resource("/graphql").route(web::post().to(graphql)))
-            .service(web::resource("/graphiql").route(web::get().to(graphiql)))
-            .service(web::resource("/healthz").route(web::get().to(healthz)))
-    });
+    let graphql_filter = juniper_warp::make_graphql_filter(schema, context.boxed());
 
-    server = if let Some(l) = listenfd.take_tcp_listener(0)? {
-        server.listen(l)?
-    } else {
-        server.bind(format!(
-            "0.0.0.0:{}",
-            std::env::var("PORT").unwrap_or_else(|e| {
-                eprintln!(
-                    "Error reading $PORT env var (defaulting to {}): {}",
-                    PORT, e
-                );
-                PORT.to_string()
-            })
-        ))?
-    };
-
-    server.run().await
+    warp::serve(
+        warp::get()
+            .and(warp::path("graphiql").and(juniper_warp::graphiql_filter("/graphql", None)))
+            .or(healthz())
+            .or(warp::path("graphql").and(graphql_filter))
+            .with(log),
+    )
+    .run(([127, 0, 0, 1], PORT))
+    .await
 }
 
 fn use_json_log_subscriber() {
