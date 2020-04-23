@@ -11,7 +11,7 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
-import graphQl from '../../services/graphql-loader';
+import { products } from '../../services/graphql-loader';
 import substanceLoader from '../../services/substance-loader';
 
 const azureProductsLoader = async (substance: string) => {
@@ -25,7 +25,7 @@ const azureProductsLoader = async (substance: string) => {
 };
 
 const graphQlProductsLoader = async (substance: string) => {
-  return graphQl.products.load(substance);
+  return products.load(substance);
 };
 
 const App: NextPage = () => {

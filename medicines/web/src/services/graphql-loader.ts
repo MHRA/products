@@ -1,7 +1,6 @@
 import DataLoader from 'dataloader';
 import { IProduct } from '../model/substance';
-
-const graphQlUrl = process.env.GRAPHQL_URL as string;
+import { graphqlRequest } from './graphql';
 
 const getProductsForSubstance = async (substanceName: string) => {
   const query = `
@@ -16,25 +15,16 @@ query ($substanceName: String) {
 
   const variables = { substanceName };
 
-  const response = await fetch(graphQlUrl, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
+  const resp = await graphqlRequest<
+    { substance: { products: IProduct[] } },
+    typeof variables
+  >({ query, variables });
 
-  return (await response.json()).data.substance.products;
+  return resp.data.substance.products;
 };
 
-const products = new DataLoader<string, IProduct[]>(async substanceNames => {
-  return Promise.all(substanceNames.map(getProductsForSubstance));
-});
-
-export default {
-  products,
-};
+export const products = new DataLoader<string, IProduct[]>(
+  async substanceNames => {
+    return Promise.all(substanceNames.map(getProductsForSubstance));
+  },
+);
