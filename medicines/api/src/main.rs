@@ -2,7 +2,11 @@ use anyhow::anyhow;
 use core::fmt::Display;
 use std::{env, str::FromStr};
 use tracing::Level;
-use warp::{self, http::StatusCode, Filter, Rejection, Reply};
+use warp::{
+    self,
+    http::{header, Method, StatusCode},
+    Filter, Rejection, Reply,
+};
 
 mod azure_context;
 mod pagination;
@@ -36,12 +40,27 @@ async fn main() {
     let schema = create_schema();
     let context = warp::any().map(create_context);
 
-    let graphql_filter = juniper_warp::make_graphql_filter(schema, context.boxed());
+    let cors = warp::cors()
+        .allow_methods(vec![Method::GET, Method::POST])
+        .allow_headers(vec![
+            header::AUTHORIZATION,
+            header::ACCEPT,
+            header::CONTENT_TYPE,
+        ])
+        .allow_any_origin();
+
+    let graphql_filter =
+        juniper_warp::make_graphql_filter(schema, context.boxed()).with(cors.clone());
 
     warp::serve(
-        warp::get()
-            .and(warp::path("graphiql").and(juniper_warp::graphiql_filter("/graphql", None)))
-            .or(healthz())
+        healthz()
+            .or(warp::path("graphiql").and(juniper_warp::graphiql_filter("/graphql", None)))
+            .or(warp::path("graphql").and(
+                warp::options()
+                    .map(warp::reply)
+                    .with(cors)
+                    .with(warp::log("cors-only")),
+            ))
             .or(warp::path("graphql").and(graphql_filter))
             .with(log),
     )
