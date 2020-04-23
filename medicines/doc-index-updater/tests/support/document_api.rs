@@ -8,7 +8,7 @@ use doc_index_updater::{
 use reqwest::Error;
 use uuid::Uuid;
 
-fn get_basic_auth_credentials() -> BasicAuth {
+fn get_basic_auth_credentials() -> (String, Option<String>) {
     let username = get_env("BASIC_AUTH_USERNAME").unwrap();
     let password = if let Ok(p) = get_env("BASIC_AUTH_PASSWORD") {
         Some(p)
@@ -16,21 +16,16 @@ fn get_basic_auth_credentials() -> BasicAuth {
         None
     };
 
-    BasicAuth { username, password }
-}
-
-struct BasicAuth {
-    pub username: String,
-    pub password: Option<String>,
+    (username, password)
 }
 
 trait WithBasicAuth {
-    fn with_basic_auth(self, auth: BasicAuth) -> Self;
+    fn with_basic_auth(self, _: (String, Option<String>)) -> Self;
 }
 
 impl WithBasicAuth for RequestBuilder {
-    fn with_basic_auth(self, auth: BasicAuth) -> Self {
-        self.basic_auth(auth.username, auth.password)
+    fn with_basic_auth(self, (username, password): (String, Option<String>)) -> Self {
+        self.basic_auth(username, password)
     }
 }
 
