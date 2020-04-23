@@ -17,13 +17,22 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 	  --name doc-index-updater-env \
 	  --query value \
 	  --output tsv | sort | sed '/^$$/d' > .env
+	az keyvault secret show \
+	  --vault-name mhra-dev \
+	  --name doc-index-updater-build-env \
+	  --query value \
+	  --output tsv | sort | sed '/^$$/d' > .env.build
 
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-dev \
-	--name doc-index-updater-env \
-	--file .env
+		--vault-name mhra-dev \
+		--name doc-index-updater-env \
+		--file .env
+	az keyvault secret set \
+		--vault-name mhra-dev \
+		--name doc-index-updater-build-env \
+		--file .env.build
 
 .PHONY: set-sftp-keys
 set-sftp-keys: ## Adds pub/private key for localhost to your .ssh dir
@@ -54,7 +63,9 @@ ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
 docker-build: ## Build and tag Docker image (with search-client create as dependency)
+	export $$(cat .env.build 2> /dev/null | xargs) && \
 	tar cv --exclude=target Dockerfile -C .. ./doc-index-updater ./search-client | docker build - \
+		--build-arg SCCACHE_AZURE_CONNECTION_STRING \
 		--progress plain \
 		--tag $(app) \
 		--tag $(image) \
