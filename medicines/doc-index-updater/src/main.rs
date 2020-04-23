@@ -1,10 +1,11 @@
 use doc_index_updater::{
-    create_manager, delete_manager, document_manager, get_env_or_default, health, state_manager,
+    auth_manager::AuthenticationFailed, create_manager, delete_manager, document_manager,
+    get_env_or_default, health, state_manager,
 };
 use state_manager::get_client;
-use std::{error, net::SocketAddr, time::Duration};
+use std::{convert::Infallible, error, net::SocketAddr, time::Duration};
 use tracing::Level;
-use warp::Filter;
+use warp::{http::StatusCode, Filter};
 
 const PORT: u16 = 8000;
 
@@ -45,6 +46,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
+                    .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
             .run(addr)
@@ -89,6 +91,41 @@ fn create_redis_url(server: String, port: String, key: String) -> String {
     } else {
         format!("redis://:{}@{}:{}", key, server, port)
     }
+}
+
+#[derive(serde::Serialize)]
+struct ErrorMessage {
+    code: u16,
+    message: String,
+}
+
+async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, Infallible> {
+    let code;
+    let message;
+
+    if err.is_not_found() {
+        code = StatusCode::NOT_FOUND;
+        message = "NOT_FOUND";
+    } else if let Some(warp::reject::MethodNotAllowed { .. }) = err.find() {
+        code = StatusCode::METHOD_NOT_ALLOWED;
+        message = "METHOD_NOT_ALLOWED";
+    } else if let Some(warp::reject::UnsupportedMediaType { .. }) = err.find() {
+        code = StatusCode::UNSUPPORTED_MEDIA_TYPE;
+        message = "UNSUPPORTED_MEDIA_TYPE";
+    } else if let Some(AuthenticationFailed) = err.find() {
+        code = StatusCode::UNAUTHORIZED;
+        message = "AUTHENTICATION_FAILED";
+    } else {
+        code = StatusCode::INTERNAL_SERVER_ERROR;
+        message = "UNHANDLED_REJECTION";
+    }
+
+    let json = warp::reply::json(&ErrorMessage {
+        code: code.as_u16(),
+        message: message.into(),
+    });
+
+    Ok(warp::reply::with_status(json, code))
 }
 
 #[cfg(test)]
