@@ -23,13 +23,13 @@ exports[`Footer should render 1`] = `
         </li>
         <li>
           <p>
-            <Link
+            <a
               href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice"
             >
               <a>
                 Privacy Policy
               </a>
-            </Link>
+            </a>
           </p>
         </li>
         <li>
