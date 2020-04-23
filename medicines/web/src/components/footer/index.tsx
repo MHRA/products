@@ -69,7 +69,7 @@ const Footer: React.FC = () => (
           <li>
             <p>
               <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice">
-                <a>Privacy Policy</a>
+                Privacy Policy
               </a>
             </p>
           </li>
