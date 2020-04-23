@@ -18,6 +18,7 @@ const App: React.FC = () => {
     query: {
       search: searchQS,
       page: pageQS,
+      letter: letterQS,
       substance: substanceQS,
       disclaimer: disclaimerQS,
       doc: docQS,
@@ -37,23 +38,31 @@ const App: React.FC = () => {
       router.push({
         pathname,
         query: {
-          query: searchQS.toString(),
+          search: searchQS.toString(),
           page,
           doc: docQS,
           disclaimer: disclaimerQS,
         },
       });
+    } else if (letterQS) {
+      router.push({
+        pathname: '/substance-index',
+        query: { letter: letterQS },
+      });
     } else if (substanceQS) {
       if (substanceQS.length === 1) {
         router.push({
           pathname: '/substance-index',
-          query: { query: substanceQS },
+          query: { letter: substanceQS },
         });
       } else {
-        router.push({ pathname: '/substance', query: { query: substanceQS } });
+        router.push({
+          pathname: '/substance',
+          query: { substance: substanceQS },
+        });
       }
     }
-  }, [searchQS, pageQS, substanceQS, disclaimerQS, docQS, productQS]);
+  }, [letterQS, searchQS, pageQS, substanceQS, disclaimerQS, docQS, productQS]);
 
   return (
     <Page

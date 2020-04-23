@@ -3,23 +3,48 @@ image := mhraproductsnonprodregistry.azurecr.io/products/$(app)
 tag := latest
 
 .PHONY: default
-default: ## run locally
+default: ## Run locally
 	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo run
 
+.PHONY: test
+test: ## Run tests [TEST=test_name (optional)]
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
+
 .PHONY: get-env
-get-env: ## run locally
+get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
-	  --vault-name mhra-non-prod-02 \
+	  --vault-name mhra-dev \
 	  --name doc-index-updater-env \
 	  --query value \
-	  --output tsv > .env
+	  --output tsv | sort | sed '/^$$/d' > .env
 
 .PHONY: set-env
-set-env: ## run locally
+set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-non-prod-02 \
+	--vault-name mhra-dev \
 	--name doc-index-updater-env \
 	--file .env
+
+.PHONY: set-sftp-keys
+set-sftp-keys: ## Adds pub/private key for localhost to your .ssh dir
+	az keyvault secret show \
+		--vault-name mhra-dev \
+		--name dev-sentinel-public-key \
+		--query value \
+		--output tsv > ~/.ssh/doc_index_updater.pub && \
+	az keyvault secret show \
+		--vault-name mhra-dev \
+		--name dev-sentinel-private-key \
+		--query value \
+		--output tsv > ~/.ssh/doc_index_updater && \
+	SENTINEL_PRIVATE_KEY_PASSWORD=$$(az keyvault secret show \
+		--vault-name mhra-dev  \
+		--name dev-sentinel-private-key-password \
+		--query value \
+		--output tsv) && \
+	echo "SENTINEL_PUBLIC_KEY_PATH=\"$${HOME}/.ssh/doc_index_updater.pub\"" >> .env.overrides && \
+	echo "SENTINEL_PRIVATE_KEY_PATH=\"$${HOME}/.ssh/doc_index_updater\"" >> .env.overrides && \
+	echo "SENTINEL_PRIVATE_KEY_PASSWORD=\"$${SENTINEL_PRIVATE_KEY_PASSWORD}\"" >> .env.overrides
 
 .PHONY: ci-branch
 ci-branch: docker-build ## Build branch in CI
@@ -28,13 +53,12 @@ ci-branch: docker-build ## Build branch in CI
 ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
-docker-build: ## Build and tag Docker image
-	docker build \
+docker-build: ## Build and tag Docker image (with search-client create as dependency)
+	tar cv --exclude=target Dockerfile -C .. ./doc-index-updater ./search-client | docker build - \
 		--progress plain \
 		--tag $(app) \
 		--tag $(image) \
-		--tag $(image):$(tag) \
-		.
+		--tag $(image):$(tag)
 
 .PHONY: docker-run
 docker-run: ## Run Docker image
@@ -42,12 +66,16 @@ docker-run: ## Run Docker image
 
 .PHONY: docker-pull
 docker-pull: ## Pull Docker image
-	docker pull $(image)
+	docker pull $(image):$(tag)
 
 .PHONY: docker-push
 docker-push: ## Push Docker image
 	docker push $(image)
 	docker push $(image):$(tag)
+
+.PHONY: docker-retag
+docker-retag: ## Update tag of Docker image
+	docker tag ${image}:${tag} ${new_image}:${tag}
 
 .PHONY: help
 help: ## Display this help screen

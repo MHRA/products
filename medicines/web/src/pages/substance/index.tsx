@@ -1,9 +1,8 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-
-import DrugIndex from '../../components/drug-index/index';
 import Page from '../../components/page';
+import ProductList from '../../components/product-list/index';
 import SearchWrapper from '../../components/search-wrapper';
 import {
   DrugListStructuredData,
@@ -12,19 +11,34 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
+import graphQl from '../../services/graphql-loader';
 import substanceLoader from '../../services/substance-loader';
+
+const azureProductsLoader = async (substance: string) => {
+  const firstLetter = substance.charAt(0);
+  const substanceIndex = await substanceLoader.load(firstLetter);
+  const substanceMatch = substanceIndex.find(s => s.name === substance);
+  if (substanceMatch) {
+    return substanceMatch.products;
+  }
+  return [];
+};
+
+const graphQlProductsLoader = async (substance: string) => {
+  return graphQl.products.load(substance);
+};
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
-  const [results, setResults] = React.useState<IProduct[]>([]);
+  const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
 
   const router = useRouter();
   const {
-    query: { query: queryQS },
+    query: { substance: queryQS, useGraphQl: graphQlFeatureFlag },
   } = router;
 
   useEffect(() => {
@@ -32,15 +46,18 @@ const App: NextPage = () => {
       return;
     }
     (async () => {
-      const substanceStr = queryQS.toString();
-      const firstLetter = substanceStr.charAt(0);
-      const substanceIndex = await substanceLoader.load(firstLetter);
-      const substanceMatch = substanceIndex.find(s => s.name === substanceStr);
-      if (substanceMatch) {
-        setResults(substanceMatch.products);
-      }
-      setSubstanceName(substanceStr);
-      Events.viewProductsForSubstance(substanceStr);
+      const substanceName = queryQS.toString();
+      const loader: (
+        substance: string,
+      ) => Promise<IProduct[]> = graphQlFeatureFlag
+        ? graphQlProductsLoader
+        : azureProductsLoader;
+
+      loader(substanceName).then(products => {
+        setProducts(products);
+        setSubstanceName(substanceName);
+        Events.viewProductsForSubstance(substanceName);
+      });
     })();
   }, [queryQS]);
 
@@ -57,10 +74,10 @@ const App: NextPage = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <DrugIndex title={`${substanceName || '...'}`} items={results} />
+        <ProductList title={substanceName} products={products} />
         <SubstanceStructuredData substanceName={substanceName} />
         <DrugListStructuredData
-          drugNames={results.map(product => product.name)}
+          drugNames={products.map(product => product.name)}
         />
       </SearchWrapper>
     </Page>

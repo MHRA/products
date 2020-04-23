@@ -8,27 +8,33 @@ A React web application.
 
 The site is configured to run locally at [`http://localhost:3000/`](http://localhost:3000/)
 
-You will need to set the local environment (variables provided below, see [the Azure pipeline definition](/azure-pipelines.yml) for good default values).
-
-```
-export AZURE_SEARCH_API_VERSION=
-export AZURE_SEARCH_EXACTNESS_BOOST=
-export AZURE_SEARCH_INDEX=
-export AZURE_SEARCH_KEY=
-export AZURE_SEARCH_SCORING_PROFILE=
-export AZURE_SEARCH_SERVICE=
-export AZURE_SEARCH_WORD_FUZZINESS=
-export GOOGLE_GTM_CONTAINER_ID=
-export GOOGLE_TRACKING_ID=
-export GOOGLE_USE_DEBUG=
-export ROOT_URL_DOMAIN=
-```
-
-We recommend that you set these in your `.profile` or `.bashrc` file so that it persists past the lifetime of your terminal session.
+[You will need to get the local environment variables by running make get-env](../../docs/principles/config.md).
 
 Next, start the service:
 
 ```sh
 yarn
-yarn run dev
+yarn dev
+```
+
+## Testing
+
+To open Cypress and run end-to-end tests, run the following:
+
+```sh
+make cypress
+```
+
+This will automatically read environment variables from `.env` and pass them in to Cypress.
+
+## GraphQL
+
+As we get our GraphQL API ready for the public, you can make use of GraphQL by adding `useGraphQl=true` to the query string of any page which supports it.
+
+For example, `/substance?substance=CAFFEINE&useGraphQl=true` will make use of the GraphQL API to get the list of products containing caffeine.
+
+To make use of the GraphQL endpoints running in Azure today, you'll need to add an entry to your hosts file. Run the following command to get the IP address you'll need for this:
+
+```
+kubectl get services --namespace istio-system istio-ingressgateway -o json | jq '.status.loadBalancer.ingress[0].ip'
 ```

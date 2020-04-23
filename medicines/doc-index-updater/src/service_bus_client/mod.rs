@@ -1,15 +1,17 @@
 use crate::{
+    create_manager::SftpError,
     get_env_or_default,
     models::{JobStatus, Message},
-    state_manager::StateManager,
+    state_manager::{JobStatusClient, StateManager},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
 use hyper::StatusCode;
-use std::error::Error;
+use thiserror::Error;
 use time::Duration;
+use tracing_futures::Instrument;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
@@ -45,32 +47,46 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum RetrieveFromQueueError {
+    #[error(transparent)]
     AzureError(AzureError),
+    #[error("Parsing error: {0}")]
     ParseError(String),
+    #[error("No Messages Found In Queue")]
     NotFoundError,
-}
-
-impl std::fmt::Display for RetrieveFromQueueError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "A")
-    }
-}
-
-impl Error for RetrieveFromQueueError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
+    #[error("Error reading Queue")]
+    ErrorReadingQueue,
 }
 
 pub struct RetrievedMessage<T: Message> {
     pub message: T,
     peek_lock: PeekLockResponse,
 }
+pub trait RemoveableMessage<T: Message>: Removeable {
+    fn get_message(&self) -> T;
+}
 
-impl<T: Message> RetrievedMessage<T> {
-    pub async fn remove(&self) -> Result<String, anyhow::Error> {
+impl<T> RemoveableMessage<T> for RetrievedMessage<T>
+where
+    T: Message + Sync + Send,
+{
+    fn get_message(&self) -> T {
+        self.message.clone()
+    }
+}
+
+#[async_trait]
+pub trait Removeable {
+    async fn remove(&mut self) -> Result<String, anyhow::Error>;
+}
+
+#[async_trait]
+impl<T> Removeable for RetrievedMessage<T>
+where
+    T: Message + Send + Sync,
+{
+    async fn remove(&mut self) -> Result<String, anyhow::Error> {
         let queue_removal_result = self.peek_lock.delete_message().await.map_err(|e| {
             tracing::error!("{:?}", e);
             anyhow!("Queue Removal Error")
@@ -80,12 +96,26 @@ impl<T: Message> RetrievedMessage<T> {
     }
 }
 
+#[derive(Error, Debug)]
+pub enum ProcessMessageError {
+    #[error(transparent)]
+    SftpError(#[from] SftpError),
+    #[error("Cannot find document with ID {0}")]
+    DocumentNotFoundInIndex(String),
+    #[error("Cannot delete blob with ID {0}: {1}")]
+    FailedDeletingBlob(String, String),
+    #[error("Cannot restore index for blob with ID {0}: {1}")]
+    FailedRestoringIndex(String, String),
+    #[error(transparent)]
+    Generic(#[from] anyhow::Error),
+}
+
 #[async_trait]
 pub trait ProcessRetrievalError {
     async fn handle_processing_error(
-        self,
-        e: anyhow::Error,
-        state_manager: &StateManager,
+        &mut self,
+        e: ProcessMessageError,
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()>;
 }
 
@@ -115,6 +145,11 @@ impl DocIndexUpdaterQueue {
                 tracing::error!("{:?}", e);
                 RetrieveFromQueueError::AzureError(e)
             })?;
+
+        if !peek_lock.status().is_success() {
+            tracing::error!("{} when reading queue.", peek_lock.status(),);
+            return Err(RetrieveFromQueueError::ErrorReadingQueue);
+        }
 
         if peek_lock.status() == StatusCode::NO_CONTENT {
             tracing::debug!("No new messages found.");
@@ -155,31 +190,79 @@ impl DocIndexUpdaterQueue {
     pub async fn try_process_from_queue<T>(
         &mut self,
         state_manager: &StateManager,
-    ) -> Result<(), anyhow::Error>
+    ) -> anyhow::Result<()>
     where
         T: Message,
-        RetrievedMessage<T>: ProcessRetrievalError,
+        RetrievedMessage<T>: ProcessRetrievalError + Removeable,
     {
         tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
             self.receive().await;
 
         if let Ok(retrieval) = retrieved_result {
-            let processing_result = retrieval.message.clone().process().await;
-            match processing_result {
-                Ok(job_id) => {
-                    state_manager.set_status(job_id, JobStatus::Done).await?;
-                    retrieval.remove().await?;
-                }
-                Err(e) => {
-                    tracing::error!(
-                        message = format!("Error {:?}", e).as_str(),
-                        correlation_id = retrieval.message.get_id().to_string().as_str()
-                    );
-                    retrieval.handle_processing_error(e, &state_manager).await?;
-                }
-            };
+            let correlation_id = retrieval.message.get_id().to_string();
+            let correlation_id = correlation_id.as_str();
+
+            process(retrieval, state_manager)
+                .instrument(tracing::info_span!(
+                    "try_process_from_queue",
+                    correlation_id
+                ))
+                .await?
         }
         Ok(())
+    }
+}
+
+async fn process<T>(
+    mut retrieval: RetrievedMessage<T>,
+    state_manager: &impl JobStatusClient,
+) -> anyhow::Result<()>
+where
+    T: Message,
+    RetrievedMessage<T>: ProcessRetrievalError + Removeable,
+{
+    let processing_result = retrieval.message.clone().process().await;
+
+    match processing_result {
+        Ok(job_id) => {
+            state_manager.set_status(job_id, JobStatus::Done).await?;
+            retrieval.remove().await?;
+        }
+        Err(e) => {
+            tracing::error!(message = format!("Error {:?}", e).as_str());
+            retrieval.handle_processing_error(e, state_manager).await?;
+        }
+    };
+    Ok(())
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+    pub struct TestRemoveableMessage<T: Message> {
+        pub remove_was_called: bool,
+        pub message: T,
+    }
+
+    #[async_trait]
+    impl<T> Removeable for TestRemoveableMessage<T>
+    where
+        T: Message + Send + Sync,
+    {
+        async fn remove(&mut self) -> Result<String, anyhow::Error> {
+            self.remove_was_called = true;
+            Ok("success".to_owned())
+        }
+    }
+
+    #[async_trait]
+    impl<T> RemoveableMessage<T> for TestRemoveableMessage<T>
+    where
+        T: Message + Sync + Send,
+    {
+        fn get_message(&self) -> T {
+            self.message.clone()
+        }
     }
 }

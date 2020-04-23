@@ -1,17 +1,22 @@
-const PORT: u16 = 8000;
-use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer};
+use actix_cors::Cors;
+use actix_web::{http, middleware, web, App, Error, HttpResponse, HttpServer};
+use anyhow::anyhow;
+use core::fmt::Display;
 use juniper::http::{graphiql::graphiql_source, GraphQLRequest};
 use listenfd::ListenFd;
-use std::{io, sync::Arc};
+use std::{env, io, str::FromStr, sync::Arc};
+use tracing::Level;
 
-mod azure_search;
+mod azure_context;
 mod pagination;
 mod product;
 mod schema;
 mod substance;
 
+const PORT: u16 = 8000;
+
 use crate::{
-    azure_search::{create_context, AzureContext},
+    azure_context::{create_context, AzureContext},
     schema::{create_schema, Schema},
 };
 
@@ -38,10 +43,25 @@ async fn healthz() -> impl actix_web::Responder {
     "OK"
 }
 
+fn cors_middleware() -> actix_cors::CorsFactory {
+    Cors::new()
+        .allowed_methods(vec!["POST"])
+        .allowed_headers(vec![
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+        ])
+        .max_age(3600)
+        .finish()
+}
+
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info, actix_server=info");
-    env_logger::init();
+    if get_env_or_default("JSON_LOGS", true) {
+        use_json_log_subscriber()
+    } else {
+        use_unstructured_log_subscriber()
+    }
 
     let mut listenfd = ListenFd::from_env();
 
@@ -55,6 +75,7 @@ async fn main() -> io::Result<()> {
             .data(schema.clone())
             .data(context.clone())
             .wrap(middleware::Logger::default())
+            .wrap(cors_middleware())
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
             .service(web::resource("/healthz").route(web::get().to(healthz)))
@@ -76,4 +97,44 @@ async fn main() -> io::Result<()> {
     };
 
     server.run().await
+}
+
+fn use_json_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .json()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::INFO)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
+
+fn use_unstructured_log_subscriber() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_timer(tracing_subscriber::fmt::time::ChronoUtc::rfc3339())
+        .with_max_level(Level::DEBUG)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
+
+pub fn get_env_or_default<T>(key: &str, default: T) -> T
+where
+    T: FromStr + Display,
+{
+    get_env(key).unwrap_or_else(|e| {
+        tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
+        default
+    })
+}
+
+pub fn get_env<T>(key: &str) -> anyhow::Result<T>
+where
+    T: FromStr,
+{
+    env::var(key)?
+        .parse::<T>()
+        .map_err(|_| anyhow!("failed to parse for {}", key))
 }

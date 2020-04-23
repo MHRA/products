@@ -3,8 +3,9 @@ FROM rust:1.40 AS build
 
 WORKDIR /usr/src/api
 
-COPY Cargo.toml .
-COPY Cargo.lock .
+COPY api/Cargo.toml .
+COPY api/Cargo.lock .
+COPY search-client ../search-client
 
 # Layer hack: Build an empty program to compile dependencies and place on their own layer.
 # This cuts down build time
@@ -21,7 +22,7 @@ RUN cargo build --release && \
   rm -rf ./target/release/.fingerprint/api-*
 
 # Build real binaries now
-COPY ./src ./src
+COPY ./api/src ./src
 
 RUN cargo build --release
 

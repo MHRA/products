@@ -15,6 +15,7 @@
 
 # Environment ignores
 **/.env*
+!**/.env.base
 !**/.env.example
 
 # Mac OS X ignores

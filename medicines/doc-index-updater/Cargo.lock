@@ -37,6 +37,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
 
 [[package]]
+name = "async-ssh2"
+version = "0.1.0"
+source = "git+https://github.com/spebern/async-ssh2.git#e001733c388076554641dfcf66b55995c8cdf2a5"
+dependencies = [
+ "mio",
+ "ssh2",
+ "tokio",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -61,8 +71,9 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 
 [[package]]
 name = "azure_sdk_core"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13e21ee06d328376fb11cadc053d82b81033b71b7f4e2f5659c403c44c458cca"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -91,8 +102,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_service_bus"
-version = "0.42.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.43.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8e6f239bcfe291a7ca51a3b29ce494953e8b3fdc3d26905e3fdb8129c7d3a17"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -119,8 +131,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_storage_blob"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1f650b8535b168aa401e3dd714607568408760e00baa90f70449d1626b091ae"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -150,8 +163,9 @@ dependencies = [
 
 [[package]]
 name = "azure_sdk_storage_core"
-version = "0.40.0"
-source = "git+https://github.com/MindFlavor/AzureSDKForRust#3bac38b2ed44835bba6ed9f75fe748e5e6bb9904"
+version = "0.40.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8314c70916ff631873ca35e4e08ca92d1ac1c1c8c57adb78ef90eaa5ac42824"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -369,6 +383,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctor"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47c5e5ac752e18207b12e16b10631ae5f7f68f8805f335f9b817ead83d9ffce1"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "difference"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "524cbf6897b527295dff137cec09ecf3a05f4fddffd7dfcd1585403449e74198"
+
+[[package]]
 name = "digest"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -382,6 +412,7 @@ name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-ssh2",
  "async-trait",
  "azure_sdk_core",
  "azure_sdk_service_bus",
@@ -394,14 +425,16 @@ dependencies = [
  "lazy_static",
  "md5",
  "net2",
+ "pretty_assertions",
  "redis",
  "regex",
  "reqwest",
+ "search_client",
  "serde",
+ "serde-xml-rs 0.4.0",
  "serde_derive",
  "serde_json",
  "sha1",
- "ssh2",
  "test-case",
  "thiserror",
  "time",
@@ -830,8 +863,7 @@ checksum = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
 [[package]]
 name = "libssh2-sys"
 version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bb70f29dc7c31d32c97577f13f41221af981b31248083e347b7f2c39225a6bc"
+source = "git+https://github.com/alexcrichton/ssh2-rs#5c5bf32fe985e8a39e267ac31348764abf1e207c"
 dependencies = [
  "cc",
  "libc",
@@ -1092,6 +1124,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "output_vt100"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53cdc5b785b7a58c5aad8216b3dfa114df64b0b06ae6e1501cef91df2fbdf8f9"
+dependencies = [
+ "winapi 0.3.8",
+]
+
+[[package]]
 name = "parking_lot"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1203,6 +1244,18 @@ name = "ppv-lite86"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74490b50b9fbe561ac330df47c08f3f33073d2d00c150f719147d7c54522fa1b"
+
+[[package]]
+name = "pretty_assertions"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f81e1644e1b54f5a68959a29aa86cde704219254669da328ecfdf6a1f09d427"
+dependencies = [
+ "ansi_term",
+ "ctor",
+ "difference",
+ "output_vt100",
+]
 
 [[package]]
 name = "proc-macro-hack"
@@ -1591,6 +1644,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "search_client"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "security-framework"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1757,8 +1824,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 [[package]]
 name = "ssh2"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1a0bdfb47e1fa1eb80f67c7909cfddab49d4262025aa9e4f6e9c39ad77b482"
+source = "git+https://github.com/alexcrichton/ssh2-rs#5c5bf32fe985e8a39e267ac31348764abf1e207c"
 dependencies = [
  "bitflags",
  "libc",

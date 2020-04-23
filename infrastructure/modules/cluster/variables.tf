@@ -10,16 +10,12 @@ variable "vnet_name" {
   description = "Virtual Network name"
 }
 
-variable "vnet_cidr" {
-  description = "CIDR block for cluster vnet"
+variable "vnet_resource_group" {
+  description = "Virtual Network resource group name"
 }
 
-variable "lb_subnet_name" {
-  description = "Load Balancer Subnet name"
-}
-
-variable "lb_subnet_cidr" {
-  description = "Load Balancer CIDR block"
+variable "lb_subnet_id" {
+  description = "Load Balancer Subnet id"
 }
 
 variable "cluster_subnet_name" {
@@ -30,12 +26,17 @@ variable "cluster_subnet_cidr" {
   description = "Cluster CIDR block"
 }
 
-variable "route_table_name" {
-  description = "Route Table name"
+variable "cluster_route_destination_cidr_blocks" {
+  type        = list(string)
+  description = "CIDR block destination for default route"
 }
 
-variable "route_table_resource_group_name" {
-  description = "Resource Group that hosts the Route Table"
+variable "cluster_route_next_hop" {
+  description = "Next hop for default route"
+}
+
+variable "lb_route_table_id" {
+  description = "Route Table ID"
 }
 
 variable "environment" {
@@ -55,5 +56,7 @@ variable "client_secret" {
   description = "Service Principal Client Secret"
 }
 
-
-
+variable "default_node_count" {
+  description = "Default number of nodes in AKS cluster"
+  default     = "2"
+}

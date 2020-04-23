@@ -9,8 +9,9 @@ RUN rustup component add rustfmt clippy
 
 WORKDIR /usr/src/doc-index-updater
 
-COPY Cargo.toml .
-COPY Cargo.lock .
+COPY doc-index-updater/Cargo.toml .
+COPY doc-index-updater/Cargo.lock .
+COPY search-client ../search-client
 
 # Layer hack: Build an empty program to compile dependencies and place on their own layer.
 # This cuts down build time
@@ -42,7 +43,7 @@ ENV PORT=8000
 # Build real binaries now, as late as possible
 FROM build-context AS build
 
-COPY ./src ./src
+COPY ./doc-index-updater/src ./src
 
 RUN cargo clippy --release -- -D warnings && \
   cargo test --release && \
@@ -54,6 +55,14 @@ FROM release-context AS release
 COPY --from=build /usr/src/doc-index-updater/target/release/doc_index_updater /
 
 RUN chown -R svc /doc_index_updater
+
+RUN (cd $HOME && \
+  mkdir -p .ssh && \
+  chown svc .ssh && \
+  cd .ssh && \
+  echo "GSSAPIAuthentication no" >>config && \
+  echo "GSSAPIDelegateCredentials yes" >>config && \
+  chown svc config)
 
 USER svc
 

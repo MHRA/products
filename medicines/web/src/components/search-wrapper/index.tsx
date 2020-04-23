@@ -82,7 +82,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
     router.push({
       pathname: searchRoute,
       query: {
-        query: searchTerm,
+        search: searchTerm,
         page: 1,
       },
     });

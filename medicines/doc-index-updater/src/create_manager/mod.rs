@@ -1,20 +1,22 @@
 use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
-    search_client,
-    service_bus_client::{create_factory, ProcessRetrievalError, RetrievedMessage},
-    state_manager::StateManager,
+    service_bus_client::{
+        create_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        RetrievedMessage,
+    },
+    state_manager::{JobStatusClient, StateManager},
     storage_client,
 };
-use uuid::Uuid;
-
 use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use search_index::add_blob_to_search_index;
+pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
+use uuid::Uuid;
 
 mod hash;
 pub mod models;
@@ -22,7 +24,6 @@ mod sanitiser;
 mod search_index;
 mod sftp_client;
 
-#[tracing::instrument(skip(state_manager))]
 pub async fn create_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,
@@ -47,65 +48,61 @@ pub async fn create_service_worker(
 #[async_trait]
 impl ProcessRetrievalError for RetrievedMessage<CreateMessage> {
     async fn handle_processing_error(
-        self,
-        e: anyhow::Error,
-        state_manager: &StateManager,
+        &mut self,
+        error: ProcessMessageError,
+        state_manager: &impl JobStatusClient,
     ) -> anyhow::Result<()> {
-        if e.to_string() == "Couldn't retrieve file: [-31] Failed opening remote file" {
-            tracing::warn!(
-                message = "Couldn't find file. Updating state to errored and removing message.",
-                correlation_id = self.message.job_id.to_string().as_str()
-            );
-            let _ = state_manager
-                .set_status(
-                    self.message.job_id,
-                    JobStatus::Error {
-                        message: "Couldn't find file".to_string(),
-                        code: "404".to_string(),
-                    },
-                )
-                .await?;
-            let _ = self.remove().await?;
-        }
-        Ok(())
+        handle_processing_error_for_create_message(self, error, state_manager).await
     }
 }
 
-pub async fn process_message(message: CreateMessage) -> Result<Uuid, anyhow::Error> {
-    let correlation_id = message.job_id.to_string();
-    let correlation_id = correlation_id.as_str();
+async fn handle_processing_error_for_create_message<T>(
+    removeable_message: &mut T,
+    error: ProcessMessageError,
+    state_manager: &impl JobStatusClient,
+) -> anyhow::Result<()>
+where
+    T: RemoveableMessage<CreateMessage>,
+{
+    if let ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile) = error {
+        tracing::warn!("Couldn't find file. Updating state to errored and removing message.");
+        let _ = state_manager
+            .set_status(
+                removeable_message.get_message().job_id,
+                JobStatus::Error {
+                    message: "Couldn't find file".to_string(),
+                    code: "404".to_string(),
+                },
+            )
+            .await?;
+        let _ = removeable_message.remove().await?;
+    }
+    Ok(())
+}
 
-    tracing::debug!(
-        message = format!("Message received: {:?} ", message).as_str(),
-        correlation_id
-    );
+pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMessageError> {
+    tracing::debug!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
     let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?
+        .azure_client;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
     )
-    .await
-    .map_err(|e| anyhow!("Couldn't retrieve file: {:?}", e))?;
+    .await?;
 
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
     let name = blob.name.clone();
 
-    tracing::debug!(
-        message = format!("Uploaded blob {}.", &name).as_str(),
-        correlation_id
-    );
+    tracing::debug!("Uploaded blob {}.", &name);
 
-    add_blob_to_search_index(&search_client, blob).await?;
+    add_blob_to_search_index(search_client, blob).await?;
 
-    tracing::info!(
-        message = format!("Successfully added {} to index.", &name).as_str(),
-        correlation_id
-    );
+    tracing::info!("Successfully added {} to index.", &name);
 
     Ok(message.job_id)
 }
@@ -157,4 +154,75 @@ pub struct Blob {
     name: String,
     size: usize,
     path: String,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{
+        models::{test::get_test_create_message, CreateMessage},
+        service_bus_client::test::TestRemoveableMessage,
+        state_manager::test::TestJobStatusClient,
+    };
+    use tokio_test::block_on;
+
+    fn given_an_error_has_occurred() -> ProcessMessageError {
+        anyhow!("literally any error").into()
+    }
+
+    fn given_file_not_found() -> ProcessMessageError {
+        ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile)
+    }
+
+    fn given_we_have_a_create_message() -> TestRemoveableMessage<CreateMessage> {
+        TestRemoveableMessage::<CreateMessage> {
+            message: get_test_create_message(Uuid::new_v4()),
+            remove_was_called: false,
+        }
+    }
+
+    fn when_we_handle_the_error(
+        removeable_message: &mut TestRemoveableMessage<CreateMessage>,
+        error: ProcessMessageError,
+        state_manager: TestJobStatusClient,
+    ) -> Result<(), anyhow::Error> {
+        block_on(handle_processing_error_for_create_message(
+            removeable_message,
+            error,
+            &state_manager,
+        ))
+    }
+
+    #[test]
+    fn test_an_unknown_error_does_not_remove_create_message() {
+        let mut removeable_message = given_we_have_a_create_message();
+        let error = given_an_error_has_occurred();
+
+        let result = when_we_handle_the_error(
+            &mut removeable_message,
+            error,
+            TestJobStatusClient::accepted(),
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(removeable_message.remove_was_called, false);
+    }
+
+    #[test]
+    fn test_file_not_found_removes_create_message() {
+        let mut removeable_message = given_we_have_a_create_message();
+        let error = given_file_not_found();
+
+        let result = when_we_handle_the_error(
+            &mut removeable_message,
+            error,
+            TestJobStatusClient::accepted(),
+        );
+
+        assert!(result.is_ok());
+        assert!(
+            removeable_message.remove_was_called,
+            "Message should be removed"
+        );
+    }
 }

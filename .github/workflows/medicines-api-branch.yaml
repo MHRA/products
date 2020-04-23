@@ -1,0 +1,30 @@
+name: medicines-api-branch
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!master"
+    paths:
+      - medicines/api/**
+      - medicines/search-client/**
+      - .github/workflows/medicines-api-branch.yaml
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+
+      - name: Test
+        working-directory: ./medicines/api
+        run: cargo test
+
+      - name: Build docker image
+        working-directory: ./medicines/api
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          make ci-branch tag=$TAG

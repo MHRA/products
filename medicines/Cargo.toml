@@ -1,9 +1,0 @@
-[workspace]
-members = [
-    "import",
-    "search",
-]
-exclude = [
-    "api",
-    "doc-index-updater"
-]

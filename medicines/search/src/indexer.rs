@@ -2,9 +2,8 @@ use crate::{
     azure_rest,
     env::{get_from_env, API_ADMIN_KEY, DATASOURCE_NAME, INDEXER_NAME, INDEX_NAME, SEARCH_SERVICE},
 };
-use actix_web::client;
 
-pub fn create_indexer() -> Result<(), client::SendRequestError> {
+pub async fn create_indexer() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
     let index_name = get_from_env(INDEX_NAME);
@@ -18,34 +17,34 @@ pub fn create_indexer() -> Result<(), client::SendRequestError> {
     );
     let url = get_base_url(&search_service);
 
-    azure_rest::make_post_request_with_body(indexer_definition, &url, &api_key)
+    azure_rest::make_post_request_with_body(indexer_definition, &url, &api_key).await
 }
 
-pub fn delete_indexer() -> Result<(), client::SendRequestError> {
+pub async fn delete_indexer() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &indexer_name);
 
-    azure_rest::make_delete_request(&url, &api_key)
+    azure_rest::make_delete_request(&url, &api_key).await
 }
 
-pub fn run_indexer() -> Result<(), client::SendRequestError> {
+pub async fn run_indexer() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_run_url(&search_service, &indexer_name);
 
-    azure_rest::make_post_request(&url, &api_key)
+    azure_rest::make_post_request(&url, &api_key).await
 }
 
-pub fn reset_indexer() -> Result<(), client::SendRequestError> {
+pub async fn reset_indexer() -> Result<(), reqwest::Error> {
     let api_key = get_from_env(API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_reset_url(&search_service, &indexer_name);
 
-    azure_rest::make_post_request(&url, &api_key)
+    azure_rest::make_post_request(&url, &api_key).await
 }
 
 fn get_raw_indexer_definition() -> String {

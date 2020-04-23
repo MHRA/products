@@ -2,16 +2,20 @@
 set -euo pipefail
 
 PS3='Please enter your current environment: '
-OPTIONS=("non-prod" "prod" "quit")
+OPTIONS=("dev" "non-prod" "prod" "quit")
 
 select opt in "${OPTIONS[@]}"; do
   case "$opt,$REPLY" in
+  dev,* | *,dev)
+    az aks get-credentials --resource-group 'mhra-products-development' --name 'dev'
+    break
+    ;;
   non-prod,* | *,non-prod)
     az aks get-credentials --resource-group 'adazr-rg-1001' --name 'non-prod'
     break
     ;;
   prod,* | *,prod)
-    echo 'TODO 🏗'
+    az aks get-credentials --resource-group 'apazr-rg-1001' --name 'production'
     break
     ;;
   quit,* | *,quit)

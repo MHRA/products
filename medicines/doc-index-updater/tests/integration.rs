@@ -6,7 +6,7 @@ use doc_index_updater::{
     document_manager,
     models::{CreateMessage, DeleteMessage, JobStatus, JobStatusResponse},
     service_bus_client::{create_factory, delete_factory},
-    state_manager,
+    state_manager::{get_job_status, set_job_status, JobStatusClient, StateManager},
 };
 use support::{get_ok, get_test_create_message, get_test_document, TestContext};
 use test_case::test_case;
@@ -15,26 +15,10 @@ use uuid::Uuid;
 
 #[test_case(JobStatus::Done)]
 #[test_case(JobStatus::Accepted)]
-fn set_get_compatibility_on_state_manager(status: JobStatus) {
-    let ctx = TestContext::default();
-
-    let state = state_manager::StateManager::new(ctx.client);
-    let id = Uuid::new_v4();
-
-    let response = get_ok(state.set_status(id, status.clone()));
-
-    assert_eq!(response.status, status);
-
-    let response = get_ok(state.get_status(id));
-    assert_eq!(response.status, status);
-}
-
-#[test_case(JobStatus::Done)]
-#[test_case(JobStatus::Accepted)]
 fn set_get_on_state_manager_endpoints(status: JobStatus) {
     let ctx = TestContext::default();
 
-    let state = state_manager::StateManager::new(ctx.client);
+    let state = StateManager::new(ctx.client);
     let id = Uuid::new_v4();
 
     let r = block_on(
@@ -42,7 +26,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
             .method("POST")
             .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .path(&format!("/jobs/{}/{}", id, status))
-            .reply(&state_manager::set_job_status(state.clone())),
+            .reply(&set_job_status(state.clone())),
     );
 
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
@@ -54,7 +38,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
             .method("GET")
             .header("Authorization", "Basic dXNlcm5hbWU6cGFzc3dvcmQ=") // u: username, p: password
             .path(&format!("/jobs/{}", id))
-            .reply(&state_manager::get_job_status(state)),
+            .reply(&get_job_status(state)),
     );
 
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
@@ -66,7 +50,7 @@ fn set_get_on_state_manager_endpoints(status: JobStatus) {
 fn delete_endpoint_sets_state() {
     let ctx = TestContext::default();
 
-    let state = state_manager::StateManager::new(ctx.client);
+    let state = StateManager::new(ctx.client);
     let delete_filter = document_manager::delete_document(state.clone());
 
     let r = block_on(
@@ -102,7 +86,7 @@ fn delete_endpoint_sets_state() {
 fn create_endpoint_sets_state() {
     let ctx = TestContext::default();
 
-    let state = state_manager::StateManager::new(ctx.client);
+    let state = StateManager::new(ctx.client);
     let create_filter = document_manager::check_in_document(state.clone());
 
     let document_json = serde_json::to_string(&get_test_document()).unwrap();
@@ -119,7 +103,7 @@ fn create_endpoint_sets_state() {
     let response: JobStatusResponse = serde_json::from_slice(r.body()).unwrap();
     assert_eq!(response.status, JobStatus::Accepted);
     let id = response.id;
-    let response = get_ok(state.get_status(id.clone()));
+    let response = get_ok(state.get_status(id));
     assert_eq!(response.status, JobStatus::Accepted);
 
     let mut create_client = get_ok(create_factory());
