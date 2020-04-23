@@ -3,7 +3,7 @@ use juniper::{FieldResult, RootNode};
 use crate::{
     azure_context::AzureContext,
     product::get_substance_with_products,
-    substance::{get_substances, Substance, Substances},
+    substance::{get_substances, get_substances_starting_with_letter, Substance, Substances},
 };
 
 pub struct QueryRoot;
@@ -26,6 +26,20 @@ impl QueryRoot {
                 juniper::Value::null(),
             )),
         }
+    }
+
+    async fn substances_by_first_letter(
+        context: &AzureContext,
+        letter: String,
+    ) -> FieldResult<Substances> {
+        println!("Letter: {}", letter);
+
+        get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
+            .await
+            .map_err(|e| {
+                tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+            })
     }
 
     async fn substances(first: i32) -> FieldResult<Substances> {
