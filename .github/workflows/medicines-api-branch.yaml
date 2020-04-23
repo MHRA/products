@@ -19,9 +19,11 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v2
 
-      - name: Test
+      - name: Set .env.build
         working-directory: ./medicines/api
-        run: cargo test
+        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
+        env:
+          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
 
       - name: Build docker image
         working-directory: ./medicines/api
