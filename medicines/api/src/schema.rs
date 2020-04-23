@@ -38,8 +38,13 @@ pub struct MutationRoot;
 #[juniper::graphql_object(Context = AzureContext)]
 impl MutationRoot {}
 
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot>;
+pub type Schema = RootNode<'static, QueryRoot, MutationRoot, SubscriptionRoot>;
+
+pub struct SubscriptionRoot;
+
+#[juniper::graphql_subscription(Context = AzureContext)]
+impl SubscriptionRoot {}
 
 pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot {}, MutationRoot {})
+    Schema::new(QueryRoot {}, MutationRoot {}, SubscriptionRoot {})
 }
