@@ -8,6 +8,7 @@ use std::{env, io, str::FromStr, sync::Arc};
 use tracing::Level;
 
 mod azure_context;
+mod document;
 mod pagination;
 mod product;
 mod schema;
