@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use core::fmt::Display;
-use std::{env, str::FromStr};
+use std::{env, net::SocketAddr, str::FromStr};
 use tracing::Level;
 use warp::{
     self,
@@ -50,11 +50,8 @@ async fn main() {
     let graphql_filter =
         juniper_warp::make_graphql_filter(schema, context.boxed()).with(cors.clone());
 
-    let port = std::env::var("PORT").unwrap_or_else(|e| {
-        eprintln!(
-            "Error reading $PORT env var (defaulting to {}): {}",
-            PORT, e
-        );
+    let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
+        .parse::<SocketAddr>()?;
 
     warp::serve(
         healthz()
@@ -68,7 +65,7 @@ async fn main() {
             .or(warp::path("graphql").and(graphql_filter))
             .with(log),
     )
-    .run(([127, 0, 0, 1], port))
+    .run(addr)
     .await
 }
 
