@@ -1,8 +1,0 @@
-resources:
-  - ../../base
-
-patchesStrategicMerge:
-  - elastic.yaml
-  - ingress.yaml
-  - operate.yaml
-  - zeebe.yaml
