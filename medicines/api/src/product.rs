@@ -7,6 +7,39 @@ use search_client::{models::IndexResult, Search};
 pub struct Product {
     name: String,
     document_count: i32,
+    documents: Vec<Document>,
+}
+
+impl Product {
+    fn new(name: String, documents: Vec<Document>) -> Self {
+        Self {
+            name,
+            document_count: documents.len() as i32,
+            documents,
+        }
+    }
+
+    fn add(&mut self, document: Document) {
+        self.documents.push(document);
+        self.document_count += 1;
+    }
+}
+
+#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
+pub struct Document {
+    product_name: Option<String>,
+    substance_name: Option<Vec<String>>,
+    title: Option<String>,
+}
+
+impl From<IndexResult> for Document {
+    fn from(r: IndexResult) -> Self {
+        Self {
+            product_name: r.product_name,
+            substance_name: Some(r.substance_name),
+            title: Some(r.title),
+        }
+    }
 }
 
 pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
@@ -14,20 +47,15 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
         Some(document_product_name) => {
             // Try to find an existing product.
             let existing_product = products
-                .into_iter()
-                .find(|product| product.name == document_product_name.to_string());
+                .iter_mut()
+                .find(|product| document_product_name == &product.name);
+
             match existing_product {
-                Some(existing_product) => {
-                    // Product exists! Increment its document count.
-                    existing_product.document_count += 1;
-                }
-                None => {
-                    // Product does not exist! Create it!
-                    products.push(Product {
-                        name: document_product_name.to_string(),
-                        document_count: 1,
-                    });
-                }
+                Some(existing_product) => existing_product.add(document.to_owned().into()),
+                None => products.push(Product::new(
+                    document_product_name.to_owned(),
+                    vec![document.to_owned().into()],
+                )),
             }
         }
         None => {}
@@ -52,13 +80,31 @@ pub async fn get_substance_with_products(
     Ok(Substance::new(substance_name.to_string(), Some(products)))
 }
 
+pub async fn get_product(
+    product_name: String,
+    client: &impl Search,
+) -> Result<Product, reqwest::Error> {
+    let azure_result = client
+        .filter_by_non_collection_field("product_name", &product_name)
+        .await?;
+
+    Ok(Product::new(
+        product_name,
+        azure_result
+            .search_results
+            .into_iter()
+            .map(Into::<Document>::into)
+            .collect(),
+    ))
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     fn azure_result_factory(product_name: Option<String>) -> IndexResult {
         IndexResult {
-            product_name: product_name,
+            product_name,
             doc_type: "dummy".to_string(),
             created: Some("yes".to_string()),
             facets: Vec::new(),
@@ -87,14 +133,19 @@ mod test {
         assert_eq!(products[0].document_count, 1);
     }
 
+    fn gimme_x_docs(x: i32) -> Vec<Document> {
+        let mut docs: Vec<Document> = vec![];
+        for i in 0..x {
+            docs.push(azure_result_factory(Some("Craig's Cool Product".to_string())).into())
+        }
+        docs
+    }
+
     #[test]
     fn test_handle_doc_with_existing_product() {
         let doc = azure_result_factory(Some("My Cool Product".to_string()));
         let mut products = Vec::<Product>::new();
-        products.push(Product {
-            name: "My Cool Product".to_string(),
-            document_count: 5,
-        });
+        products.push(Product::new("My Cool Product".to_string(), gimme_x_docs(5)));
         handle_doc(&doc, &mut products);
         assert_eq!(products.len(), 1);
         assert_eq!(products[0].name, "My Cool Product".to_string());
@@ -112,18 +163,9 @@ mod test {
     #[test]
     fn test_sort_products() {
         let mut products = Vec::<Product>::new();
-        products.push(Product {
-            name: "B".to_string(),
-            document_count: 1,
-        });
-        products.push(Product {
-            name: "C".to_string(),
-            document_count: 1,
-        });
-        products.push(Product {
-            name: "A".to_string(),
-            document_count: 1,
-        });
+        products.push(Product::new("B".to_owned(), gimme_x_docs(1)));
+        products.push(Product::new("C".to_owned(), gimme_x_docs(1)));
+        products.push(Product::new("A".to_owned(), gimme_x_docs(1)));
         products.sort();
         assert_eq!(products[0].name, "A");
         assert_eq!(products[1].name, "B");

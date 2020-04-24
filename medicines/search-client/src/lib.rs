@@ -65,6 +65,12 @@ pub trait Search {
         field_name: &str,
         field_value: &str,
     ) -> Result<IndexResults, reqwest::Error>;
+
+    async fn filter_by_non_collection_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<IndexResults, reqwest::Error>;
 }
 
 #[async_trait]
@@ -79,6 +85,27 @@ impl Search for AzureSearchClient {
         field_value: &str,
     ) -> Result<IndexResults, reqwest::Error> {
         let request = build_filter_by_collection_request(
+            field_name,
+            field_value,
+            "eq",
+            &self.client,
+            &self.config,
+        )?;
+
+        self.client
+            .execute(request)
+            .await?
+            .error_for_status()?
+            .json::<IndexResults>()
+            .await
+    }
+
+    async fn filter_by_non_collection_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<IndexResults, reqwest::Error> {
+        let request = build_filter_by_field_request(
             field_name,
             field_value,
             "eq",
@@ -110,6 +137,33 @@ fn build_filter_by_collection_request(
 
     let filter = format!(
         "{field_name}/any(value: value {operator} '{value}')",
+        field_name = field_name,
+        value = value,
+        operator = operator,
+    );
+
+    client
+        .get(&base_url)
+        .query(&[("api-version", &config.api_version), ("$filter", &filter)])
+        .header("api-key", &config.api_key)
+        .build()
+}
+
+fn build_filter_by_field_request(
+    field_name: &str,
+    value: &str,
+    operator: &str,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<reqwest::Request, reqwest::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    let filter = format!(
+        "{field_name} {operator} '{value}'",
         field_name = field_name,
         value = value,
         operator = operator,
