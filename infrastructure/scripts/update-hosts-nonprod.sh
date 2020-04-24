@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-sh ./update-kubernetes-config.sh
+echo 2 | ./update-kubernetes-config.sh
 
 cat /etc/hosts | sed "/.*argocd.test.mhra.gov.uk.*$/d" > /tmp/hosts
 kubectl get services --namespace istio-system istio-ingressgateway -o json \
