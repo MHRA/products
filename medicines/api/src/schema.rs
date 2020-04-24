@@ -2,6 +2,7 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_context::AzureContext,
+    document::{get_documents, Documents},
     product::get_substance_with_products,
     substance::{get_substances, Substance, Substances},
 };
@@ -30,6 +31,17 @@ impl QueryRoot {
 
     async fn substances(first: i32) -> FieldResult<Substances> {
         Ok(get_substances(first).await)
+    }
+
+    async fn documents(
+        context: &AzureContext,
+        search: Option<String>,
+        first: Option<i32>,
+        last: Option<i32>,
+        before: Option<String>,
+        after: Option<String>,
+    ) -> FieldResult<Documents> {
+        Ok(get_documents(&context.client, search, first, last, before, after).await)
     }
 }
 
