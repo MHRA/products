@@ -20,8 +20,8 @@ pub struct AzureSearchClient {
 }
 
 pub struct AzurePagination {
-    pub result_count: u32,
-    pub offset: u32,
+    pub result_count: i32,
+    pub offset: i32,
 }
 
 impl Default for AzureSearchClient {

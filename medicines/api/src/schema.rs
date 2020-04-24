@@ -56,7 +56,19 @@ impl QueryRoot {
         before: Option<String>,
         after: Option<String>,
     ) -> FieldResult<Documents> {
-        Ok(get_documents(&context.client, search, first, last, before, after).await)
+        get_documents(
+            &context.client,
+            search.unwrap_or(" ".to_string()),
+            first,
+            last,
+            before,
+            after,
+        )
+        .await
+        .map_err(|e| {
+            tracing::error!("Error fetching results from Azure search service: {:?}", e);
+            juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+        })
     }
 }
 

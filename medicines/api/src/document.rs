@@ -16,22 +16,6 @@ pub struct Document {
     url: Option<String>,
 }
 
-impl Document {
-    fn name_only(name: String) -> Self {
-        Self {
-            name: Some(name),
-            product_name: None,
-            active_substances: None,
-            title: None,
-            highlights: None,
-            created: None,
-            doc_type: None,
-            file_size_in_bytes: None,
-            url: None,
-        }
-    }
-}
-
 impl From<IndexResult> for Document {
     fn from(r: IndexResult) -> Self {
         Self {
@@ -55,31 +39,57 @@ pagination! {Documents, DocumentEdge, Document}
 
 pub async fn get_documents(
     client: &impl Search,
-    search: Option<String>,
+    search: String,
     first: Option<i32>,
     last: Option<i32>,
     before: Option<String>,
     after: Option<String>,
-) -> Documents {
-    let placeholder_names: [&str; 1000] = ["A cool document"; 1000];
-    let edges = placeholder_names
+) -> Result<Documents, anyhow::Error> {
+
+    // TODO: Do something with last and after.
+
+    let offset = after.unwrap_or("-1".to_string()).parse::<i32>().unwrap() + 1;
+    let result_count = first.unwrap_or(10);
+
+    let azure_result = client
+        .search_with_pagination(
+            &search,
+            search_client::AzurePagination {
+                result_count: result_count,
+                offset: offset,
+            },
+            true,
+        )
+        .await?;
+
+    let mut cursor = offset.clone();
+    let edges = azure_result.search_results
         .iter()
-        // .take(first as usize)
-        .map(|&name| Document::name_only(name.to_string()))
-        .map(|document| DocumentEdge {
-            node: document,
-            cursor: "cursor".to_owned(),
+        .map(|search_result| Document::from(search_result.clone()))
+        .map(|document| {
+            let edge = DocumentEdge {
+                node: document,
+                cursor: cursor.to_string(),
+            };
+            cursor += 1;
+            return edge;
         })
         .collect();
 
-    Documents {
+    let total_count = azure_result.count.unwrap_or(0);
+    let has_previous_page = offset != 0;
+    let has_next_page = offset + result_count <= total_count;
+    let start_cursor = offset.to_string();
+    let end_cursor = std::cmp::min(total_count, offset + result_count - 1).to_string();
+
+    Ok(Documents {
         edges,
-        total_count: 1000,
+        total_count: total_count,
         page_info: PageInfo {
-            has_previous_page: false,
-            has_next_page: false,
-            start_cursor: "start cursor here".to_string(),
-            end_cursor: "end cursor here".to_string(),
+            has_previous_page: has_previous_page,
+            has_next_page: has_next_page,
+            start_cursor: start_cursor,
+            end_cursor: end_cursor,
         },
-    }
+    })
 }
