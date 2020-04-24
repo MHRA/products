@@ -28,16 +28,31 @@ impl Product {
 #[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
     product_name: Option<String>,
-    substance_name: Option<Vec<String>>,
+    active_substances: Option<Vec<String>>,
     title: Option<String>,
+    highlights: Option<Vec<String>>,
+    created: Option<String>,
+    doc_type: Option<String>,
+    file_bytes: Option<i32>,
+    name: Option<String>,
+    url: Option<String>,
 }
 
 impl From<IndexResult> for Document {
     fn from(r: IndexResult) -> Self {
         Self {
             product_name: r.product_name,
-            substance_name: Some(r.substance_name),
+            active_substances: Some(r.substance_name),
             title: Some(r.title),
+            created: r.created,
+            doc_type: Some(r.doc_type),
+            file_bytes: Some(r.metadata_storage_size),
+            name: Some(r.file_name),
+            url: Some(r.metadata_storage_path),
+            highlights: match r.highlights {
+                Some(a) => Some(a.content),
+                _ => None,
+            },
         }
     }
 }
