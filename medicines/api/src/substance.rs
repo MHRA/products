@@ -14,11 +14,6 @@ impl Substance {
     pub fn new(name: String, products: Vec<Product>) -> Self {
         Self { name, products }
     }
-
-    #[allow(dead_code)]
-    fn name(&self) -> &str {
-        &self.name
-    }
 }
 
 pagination! {Substances, SubstanceEdge, Substance}
