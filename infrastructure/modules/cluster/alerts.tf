@@ -5,7 +5,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_ale
 
   action {
     action_group           = []
-    email_subject          = "Application ERRORS"
+    email_subject          = "Medicine API Errors (${var.environment})"
     custom_webhook_payload = "{}"
   }
   data_source_id = azurerm_log_analytics_workspace.cluster.id
@@ -45,7 +45,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
 
   action {
     action_group           = []
-    email_subject          = "Application ERRORS"
+    email_subject          = "Doc Index Updater Errors (${var.environment})"
     custom_webhook_payload = "{}"
   }
   data_source_id = azurerm_log_analytics_workspace.cluster.id
