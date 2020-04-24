@@ -11,7 +11,7 @@ pub struct Document {
     highlights: Option<Vec<String>>,
     created: Option<String>,
     doc_type: Option<String>,
-    file_bytes: Option<i32>,
+    file_size_in_bytes: Option<i32>,
     name: Option<String>,
     url: Option<String>,
 }
@@ -26,7 +26,7 @@ impl Document {
             highlights: None,
             created: None,
             doc_type: None,
-            file_bytes: None,
+            file_size_in_bytes: None,
             url: None,
         }
     }
@@ -40,7 +40,7 @@ impl From<IndexResult> for Document {
             title: Some(r.title),
             created: r.created,
             doc_type: Some(r.doc_type),
-            file_bytes: Some(r.metadata_storage_size),
+            file_size_in_bytes: Some(r.metadata_storage_size),
             name: Some(r.file_name),
             url: Some(r.metadata_storage_path),
             highlights: match r.highlights {
