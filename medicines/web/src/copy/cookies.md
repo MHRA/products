@@ -17,5 +17,7 @@ This information is only processed in a way that does not identify anyone.
 We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website.
 Please visit Google’s [overview of privacy and safeguarding data][google privacy] to know more about their policies.
 
+You can turn these cookies on or off below, and then save your preferences. This site stores your acceptance of Google Analytics cookies in your browser’s local storage as 'allowStorage'.
+
 [ico]: https://ico.org.uk/for-the-public/online/cookies/
 [google privacy]: https://support.google.com/analytics/answer/6004245
