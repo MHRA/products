@@ -7,7 +7,9 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
+import { IDocument } from '../../model/substance';
 import { docSearch, DocType } from '../../services/azure-search';
+import { documents } from '../../services/documents-loader';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
@@ -15,17 +17,39 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults, IDocument } from '../../services/results-converter';
+import { convertResults } from '../../services/results-converter';
 
 const pageSize = 10;
 const productPath = '/product';
+
+const azureDocumentsLoader = async (
+  product: string,
+  page: number,
+  docTypes: DocType[],
+) => {
+  const results = await docSearch({
+    query: '',
+    page,
+    pageSize,
+    filters: {
+      docType: docTypes,
+      sortOrder: 'a-z',
+      productName: product,
+    },
+  });
+  return results.results.map(convertResults);
+};
+
+const graphQlDocumentsLoader = async (product: string) => {
+  return documents.load(product);
+};
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
-  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [documents, setDocuments] = React.useState<IDocument[]>([]);
   const [productName, setProductName] = React.useState('');
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -40,6 +64,7 @@ const App: NextPage = () => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
+      useGraphQl: graphQlFeatureFlag,
     },
   } = router;
 
@@ -48,16 +73,11 @@ const App: NextPage = () => {
     page: number,
     docTypes: DocType[],
   ) => {
-    return docSearch({
-      query: '',
-      page,
-      pageSize,
-      filters: {
-        docType: docTypes,
-        sortOrder: 'a-z',
-        productName: product,
-      },
-    });
+    if (graphQlFeatureFlag) {
+      return graphQlDocumentsLoader(product);
+    } else {
+      return azureDocumentsLoader(product, page, docTypes);
+    }
   };
 
   useEffect(() => {
@@ -72,9 +92,9 @@ const App: NextPage = () => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      const results = await getResults(product, page, docTypes);
-      setResults(results.results.map(convertResults));
-      setCount(results.resultCount);
+      const documents = await getResults(product, page, docTypes);
+      setDocuments(documents);
+      setCount(documents.length);
       setIsLoading(false);
       Events.viewResultsForProduct({
         productName: product,
@@ -132,7 +152,7 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         <SearchResults
-          drugs={results}
+          drugs={documents}
           showingResultsForTerm={productName}
           resultCount={count}
           page={pageNumber}

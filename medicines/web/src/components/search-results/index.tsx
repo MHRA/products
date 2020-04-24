@@ -1,6 +1,8 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
+import { IDocument } from '../../model/substance';
+import { DocType } from '../../services/azure-search';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
@@ -12,9 +14,6 @@ import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
 import Pagination from './pagination';
-
-import { DocType } from '../../services/azure-search';
-import { IDocument } from '../../services/results-converter';
 
 const StyledDrugList = styled.div`
   .title {
@@ -174,6 +173,10 @@ const searchResultsNumberingInformation = (
 };
 
 const normalizeDescription = (description: string): string => {
+  if (!description) {
+    return description;
+  }
+
   const normalized = description
     .substr(0, 300) // Cut to 300 characters.
     .replace(/[^\w<>/\s…]/gi, '') // Remove non-word characters other than ellipsis & tags.
