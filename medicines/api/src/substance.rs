@@ -100,9 +100,12 @@ pub async fn get_substances(first: i32) -> Substances {
 
     Substances {
         edges,
+        total_count: 1000,
         page_info: PageInfo {
             has_previous_page: false,
             has_next_page: first < 1000,
+            start_cursor: "start cursor here".to_string(),
+            end_cursor: "end cursor here".to_string(),
         },
     }
 }
