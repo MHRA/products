@@ -1,16 +1,53 @@
-use crate::{pagination, pagination::PageInfo, product::Product};
+use crate::{pagination, pagination::PageInfo};
+use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 
-#[derive(juniper::GraphQLObject)]
+#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
 pub struct Document {
-    name: String,
-    // Yes, more fields will be added here.
+    product_name: Option<String>,
+    active_substances: Option<Vec<String>>,
+    title: Option<String>,
+    highlights: Option<Vec<String>>,
+    created: Option<String>,
+    doc_type: Option<String>,
+    file_bytes: Option<i32>,
+    name: Option<String>,
+    url: Option<String>,
 }
 
 impl Document {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    fn name_only(name: String) -> Self {
+        Self {
+            name: Some(name),
+            product_name: None,
+            active_substances: None,
+            title: None,
+            highlights: None,
+            created: None,
+            doc_type: None,
+            file_bytes: None,
+            url: None,
+        }
+    }
+}
+
+impl From<IndexResult> for Document {
+    fn from(r: IndexResult) -> Self {
+        Self {
+            product_name: r.product_name,
+            active_substances: Some(r.substance_name),
+            title: Some(r.title),
+            created: r.created,
+            doc_type: Some(r.doc_type),
+            file_bytes: Some(r.metadata_storage_size),
+            name: Some(r.file_name),
+            url: Some(r.metadata_storage_path),
+            highlights: match r.highlights {
+                Some(a) => Some(a.content),
+                _ => None,
+            },
+        }
     }
 }
 
@@ -28,7 +65,7 @@ pub async fn get_documents(
     let edges = placeholder_names
         .iter()
         // .take(first as usize)
-        .map(|&name| Document::new(name.to_string()))
+        .map(|&name| Document::name_only(name.to_string()))
         .map(|document| DocumentEdge {
             node: document,
             cursor: "cursor".to_owned(),

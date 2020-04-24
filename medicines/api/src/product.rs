@@ -1,4 +1,4 @@
-use crate::substance::Substance;
+use crate::{document::Document, substance::Substance};
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 
@@ -22,38 +22,6 @@ impl Product {
     fn add(&mut self, document: Document) {
         self.documents.push(document);
         self.document_count += 1;
-    }
-}
-
-#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Document {
-    product_name: Option<String>,
-    active_substances: Option<Vec<String>>,
-    title: Option<String>,
-    highlights: Option<Vec<String>>,
-    created: Option<String>,
-    doc_type: Option<String>,
-    file_bytes: Option<i32>,
-    name: Option<String>,
-    url: Option<String>,
-}
-
-impl From<IndexResult> for Document {
-    fn from(r: IndexResult) -> Self {
-        Self {
-            product_name: r.product_name,
-            active_substances: Some(r.substance_name),
-            title: Some(r.title),
-            created: r.created,
-            doc_type: Some(r.doc_type),
-            file_bytes: Some(r.metadata_storage_size),
-            name: Some(r.file_name),
-            url: Some(r.metadata_storage_path),
-            highlights: match r.highlights {
-                Some(a) => Some(a.content),
-                _ => None,
-            },
-        }
     }
 }
 
@@ -150,7 +118,7 @@ mod test {
 
     fn gimme_x_docs(x: i32) -> Vec<Document> {
         let mut docs: Vec<Document> = vec![];
-        for i in 0..x {
+        for _ in 0..x {
             docs.push(azure_result_factory(Some("Craig's Cool Product".to_string())).into())
         }
         docs
