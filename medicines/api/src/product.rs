@@ -39,7 +39,7 @@ pub async fn get_substance_with_products(
     client: &impl Search,
 ) -> Result<Substance, reqwest::Error> {
     let azure_result = client
-        .filter_by_field("substance_name", substance_name)
+        .filter_by_collection_field("substance_name", substance_name)
         .await?;
 
     let mut products = Vec::<Product>::new();
