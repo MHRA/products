@@ -2,11 +2,20 @@ use crate::substance::Substance;
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 
-#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(GraphQLObject, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A medical product containing active ingredients")]
 pub struct Product {
     name: String,
     document_count: i32,
+}
+
+impl Product {
+    pub fn new(name: String, document_count: i32) -> Self {
+        Product {
+            name,
+            document_count,
+        }
+    }
 }
 
 pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
@@ -49,7 +58,7 @@ pub async fn get_substance_with_products(
 
     products.sort();
 
-    Ok(Substance::new(substance_name.to_string(), Some(products)))
+    Ok(Substance::new(substance_name.to_string(), products))
 }
 
 #[cfg(test)]

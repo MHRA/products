@@ -196,9 +196,6 @@ fn build_search(
             ("api-version", config.api_version.as_str()),
             ("highlight", "content"),
             ("queryType", "full"),
-            ("@count", "true"),
-            ("@top", "10"),
-            ("@skip", "0"),
             ("search", search_term),
             ("scoringProfile", "preferKeywords"),
         ])
@@ -281,7 +278,7 @@ mod test {
     fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
-            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&%40count=true&%40top=10&%40skip=0&search=cool+beans&scoringProfile=preferKeywords"
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords"
                 .to_string();
 
             assert_eq!(actual, expected);
