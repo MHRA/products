@@ -2,7 +2,7 @@ use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 
-#[derive(GraphQLObject, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
 pub struct Document {
     product_name: Option<String>,
