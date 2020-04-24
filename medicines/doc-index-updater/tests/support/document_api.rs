@@ -1,5 +1,9 @@
 use super::get_ok;
-use doc_index_updater::models::{Document, DocumentType, FileSource, JobStatus, JobStatusResponse};
+
+use doc_index_updater::{
+    get_env,
+    models::{Document, DocumentType, FileSource, JobStatus, JobStatusResponse},
+};
 use reqwest::Error;
 use uuid::Uuid;
 
@@ -9,7 +13,10 @@ pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> 
     let response = get_ok(
         client
             .delete(format!("http://localhost:8000/documents/{}", document_id).as_str())
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .basic_auth(
+                get_env::<String>("BASIC_AUTH_USERNAME").unwrap(),
+                Some(get_env::<String>("BASIC_AUTH_PASSWORD").unwrap()),
+            )
             .send(),
     );
 
@@ -37,7 +44,10 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
     let response = get_ok(
         client
             .post("http://localhost:8000/documents")
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .basic_auth(
+                get_env::<String>("BASIC_AUTH_USERNAME").unwrap(),
+                Some(get_env::<String>("BASIC_AUTH_PASSWORD").unwrap()),
+            )
             .header("Content-Type", "application/json")
             .body(serde_json::to_string(&metadata).unwrap())
             .send(),
@@ -49,10 +59,14 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
 
 pub fn get_job_status(job_id: Uuid) -> JobStatus {
     let client = reqwest::Client::new();
+
     let response = get_ok(
         client
             .get(format!("http://localhost:8000/jobs/{}", job_id).as_str())
-            .basic_auth("username".to_string(), Some("password".to_string()))
+            .basic_auth(
+                get_env::<String>("BASIC_AUTH_USERNAME").unwrap(),
+                Some(get_env::<String>("BASIC_AUTH_PASSWORD").unwrap()),
+            )
             .send(),
     );
     let job_status_response: JobStatusResponse = get_ok(response.json());

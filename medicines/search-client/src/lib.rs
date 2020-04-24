@@ -19,6 +19,11 @@ pub struct AzureSearchClient {
     config: AzureConfig,
 }
 
+pub struct AzurePagination {
+    pub result_count: u32,
+    pub offset: u32,
+}
+
 impl Default for AzureSearchClient {
     fn default() -> Self {
         Self::new()
@@ -60,6 +65,13 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 pub trait Search {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
 
+    async fn search_with_pagination(
+        &self,
+        search_term: &str,
+        pagination: AzurePagination,
+        include_count: bool,
+    ) -> Result<IndexResults, reqwest::Error>;
+
     async fn filter_by_collection_field(
         &self,
         field_name: &str,
@@ -76,7 +88,23 @@ pub trait Search {
 #[async_trait]
 impl Search for AzureSearchClient {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, &self.client, &self.config).await
+        search(search_term, None, None, &self.client, &self.config).await
+    }
+
+    async fn search_with_pagination(
+        &self,
+        search_term: &str,
+        pagination: AzurePagination,
+        include_count: bool,
+    ) -> Result<IndexResults, reqwest::Error> {
+        search(
+            search_term,
+            Some(pagination),
+            Some(include_count),
+            &self.client,
+            &self.config,
+        )
+        .await
     }
 
     async fn filter_by_collection_field(
@@ -220,10 +248,18 @@ impl CreateIndexEntry for AzureSearchClient {
 
 async fn search(
     search_term: &str,
+    pagination: Option<AzurePagination>,
+    include_count: Option<bool>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
-    let req = build_search(search_term, &client, &config)?;
+    let req = build_search(
+        search_term,
+        pagination,
+        include_count,
+        &client,
+        &config,
+    )?;
     tracing::debug!("Requesting from URL: {}", &req.url());
     client
         .execute(req)
@@ -235,6 +271,8 @@ async fn search(
 
 fn build_search(
     search_term: &str,
+    pagination: Option<AzurePagination>,
+    include_count: Option<bool>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<reqwest::Request, reqwest::Error> {
@@ -244,7 +282,9 @@ fn build_search(
         search_index = config.search_index
     );
 
-    let req = client
+    let include_count = include_count.unwrap_or(false).to_string();
+
+    let request_builder = client
         .get(&base_url)
         .query(&[
             ("api-version", config.api_version.as_str()),
@@ -252,11 +292,19 @@ fn build_search(
             ("queryType", "full"),
             ("search", search_term),
             ("scoringProfile", "preferKeywords"),
+            ("$count", &include_count),
         ])
-        .header("api-key", &config.api_key)
-        .build()?;
+        .header("api-key", &config.api_key);
 
-    Ok(req)
+    match pagination {
+        Some(pagination) => Ok(request_builder
+            .query(&[
+                ("$top", pagination.result_count.to_string()),
+                ("$skip", pagination.offset.to_string()),
+            ])
+            .build()?),
+        None => Ok(request_builder.build()?)
+    }
 }
 
 async fn update_index<T>(
@@ -321,18 +369,20 @@ mod test {
         }
     }
 
-    fn when_we_build_a_search_request(
+    fn when_we_build_a_search_request_without_pagination(
         client: reqwest::Client,
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(&search_term, &client, &config)
+        build_search(&search_term, None, None, &client, &config)
     }
 
-    fn then_search_url_is_as_expected(actual_result: Result<reqwest::Request, reqwest::Error>) {
+    fn then_search_url_without_pagination_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
-            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords"
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=false"
                 .to_string();
 
             assert_eq!(actual, expected);
@@ -342,12 +392,49 @@ mod test {
     }
 
     #[test]
-    fn test_build_search() {
+    fn test_build_search_without_pagination() {
         let client = given_we_have_a_search_client();
         let search_term = given_we_have_a_search_term();
         let config = given_we_have_a_config();
-        let actual = when_we_build_a_search_request(client, search_term, config);
-        then_search_url_is_as_expected(actual);
+        let actual = when_we_build_a_search_request_without_pagination(client, search_term, config);
+        then_search_url_without_pagination_is_as_expected(actual);
+    }
+
+    fn when_we_build_a_search_request_with_pagination(
+        client: reqwest::Client,
+        search_term: String,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_search(
+            &search_term,
+            Some(AzurePagination{result_count: 10, offset: 50}),
+            Some(true),
+            &client,
+            &config,
+        )
+    }
+
+    fn then_search_url_with_pagination_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=true&%24top=10&%24skip=50"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            assert!(false, "Provided search request is an error");
+        }
+    }
+
+    #[test]
+    fn test_build_search_with_pagination() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_a_search_term();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_request_with_pagination(client, search_term, config);
+        then_search_url_with_pagination_is_as_expected(actual);
     }
 
     #[test]
