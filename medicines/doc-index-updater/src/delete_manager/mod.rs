@@ -615,7 +615,7 @@ mod test {
 
     #[async_trait]
     impl Search for TestAzureSearchClient {
-        async fn search(&self, _search_term: &str) -> Result<IndexResults, anyhow::Error> {
+        async fn search(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
                 context: String::from(""),
@@ -625,11 +625,10 @@ mod test {
         async fn search_with_pagination(
             &self,
             _search_term: &str,
-            _result_count: u32,
-            _offset: u32,
+            _pagination: search_client::AzurePagination,
             _include_count: bool,
-        ) -> Result<IndexResults, anyhow::Error> {
-            Err(anyhow::anyhow!("Should not be called from doc index updater."))
+        ) -> Result<IndexResults, reqwest::Error> {
+            unimplemented!()
         }
         async fn filter_by_field(
             &self,

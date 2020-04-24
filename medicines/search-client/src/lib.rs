@@ -19,6 +19,11 @@ pub struct AzureSearchClient {
     config: AzureConfig,
 }
 
+pub struct AzurePagination {
+    pub result_count: u32,
+    pub offset: u32,
+}
+
 impl Default for AzureSearchClient {
     fn default() -> Self {
         Self::new()
@@ -58,15 +63,14 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 
 #[async_trait]
 pub trait Search {
-    async fn search(&self, search_term: &str) -> Result<IndexResults, anyhow::Error>;
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
 
     async fn search_with_pagination(
         &self,
         search_term: &str,
-        result_count: u32,
-        offset: u32,
+        pagination: AzurePagination,
         include_count: bool,
-    ) -> Result<IndexResults, anyhow::Error>;
+    ) -> Result<IndexResults, reqwest::Error>;
 
     async fn filter_by_field(
         &self,
@@ -77,21 +81,19 @@ pub trait Search {
 
 #[async_trait]
 impl Search for AzureSearchClient {
-    async fn search(&self, search_term: &str) -> Result<IndexResults, anyhow::Error> {
-        search(search_term, None, None, None, &self.client, &self.config).await
+    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        search(search_term, None, None, &self.client, &self.config).await
     }
 
     async fn search_with_pagination(
         &self,
         search_term: &str,
-        result_count: u32,
-        offset: u32,
+        pagination: AzurePagination,
         include_count: bool,
-    ) -> Result<IndexResults, anyhow::Error> {
+    ) -> Result<IndexResults, reqwest::Error> {
         search(
             search_term,
-            Some(result_count),
-            Some(offset),
+            Some(pagination),
             Some(include_count),
             &self.client,
             &self.config,
@@ -192,16 +194,14 @@ impl CreateIndexEntry for AzureSearchClient {
 
 async fn search(
     search_term: &str,
-    result_count: Option<u32>,
-    offset: Option<u32>,
+    pagination: Option<AzurePagination>,
     include_count: Option<bool>,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<IndexResults, anyhow::Error> {
+) -> Result<IndexResults, reqwest::Error> {
     let req = build_search(
         search_term,
-        result_count,
-        offset,
+        pagination,
         include_count,
         &client,
         &config,
@@ -213,17 +213,15 @@ async fn search(
         .error_for_status()?
         .json::<IndexResults>()
         .await
-        .map_err(|e| anyhow::anyhow!(e))
 }
 
 fn build_search(
     search_term: &str,
-    result_count: Option<u32>,
-    offset: Option<u32>,
+    pagination: Option<AzurePagination>,
     include_count: Option<bool>,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<reqwest::Request, anyhow::Error> {
+) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
         search_service = config.search_service,
@@ -244,17 +242,14 @@ fn build_search(
         ])
         .header("api-key", &config.api_key);
 
-    match (result_count, offset) {
-        (Some(result_count), Some(offset)) => Ok(request_builder
+    match pagination {
+        Some(pagination) => Ok(request_builder
             .query(&[
-                ("$top", result_count.to_string()),
-                ("$skip", offset.to_string()),
+                ("$top", pagination.result_count.to_string()),
+                ("$skip", pagination.offset.to_string()),
             ])
             .build()?),
-        (None, None) => Ok(request_builder.build()?),
-        _ => Err(anyhow::anyhow!(
-            "If one of result_count or offset is set, the other must be set as well."
-        )),
+        None => Ok(request_builder.build()?)
     }
 }
 
@@ -324,12 +319,12 @@ mod test {
         client: reqwest::Client,
         search_term: String,
         config: AzureConfig,
-    ) -> Result<reqwest::Request, anyhow::Error> {
-        build_search(&search_term, None, None, None, &client, &config)
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_search(&search_term, None, None, &client, &config)
     }
 
     fn then_search_url_without_pagination_is_as_expected(
-        actual_result: Result<reqwest::Request, anyhow::Error>,
+        actual_result: Result<reqwest::Request, reqwest::Error>,
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
@@ -355,11 +350,10 @@ mod test {
         client: reqwest::Client,
         search_term: String,
         config: AzureConfig,
-    ) -> Result<reqwest::Request, anyhow::Error> {
+    ) -> Result<reqwest::Request, reqwest::Error> {
         build_search(
             &search_term,
-            Some(10),
-            Some(50),
+            Some(AzurePagination{result_count: 10, offset: 50}),
             Some(true),
             &client,
             &config,
@@ -367,7 +361,7 @@ mod test {
     }
 
     fn then_search_url_with_pagination_is_as_expected(
-        actual_result: Result<reqwest::Request, anyhow::Error>,
+        actual_result: Result<reqwest::Request, reqwest::Error>,
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
