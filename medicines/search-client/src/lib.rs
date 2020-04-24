@@ -60,7 +60,7 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 pub trait Search {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
 
-    async fn filter_by_field(
+    async fn filter_by_collection_field(
         &self,
         field_name: &str,
         field_value: &str,
@@ -73,7 +73,7 @@ impl Search for AzureSearchClient {
         search(search_term, &self.client, &self.config).await
     }
 
-    async fn filter_by_field(
+    async fn filter_by_collection_field(
         &self,
         field_name: &str,
         field_value: &str,
