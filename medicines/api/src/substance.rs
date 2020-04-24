@@ -51,21 +51,16 @@ fn format_search_results(results: IndexResults, letter: char) -> Substances {
 
             Some((substance_name, product_name))
         })
-        .for_each(|(substance, product)| {
-            println!();
-            println!("Result: {} - {:?}", substance, product);
+        .for_each(|(substance, product)| match substances.get_mut(substance) {
+            None => {
+                let mut map = BTreeMap::new();
+                map.insert(product, 1);
+                substances.insert(substance, map);
+            }
+            Some(map) => {
+                let count = map.get(product).copied().unwrap_or_default();
 
-            match substances.get_mut(substance) {
-                None => {
-                    let mut map = BTreeMap::new();
-                    map.insert(product, 1);
-                    substances.insert(substance, map);
-                }
-                Some(map) => {
-                    let count = map.get(product).copied().unwrap_or_default();
-
-                    map.insert(product, count + 1);
-                }
+                map.insert(product, count + 1);
             }
         });
 

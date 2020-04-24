@@ -32,8 +32,6 @@ impl QueryRoot {
         context: &AzureContext,
         letter: String,
     ) -> FieldResult<Substances> {
-        println!("Letter: {}", letter);
-
         get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
             .await
             .map_err(|e| {
