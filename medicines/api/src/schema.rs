@@ -4,7 +4,7 @@ use crate::{
     azure_context::AzureContext,
     document::{get_documents, Documents},
     product::get_substance_with_products,
-    substance::{get_substances, get_substances_starting_with_letter, Substance, Substances},
+    substance::{get_substances_starting_with_letter, Substance},
 };
 
 pub struct QueryRoot;
@@ -32,17 +32,13 @@ impl QueryRoot {
     async fn substances_by_first_letter(
         context: &AzureContext,
         letter: String,
-    ) -> FieldResult<Substances> {
+    ) -> FieldResult<Vec<Substance>> {
         get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
                 juniper::FieldError::new("Error fetching search results", juniper::Value::null())
             })
-    }
-
-    async fn substances(first: i32) -> FieldResult<Substances> {
-        Ok(get_substances(first).await)
     }
 
     async fn documents(
