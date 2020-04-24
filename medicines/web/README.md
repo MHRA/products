@@ -22,7 +22,7 @@ yarn dev
 To open Cypress and run end-to-end tests, run the following:
 
 ```sh
-make cypress
+yarn test-e2e
 ```
 
 This will automatically read environment variables from `.env` and pass them in to Cypress.
