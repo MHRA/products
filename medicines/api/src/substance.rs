@@ -1,5 +1,4 @@
-use crate::{pagination, pagination::PageInfo, product::Product};
-use base64;
+use crate::{document::Document, product::Product};
 use search_client::{models::IndexResults, Search};
 use std::collections::BTreeMap;
 
@@ -16,23 +15,21 @@ impl Substance {
     }
 }
 
-pagination! {Substances, SubstanceEdge, Substance}
-
 pub async fn get_substances_starting_with_letter(
     client: &impl Search,
     letter: char,
-) -> reqwest::Result<Substances> {
+) -> reqwest::Result<Vec<Substance>> {
     let upper_letter = letter.to_ascii_uppercase();
 
     let azure_result = client
-        .filter_by_field("facets", &upper_letter.to_string())
+        .filter_by_collection_field("facets", &upper_letter.to_string())
         .await?;
 
     Ok(format_search_results(azure_result, upper_letter))
 }
 
-fn format_search_results(results: IndexResults, letter: char) -> Substances {
-    let mut substances: BTreeMap<&str, BTreeMap<&str, i32>> = BTreeMap::new();
+fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> {
+    let mut substances: BTreeMap<&str, BTreeMap<&str, Vec<Document>>> = BTreeMap::new();
 
     let letter_string = letter.to_string();
 
@@ -44,83 +41,37 @@ fn format_search_results(results: IndexResults, letter: char) -> Substances {
             let substance_name = result.substance_name.first()?.as_str();
             let product_name = result.product_name.as_ref()?.as_str();
 
-            Some((substance_name, product_name))
+            let doc: Document = result.clone().into();
+
+            Some((substance_name, product_name, doc))
         })
-        .for_each(|(substance, product)| match substances.get_mut(substance) {
-            None => {
-                let mut map = BTreeMap::new();
-                map.insert(product, 1);
-                substances.insert(substance, map);
-            }
-            Some(map) => {
-                let count = map.get(product).copied().unwrap_or_default();
+        .for_each(
+            |(substance, product, doc)| match substances.get_mut(substance) {
+                None => {
+                    let mut map = BTreeMap::new();
+                    map.insert(product, vec![doc]);
+                    substances.insert(substance, map);
+                }
+                Some(map) => match map.get_mut(product) {
+                    Some(docs) => {
+                        docs.push(doc);
+                    }
+                    None => {
+                        map.insert(product, vec![doc]);
+                    }
+                },
+            },
+        );
 
-                map.insert(product, count + 1);
-            }
-        });
-
-    let edges: Vec<_> = substances
+    substances
         .iter()
-        .enumerate()
-        .map(|(i, (&substance, prods))| {
+        .map(|(&substance, prods)| {
             let products = prods
-                .iter()
-                .map(|(&name, &document_count)| Product::new(name.into(), document_count))
+                .into_iter()
+                .map(|(&name, docs)| Product::new(name.into(), docs.clone()))
                 .collect();
 
-            let node = Substance::new(substance.into(), products);
-
-            SubstanceEdge {
-                node,
-                cursor: base64::encode(i.to_string()),
-            }
+            Substance::new(substance.into(), products)
         })
-        .collect();
-
-    let first_cursor = base64::encode("1");
-
-    let page_info = PageInfo {
-        start_cursor: edges
-            .first()
-            .map(|edge| edge.cursor.clone())
-            .unwrap_or(first_cursor.clone()),
-        end_cursor: edges
-            .last()
-            .map(|edge| edge.cursor.clone())
-            .unwrap_or(first_cursor),
-        has_previous_page: false,
-        has_next_page: false,
-    };
-
-    let total_count = edges.len() as i32;
-
-    Substances {
-        edges,
-        total_count,
-        page_info,
-    }
-}
-
-pub async fn get_substances(first: i32) -> Substances {
-    let substances: [&str; 1000] = ["Ibuprofen"; 1000];
-    let edges = substances
-        .iter()
-        .take(first as usize)
-        .map(|&x| Substance::new(x.to_string(), vec![]))
-        .map(|y| SubstanceEdge {
-            node: y,
-            cursor: "cursor".to_owned(),
-        })
-        .collect();
-
-    Substances {
-        edges,
-        total_count: 1000,
-        page_info: PageInfo {
-            has_previous_page: false,
-            has_next_page: first < 1000,
-            start_cursor: "start cursor here".to_string(),
-            end_cursor: "end cursor here".to_string(),
-        },
-    }
+        .collect()
 }

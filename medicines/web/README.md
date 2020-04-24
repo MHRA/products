@@ -38,3 +38,5 @@ To make use of the GraphQL endpoints running in Azure today, you'll need to add 
 ```
 kubectl get services --namespace istio-system istio-ingressgateway -o json | jq '.status.loadBalancer.ingress[0].ip'
 ```
+
+If you are on a unix-based system and wish to have your hosts file updated automatically, run [`../../infrastructure/scripts/update-hosts.sh`](../../infrastructure/scripts/update-hosts.sh).
