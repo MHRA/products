@@ -1,4 +1,5 @@
 use crate::{pagination, pagination::PageInfo, product::Product};
+use base64;
 use search_client::{models::IndexResults, Search};
 use std::collections::BTreeMap;
 
@@ -26,22 +27,24 @@ pub async fn get_substances_starting_with_letter(
     client: &impl Search,
     letter: char,
 ) -> reqwest::Result<Substances> {
-    let upper_letter = letter.to_ascii_uppercase().to_string();
+    let upper_letter = letter.to_ascii_uppercase();
 
-    let azure_result = client.filter_by_field("facets", &upper_letter).await?;
+    let azure_result = client
+        .filter_by_field("facets", &upper_letter.to_string())
+        .await?;
 
     Ok(format_search_results(azure_result, upper_letter))
 }
 
-fn format_search_results(results: IndexResults, letter: String) -> Substances {
-    println!("Search results {:?}", results);
-
+fn format_search_results(results: IndexResults, letter: char) -> Substances {
     let mut substances: BTreeMap<&str, BTreeMap<&str, i32>> = BTreeMap::new();
+
+    let letter_string = letter.to_string();
 
     results
         .search_results
         .iter()
-        .filter(|result| result.facets.first() == Some(&letter))
+        .filter(|result| result.facets.first() == Some(&letter_string))
         .filter_map(|result| {
             let substance_name = result.substance_name.first()?.as_str();
             let product_name = result.product_name.as_ref()?.as_str();
@@ -68,7 +71,8 @@ fn format_search_results(results: IndexResults, letter: String) -> Substances {
 
     let edges = substances
         .iter()
-        .map(|(&substance, prods)| {
+        .enumerate()
+        .map(|(i, (&substance, prods))| {
             let products = prods
                 .iter()
                 .map(|(&name, &document_count)| Product::new(name.into(), document_count))
@@ -78,7 +82,7 @@ fn format_search_results(results: IndexResults, letter: String) -> Substances {
 
             SubstanceEdge {
                 node,
-                cursor: "TODO".into(),
+                cursor: base64::encode(i.to_string()),
             }
         })
         .collect();
