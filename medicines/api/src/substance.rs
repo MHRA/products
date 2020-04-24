@@ -59,7 +59,7 @@ fn format_search_results(results: IndexResults, letter: char) -> Substances {
             }
         });
 
-    let edges = substances
+    let edges: Vec<_> = substances
         .iter()
         .enumerate()
         .map(|(i, (&substance, prods))| {
@@ -77,12 +77,27 @@ fn format_search_results(results: IndexResults, letter: char) -> Substances {
         })
         .collect();
 
+    let first_cursor = base64::encode("1");
+
+    let page_info = PageInfo {
+        start_cursor: edges
+            .first()
+            .map(|edge| edge.cursor.clone())
+            .unwrap_or(first_cursor.clone()),
+        end_cursor: edges
+            .last()
+            .map(|edge| edge.cursor.clone())
+            .unwrap_or(first_cursor),
+        has_previous_page: false,
+        has_next_page: false,
+    };
+
+    let total_count = edges.len() as i32;
+
     Substances {
         edges,
-        page_info: PageInfo {
-            has_previous_page: false,
-            has_next_page: false,
-        },
+        total_count,
+        page_info,
     }
 }
 
