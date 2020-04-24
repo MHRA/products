@@ -622,7 +622,7 @@ mod test {
                 count: None,
             })
         }
-        async fn filter_by_field(
+        async fn filter_by_collection_field(
             &self,
             _field_name: &str,
             _field_value: &str,
