@@ -22,12 +22,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_ale
   | project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
   | render table
   | extend message_ = tostring(parse_json(tostring(parse_json(LogEntry).fields)).message)
-  | where parse_json(LogEntry).level == "WARN" or parse_json(LogEntry).level == "ERROR"
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SERVICE_BUS_MESSAGE_LOCK_TIMEOUT to \"10\" (environment variable not found)"
+  | where parse_json(LogEntry).level == "ERROR"
   | extend correlation_id_ = tostring(parse_json(tostring(parse_json(LogEntry).span)).correlation_id)
   | extend level = tostring(parse_json(tostring(parse_json(LogEntry).level)))
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SECONDS_TO_WAIT to \"5\" (environment variable not found)"
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SECONDS_TO_WAIT to \"5\" (environment variable not found)"
   QUERY
   severity       = 1
   frequency      = 5
@@ -62,12 +59,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
   | project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
   | render table
   | extend message_ = tostring(parse_json(tostring(parse_json(LogEntry).fields)).message)
-  | where parse_json(LogEntry).level == "WARN" or parse_json(LogEntry).level == "ERROR"
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SERVICE_BUS_MESSAGE_LOCK_TIMEOUT to \"10\" (environment variable not found)"
+  | where parse_json(LogEntry).level == "ERROR"
   | extend correlation_id_ = tostring(parse_json(tostring(parse_json(LogEntry).span)).correlation_id)
   | extend level = tostring(parse_json(tostring(parse_json(LogEntry).level)))
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SECONDS_TO_WAIT to \"5\" (environment variable not found)"
-  | where parse_json(tostring(parse_json(LogEntry).fields)).message <> "defaulting SECONDS_TO_WAIT to \"5\" (environment variable not found)"
   QUERY
   severity       = 1
   frequency      = 5
