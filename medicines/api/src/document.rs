@@ -217,7 +217,7 @@ mod test {
         assert!(expected_names.eq(actual_names));
     }
 
-    fn then_we_have_first_page(documents_response: &Documents) {
+    fn then_we_are_on_first_page(documents_response: &Documents) {
         assert_eq!(1234, documents_response.total_count);
         let expected_page_info = PageInfo {
             has_previous_page: false,
@@ -228,7 +228,7 @@ mod test {
         assert_eq!(expected_page_info, documents_response.page_info);
     }
 
-    fn then_we_have_last_page(documents_response: &Documents) {
+    fn then_we_are_on_last_page(documents_response: &Documents) {
         assert_eq!(1234, documents_response.total_count);
         let expected_page_info = PageInfo {
             has_previous_page: true,
@@ -245,7 +245,7 @@ mod test {
         let search_client = given_a_search_client(&search_results);
         let response = when_we_get_the_first_page_of_documents(search_client);
         then_we_have_expected_documents(&response, &search_results);
-        then_we_have_first_page(&response);
+        then_we_are_on_first_page(&response);
     }
 
     #[test]
@@ -254,6 +254,6 @@ mod test {
         let search_client = given_a_search_client(&search_results);
         let response = when_we_get_the_last_page_of_documents(search_client);
         then_we_have_expected_documents(&response, &search_results);
-        then_we_have_last_page(&response);
+        then_we_are_on_last_page(&response);
     }
 }
