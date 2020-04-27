@@ -1,7 +1,7 @@
 use juniper::GraphQLObject;
 
 // Based upon: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-#[derive(GraphQLObject)]
+#[derive(GraphQLObject, Debug, PartialEq)]
 pub struct PageInfo {
     pub has_previous_page: bool,
     pub has_next_page: bool,
