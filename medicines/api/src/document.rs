@@ -43,8 +43,15 @@ pub async fn get_documents(
     first: Option<i32>,
     after: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
-    let offset = after.unwrap_or("-1".to_string()).parse::<i32>().unwrap() + 1;
     let result_count = first.unwrap_or(10);
+    let offset = match after {
+        Some(after) => {
+            let bytes = base64::decode(after)?;
+            let string = std::str::from_utf8(&bytes)?;
+            string.parse::<i32>()? + 1
+        },
+        None => 0,
+    };
 
     let azure_result = client
         .search_with_pagination(
@@ -197,7 +204,7 @@ mod test {
             &search_client,
             "Search string".to_string(),
             None,
-            Some("1229".to_string()),
+            Some(base64::encode("1229").to_string()),
         ))
         .unwrap()
     }
