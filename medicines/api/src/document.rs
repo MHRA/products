@@ -65,7 +65,7 @@ pub async fn get_documents(
         .map(|document| {
             let edge = DocumentEdge {
                 node: document,
-                cursor: cursor.to_string(),
+                cursor: base64::encode(cursor.to_string()),
             };
             cursor += 1;
             return edge;
@@ -75,8 +75,9 @@ pub async fn get_documents(
     let total_count = azure_result.count.unwrap_or(0);
     let has_previous_page = offset != 0;
     let has_next_page = offset + result_count <= total_count;
-    let start_cursor = offset.to_string();
-    let end_cursor = std::cmp::min(total_count, offset + result_count - 1).to_string();
+    let start_cursor = base64::encode(offset.to_string());
+    let end_cursor =
+        base64::encode(std::cmp::min(total_count, offset + result_count - 1).to_string());
 
     Ok(Documents {
         edges,
@@ -221,8 +222,8 @@ mod test {
         let expected_page_info = PageInfo {
             has_previous_page: false,
             has_next_page: true,
-            start_cursor: "0".to_string(),
-            end_cursor: "9".to_string(),
+            start_cursor: base64::encode("0"),
+            end_cursor: base64::encode("9"),
         };
         assert_eq!(expected_page_info, documents_response.page_info);
     }
@@ -232,8 +233,8 @@ mod test {
         let expected_page_info = PageInfo {
             has_previous_page: true,
             has_next_page: false,
-            start_cursor: "1230".to_string(),
-            end_cursor: "1234".to_string(),
+            start_cursor: base64::encode("1230"),
+            end_cursor: base64::encode("1234"),
         };
         assert_eq!(expected_page_info, documents_response.page_info);
     }
