@@ -52,16 +52,12 @@ impl QueryRoot {
         context: &AzureContext,
         search: Option<String>,
         first: Option<i32>,
-        last: Option<i32>,
-        before: Option<String>,
         after: Option<String>,
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,
             search.unwrap_or(" ".to_string()),
             first,
-            last,
-            before,
             after,
         )
         .await

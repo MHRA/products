@@ -41,12 +41,8 @@ pub async fn get_documents(
     client: &impl Search,
     search: String,
     first: Option<i32>,
-    last: Option<i32>,
-    before: Option<String>,
     after: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
-    // TODO: Do something with last and after.
-
     let offset = after.unwrap_or("-1".to_string()).parse::<i32>().unwrap() + 1;
     let result_count = first.unwrap_or(10);
 
@@ -191,19 +187,14 @@ mod test {
             "Search string".to_string(),
             None,
             None,
-            None,
-            None,
         ))
         .unwrap()
     }
-
 
     fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
         block_on(get_documents(
             &search_client,
             "Search string".to_string(),
-            None,
-            None,
             None,
             Some("1229".to_string()),
         ))
