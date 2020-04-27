@@ -197,6 +197,19 @@ mod test {
         .unwrap()
     }
 
+
+    fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
+        block_on(get_documents(
+            &search_client,
+            "Search string".to_string(),
+            None,
+            None,
+            None,
+            Some("1229".to_string()),
+        ))
+        .unwrap()
+    }
+
     fn then_we_have_expected_documents(
         documents_response: &Documents,
         search_results: &Vec<IndexResult>,
@@ -223,6 +236,17 @@ mod test {
         assert_eq!(expected_page_info, documents_response.page_info);
     }
 
+    fn then_we_have_last_page(documents_response: &Documents) {
+        assert_eq!(1234, documents_response.total_count);
+        let expected_page_info = PageInfo {
+            has_previous_page: true,
+            has_next_page: false,
+            start_cursor: "1230".to_string(),
+            end_cursor: "1234".to_string(),
+        };
+        assert_eq!(expected_page_info, documents_response.page_info);
+    }
+
     #[test]
     fn test_get_documents_first_page() {
         let search_results = given_some_search_results();
@@ -230,5 +254,14 @@ mod test {
         let response = when_we_get_the_first_page_of_documents(search_client);
         then_we_have_expected_documents(&response, &search_results);
         then_we_have_first_page(&response);
+    }
+
+    #[test]
+    fn test_get_documents_last_page() {
+        let search_results = given_some_search_results();
+        let search_client = given_a_search_client(&search_results);
+        let response = when_we_get_the_last_page_of_documents(search_client);
+        then_we_have_expected_documents(&response, &search_results);
+        then_we_have_last_page(&response);
     }
 }
