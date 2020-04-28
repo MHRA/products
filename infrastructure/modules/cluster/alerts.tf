@@ -19,12 +19,13 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_ale
   | distinct ContainerID;
   ContainerLog
   | where ContainerID in (ContainerIdList)
-  | project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+  | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
-  | extend message_ = tostring(parse_json(tostring(parse_json(LogEntry).fields)).message)
-  | where parse_json(LogEntry).level == "ERROR"
-  | extend correlation_id_ = tostring(parse_json(tostring(parse_json(LogEntry).span)).correlation_id)
-  | extend level = tostring(parse_json(tostring(parse_json(LogEntry).level)))
+  | extend correlation_id = tostring(LogEntry.span.correlation_id)
+  | extend message = tostring(LogEntry.span.message)
+  | extend level = tostring(LogEntry.level)
+  | where level == "ERROR"
+
   QUERY
   severity       = 1
   frequency      = 5
@@ -56,12 +57,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
   | distinct ContainerID;
   ContainerLog
   | where ContainerID in (ContainerIdList)
-  | project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+  | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
-  | extend message_ = tostring(parse_json(tostring(parse_json(LogEntry).fields)).message)
-  | where parse_json(LogEntry).level == "ERROR"
-  | extend correlation_id_ = tostring(parse_json(tostring(parse_json(LogEntry).span)).correlation_id)
-  | extend level = tostring(parse_json(tostring(parse_json(LogEntry).level)))
+  | extend correlation_id = tostring(LogEntry.span.correlation_id)
+  | extend message = tostring(LogEntry.span.message)
+  | extend level = tostring(LogEntry.level)
+  | where level == "ERROR"
   QUERY
   severity       = 1
   frequency      = 5
