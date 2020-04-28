@@ -2,7 +2,7 @@ name: Bring up dev cluster
 
 on:
   schedule:
-    - 30 8 * * 1-5 # 8:30, Monday - Friday
+    - cron: "30 8 * * 1-5" # 8:30, Monday - Friday
 
 env:
   TF_IN_AUTOMATION: "1"

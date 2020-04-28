@@ -2,7 +2,7 @@ name: Destroy the dev cluster
 
 on:
   schedule:
-    - 45 17 * * 1-5 # 17:45, Monday - Friday
+    - cron: "45 17 * * 1-5" # 17:45, Monday - Friday
 
 env:
   TF_IN_AUTOMATION: "1"
