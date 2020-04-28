@@ -622,7 +622,22 @@ mod test {
                 count: None,
             })
         }
-        async fn filter_by_field(
+        async fn search_with_pagination(
+            &self,
+            _search_term: &str,
+            _pagination: search_client::AzurePagination,
+            _include_count: bool,
+        ) -> Result<IndexResults, reqwest::Error> {
+            unimplemented!()
+        }
+        async fn filter_by_collection_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<IndexResults, reqwest::Error> {
+            unimplemented!()
+        }
+        async fn filter_by_non_collection_field(
             &self,
             _field_name: &str,
             _field_value: &str,

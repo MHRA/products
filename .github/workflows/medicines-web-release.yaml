@@ -43,6 +43,16 @@ jobs:
         working-directory: medicines/web
         run: yarn build && yarn export
 
+      - name: Write variables to .env
+        working-directory: medicines/web
+        run: |
+          {
+            echo "AZURE_SEARCH_SERVICE=\"$AZURE_SEARCH_SERVICE\""
+            echo "AZURE_SEARCH_INDEX=\"$AZURE_SEARCH_INDEX\""
+            echo "AZURE_SEARCH_KEY=\"$AZURE_SEARCH_KEY\""
+            echo "GRAPHQL_URL=\"$GRAPHQL_URL\""
+          } > .env
+
       - name: Run cypress end-to-end tests
         working-directory: medicines/web
         run: mkdir -p cypress/screenshots && yarn test-e2e

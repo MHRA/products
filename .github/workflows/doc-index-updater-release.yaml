@@ -30,7 +30,7 @@ jobs:
       - name: Fetch image for tagged commit
         working-directory: ./products/medicines/doc-index-updater
         run: |
-          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
           make docker-pull image=$NONPROD_IMAGE tag=$TAG
           echo ::set-env name=TAG::$TAG
 

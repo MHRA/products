@@ -6,7 +6,7 @@ use std::clone::Clone;
 #[derive(Clone, Debug, Deserialize)]
 pub struct AzureHighlight {
     #[serde(rename = "content")]
-    content: Vec<String>,
+    pub content: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]

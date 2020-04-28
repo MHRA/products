@@ -9,7 +9,9 @@ import { SubstanceListStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { ISubstance } from '../../model/substance';
 import Events from '../../services/events';
-import substanceLoader from '../../services/substance-loader';
+import substanceLoader, {
+  graphqlSubstanceLoader,
+} from '../../services/substance-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -21,7 +23,7 @@ const App: NextPage = () => {
 
   const router = useRouter();
   const {
-    query: { letter: queryQS },
+    query: { letter: queryQS, useGraphQl: graphQlFeatureFlag },
   } = router;
 
   useEffect(() => {
@@ -30,7 +32,12 @@ const App: NextPage = () => {
     }
     (async () => {
       const index = queryQS.toString();
-      setResults(await substanceLoader.load(index));
+
+      const loader = graphQlFeatureFlag
+        ? graphqlSubstanceLoader
+        : substanceLoader;
+
+      setResults(await loader.load(index));
       setSubstanceIndex(index);
       Events.viewSubstancesStartingWith(index);
     })();
