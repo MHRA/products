@@ -1,0 +1,48 @@
+name: Destroy the dev cluster
+
+on:
+  schedule:
+    - 45 17 * * 1-5 # 17:45, Monday - Friday
+
+env:
+  TF_IN_AUTOMATION: "1"
+  TF_VAR_CLIENT_ID: ${{ secrets.TF_VAR_CLIENT_ID }}
+  TF_VAR_CLIENT_SECRET: ${{ secrets.TF_VAR_CLIENT_SECRET }}
+  TF_VAR_CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS: ${{ secrets.TF_DEV_CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS }}
+  TF_VAR_CLUSTER_ROUTE_NEXT_HOP: ${{ secrets.TF_DEV_CLUSTER_ROUTE_NEXT_HOP }}
+
+jobs:
+  destroy-cluster:
+    name: Validate Terraform config
+
+    container:
+      image: hashicorp/terraform:light
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Initialize terraform
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform init -input=false
+
+      - name: Create terraform plan
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform plan -destroy -input=false -out=tfplan -target=module.cluster.azurerm_kubernetes_cluster.cluster
+
+      - name: Save plan file
+        uses: actions/upload-artifact@v1
+        with:
+          name: terraform-plan
+          path: ./products/infrastructure/environments/dev/tfplan
+
+      - name: Apply terraform plan
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform apply -input=false tfplan

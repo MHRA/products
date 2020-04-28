@@ -1,0 +1,50 @@
+name: Bring up dev cluster
+
+on:
+  schedule:
+    - 30 8 * * 1-5 # 8:30, Monday - Friday
+
+env:
+  TF_IN_AUTOMATION: "1"
+  TF_VAR_CLIENT_ID: ${{ secrets.TF_VAR_CLIENT_ID }}
+  TF_VAR_CLIENT_SECRET: ${{ secrets.TF_VAR_CLIENT_SECRET }}
+  TF_VAR_CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS: ${{ secrets.TF_DEV_CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS }}
+  TF_VAR_CLUSTER_ROUTE_NEXT_HOP: ${{ secrets.TF_DEV_CLUSTER_ROUTE_NEXT_HOP }}
+
+jobs:
+  create-cluster:
+    name: Validate Terraform config
+
+    container:
+      image: hashicorp/terraform:light
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Initialize terraform
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform init -input=false
+
+      - name: Create terraform plan
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform plan -input=false -out=tfplan
+
+      - name: Save plan file
+        uses: actions/upload-artifact@v1
+        with:
+          name: terraform-plan
+          path: ./products/infrastructure/environments/dev/tfplan
+
+      - name: Apply terraform plan
+        working-directory: ./products/infrastructure/environments/dev
+        run: |
+          terraform apply -input=false tfplan
+
+# TODO: maybe apply the kubernetes config as well?
