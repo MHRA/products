@@ -64,18 +64,16 @@ pub async fn get_documents(
         )
         .await?;
 
-    let mut cursor = offset.clone();
     let edges = azure_result
         .search_results
         .iter()
         .map(|search_result| Document::from(search_result.clone()))
-        .map(|document| {
-            let edge = DocumentEdge {
+        .enumerate()
+        .map(|(i, document)| {
+            DocumentEdge {
                 node: document,
-                cursor: base64::encode(cursor.to_string()),
-            };
-            cursor += 1;
-            return edge;
+                cursor: base64::encode((i as i32 + offset).to_string()),
+            }
         })
         .collect();
 
