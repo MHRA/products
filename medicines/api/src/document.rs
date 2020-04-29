@@ -57,8 +57,8 @@ pub async fn get_documents(
         .search_with_pagination(
             &search,
             search_client::AzurePagination {
-                result_count: result_count,
-                offset: offset,
+                result_count,
+                offset,
             },
             true,
         )
@@ -69,11 +69,9 @@ pub async fn get_documents(
         .iter()
         .map(|search_result| Document::from(search_result.clone()))
         .enumerate()
-        .map(|(i, document)| {
-            DocumentEdge {
-                node: document,
-                cursor: base64::encode((i as i32 + offset).to_string()),
-            }
+        .map(|(i, document)| DocumentEdge {
+            node: document,
+            cursor: base64::encode((i as i32 + offset).to_string()),
         })
         .collect();
 
@@ -87,12 +85,12 @@ pub async fn get_documents(
 
     Ok(Documents {
         edges,
-        total_count: total_count,
+        total_count,
         page_info: PageInfo {
-            has_previous_page: has_previous_page,
-            has_next_page: has_next_page,
-            start_cursor: start_cursor,
-            end_cursor: end_cursor,
+            has_previous_page,
+            has_next_page,
+            start_cursor,
+            end_cursor,
         },
     })
 }
