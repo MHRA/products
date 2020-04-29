@@ -3,10 +3,8 @@ set -euo pipefail
 
 update_hosts_file() {
     if [ -z "$1" ]; then
-        echo 'setting postfix to empty'
         ENV_POSTFIX=''
     else
-        echo "setting postfix to $1"
         ENV_POSTFIX=$1
     fi
 
