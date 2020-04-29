@@ -2,8 +2,7 @@ use crate::{document::Document, product::Product};
 use search_client::{models::IndexResults, Search};
 use std::collections::BTreeMap;
 
-#[derive(Debug, PartialEq, juniper::GraphQLObject)]
-#[graphql(description = "An active ingredient found in medical products")]
+#[derive(Debug, PartialEq)]
 pub struct Substance {
     name: String,
     products: Vec<Product>,
@@ -12,6 +11,17 @@ pub struct Substance {
 impl Substance {
     pub fn new(name: String, products: Vec<Product>) -> Self {
         Self { name, products }
+    }
+}
+
+#[juniper::graphql_object]
+#[graphql(description = "An active ingredient found in medical products")]
+impl Substance {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn products(&self) -> &Vec<Product> {
+        &self.products
     }
 }
 
@@ -206,9 +216,6 @@ mod tests {
         );
 
         let results = IndexResults {
-
-
-
             search_results: vec![
                 index_result.clone(),
 

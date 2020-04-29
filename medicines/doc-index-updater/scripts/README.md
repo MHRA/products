@@ -9,8 +9,10 @@ and then from the `bin` folder run `sh ./galtling.sh` and follow the onscreen pr
 # Functional testing scripts
 
 [delete file (via localhost instance of doc-index-updater)](delete.sh)
-Setup environment vars as per the [doc-index-updater README](../README.md) and then run 
-```
+Setup environment vars as per the [doc-index-updater README](../README.md) and then run
+
+```sh
 sh ./delete.sh <doc id here>
 ```
+
 This will call the api on http://localhost:8000 and check the job status to see if it succeeds or not
