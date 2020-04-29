@@ -29,3 +29,9 @@ variable "CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS" {
 variable "CLUSTER_ROUTE_NEXT_HOP" {
   description = "Next hop for default route"
 }
+
+variable "SUPPORT_EMAIL_ONE" {
+}
+
+variable "SUPPORT_EMAIL_TWO" {
+}

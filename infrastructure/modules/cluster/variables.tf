@@ -55,3 +55,9 @@ variable "default_node_count" {
   description = "Default number of nodes in AKS cluster"
   default     = "2"
 }
+
+variable "support_email_one" {
+}
+
+variable "support_email_two" {
+}
