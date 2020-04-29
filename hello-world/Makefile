@@ -18,7 +18,7 @@ ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
 docker-build: ## Build and tag Docker image
-	docker build \
+	DOCKER_BUILDKIT=1 docker build \
 		--progress plain \
 		--tag $(app) \
 		--tag $(image) \

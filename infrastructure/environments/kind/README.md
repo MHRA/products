@@ -6,6 +6,6 @@ A four node local cluster using [KIND](https://kind.sigs.k8s.io/) (Kubernetes In
 
 After creating the cluster, use `kubectl get pod --all-namespaces` and wait for everything to come up
 
-```bash
+```sh
 make create_cluster
 ```

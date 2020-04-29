@@ -8,16 +8,16 @@ The Import tool is written in Rust, so in order to contribute to or run the Impo
 
 In order to compile the tool, navigate to the correct directory and run:
 
-```
-$  cargo build
+```sh
+ cargo build
 ```
 
 ## Testing the Import tool
 
 In order to run the automated testing suite, navigate to the correct directory and run:
 
-```
-$  cargo test
+```sh
+ cargo test
 ```
 
 ## Using the Import tool
@@ -38,8 +38,8 @@ All PDF files, along with a CSV file containing metadata about the PDFs, are exp
 
 Navigate to the correct directory and run the following command:
 
-```
-$  cargo run spcpil -d /path/to/pdfs/
+```sh
+ cargo run spcpil -d /path/to/pdfs/
 ```
 
 ### Importing PARs
@@ -48,8 +48,8 @@ All PDF files, along with a CSV file containing metadata about the PDFs, are exp
 
 Navigate to the correct directory and run the following command:
 
-```
-$  cargo run par -d /path/to/pdfs/
+```sh
+ cargo run par -d /path/to/pdfs/
 ```
 
 ### Other Command Line Options
