@@ -1,5 +1,5 @@
 use crate::{
-    document::{get_document_edges, Document},
+    document::{self, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };
 use search_client::{models::IndexResult, Search};
@@ -32,7 +32,7 @@ impl Product {
     fn name(&self) -> &str {
         &self.name
     }
-    fn documents(&self, first: Option<i32>, skip: Option<i32>) -> crate::document::Documents {
+    fn documents(&self, first: Option<i32>, skip: Option<i32>) -> document::Documents {
         let docs = self.documents.clone().into_iter();
         let docs = match first {
             Some(t) => docs.take(t as usize).collect(),
@@ -44,9 +44,7 @@ impl Product {
             None => 0,
         };
 
-        let edges = get_document_edges(docs, offset);
-
-        crate::document::get_documents_from_edges(edges, self.document_count, offset)
+        get_documents_graph_from_documents_vector(docs, offset, self.document_count)
     }
 }
 

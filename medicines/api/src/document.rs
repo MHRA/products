@@ -37,7 +37,7 @@ impl From<IndexResult> for Document {
 
 pagination! {Documents, DocumentEdge, Document}
 
-pub fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge> {
+fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge> {
     docs.into_iter()
         .enumerate()
         .map(|(i, document)| DocumentEdge {
@@ -47,11 +47,7 @@ pub fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge>
         .collect()
 }
 
-pub fn get_documents_from_edges(
-    edges: Vec<DocumentEdge>,
-    total_count: i32,
-    offset: i32,
-) -> Documents {
+fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: i32) -> Documents {
     let result_count = edges.len() as i32;
     let has_previous_page = offset != 0;
     let has_next_page = offset + result_count < total_count;
@@ -69,6 +65,15 @@ pub fn get_documents_from_edges(
             end_cursor,
         },
     }
+}
+
+pub fn get_documents_graph_from_documents_vector(
+    docs: Vec<Document>,
+    offset: i32,
+    total_count: i32,
+) -> Documents {
+    let edges = get_document_edges(docs, offset);
+    get_documents_from_edges(edges, offset, total_count)
 }
 
 pub async fn get_documents(
@@ -104,10 +109,13 @@ pub async fn get_documents(
         .map(|search_result| Document::from(search_result.clone()))
         .collect();
 
-    let edges = get_document_edges(docs, offset);
     let total_count = azure_result.count.unwrap_or(0);
 
-    Ok(get_documents_from_edges(edges, total_count, offset))
+    Ok(get_documents_graph_from_documents_vector(
+        docs,
+        offset,
+        total_count,
+    ))
 }
 
 #[cfg(test)]
