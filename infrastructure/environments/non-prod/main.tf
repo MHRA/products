@@ -98,7 +98,6 @@ module cpd {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  cdn_location        = "westeurope"
   namespace           = "mhracpdnonprod"
   resource_group_name = azurerm_resource_group.products.name
 }

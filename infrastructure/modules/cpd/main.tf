@@ -24,7 +24,7 @@ resource "azurerm_storage_container" "cpd_website" {
 
 resource "azurerm_cdn_profile" "cpd" {
   name                = "mhracpd${var.environment}"
-  location            = var.cdn_location
+  location            = var.location
   resource_group_name = var.resource_group_name
   sku                 = "Standard_Microsoft"
 }

@@ -6,10 +6,6 @@ variable "location" {
   description = "Resource group location"
 }
 
-variable "cdn_location" {
-  description = "Region to create the CDN in"
-}
-
 variable "environment" {
   description = "Environment name to use as a tag"
 }
