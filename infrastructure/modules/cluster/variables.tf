@@ -56,8 +56,6 @@ variable "default_node_count" {
   default     = "2"
 }
 
-variable "support_email_one" {
-}
-
-variable "support_email_two" {
+variable "support_email_addresses" {
+  description = "A list of email addresses for first line support alerts to be sent to."
 }

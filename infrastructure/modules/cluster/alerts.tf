@@ -3,19 +3,16 @@ resource "azurerm_monitor_action_group" "support" {
   resource_group_name = var.resource_group_name
   short_name          = "support"
 
-  email_receiver {
-    name                    = "supportemailone"
-    email_address           = var.support_email_one
-    use_common_alert_schema = true
+  dynamic "email_receiver" {
+    for_each = var.support_email_addresses
+    content {
+      name                    = email_receiver.value
+      email_address           = email_receiver.value
+      use_common_alert_schema = true
+    }
   }
-
-  email_receiver {
-    name                    = "supportemailtwo"
-    email_address           = var.support_email_two
-    use_common_alert_schema = true
-  }
-
 }
+
 resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_alert" {
   name                = "Medicine API Errors (${var.environment})"
   location            = var.location
