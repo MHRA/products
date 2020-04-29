@@ -53,6 +53,7 @@ impl QueryRoot {
         search: Option<String>,
         first: Option<i32>,
         after: Option<String>,
+        document_types: Option<Vec<String>>,
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,
