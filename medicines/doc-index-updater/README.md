@@ -4,13 +4,13 @@
 
 ## To build a docker image:
 
-```bash
+```sh
 make docker-build
 ```
 
 ## To push image to Azure container registry (ACR):
 
-```bash
+```sh
 az acr login --name mhraproductsnonprodregistry
 
 docker push mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
@@ -22,13 +22,13 @@ Run locally by tunneling redis connection to Azure over TLS.
 
 - install `stunnel` with homebrew:
 
-```
+```sh
 brew install stunnel
 ```
 
 - start stunnel in a new terminal window:
 
-```bash
+```sh
 stunnel stunnel.conf
 ```
 
@@ -36,7 +36,7 @@ stunnel stunnel.conf
 
 - run the service
 
-```bash
+```sh
 make
 ```
 
@@ -74,13 +74,13 @@ Don't forget to run `make set-env` to share with the team.
 
 Run all tests:
 
-```bash
+```sh
 make test
 ```
 
 Run specific tests by passing `<arguments>` through to `cargo test`:
 
-```bash
+```sh
 make test TEST=<arguments>
 ```
 
