@@ -194,7 +194,7 @@ trait AzureSearchRequestBuilder {
 
 impl AzureSearchRequestBuilder for reqwest::RequestBuilder {
     fn filter(self, filter_set: AzureFilterSet) -> Self {
-        if filter_set.field_filters.len() == 0 {
+        if filter_set.field_filters.is_empty() {
             return self;
         }
         let filter_strings = filter_set.field_filters.into_iter().map(|filter| {
