@@ -1,9 +1,10 @@
-use crate::{document::Document, substance::Substance};
-use juniper::GraphQLObject;
+use crate::{
+    document::{self, get_documents_graph_from_documents_vector, Document},
+    substance::Substance,
+};
 use search_client::{models::IndexResult, Search};
 
-#[derive(GraphQLObject, Debug, Eq, Ord, PartialEq, PartialOrd)]
-#[graphql(description = "A medical product containing active ingredients")]
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
     name: String,
     document_count: i32,
@@ -22,6 +23,28 @@ impl Product {
     pub fn add(&mut self, document: Document) {
         self.documents.push(document);
         self.document_count += 1;
+    }
+}
+
+#[juniper::graphql_object]
+#[graphql(description = "A medical product containing active ingredients")]
+impl Product {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn documents(&self, first: Option<i32>, skip: Option<i32>) -> document::Documents {
+        let docs = self.documents.clone().into_iter();
+        let docs = match first {
+            Some(t) => docs.take(t as usize).collect(),
+            None => docs.collect(),
+        };
+
+        let offset = match skip {
+            Some(a) => a,
+            None => 0,
+        };
+
+        get_documents_graph_from_documents_vector(docs, offset, self.document_count)
     }
 }
 
