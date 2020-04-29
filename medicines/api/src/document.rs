@@ -37,6 +37,16 @@ impl From<IndexResult> for Document {
 
 pagination! {Documents, DocumentEdge, Document}
 
+pub fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge> {
+    docs.into_iter()
+        .enumerate()
+        .map(|(i, document)| DocumentEdge {
+            node: document,
+            cursor: base64::encode((i as i32 + offset).to_string()),
+        })
+        .collect()
+}
+
 pub async fn get_documents(
     client: &impl Search,
     search: String,
@@ -64,16 +74,13 @@ pub async fn get_documents(
         )
         .await?;
 
-    let edges = azure_result
+    let docs = azure_result
         .search_results
         .iter()
         .map(|search_result| Document::from(search_result.clone()))
-        .enumerate()
-        .map(|(i, document)| DocumentEdge {
-            node: document,
-            cursor: base64::encode((i as i32 + offset).to_string()),
-        })
         .collect();
+
+    let edges = get_document_edges(docs, offset);
 
     let result_count = azure_result.search_results.len() as i32;
     let total_count = azure_result.count.unwrap_or(0);
