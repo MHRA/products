@@ -41,10 +41,18 @@ fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
 }
 
 fn extract_username_and_password(decoded_creds: String) -> Option<(String, String)> {
+    lazy_static! {
+        static ref RE: Regex = Regex::new(r"\p{C}").expect("regex failed to compile");
+    }
     if let Ok(url) = Url::parse(&format!("http://{}@example.com", decoded_creds)) {
-        if let Some(pwd) = url.password() {
-            if let Ok(pwd) = percent_decode_str(pwd).decode_utf8() {
-                return Some((url.username().to_string(), pwd.into()));
+        if let (usr, Some(pwd)) = (url.username(), url.password()) {
+            if let (Ok(usr), Ok(pwd)) = (
+                percent_decode_str(usr).decode_utf8(),
+                percent_decode_str(pwd).decode_utf8(),
+            ) {
+                if let (None, None) = (RE.find(&usr), RE.find(&pwd)) {
+                    return Some((usr.into(), pwd.into()));
+                }
             }
         }
     }
@@ -151,10 +159,8 @@ mod test {
                 "user_%ame:@£$%^&*()".to_string(),
                 Some(("user_%ame".to_string(), "@£$%^&*()".to_string())),
             ),
-            (
-                "\x01:\x01".to_string(),
-                Some(("%01".to_string(), "\u{1}".to_string())),
-            ),
+            ("\x01:password".to_string(), None),
+            ("username:\x01".to_string(), None),
             (
                 "username:pass:word".to_string(),
                 Some(("username".to_string(), "pass:word".to_string())),
