@@ -47,6 +47,30 @@ pub fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge>
         .collect()
 }
 
+pub fn get_documents_from_edges(
+    edges: Vec<DocumentEdge>,
+    total_count: i32,
+    offset: i32,
+) -> Documents {
+    let result_count = edges.len() as i32;
+    let has_previous_page = offset != 0;
+    let has_next_page = offset + result_count < total_count;
+    let start_cursor = base64::encode(offset.to_string());
+    let end_cursor =
+        base64::encode(std::cmp::min(total_count, offset + result_count - 1).to_string());
+
+    Documents {
+        edges,
+        total_count,
+        page_info: PageInfo {
+            has_previous_page,
+            has_next_page,
+            start_cursor,
+            end_cursor,
+        },
+    }
+}
+
 pub async fn get_documents(
     client: &impl Search,
     search: String,
@@ -81,25 +105,9 @@ pub async fn get_documents(
         .collect();
 
     let edges = get_document_edges(docs, offset);
-
-    let result_count = azure_result.search_results.len() as i32;
     let total_count = azure_result.count.unwrap_or(0);
-    let has_previous_page = offset != 0;
-    let has_next_page = offset + result_count < total_count;
-    let start_cursor = base64::encode(offset.to_string());
-    let end_cursor =
-        base64::encode(std::cmp::min(total_count, offset + result_count - 1).to_string());
 
-    Ok(Documents {
-        edges,
-        total_count,
-        page_info: PageInfo {
-            has_previous_page,
-            has_next_page,
-            start_cursor,
-            end_cursor,
-        },
-    })
+    Ok(get_documents_from_edges(edges, total_count, offset))
 }
 
 #[cfg(test)]

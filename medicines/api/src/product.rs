@@ -1,4 +1,7 @@
-use crate::{document::Document, substance::Substance};
+use crate::{
+    document::{get_document_edges, Document},
+    substance::Substance,
+};
 use search_client::{models::IndexResult, Search};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -29,14 +32,21 @@ impl Product {
     fn name(&self) -> &str {
         &self.name
     }
-    fn documents(&self, first: i32) -> Vec<Document> {
-        let docs: Vec<Document> = self
-            .documents
-            .clone()
-            .into_iter()
-            .take(first as usize)
-            .collect();
-        docs
+    fn documents(&self, first: Option<i32>, skip: Option<i32>) -> crate::document::Documents {
+        let docs = self.documents.clone().into_iter();
+        let docs = match first {
+            Some(t) => docs.take(t as usize).collect(),
+            None => docs.collect(),
+        };
+
+        let offset = match skip {
+            Some(a) => a,
+            None => 0,
+        };
+
+        let edges = get_document_edges(docs, offset);
+
+        crate::document::get_documents_from_edges(edges, self.document_count, offset)
     }
 }
 
