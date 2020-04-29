@@ -1,5 +1,7 @@
 use futures::future;
+use percent_encoding::percent_decode_str;
 use regex::Regex;
+use url::Url;
 use warp::{Filter, Rejection};
 
 #[derive(Clone, Debug)]
@@ -23,46 +25,39 @@ fn extract_encoded_credentials(auth_header: String) -> Option<String> {
         .expect("Regex failed to compile");
 
     if let Some(caps) = re.captures(&auth_header) {
-        match caps.name("encoded_credentials") {
-            Some(creds) => Some(creds.as_str().to_string()),
-            _ => None,
+        if let Some(creds) = caps.name("encoded_credentials") {
+            return Some(creds.as_str().to_string());
         }
+    }
+    None
+}
+
+fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
+    if let Ok(credentials) = base64::decode(&encoded_credentials) {
+        extract_username_and_password(std::str::from_utf8(&credentials).unwrap_or("").to_string())
     } else {
         None
     }
 }
 
-fn decode_credentials(encoded_credentials: String) -> Option<(String, String)> {
-    if let Ok(credentials) = base64::decode(&encoded_credentials) {
-        let re =
-            Regex::new(r"^(?P<username>\w+):(?P<password>\w+)$").expect("Regex failed to compile");
-        match re.captures(std::str::from_utf8(&credentials).unwrap_or("")) {
-            Some(caps) => {
-                if let (Some(username), Some(password)) =
-                    (caps.name("username"), caps.name("password"))
-                {
-                    Some((username.as_str().to_string(), password.as_str().to_string()))
-                } else {
-                    None
-                }
+fn extract_username_and_password(decoded_creds: String) -> Option<(String, String)> {
+    if let Ok(url) = Url::parse(&format!("http://{}@example.com", decoded_creds)) {
+        if let Some(pwd) = url.password() {
+            if let Ok(pwd) = percent_decode_str(pwd).decode_utf8() {
+                return Some((url.username().to_string(), pwd.into()));
             }
-            None => None,
         }
-    } else {
-        None
     }
+    None
 }
 
 fn attempt_basic_auth(auth_header: String) -> bool {
     if let Some(encoded_creds) = extract_encoded_credentials(auth_header) {
         if let Some((username, password)) = decode_credentials(encoded_creds) {
-            auth_is_correct(username, password)
-        } else {
-            false
+            return auth_is_correct(username, password);
         }
-    } else {
-        false
     }
+    false
 }
 
 pub fn with_basic_auth() -> impl Filter<Extract = (), Error = Rejection> + Copy {
@@ -135,5 +130,40 @@ mod test {
         std::env::set_var("BASIC_AUTH_USERNAME", "username");
         std::env::set_var("BASIC_AUTH_PASSWORD", "password");
         assert_eq!(attempt_basic_auth(input), output);
+    }
+
+    #[test] // can't use `test_case` as the generated function names clash
+    fn test_extract_username_and_password() {
+        for v in vec![
+            (
+                "username:password".to_string(),
+                Some(("username".to_string(), "password".to_string())),
+            ),
+            (
+                "user-name:pass-word".to_string(),
+                Some(("user-name".to_string(), "pass-word".to_string())),
+            ),
+            (
+                "user_name:pass word".to_string(),
+                Some(("user_name".to_string(), "pass word".to_string())),
+            ),
+            (
+                "user_%ame:@£$%^&*()".to_string(),
+                Some(("user_%ame".to_string(), "@£$%^&*()".to_string())),
+            ),
+            (
+                "\x01:\x01".to_string(),
+                Some(("%01".to_string(), "\u{1}".to_string())),
+            ),
+            (
+                "username:pass:word".to_string(),
+                Some(("username".to_string(), "pass:word".to_string())),
+            ),
+            ("".to_string(), None),
+        ]
+        .iter()
+        {
+            assert_eq!(extract_username_and_password(v.0.clone()), v.1);
+        }
     }
 }

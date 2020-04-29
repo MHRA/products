@@ -425,6 +425,7 @@ dependencies = [
  "lazy_static",
  "md5",
  "net2",
+ "percent-encoding",
  "pretty_assertions",
  "redis",
  "regex",
@@ -444,6 +445,7 @@ dependencies = [
  "tracing-futures",
  "tracing-log",
  "tracing-subscriber",
+ "url",
  "uuid",
  "warp",
 ]
