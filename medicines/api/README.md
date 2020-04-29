@@ -34,7 +34,7 @@ To see the graphql explorer, go to http://127.0.0.1:8000/graphiql.
 ## Running in Docker container 🐳
 
 1. Navigate to this directory, `/medicines/api`
-2. Run `docker build . -t api`
+2. Run `DOCKER_BUILDKIT=1 docker build . -t api`
 3. Run `docker run -p 8080:8000 --env-file .env api`
 4. Open the browser and go to `http://localhost:8080/healthz`
 5. You should see an **Ok** and a server log in your terminal

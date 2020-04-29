@@ -19,7 +19,7 @@ update the status of the document as it progresses.
 ## Running
 
 ```
-$ docker build -t stub-document-manager-api
+$ DOCKER_BUILDKIT=1 docker build -t stub-document-manager-api
 $ docker run -p 8080:8080 -it --rm stub-document-manager-api
 ```
 
@@ -52,7 +52,7 @@ Then you need to build the Docker image and push it to your container registry:
 ```bash
 $ export STUB_IMAGE=container-registry.yourdomain.com/stub-api:1.0.1
 
-$ docker build -t $STUB_IMAGE .
+$ DOCKER_BUILDKIT=1 docker build -t $STUB_IMAGE .
 $ docker push $STUB_IMAGE
 ```
 
