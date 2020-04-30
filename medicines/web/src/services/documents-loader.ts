@@ -8,8 +8,10 @@ interface IDocuments {
 }
 
 interface IProductResponse {
-  name: string;
-  documents: IDocuments;
+  product: {
+    name: string;
+    documents: IDocuments;
+  };
 }
 
 const query = `
@@ -20,14 +22,13 @@ query ($productName: String!, $first: Int, $skip: Int) {
       count: totalCount
       edges {
         node {
-          productName
+          name: productName
           activeSubstances
-          title
           highlights
           created
           docType
           fileBytes: fileSizeInBytes
-          name
+          title
           url
         }
       }
@@ -42,8 +43,10 @@ interface IProduct {
 }
 
 const convertResponseToProduct = ({
-  name,
-  documents: { count, edges },
+  product: {
+    name,
+    documents: { count, edges },
+  },
 }: IProductResponse): IProduct => {
   return {
     name,
