@@ -13,7 +13,7 @@ interface IProductResponse {
 }
 
 const query = `
-query ($productName: String) {
+query ($productName: String!) {
   product(name: $productName) {
     name
     documents {
