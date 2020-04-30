@@ -35,7 +35,7 @@ For example, `/substance?substance=CAFFEINE&useGraphQl=true` will make use of th
 
 To make use of the GraphQL endpoints running in Azure today, you'll need to add an entry to your hosts file. Run the following command to get the IP address you'll need for this:
 
-```
+```sh
 kubectl get services --namespace istio-system istio-ingressgateway -o json | jq '.status.loadBalancer.ingress[0].ip'
 ```
 

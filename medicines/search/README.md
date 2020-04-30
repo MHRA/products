@@ -8,16 +8,16 @@ The Search tool is written in Rust, so in order to contribute to or run the Sear
 
 In order to compile the tool, navigate to the correct directory and run:
 
-```
-$  cargo build
+```sh
+cargo build
 ```
 
 ## Testing the Search tool
 
 In order to run the automated testing suite, navigate to the correct directory and run:
 
-```
-$  cargo test
+```sh
+cargo test
 ```
 
 ## Using the Search tool
@@ -54,16 +54,16 @@ Run `make set-env-dev` or `make set-env-non-prod` to update the environment vari
 
 First check the definition is correct in `definitions/datasources/docs.json`, then run the following command:
 
-```
-$  cargo run create_datasource
+```sh
+cargo run create_datasource
 ```
 
 #### Deleting a Datasource
 
 This will delete the datasource specified by the `DATASOURCE_NAME` environment variable:
 
-```
-$  cargo run delete_datasource
+```sh
+cargo run delete_datasource
 ```
 
 ### Indexes
@@ -72,16 +72,16 @@ $  cargo run delete_datasource
 
 First check the definition is correct in `definitions/indexes/azureblob-index.json`, then run the following command:
 
-```
-$  cargo run create_index
+```sh
+cargo run create_index
 ```
 
 #### Deleting an Index
 
 This will delete the index specified by the `INDEX_NAME` environment variable:
 
-```
-$  cargo run delete_index
+```sh
+cargo run delete_index
 ```
 
 ### Indexers
@@ -90,30 +90,30 @@ $  cargo run delete_index
 
 First check the definition is correct in `definitions/indexes/azureblob-indexer.json`, then run the following command:
 
-```
-$  cargo run create_indexer
+```sh
+cargo run create_indexer
 ```
 
 #### Deleting an Indexer
 
 This will delete the indexer specified by the `INDEXER_NAME` environment variable:
 
-```
-$  cargo run delete_indexer
+```sh
+cargo run delete_indexer
 ```
 
 #### Resetting an Indexer
 
 This will reset the indexer specified by the `INDEXER_NAME` environment variable:
 
-```
-$  cargo run reset_indexer
+```sh
+cargo run reset_indexer
 ```
 
 #### Running an Indexer
 
 This will run the indexer specified by the `INDEXER_NAME` environment variable:
 
-```
-$  cargo run run_indexer
+```sh
+cargo run run_indexer
 ```

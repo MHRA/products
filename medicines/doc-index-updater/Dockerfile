@@ -1,5 +1,5 @@
 # Setup rust build environment
-FROM rust:1.42.0 AS build-context
+FROM rust:1.43.0 AS build-context
 
 ENV SCCACHE_URL=https://github.com/mozilla/sccache/releases/download/0.2.13/sccache-0.2.13-x86_64-unknown-linux-musl.tar.gz
 

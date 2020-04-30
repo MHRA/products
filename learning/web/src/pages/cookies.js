@@ -102,7 +102,9 @@ class CookiePolicy extends React.Component {
           <p>We use Google Analytics, a third party service, to collect standard internet log information and details of visitor behaviour patterns. We do this to find out such things as the number of visitors to the various parts of the site, the search terms used and geographic region.</p>
 
           <p>This information is only processed in a way that does not identify anyone. We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website. Please visit Google’s <a href="https://support.google.com/analytics/answer/6004245">overview of privacy and safeguarding data</a> to know more about their policies.</p>
-          <form onSubmit={this.handleCookieFormSubmit}>
+          
+          <p>You can turn these cookies on or off below, and then save your preferences. This site stores your acceptance of Google Analytics cookies in your browser’s local storage as 'allowStorage'.</p>
+      <form onSubmit={this.handleCookieFormSubmit}>
             <p>
               <label htmlFor="cookie-on">
                 <input
