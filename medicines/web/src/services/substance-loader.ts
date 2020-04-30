@@ -40,7 +40,7 @@ interface IResponse {
 
 interface IProductResponse {
   name: string;
-  count: number;
+  documents: { count: number };
 }
 
 const query = `
@@ -49,7 +49,9 @@ query ($letter: String!) {
     name
     products {
       name
-      count: documentCount
+      documents {
+        count: totalCount
+      }
     }
   }
 }`;
@@ -71,7 +73,7 @@ export const graphqlSubstanceLoader = new DataLoader<string, ISubstance[]>(
           return {
             name,
             count: documentsCount(products),
-            products: products.map(({ name, count }) => {
+            products: products.map(({ name, documents: { count } }) => {
               return { name, count };
             }),
           };
@@ -82,6 +84,9 @@ export const graphqlSubstanceLoader = new DataLoader<string, ISubstance[]>(
 );
 
 const documentsCount = (products: IProductResponse[]) =>
-  products.reduce((total: number, { count }) => total + count, 0);
+  products.reduce(
+    (total: number, { documents: { count } }) => total + count,
+    0,
+  );
 
 export default substanceLoader;
