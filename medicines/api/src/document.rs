@@ -1,6 +1,6 @@
 use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
-use search_client::{models::IndexResult, AzureFieldFilter, AzureFilterSet, Search};
+use search_client::{models::IndexResult, Search};
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -82,6 +82,7 @@ pub async fn get_documents(
     first: Option<i32>,
     after: Option<String>,
     document_types: Option<Vec<String>>,
+    product_name: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
     let offset = match after {
@@ -92,7 +93,6 @@ pub async fn get_documents(
         }
         None => 0,
     };
-    let filter_set = build_document_types_filter_set(document_types);
 
     let azure_result = client
         .search_with_pagination_and_filter(
@@ -102,7 +102,7 @@ pub async fn get_documents(
                 offset,
             },
             true,
-            filter_set,
+            build_filter(document_types, product_name),
         )
         .await?;
 
@@ -121,35 +121,47 @@ pub async fn get_documents(
     ))
 }
 
-fn build_document_types_filter_set(document_types: Option<Vec<String>>) -> AzureFilterSet {
-    match document_types {
-        Some(document_types) => AzureFilterSet {
-            boolean_operator: "or".to_string(),
-            field_filters: document_types
-                .into_iter()
-                .map(|document_type| AzureFieldFilter {
-                    field_name: "doc_type".to_string(),
-                    operator: "eq".to_string(),
-                    field_value: format!(
-                        "{}{}",
-                        document_type[..1].to_uppercase(),
-                        document_type[1..].to_lowercase()
-                    ),
-                })
-                .collect(),
-        },
-        None => AzureFilterSet {
-            boolean_operator: "or".to_string(),
-            field_filters: vec![],
-        },
+fn build_filter(
+    document_types: Option<Vec<String>>,
+    product_name: Option<String>,
+) -> Option<String> {
+    match (document_types, product_name) {
+        (Some(document_types), Some(product_name)) => Some(format!(
+            "({} and {})",
+            build_product_name_filter(product_name),
+            build_document_types_filter(document_types)
+        )),
+        (Some(document_types), None) => Some(build_document_types_filter(document_types)),
+        (None, Some(product_name)) => Some(build_product_name_filter(product_name)),
+        (None, None) => None,
     }
+}
+
+fn build_document_types_filter(document_types: Vec<String>) -> String {
+    format!(
+        "({})",
+        document_types
+            .into_iter()
+            .map(|document_type| format!(
+                "doc_type eq '{}{}'",
+                document_type[..1].to_uppercase(),
+                document_type[1..].to_lowercase()
+            ))
+            .collect::<Vec<_>>()
+            .join(" or ")
+    )
+}
+
+fn build_product_name_filter(product_name: String) -> String {
+    format!("(product_name eq '{}')", product_name)
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use search_client::{models::IndexResults, AzureFilterSet};
+    use search_client::models::IndexResults;
+    use test_case::test_case;
     use tokio_test::block_on;
 
     struct TestAzureSearchClient {
@@ -180,7 +192,7 @@ mod test {
             _search_term: &str,
             _pagination: search_client::AzurePagination,
             _include_count: bool,
-            _filter: search_client::AzureFilterSet,
+            _filter: Option<String>,
         ) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
@@ -260,6 +272,7 @@ mod test {
             None,
             None,
             None,
+            None,
         ))
         .unwrap()
     }
@@ -270,6 +283,7 @@ mod test {
             "Search string".to_string(),
             None,
             Some(base64::encode("1229").to_string()),
+            None,
             None,
         ))
         .unwrap()
@@ -332,45 +346,27 @@ mod test {
         then_we_have_the_last_page(&response);
     }
 
-    #[test]
-    fn test_build_document_types_filter_set() {
-        let document_types = Some(vec![
-            "SPC".to_string(),
-            "pil".to_string(),
-            "PaR".to_string(),
-        ]);
-        let expected_filter_set = AzureFilterSet {
-            boolean_operator: "or".to_string(),
-            field_filters: vec![
-                AzureFieldFilter {
-                    field_name: "doc_type".to_string(),
-                    operator: "eq".to_string(),
-                    field_value: "Spc".to_string(),
-                },
-                AzureFieldFilter {
-                    field_name: "doc_type".to_string(),
-                    operator: "eq".to_string(),
-                    field_value: "Pil".to_string(),
-                },
-                AzureFieldFilter {
-                    field_name: "doc_type".to_string(),
-                    operator: "eq".to_string(),
-                    field_value: "Par".to_string(),
-                },
-            ],
-        };
-        let actual_filter_set = build_document_types_filter_set(document_types);
-        assert_eq!(expected_filter_set, actual_filter_set);
-    }
-
-    #[test]
-    fn test_build_empty_document_types_filter_set() {
-        let document_types = None;
-        let expected_filter_set = AzureFilterSet {
-            boolean_operator: "or".to_string(),
-            field_filters: vec![],
-        };
-        let actual_filter_set = build_document_types_filter_set(document_types);
-        assert_eq!(expected_filter_set, actual_filter_set);
+    #[test_case(None, None, None)]
+    #[test_case(
+        Some(vec!["SPC".to_string(), "pil".to_string(), "PaR".to_string()]),
+        Some("IBUPROFEN 100MG CAPLETS".to_string()),
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par'))".to_string())
+    )]
+    #[test_case(
+        Some(vec!["SPC".to_string(), "pil".to_string(), "PaR".to_string()]),
+        None,
+        Some("(doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par')".to_string())
+    )]
+    #[test_case(
+        None,
+        Some("IBUPROFEN 100MG CAPLETS".to_string()),
+        Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')".to_string())
+    )]
+    fn test_build_filter(
+        document_types: Option<Vec<String>>,
+        product_name: Option<String>,
+        expected_filter: Option<String>,
+    ) {
+        assert_eq!(expected_filter, build_filter(document_types, product_name));
     }
 }

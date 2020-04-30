@@ -83,7 +83,7 @@ fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> 
         .map(|(&substance, prods)| {
             let products = prods
                 .iter()
-                .map(|(&name, docs)| Product::new(name.into(), docs.clone()))
+                .map(|(&name, _docs)| Product::new(name.into()))
                 .collect();
 
             Substance::new(substance.into(), products)
@@ -177,20 +177,13 @@ mod tests {
                 "ZOLMITRIPTAN".into(),
                 vec![Product::new(
                     "ZOMIG RAPIMELT 2.5 MG ORODISPERSIBLE TABLETS".into(),
-                    vec![zolmitriptan.into()],
                 )],
             ),
             Substance::new(
                 "ZONISAMIDE".into(),
                 vec![
-                    Product::new(
-                        "ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into(),
-                        vec![zonismade_25mg.into()],
-                    ),
-                    Product::new(
-                        "ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into(),
-                        vec![zonismade_50mg.into(), zonismade_50mg_repeat.into()],
-                    ),
+                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into()),
+                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into()),
                 ],
             ),
         ];
@@ -230,7 +223,6 @@ mod tests {
             "ZIDOVUDINE".into(),
             vec![Product::new(
                 "LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS".into(),
-                vec![index_result.into()],
             )],
         )];
 

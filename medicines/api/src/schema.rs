@@ -29,8 +29,8 @@ impl QueryRoot {
         }
     }
 
-    async fn product(context: &AzureContext, name: String) -> FieldResult<Product> {
-        get_product(name, &context.client).await.map_err(|e| {
+    async fn product(_context: &AzureContext, name: String) -> FieldResult<Product> {
+        get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
             juniper::FieldError::new("Error fetching search results", juniper::Value::null())
         })
@@ -61,6 +61,7 @@ impl QueryRoot {
             first,
             after,
             document_types,
+            None,
         )
         .await
         .map_err(|e| {

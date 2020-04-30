@@ -1,28 +1,18 @@
 use crate::{
-    document::{self, get_documents_graph_from_documents_vector, Document},
+    document::{self, get_documents},
     substance::Substance,
 };
+use juniper::FieldResult;
 use search_client::{models::IndexResult, Search};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
     name: String,
-    document_count: i32,
-    documents: Vec<Document>,
 }
 
 impl Product {
-    pub fn new(name: String, documents: Vec<Document>) -> Self {
-        Self {
-            name,
-            document_count: documents.len() as i32,
-            documents,
-        }
-    }
-
-    pub fn add(&mut self, document: Document) {
-        self.documents.push(document);
-        self.document_count += 1;
+    pub fn new(name: String) -> Self {
+        Self { name }
     }
 }
 
@@ -32,19 +22,29 @@ impl Product {
     fn name(&self) -> &str {
         &self.name
     }
-    fn documents(&self, first: Option<i32>, skip: Option<i32>) -> document::Documents {
-        let docs = self.documents.clone().into_iter();
-        let docs = match first {
-            Some(t) => docs.take(t as usize).collect(),
-            None => docs.collect(),
-        };
 
-        let offset = match skip {
-            Some(a) => a,
-            None => 0,
-        };
-
-        get_documents_graph_from_documents_vector(docs, offset, self.document_count)
+    async fn documents(
+        &self,
+        first: Option<i32>,
+        after: Option<String>,
+        document_types: Option<Vec<String>>,
+    ) -> FieldResult<document::Documents> {
+        get_documents(
+            &search_client::AzureSearchClient::new(),
+            "".to_string(),
+            first,
+            after,
+            document_types,
+            Some(self.name.clone()),
+        )
+        .await
+        .map_err(|e| {
+            tracing::error!(
+                "Error fetching documents from Azure search service: {:?}",
+                e
+            );
+            juniper::FieldError::new("Error fetching documents", juniper::Value::null())
+        })
     }
 }
 
@@ -56,12 +56,8 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
                 .iter_mut()
                 .find(|product| document_product_name == &product.name);
 
-            match existing_product {
-                Some(existing_product) => existing_product.add(document.to_owned().into()),
-                None => products.push(Product::new(
-                    document_product_name.to_owned(),
-                    vec![document.to_owned().into()],
-                )),
+            if existing_product.is_none() {
+                products.push(Product::new(document_product_name.to_owned()));
             }
         }
         None => {}
@@ -86,22 +82,8 @@ pub async fn get_substance_with_products(
     Ok(Substance::new(substance_name.to_string(), products))
 }
 
-pub async fn get_product(
-    product_name: String,
-    client: &impl Search,
-) -> Result<Product, reqwest::Error> {
-    let azure_result = client
-        .filter_by_non_collection_field("product_name", &product_name)
-        .await?;
-
-    Ok(Product::new(
-        product_name,
-        azure_result
-            .search_results
-            .into_iter()
-            .map(Into::<Document>::into)
-            .collect(),
-    ))
+pub async fn get_product(product_name: String) -> Result<Product, reqwest::Error> {
+    Ok(Product::new(product_name))
 }
 
 #[cfg(test)]
@@ -136,26 +118,16 @@ mod test {
         handle_doc(&doc, &mut products);
         assert_eq!(products.len(), 1);
         assert_eq!(products[0].name, "My Cool Product".to_string());
-        assert_eq!(products[0].document_count, 1);
-    }
-
-    fn gimme_x_docs(x: i32) -> Vec<Document> {
-        let mut docs: Vec<Document> = vec![];
-        for _ in 0..x {
-            docs.push(azure_result_factory(Some("Craig's Cool Product".to_string())).into())
-        }
-        docs
     }
 
     #[test]
     fn test_handle_doc_with_existing_product() {
         let doc = azure_result_factory(Some("My Cool Product".to_string()));
         let mut products = Vec::<Product>::new();
-        products.push(Product::new("My Cool Product".to_string(), gimme_x_docs(5)));
+        products.push(Product::new("My Cool Product".to_string()));
         handle_doc(&doc, &mut products);
         assert_eq!(products.len(), 1);
         assert_eq!(products[0].name, "My Cool Product".to_string());
-        assert_eq!(products[0].document_count, 6);
     }
 
     #[test]
@@ -169,9 +141,9 @@ mod test {
     #[test]
     fn test_sort_products() {
         let mut products = Vec::<Product>::new();
-        products.push(Product::new("B".to_owned(), gimme_x_docs(1)));
-        products.push(Product::new("C".to_owned(), gimme_x_docs(1)));
-        products.push(Product::new("A".to_owned(), gimme_x_docs(1)));
+        products.push(Product::new("B".to_owned()));
+        products.push(Product::new("C".to_owned()));
+        products.push(Product::new("A".to_owned()));
         products.sort();
         assert_eq!(products[0].name, "A");
         assert_eq!(products[1].name, "B");

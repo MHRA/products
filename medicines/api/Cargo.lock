@@ -43,6 +43,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "test-case",
  "tokio",
  "tokio-test",
  "tracing",
@@ -1574,6 +1575,18 @@ dependencies = [
  "redox_syscall",
  "remove_dir_all",
  "winapi 0.3.8",
+]
+
+[[package]]
+name = "test-case"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "199464148b42bcf3da8b2a56f6ee87ca68f47402496d1268849291ec9fb463c8"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "version_check 0.9.1",
 ]
 
 [[package]]

@@ -24,19 +24,6 @@ pub struct AzurePagination {
     pub offset: i32,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct AzureFilterSet {
-    pub boolean_operator: String,
-    pub field_filters: Vec<AzureFieldFilter>,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct AzureFieldFilter {
-    pub field_name: String,
-    pub operator: String,
-    pub field_value: String,
-}
-
 impl Default for AzureSearchClient {
     fn default() -> Self {
         Self::new()
@@ -90,7 +77,7 @@ pub trait Search {
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-        filter: AzureFilterSet,
+        filter: Option<String>,
     ) -> Result<IndexResults, reqwest::Error>;
 
     async fn filter_by_collection_field(
@@ -134,13 +121,13 @@ impl Search for AzureSearchClient {
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-        filter: AzureFilterSet,
+        filter: Option<String>,
     ) -> Result<IndexResults, reqwest::Error> {
         search(
             search_term,
             Some(pagination),
             Some(include_count),
-            Some(filter),
+            filter,
             &self.client,
             &self.config,
         )
@@ -190,36 +177,12 @@ impl Search for AzureSearchClient {
     }
 }
 
-trait AzureSearchRequestBuilder {
-    fn filter(self, filter_set: AzureFilterSet) -> Self;
-}
-
-impl AzureSearchRequestBuilder for reqwest::RequestBuilder {
-    fn filter(self, filter_set: AzureFilterSet) -> Self {
-        if filter_set.field_filters.is_empty() {
-            return self;
-        }
-        let filter_strings = filter_set.field_filters.into_iter().map(|filter| {
-            format!(
-                "{} {} '{}'",
-                filter.field_name, filter.operator, filter.field_value
-            )
-        });
-        let filter_string = format!(
-            "({})",
-            filter_strings
-                .collect::<Vec<_>>()
-                .join(format!(" {} ", filter_set.boolean_operator).as_str())
-        );
-        self.query(&[("$filter", filter_string)])
-    }
-}
 
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
-    filter_set: Option<AzureFilterSet>,
+    filter: Option<String>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<reqwest::Request, reqwest::Error> {
@@ -243,8 +206,8 @@ fn build_search(
         ])
         .header("api-key", &config.api_key);
 
-    if let Some(filter_set) = filter_set {
-        request_builder = request_builder.filter(filter_set);
+    if let Some(filter) = filter {
+        request_builder = request_builder.query(&[("$filter", filter)]);
     }
 
     match pagination {
@@ -358,7 +321,7 @@ async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
-    filter_set: Option<AzureFilterSet>,
+    filter: Option<String>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
@@ -366,7 +329,7 @@ async fn search(
         search_term,
         pagination,
         include_count,
-        filter_set,
+        filter,
         &client,
         &config,
     )?;
@@ -503,21 +466,7 @@ mod test {
                 offset: 50,
             }),
             Some(true),
-            Some(AzureFilterSet {
-                boolean_operator: "xor".to_string(),
-                field_filters: vec![
-                    AzureFieldFilter {
-                        field_name: "my_cool_field".to_string(),
-                        operator: "eq".to_string(),
-                        field_value: "my cool value".to_string(),
-                    },
-                    AzureFieldFilter {
-                        field_name: "my_cool_field".to_string(),
-                        operator: "ne".to_string(),
-                        field_value: "my uncool value".to_string(),
-                    },
-                ],
-            }),
+            Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')".to_string()),
             &client,
             &config,
         )
