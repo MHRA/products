@@ -7,8 +7,12 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
-import { IDocument } from '../../model/substance';
-import { docSearch, DocType } from '../../services/azure-search';
+import { IDocument, IProduct } from '../../model/substance';
+import {
+  docSearch,
+  DocType,
+  ISearchResults,
+} from '../../services/azure-search';
 import { documents } from '../../services/documents-loader';
 import Events from '../../services/events';
 import {
@@ -22,11 +26,17 @@ import { convertResults } from '../../services/results-converter';
 const pageSize = 10;
 const productPath = '/product';
 
+interface IProductResult {
+  name: string;
+  count: number;
+  documents: IDocument[];
+}
+
 const azureDocumentsLoader = async (
   product: string,
   page: number,
   docTypes: DocType[],
-) => {
+): Promise<IProductResult> => {
   const results = await docSearch({
     query: '',
     page,
@@ -37,10 +47,16 @@ const azureDocumentsLoader = async (
       productName: product,
     },
   });
-  return results.results.map(convertResults);
+  return {
+    count: results.resultCount,
+    name: product,
+    documents: results.results.map(convertResults),
+  };
 };
 
-const graphQlDocumentsLoader = async (product: string) => {
+const graphQlProductLoader = async (
+  product: string,
+): Promise<IProductResult> => {
   return documents.load(product);
 };
 
@@ -68,13 +84,13 @@ const App: NextPage = () => {
     },
   } = router;
 
-  const getResults = async (
+  const getProduct = async (
     product: string,
     page: number,
     docTypes: DocType[],
-  ) => {
+  ): Promise<IProductResult> => {
     if (graphQlFeatureFlag) {
-      return graphQlDocumentsLoader(product);
+      return graphQlProductLoader(product);
     } else {
       return azureDocumentsLoader(product, page, docTypes);
     }
@@ -92,9 +108,9 @@ const App: NextPage = () => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      const documents = await getResults(product, page, docTypes);
+      const { documents, count } = await getProduct(product, page, docTypes);
       setDocuments(documents);
-      setCount(documents.length);
+      setCount(count);
       setIsLoading(false);
       Events.viewResultsForProduct({
         productName: product,

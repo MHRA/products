@@ -1,35 +1,68 @@
 import DataLoader from 'dataloader';
 import { IDocument } from '../model/substance';
+import { graphqlRequest } from './graphql';
 
-const graphQlUrl = process.env.GRAPHQL_URL as string;
+interface IDocuments {
+  count: number;
+  edges: Array<{ node: IDocument }>;
+}
 
-const fetchFromGraphQl = (query: string): Promise<Response> => {
-  return fetch(graphQlUrl, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables: null }),
-  });
+interface IProductResponse {
+  name: string;
+  documents: IDocuments;
+}
+
+const query = `
+query ($productName: String) {
+  product(name: $productName) {
+    name
+    documents {
+      count: totalCount
+      edges {
+        node {
+          productName
+          activeSubstances
+          title
+          highlights
+          created
+          docType
+          fileBytes
+          name
+          url
+        }
+      }
+    }
+  }
+}`;
+
+interface IProduct {
+  name: string;
+  count: number;
+  documents: IDocument[];
+}
+
+const convertResponseToProduct = ({
+  name,
+  documents: { count, edges },
+}: IProductResponse): IProduct => {
+  return {
+    name,
+    count,
+    documents: edges.map(x => x.node),
+  };
 };
 
 const getDocumentsForProduct = async (productName: any) => {
-  const query = `{ product(name: "${productName}") { documents {       productName
-    activeSubstances
-    title
-    highlights
-    created
-    docType
-    fileBytes
-    name
-    url } } }`;
-  const response = await fetchFromGraphQl(query);
+  const variables = { productName };
+  const { data } = await graphqlRequest<IProductResponse, typeof variables>({
+    query,
+    variables,
+  });
 
-  return (await response.json()).data.product.documents;
+  return convertResponseToProduct(data);
 };
 
-export const documents = new DataLoader<string, IDocument[]>(
+export const documents = new DataLoader<string, IProduct>(
   async productNames => {
     return Promise.all(productNames.map(getDocumentsForProduct));
   },
