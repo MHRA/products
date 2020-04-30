@@ -37,9 +37,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_ale
   | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
   | extend correlation_id = tostring(LogEntry.span.correlation_id)
-  | extend message = tostring(LogEntry.span.message)
+  | extend message = tostring(LogEntry.fields.message)
   | extend level = tostring(LogEntry.level)
   | where level == "ERROR"
+  | order by TimeGenerated desc
 
   QUERY
   severity       = 1
@@ -75,9 +76,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
   | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
   | extend correlation_id = tostring(LogEntry.span.correlation_id)
-  | extend message = tostring(LogEntry.span.message)
+  | extend message = tostring(LogEntry.fields.message)
   | extend level = tostring(LogEntry.level)
   | where level == "ERROR"
+  | order by TimeGenerated desc
   QUERY
   severity       = 1
   frequency      = 5
