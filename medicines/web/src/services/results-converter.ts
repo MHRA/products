@@ -1,5 +1,6 @@
 import moment from 'moment';
 
+import { IDocument } from '../model/substance';
 import { ISearchResult } from '../services/azure-search';
 
 const sanitizeTitle = (title: string | null): string => {
@@ -13,17 +14,6 @@ const sanitizeTitle = (title: string | null): string => {
   }
   return name;
 };
-
-export interface IDocument {
-  activeSubstances: string[];
-  context: string;
-  created: string;
-  docType: string;
-  fileSize: string;
-  name: string;
-  product: string;
-  url: string;
-}
 
 export const convertResults = (doc: ISearchResult): IDocument => {
   return {
