@@ -17,7 +17,7 @@ interface IProductResponse {
 interface IDocumentResponse {
   product: string;
   activeSubstances: string[];
-  highlights: string;
+  highlights: string[];
   created: string;
   docType: string;
   fileBytes: number;
@@ -73,7 +73,7 @@ const convertDocumentResponseToDocument = ({
 }): IDocument => {
   return {
     activeSubstances: doc.activeSubstances,
-    context: doc.highlights,
+    context: doc.highlights?.join(' … ') || '',
     created: doc.created,
     docType: doc.docType,
     fileSize: Math.ceil(doc.fileBytes / 1000).toLocaleString('en-GB'),
