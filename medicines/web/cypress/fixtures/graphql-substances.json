@@ -5,11 +5,15 @@
       "products": [
         {
           "name": "PARACETAMOL TABLETS FROM GRAPHQL",
-          "documentCount": 1438
+          "documents": {
+            "count": 1438
+          }
         },
         {
           "name": "PARACETAMOL CAPSULES FROM GRAPHQL",
-          "documentCount": 1438
+          "documents": {
+            "count": 1438
+          }
         }
       ]
     }
