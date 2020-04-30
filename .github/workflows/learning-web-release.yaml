@@ -34,7 +34,7 @@ jobs:
         working-directory: learning/web
         run: yarn build
         env:
-          PATH_PREFIX: ""
+          PATH_PREFIX: "/"
 
       - name: Run cypress end-to-end tests
         working-directory: learning/web
