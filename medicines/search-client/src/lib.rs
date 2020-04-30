@@ -24,6 +24,17 @@ pub struct AzurePagination {
     pub offset: i32,
 }
 
+pub struct AzureFilterSet {
+    pub boolean_operator: String,
+    pub field_filters: Vec<AzureFieldFilter>,
+}
+
+pub struct AzureFieldFilter {
+    pub field_name: String,
+    pub operator: String,
+    pub field_value: String,
+}
+
 impl Default for AzureSearchClient {
     fn default() -> Self {
         Self::new()
@@ -72,6 +83,14 @@ pub trait Search {
         include_count: bool,
     ) -> Result<IndexResults, reqwest::Error>;
 
+    async fn search_with_pagination_and_filter(
+        &self,
+        search_term: &str,
+        pagination: AzurePagination,
+        include_count: bool,
+        filter: AzureFilterSet,
+    ) -> Result<IndexResults, reqwest::Error>;
+
     async fn filter_by_collection_field(
         &self,
         field_name: &str,
@@ -88,7 +107,7 @@ pub trait Search {
 #[async_trait]
 impl Search for AzureSearchClient {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, None, None, &self.client, &self.config).await
+        search(search_term, None, None, None, &self.client, &self.config).await
     }
 
     async fn search_with_pagination(
@@ -101,6 +120,25 @@ impl Search for AzureSearchClient {
             search_term,
             Some(pagination),
             Some(include_count),
+            None,
+            &self.client,
+            &self.config,
+        )
+        .await
+    }
+
+    async fn search_with_pagination_and_filter(
+        &self,
+        search_term: &str,
+        pagination: AzurePagination,
+        include_count: bool,
+        filter: AzureFilterSet,
+    ) -> Result<IndexResults, reqwest::Error> {
+        search(
+            search_term,
+            Some(pagination),
+            Some(include_count),
+            Some(filter),
             &self.client,
             &self.config,
         )
@@ -147,6 +185,74 @@ impl Search for AzureSearchClient {
             .error_for_status()?
             .json::<IndexResults>()
             .await
+    }
+}
+
+trait AzureSearchRequestBuilder {
+    fn filter(self, filter_set: AzureFilterSet) -> Self;
+}
+
+impl AzureSearchRequestBuilder for reqwest::RequestBuilder {
+    fn filter(self, filter_set: AzureFilterSet) -> Self {
+        if filter_set.field_filters.is_empty() {
+            return self;
+        }
+        let filter_strings = filter_set.field_filters.into_iter().map(|filter| {
+            format!(
+                "{} {} '{}'",
+                filter.field_name, filter.operator, filter.field_value
+            )
+        });
+        let filter_string = format!(
+            "({})",
+            filter_strings
+                .collect::<Vec<_>>()
+                .join(format!(" {} ", filter_set.boolean_operator).as_str())
+        );
+        self.query(&[("$filter", filter_string)])
+    }
+}
+
+fn build_search(
+    search_term: &str,
+    pagination: Option<AzurePagination>,
+    include_count: Option<bool>,
+    filter_set: Option<AzureFilterSet>,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<reqwest::Request, reqwest::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    let include_count = include_count.unwrap_or(false).to_string();
+
+    let mut request_builder = client
+        .get(&base_url)
+        .query(&[
+            ("api-version", config.api_version.as_str()),
+            ("highlight", "content"),
+            ("queryType", "full"),
+            ("search", search_term),
+            ("scoringProfile", "preferKeywords"),
+            ("$count", &include_count),
+        ])
+        .header("api-key", &config.api_key);
+
+    if let Some(filter_set) = filter_set {
+        request_builder = request_builder.filter(filter_set);
+    }
+
+    match pagination {
+        Some(pagination) => Ok(request_builder
+            .query(&[
+                ("$top", pagination.result_count.to_string()),
+                ("$skip", pagination.offset.to_string()),
+            ])
+            .build()?),
+        None => Ok(request_builder.build()?),
     }
 }
 
@@ -250,6 +356,7 @@ async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
+    filter_set: Option<AzureFilterSet>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
@@ -257,9 +364,11 @@ async fn search(
         search_term,
         pagination,
         include_count,
+        filter_set,
         &client,
         &config,
     )?;
+
     tracing::debug!("Requesting from URL: {}", &req.url());
     client
         .execute(req)
@@ -267,44 +376,6 @@ async fn search(
         .error_for_status()?
         .json::<IndexResults>()
         .await
-}
-
-fn build_search(
-    search_term: &str,
-    pagination: Option<AzurePagination>,
-    include_count: Option<bool>,
-    client: &reqwest::Client,
-    config: &AzureConfig,
-) -> Result<reqwest::Request, reqwest::Error> {
-    let base_url = format!(
-        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
-        search_service = config.search_service,
-        search_index = config.search_index
-    );
-
-    let include_count = include_count.unwrap_or(false).to_string();
-
-    let request_builder = client
-        .get(&base_url)
-        .query(&[
-            ("api-version", config.api_version.as_str()),
-            ("highlight", "content"),
-            ("queryType", "full"),
-            ("search", search_term),
-            ("scoringProfile", "preferKeywords"),
-            ("$count", &include_count),
-        ])
-        .header("api-key", &config.api_key);
-
-    match pagination {
-        Some(pagination) => Ok(request_builder
-            .query(&[
-                ("$top", pagination.result_count.to_string()),
-                ("$skip", pagination.offset.to_string()),
-            ])
-            .build()?),
-        None => Ok(request_builder.build()?)
-    }
 }
 
 async fn update_index<T>(
@@ -374,7 +445,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(&search_term, None, None, &client, &config)
+        build_search(&search_term, None, None, None, &client, &config)
     }
 
     fn then_search_url_without_pagination_is_as_expected(
@@ -407,8 +478,44 @@ mod test {
     ) -> Result<reqwest::Request, reqwest::Error> {
         build_search(
             &search_term,
-            Some(AzurePagination{result_count: 10, offset: 50}),
+            Some(AzurePagination {
+                result_count: 10,
+                offset: 50,
+            }),
             Some(true),
+            None,
+            &client,
+            &config,
+        )
+    }
+
+    fn when_we_build_a_search_request_with_pagination_and_filter(
+        client: reqwest::Client,
+        search_term: String,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_search(
+            &search_term,
+            Some(AzurePagination {
+                result_count: 10,
+                offset: 50,
+            }),
+            Some(true),
+            Some(AzureFilterSet {
+                boolean_operator: "xor".to_string(),
+                field_filters: vec![
+                    AzureFieldFilter {
+                        field_name: "my_cool_field".to_string(),
+                        operator: "eq".to_string(),
+                        field_value: "my cool value".to_string(),
+                    },
+                    AzureFieldFilter {
+                        field_name: "my_cool_field".to_string(),
+                        operator: "ne".to_string(),
+                        field_value: "my uncool value".to_string(),
+                    },
+                ],
+            }),
             &client,
             &config,
         )
@@ -428,6 +535,20 @@ mod test {
         }
     }
 
+    fn then_search_url_with_pagination_and_filter_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=true&%24filter=%28my_cool_field+eq+%27my+cool+value%27+xor+my_cool_field+ne+%27my+uncool+value%27%29&%24top=10&%24skip=50"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            assert!(false, "Provided search request is an error");
+        }
+    }
+
     #[test]
     fn test_build_search_with_pagination() {
         let client = given_we_have_a_search_client();
@@ -435,6 +556,16 @@ mod test {
         let config = given_we_have_a_config();
         let actual = when_we_build_a_search_request_with_pagination(client, search_term, config);
         then_search_url_with_pagination_is_as_expected(actual);
+    }
+
+    #[test]
+    fn test_build_search_with_pagination_and_filter() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_a_search_term();
+        let config = given_we_have_a_config();
+        let actual =
+            when_we_build_a_search_request_with_pagination_and_filter(client, search_term, config);
+        then_search_url_with_pagination_and_filter_is_as_expected(actual);
     }
 
     #[test]
