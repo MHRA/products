@@ -32,11 +32,11 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: learning/web
-        run: yarn test:ci
+        run: yarn run test:ci
 
       - name: Build
         working-directory: learning/web
-        run: yarn build
+        run: yarn run build
         env:
           PATH_PREFIX: ""
 
@@ -60,6 +60,13 @@ jobs:
 
       - name: Accessibility check
         working-directory: learning/web
-        run: yarn a11y
+        run: yarn run a11y
         env:
           ROOT_URL_DOMAIN: localhost
+
+      - name: Deploy learning web to static site in azure storage
+        uses: lauchacarro/Azure-Storage-Action@master
+        with:
+          enabled-static-website: true
+          folder: learning/web/public
+          connection-string: ${{ secrets.AZURE_STORAGE_LEARNING_WEB_CONNECTION_STRING }}
