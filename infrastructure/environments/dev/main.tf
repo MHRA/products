@@ -97,6 +97,7 @@ module cluster {
   cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS
   cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
   lb_route_table_id                     = azurerm_route_table.load_balancer.id
+  support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
 }
 
 # Service Bus
