@@ -28,7 +28,7 @@ jobs:
 
       - name: Install modules
         working-directory: learning/web
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Run tests with coverage
         working-directory: learning/web
@@ -38,31 +38,31 @@ jobs:
         working-directory: learning/web
         run: yarn run build
         env:
-          PATH_PREFIX: ""
+          PATH_PREFIX: "/"
 
-      - name: Run cypress end-to-end tests
-        working-directory: learning/web
-        run: mkdir -p cypress/screenshots && yarn test-e2e
+      # - name: Run cypress end-to-end tests
+      #   working-directory: learning/web
+      #   run: mkdir -p cypress/screenshots && yarn test-e2e
 
-      - name: Upload cypress screenshots
-        uses: actions/upload-artifact@v1
-        if: failure()
-        with:
-          name: learning-cypress-screenshots
-          path: learning/web/cypress/screenshots
+      # - name: Upload cypress screenshots
+      #   uses: actions/upload-artifact@v1
+      #   if: failure()
+      #   with:
+      #     name: learning-cypress-screenshots
+      #     path: learning/web/cypress/screenshots
 
-      - name: Upload cypress videos
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: learning-cypress-videos
-          path: learning/web/cypress/videos
+      # - name: Upload cypress videos
+      #   uses: actions/upload-artifact@v1
+      #   if: always()
+      #   with:
+      #     name: learning-cypress-videos
+      #     path: learning/web/cypress/videos
 
-      - name: Accessibility check
-        working-directory: learning/web
-        run: yarn run a11y
-        env:
-          ROOT_URL_DOMAIN: localhost
+      # - name: Accessibility check
+      #   working-directory: learning/web
+      #   run: yarn run a11y
+      #   env:
+      #     ROOT_URL_DOMAIN: localhost
 
       - name: Deploy learning web to static site in azure storage
         uses: lauchacarro/Azure-Storage-Action@master
