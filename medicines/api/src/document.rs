@@ -1,6 +1,6 @@
 use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
-use search_client::{models::IndexResult, Search};
+use search_client::{models::IndexResult, AzureFieldFilter, AzureFilterSet, Search};
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -81,6 +81,7 @@ pub async fn get_documents(
     search: String,
     first: Option<i32>,
     after: Option<String>,
+    document_types: Option<Vec<String>>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
     let offset = match after {
@@ -91,15 +92,17 @@ pub async fn get_documents(
         }
         None => 0,
     };
+    let filter_set = build_document_types_filter_set(document_types);
 
     let azure_result = client
-        .search_with_pagination(
+        .search_with_pagination_and_filter(
             &search,
             search_client::AzurePagination {
                 result_count,
                 offset,
             },
             true,
+            filter_set,
         )
         .await?;
 
@@ -118,15 +121,45 @@ pub async fn get_documents(
     ))
 }
 
+fn build_document_types_filter_set(document_types: Option<Vec<String>>) -> AzureFilterSet {
+    match document_types {
+        Some(document_types) => AzureFilterSet {
+            boolean_operator: "or".to_string(),
+            field_filters: document_types
+                .into_iter()
+                .map(|document_type| AzureFieldFilter {
+                    field_name: "doc_type".to_string(),
+                    operator: "eq".to_string(),
+                    field_value: format!(
+                        "{}{}",
+                        document_type[..1].to_uppercase(),
+                        document_type[1..].to_lowercase()
+                    ),
+                })
+                .collect(),
+        },
+        None => AzureFilterSet {
+            boolean_operator: "or".to_string(),
+            field_filters: vec![],
+        },
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use search_client::models::IndexResults;
+    use search_client::{models::IndexResults, AzureFilterSet};
     use tokio_test::block_on;
 
     struct TestAzureSearchClient {
         pub search_results: Vec<IndexResult>,
+    }
+
+    impl TestAzureSearchClient {
+        fn new(search_results: Vec<IndexResult>) -> Self {
+            Self { search_results }
+        }
     }
 
     #[async_trait]
@@ -140,11 +173,7 @@ mod test {
             _pagination: search_client::AzurePagination,
             _include_count: bool,
         ) -> Result<IndexResults, reqwest::Error> {
-            Ok(IndexResults {
-                search_results: self.search_results.clone(),
-                context: String::from(""),
-                count: Some(1234),
-            })
+            unimplemented!();
         }
         async fn search_with_pagination_and_filter(
             &self,
@@ -153,7 +182,11 @@ mod test {
             _include_count: bool,
             _filter: search_client::AzureFilterSet,
         ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
+            Ok(IndexResults {
+                search_results: self.search_results.clone(),
+                context: String::from(""),
+                count: Some(1234),
+            })
         }
         async fn filter_by_collection_field(
             &self,
@@ -216,16 +249,15 @@ mod test {
         ]
     }
 
-    fn given_a_search_client(search_results: &Vec<IndexResult>) -> impl Search {
-        TestAzureSearchClient {
-            search_results: search_results.clone(),
-        }
+    fn given_a_search_client(search_results: &Vec<IndexResult>) -> TestAzureSearchClient {
+        TestAzureSearchClient::new(search_results.clone())
     }
 
     fn when_we_get_the_first_page_of_documents(search_client: impl Search) -> Documents {
         block_on(get_documents(
             &search_client,
             "Search string".to_string(),
+            None,
             None,
             None,
         ))
@@ -238,6 +270,7 @@ mod test {
             "Search string".to_string(),
             None,
             Some(base64::encode("1229").to_string()),
+            None,
         ))
         .unwrap()
     }
@@ -297,5 +330,47 @@ mod test {
         let search_client = given_a_search_client(&search_results);
         let response = when_we_get_the_last_page_of_documents(search_client);
         then_we_have_the_last_page(&response);
+    }
+
+    #[test]
+    fn test_build_document_types_filter_set() {
+        let document_types = Some(vec![
+            "SPC".to_string(),
+            "pil".to_string(),
+            "PaR".to_string(),
+        ]);
+        let expected_filter_set = AzureFilterSet {
+            boolean_operator: "or".to_string(),
+            field_filters: vec![
+                AzureFieldFilter {
+                    field_name: "doc_type".to_string(),
+                    operator: "eq".to_string(),
+                    field_value: "Spc".to_string(),
+                },
+                AzureFieldFilter {
+                    field_name: "doc_type".to_string(),
+                    operator: "eq".to_string(),
+                    field_value: "Pil".to_string(),
+                },
+                AzureFieldFilter {
+                    field_name: "doc_type".to_string(),
+                    operator: "eq".to_string(),
+                    field_value: "Par".to_string(),
+                },
+            ],
+        };
+        let actual_filter_set = build_document_types_filter_set(document_types);
+        assert_eq!(expected_filter_set, actual_filter_set);
+    }
+
+    #[test]
+    fn test_build_empty_document_types_filter_set() {
+        let document_types = None;
+        let expected_filter_set = AzureFilterSet {
+            boolean_operator: "or".to_string(),
+            field_filters: vec![],
+        };
+        let actual_filter_set = build_document_types_filter_set(document_types);
+        assert_eq!(expected_filter_set, actual_filter_set);
     }
 }

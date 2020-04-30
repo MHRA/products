@@ -57,9 +57,10 @@ impl QueryRoot {
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,
-            search.unwrap_or(" ".to_string()),
+            search.unwrap_or_else(|| " ".to_string()),
             first,
             after,
+            document_types,
         )
         .await
         .map_err(|e| {

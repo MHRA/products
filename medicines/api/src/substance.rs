@@ -82,7 +82,7 @@ fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> 
         .iter()
         .map(|(&substance, prods)| {
             let products = prods
-                .into_iter()
+                .iter()
                 .map(|(&name, docs)| Product::new(name.into(), docs.clone()))
                 .collect();
 

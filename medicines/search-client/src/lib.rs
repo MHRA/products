@@ -24,11 +24,13 @@ pub struct AzurePagination {
     pub offset: i32,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct AzureFilterSet {
     pub boolean_operator: String,
     pub field_filters: Vec<AzureFieldFilter>,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct AzureFieldFilter {
     pub field_name: String,
     pub operator: String,
