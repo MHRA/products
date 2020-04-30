@@ -32,11 +32,17 @@ interface IProductResult {
   documents: IDocument[];
 }
 
-const azureDocumentsLoader = async (
-  product: string,
-  page: number,
-  docTypes: DocType[],
-): Promise<IProductResult> => {
+interface IProductPageInfo {
+  name: string;
+  page: number;
+  docTypes: DocType[];
+}
+
+const azureDocumentsLoader = async ({
+  name,
+  page,
+  docTypes,
+}: IProductPageInfo): Promise<IProductResult> => {
   const results = await docSearch({
     query: '',
     page,
@@ -44,20 +50,21 @@ const azureDocumentsLoader = async (
     filters: {
       docType: docTypes,
       sortOrder: 'a-z',
-      productName: product,
+      productName: name,
     },
   });
   return {
     count: results.resultCount,
-    name: product,
+    name,
     documents: results.results.map(convertResults),
   };
 };
 
-const graphQlProductLoader = async (
-  product: string,
-): Promise<IProductResult> => {
-  return documents.load(product);
+const graphQlProductLoader = async ({
+  name,
+  page,
+}: IProductPageInfo): Promise<IProductResult> => {
+  return documents.load({ name, page, pageSize });
 };
 
 const App: NextPage = () => {
@@ -85,14 +92,12 @@ const App: NextPage = () => {
   } = router;
 
   const getProduct = async (
-    product: string,
-    page: number,
-    docTypes: DocType[],
+    productPageInfo: IProductPageInfo,
   ): Promise<IProductResult> => {
     if (graphQlFeatureFlag) {
-      return graphQlProductLoader(product);
+      return graphQlProductLoader(productPageInfo);
     } else {
-      return azureDocumentsLoader(product, page, docTypes);
+      return azureDocumentsLoader(productPageInfo);
     }
   };
 
@@ -108,7 +113,11 @@ const App: NextPage = () => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      const { documents, count } = await getProduct(product, page, docTypes);
+      const { documents, count } = await getProduct({
+        name: product,
+        page,
+        docTypes,
+      });
       setDocuments(documents);
       setCount(count);
       setIsLoading(false);

@@ -13,10 +13,10 @@ interface IProductResponse {
 }
 
 const query = `
-query ($productName: String!) {
+query ($productName: String!, $first: Int, $skip: Int) {
   product(name: $productName) {
     name
-    documents {
+    documents(first: $first, skip: $skip) {
       count: totalCount
       edges {
         node {
@@ -52,8 +52,16 @@ const convertResponseToProduct = ({
   };
 };
 
-const getDocumentsForProduct = async (productName: any) => {
-  const variables = { productName };
+const getDocumentsForProduct = async ({
+  name,
+  page,
+  pageSize,
+}: IProductPageInfo) => {
+  const variables = {
+    productName: name,
+    first: pageSize,
+    skip: calculatePageStartRecord(page, pageSize),
+  };
   const { data } = await graphqlRequest<IProductResponse, typeof variables>({
     query,
     variables,
@@ -62,8 +70,17 @@ const getDocumentsForProduct = async (productName: any) => {
   return convertResponseToProduct(data);
 };
 
-export const documents = new DataLoader<string, IProduct>(
-  async productNames => {
-    return Promise.all(productNames.map(getDocumentsForProduct));
+interface IProductPageInfo {
+  name: string;
+  page: number;
+  pageSize: number;
+}
+
+const calculatePageStartRecord = (page: number, pageSize: number): number =>
+  pageSize * (page - 1);
+
+export const documents = new DataLoader<IProductPageInfo, IProduct>(
+  async productPages => {
+    return Promise.all(productPages.map(getDocumentsForProduct));
   },
 );
