@@ -26,7 +26,7 @@ query ($productName: String) {
           highlights
           created
           docType
-          fileBytes
+          fileBytes: fileSizeInBytes
           name
           url
         }
