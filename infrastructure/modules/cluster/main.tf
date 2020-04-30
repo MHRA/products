@@ -65,18 +65,13 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 }
 
 data "azurerm_subnet" "cluster_nodes" {
-  name                 = var.cluster_subnet_name
-  resource_group_name  = var.vnet_resource_group
-  virtual_network_name = var.vnet_name
-
-  depends_on = [
-    azurerm_kubernetes_cluster.cluster
-  ]
-}
-
-data "azurerm_route_table" "cluster_nodes" {
-  name                = split("/", data.azurerm_subnet.cluster_nodes.route_table_id)[8]
-  resource_group_name = azurerm_kubernetes_cluster.cluster.node_resource_group
+  # We read the `name` off the cluster to create an implicit dependency on it. Otherwise if we try
+  # and read from this data source before the cluster and its route table have been created the
+  # `route_table_id` attribute will be null when we try to read it in `azurerm_route.cluster_nodes`
+  # below.
+  name                 = split("/", azurerm_kubernetes_cluster.cluster.default_node_pool[0].vnet_subnet_id)[10]
+  resource_group_name  = azurerm_subnet.cluster.resource_group_name
+  virtual_network_name = azurerm_subnet.cluster.virtual_network_name
 }
 
 resource "azurerm_route" "cluster_nodes" {
@@ -84,7 +79,7 @@ resource "azurerm_route" "cluster_nodes" {
 
   name                   = replace(replace(each.value, ".", "_"), "/", "__")
   resource_group_name    = azurerm_kubernetes_cluster.cluster.node_resource_group
-  route_table_name       = data.azurerm_route_table.cluster_nodes.name
+  route_table_name       = split("/", data.azurerm_subnet.cluster_nodes.route_table_id)[8]
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = var.cluster_route_next_hop
