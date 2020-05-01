@@ -1,5 +1,5 @@
 use crate::{
-    document::{self, get_documents, DocumentType},
+    document::{self, get_documents, Document, DocumentType},
     substance::Substance,
 };
 use juniper::FieldResult;
@@ -29,7 +29,7 @@ impl Product {
         offset: i32,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
-        get_documents(
+        let docs = get_documents(
             &search_client::AzureSearchClient::new(),
             "",
             first,
@@ -44,7 +44,9 @@ impl Product {
                 e
             );
             juniper::FieldError::new("Error fetching documents", juniper::Value::null())
-        })
+        })?
+        .into();
+        Ok(docs)
     }
 }
 

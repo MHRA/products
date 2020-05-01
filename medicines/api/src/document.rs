@@ -103,6 +103,18 @@ pub fn get_documents_graph_from_documents_vector(
     get_documents_from_edges(edges, offset, total_count)
 }
 
+pub struct AzureDocumentResult {
+    docs: Vec<Document>,
+    offset: i32,
+    total_count: i32,
+}
+
+impl Into<Documents> for AzureDocumentResult {
+    fn into(self) -> Documents {
+        get_documents_graph_from_documents_vector(self.docs, self.offset, self.total_count)
+    }
+}
+
 pub async fn get_documents(
     client: &impl Search,
     search: &str,
@@ -110,7 +122,7 @@ pub async fn get_documents(
     offset: i32,
     document_types: Option<Vec<DocumentType>>,
     product_name: Option<String>,
-) -> Result<Documents, anyhow::Error> {
+) -> Result<AzureDocumentResult, anyhow::Error> {
     let result_count = first.unwrap_or(10);
 
     let azure_result = client
@@ -133,11 +145,11 @@ pub async fn get_documents(
 
     let total_count = azure_result.count.unwrap_or(0);
 
-    Ok(get_documents_graph_from_documents_vector(
+    Ok(AzureDocumentResult {
         docs,
-        offset,
         total_count,
-    ))
+        offset,
+    })
 }
 
 fn build_filter(
@@ -290,6 +302,7 @@ mod test {
             None,
         ))
         .unwrap()
+        .into()
     }
 
     fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
@@ -302,6 +315,7 @@ mod test {
             None,
         ))
         .unwrap()
+        .into()
     }
 
     fn then_we_have_the_first_page(documents_response: &Documents) {

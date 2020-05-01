@@ -58,7 +58,7 @@ impl QueryRoot {
     ) -> FieldResult<Documents> {
         let offset = get_offset_or_default(skip, after, 0);
 
-        get_documents(
+        let docs = get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
@@ -70,7 +70,10 @@ impl QueryRoot {
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
             juniper::FieldError::new("Error fetching search results", juniper::Value::null())
-        })
+        })?
+        .into();
+
+        Ok(docs)
     }
 }
 
