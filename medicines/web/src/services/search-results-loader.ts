@@ -83,7 +83,7 @@ const getDocumentsForProduct = async ({
   const variables = {
     searchTerm,
     first: pageSize,
-    after: base64(calculatePageStartRecord(page, pageSize)),
+    after: makeCursor(page, pageSize),
     documentTypes: docTypes,
   };
   const { data } = await graphqlRequest<ISearchPageResponse, typeof variables>({
@@ -101,8 +101,10 @@ interface ISearchPageInfo {
   docTypes: DocType[];
 }
 
-const base64 = (skip: number): string => {
-  return Buffer.from(skip.toString()).toString('base64');
+export const makeCursor = (page: number, pageSize: number): string => {
+  const skip = calculatePageStartRecord(page, pageSize);
+
+  return Buffer.from((skip - 1).toString()).toString('base64');
 };
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
