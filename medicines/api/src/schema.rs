@@ -2,7 +2,7 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_context::AzureContext,
-    document::{get_documents, Documents},
+    document::{get_documents, DocumentType, Documents},
     product::{get_product, get_substance_with_products, Product},
     substance::{get_substances_starting_with_letter, Substance},
 };
@@ -53,7 +53,7 @@ impl QueryRoot {
         search: Option<String>,
         first: Option<i32>,
         after: Option<String>,
-        document_types: Option<Vec<String>>,
+        document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,

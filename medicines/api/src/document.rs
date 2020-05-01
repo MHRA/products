@@ -10,7 +10,7 @@ pub struct Document {
     title: Option<String>,
     highlights: Option<Vec<String>>,
     created: Option<String>,
-    doc_type: Option<String>,
+    doc_type: Option<String>, // TODO: use DocumentType enum below
     file_size_in_bytes: Option<i32>,
     name: Option<String>,
     url: Option<String>,
@@ -67,6 +67,33 @@ fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: 
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, juniper::GraphQLEnum)]
+pub enum DocumentType {
+    Spc,
+    Pil,
+    Par,
+}
+
+impl DocumentType {
+    fn to_search_str(&self) -> &str {
+        match self {
+            DocumentType::Spc => "Spc",
+            DocumentType::Pil => "Pil",
+            DocumentType::Par => "Par",
+        }
+    }
+}
+
+impl std::fmt::Display for DocumentType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DocumentType::Spc => write!(f, "SPC"),
+            DocumentType::Pil => write!(f, "PIL"),
+            DocumentType::Par => write!(f, "PAR"),
+        }
+    }
+}
+
 pub fn get_documents_graph_from_documents_vector(
     docs: Vec<Document>,
     offset: i32,
@@ -81,7 +108,7 @@ pub async fn get_documents(
     search: String,
     first: Option<i32>,
     after: Option<String>,
-    document_types: Option<Vec<String>>,
+    document_types: Option<Vec<DocumentType>>,
     product_name: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
@@ -122,7 +149,7 @@ pub async fn get_documents(
 }
 
 fn build_filter(
-    document_types: Option<Vec<String>>,
+    document_types: Option<Vec<DocumentType>>,
     product_name: Option<String>,
 ) -> Option<String> {
     match (document_types, product_name) {
@@ -137,16 +164,12 @@ fn build_filter(
     }
 }
 
-fn build_document_types_filter(document_types: Vec<String>) -> String {
+fn build_document_types_filter(document_types: Vec<DocumentType>) -> String {
     format!(
         "({})",
         document_types
             .into_iter()
-            .map(|document_type| format!(
-                "doc_type eq '{}{}'",
-                document_type[..1].to_uppercase(),
-                document_type[1..].to_lowercase()
-            ))
+            .map(|document_type| format!("doc_type eq '{}'", document_type.to_search_str()))
             .collect::<Vec<_>>()
             .join(" or ")
     )
@@ -348,12 +371,12 @@ mod test {
 
     #[test_case(None, None, None)]
     #[test_case(
-        Some(vec!["SPC".to_string(), "pil".to_string(), "PaR".to_string()]),
+        Some(vec![DocumentType::Spc, DocumentType::Pil,DocumentType::Par,]),
         Some("IBUPROFEN 100MG CAPLETS".to_string()),
         Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par'))".to_string())
     )]
     #[test_case(
-        Some(vec!["SPC".to_string(), "pil".to_string(), "PaR".to_string()]),
+        Some(vec![DocumentType::Spc,  DocumentType::Pil,DocumentType::Par,]),
         None,
         Some("(doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par')".to_string())
     )]
@@ -363,7 +386,7 @@ mod test {
         Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')".to_string())
     )]
     fn test_build_filter(
-        document_types: Option<Vec<String>>,
+        document_types: Option<Vec<DocumentType>>,
         product_name: Option<String>,
         expected_filter: Option<String>,
     ) {

@@ -1,5 +1,5 @@
 use crate::{
-    document::{self, get_documents},
+    document::{self, get_documents, DocumentType},
     substance::Substance,
 };
 use juniper::FieldResult;
@@ -27,7 +27,7 @@ impl Product {
         &self,
         first: Option<i32>,
         after: Option<String>,
-        document_types: Option<Vec<String>>,
+        document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
         get_documents(
             &search_client::AzureSearchClient::new(),
