@@ -56,6 +56,6 @@ describe('A-Z Index', function() {
 
     cy.visit('/substance?substance=PARACETAMOL&useGraphQl=true');
     cy.contains('PARACETAMOL TABLETS FROM GRAPHQL');
-    cy.contains('WRONG THING');
+    cy.contains('WRONG THING', { timeout: 0 }).should('not.exist');
   });
 });
