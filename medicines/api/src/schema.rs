@@ -2,7 +2,7 @@ use juniper::{FieldResult, RootNode};
 
 use crate::{
     azure_context::AzureContext,
-    document::{get_documents, Documents},
+    document::{get_documents, DocumentType, Documents},
     product::{get_product, get_substance_with_products, Product},
     substance::{get_substances_starting_with_letter, Substance},
 };
@@ -29,8 +29,8 @@ impl QueryRoot {
         }
     }
 
-    async fn product(context: &AzureContext, name: String) -> FieldResult<Product> {
-        get_product(name, &context.client).await.map_err(|e| {
+    async fn product(_context: &AzureContext, name: String) -> FieldResult<Product> {
+        get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
             juniper::FieldError::new("Error fetching search results", juniper::Value::null())
         })
@@ -52,15 +52,18 @@ impl QueryRoot {
         context: &AzureContext,
         search: Option<String>,
         first: Option<i32>,
+        skip: Option<i32>,
         after: Option<String>,
-        document_types: Option<Vec<String>>,
+        document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,
-            search.unwrap_or_else(|| " ".to_string()),
+            search.as_deref().unwrap_or(" "),
             first,
+            skip,
             after,
             document_types,
+            None,
         )
         .await
         .map_err(|e| {

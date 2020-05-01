@@ -635,7 +635,7 @@ mod test {
             _search_term: &str,
             _pagination: search_client::AzurePagination,
             _include_count: bool,
-            _filter: search_client::AzureFilterSet,
+            _filter: Option<&str>,
         ) -> Result<IndexResults, reqwest::Error> {
             unimplemented!()
         }
