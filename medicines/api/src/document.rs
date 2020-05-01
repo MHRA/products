@@ -107,21 +107,11 @@ pub async fn get_documents(
     client: &impl Search,
     search: &str,
     first: Option<i32>,
-    skip: Option<i32>,
-    after: Option<String>,
+    offset: i32,
     document_types: Option<Vec<DocumentType>>,
     product_name: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
-    let offset = match (after, skip) {
-        (Some(encoded), _) => {
-            let bytes = base64::decode(encoded)?;
-            let string = std::str::from_utf8(&bytes)?;
-            string.parse::<i32>()? + 1
-        }
-        (None, Some(offset)) => offset,
-        _ => 0,
-    };
 
     let azure_result = client
         .search_with_pagination_and_filter(
@@ -295,8 +285,7 @@ mod test {
             &search_client,
             "Search string",
             None,
-            None,
-            None,
+            0,
             None,
             None,
         ))
@@ -308,21 +297,7 @@ mod test {
             &search_client,
             "Search string",
             None,
-            Some(1230),
-            None,
-            None,
-            None,
-        ))
-        .unwrap()
-    }
-
-    fn when_we_get_the_last_page_of_documents_using_after(search_client: impl Search) -> Documents {
-        block_on(get_documents(
-            &search_client,
-            "Search string",
-            None,
-            None,
-            Some(base64::encode("1229".to_string())),
+            1230,
             None,
             None,
         ))
@@ -383,14 +358,6 @@ mod test {
         let search_results = given_last_page_of_search_results();
         let search_client = given_a_search_client(&search_results);
         let response = when_we_get_the_last_page_of_documents(search_client);
-        then_we_have_the_last_page(&response);
-    }
-
-    #[test]
-    fn test_get_documents_last_page_using_after() {
-        let search_results = given_last_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_last_page_of_documents_using_after(search_client);
         then_we_have_the_last_page(&response);
     }
 

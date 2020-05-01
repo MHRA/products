@@ -56,12 +56,13 @@ impl QueryRoot {
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
+        let offset = get_offset_or_default(skip, after, 0);
+
         get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
-            skip,
-            after,
+            offset,
             document_types,
             None,
         )
@@ -71,6 +72,23 @@ impl QueryRoot {
             juniper::FieldError::new("Error fetching search results", juniper::Value::null())
         })
     }
+}
+
+fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
+    match (after, skip) {
+        (Some(encoded), _) => match base_64_decode(encoded) {
+            Ok(a) => a,
+            _ => default,
+        },
+        (None, Some(offset)) => offset,
+        _ => default,
+    }
+}
+
+fn base_64_decode(encoded: String) -> Result<i32, anyhow::Error> {
+    let bytes = base64::decode(encoded)?;
+    let string = std::str::from_utf8(&bytes)?;
+    Ok(string.parse::<i32>()? + 1)
 }
 
 pub struct MutationRoot;
@@ -87,4 +105,15 @@ impl SubscriptionRoot {}
 
 pub fn create_schema() -> Schema {
     Schema::new(QueryRoot {}, MutationRoot {}, SubscriptionRoot {})
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_base_64_decode() {
+        let encoded = base64::encode("1229".to_string());
+        assert_eq!(base_64_decode(encoded).unwrap(), 1230);
+    }
 }
