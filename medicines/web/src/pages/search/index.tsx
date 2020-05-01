@@ -6,6 +6,7 @@ import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
+import { IDocument } from '../../model/substance';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
 import {
@@ -14,17 +15,57 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults, IDocument } from '../../services/results-converter';
+import { convertResults } from '../../services/results-converter';
+import { searchResults } from '../../services/search-results-loader';
 
 const pageSize = 10;
 const searchPath = '/search';
+
+interface ISearchResult {
+  count: number;
+  documents: IDocument[];
+}
+
+interface ISearchPageInfo {
+  searchTerm: string;
+  page: number;
+  docTypes: DocType[];
+}
+
+const azureSearchPageLoader = async ({
+  searchTerm,
+  page,
+  docTypes,
+}: ISearchPageInfo): Promise<ISearchResult> => {
+  const results = await docSearch({
+    query: searchTerm,
+    page,
+    pageSize,
+    filters: {
+      docType: docTypes,
+      sortOrder: 'a-z',
+    },
+  });
+  return {
+    count: results.resultCount,
+    documents: results.results.map(convertResults),
+  };
+};
+
+const graphQlSearchPageLoader = async ({
+  searchTerm,
+  page,
+  docTypes,
+}: ISearchPageInfo): Promise<ISearchResult> => {
+  return searchResults.load({ searchTerm, page, pageSize, docTypes });
+};
 
 const App: NextPage = props => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
-  const [results, setResults] = React.useState<IDocument[]>([]);
+  const [documents, setDocuments] = React.useState<IDocument[]>([]);
   const [query, setQuery] = React.useState('');
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -39,23 +80,18 @@ const App: NextPage = props => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
+      useGraphQl: graphQlFeatureFlag,
     },
   } = router;
 
-  const getResults = async (
-    query: string,
-    page: number,
-    docTypes: DocType[],
-  ) => {
-    return docSearch({
-      query,
-      page,
-      pageSize,
-      filters: {
-        docType: docTypes,
-        sortOrder: 'a-z',
-      },
-    });
+  const getSearchResults = async (
+    searchPageInfo: ISearchPageInfo,
+  ): Promise<ISearchResult> => {
+    if (graphQlFeatureFlag) {
+      return graphQlSearchPageLoader(searchPageInfo);
+    } else {
+      return azureSearchPageLoader(searchPageInfo);
+    }
   };
 
   useEffect(() => {
@@ -71,9 +107,13 @@ const App: NextPage = props => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      const results = await getResults(query, page, docTypes);
-      setResults(results.results.map(convertResults));
-      setCount(results.resultCount);
+      const { documents, count } = await getSearchResults({
+        searchTerm: query,
+        page,
+        docTypes,
+      });
+      setDocuments(documents);
+      setCount(count);
       setIsLoading(false);
       Events.searchForProductsMatchingKeywords({
         searchTerm: query,
@@ -129,7 +169,7 @@ const App: NextPage = props => {
     >
       <SearchWrapper initialSearchValue={query}>
         <SearchResults
-          drugs={results}
+          drugs={documents}
           showingResultsForTerm={query}
           resultCount={count}
           page={pageNumber}

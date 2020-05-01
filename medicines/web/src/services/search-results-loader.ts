@@ -1,5 +1,6 @@
 import DataLoader from 'dataloader';
 import { IDocument } from '../model/substance';
+import { DocType } from './azure-search';
 import { graphqlRequest } from './graphql';
 
 interface IDocuments {
@@ -7,11 +8,8 @@ interface IDocuments {
   edges: Array<{ node: IDocumentResponse }>;
 }
 
-interface IProductResponse {
-  product: {
-    name: string;
-    documents: IDocuments;
-  };
+interface ISearchPageResponse {
+  documents: IDocuments;
 }
 
 interface IDocumentResponse {
@@ -26,41 +24,34 @@ interface IDocumentResponse {
 }
 
 const query = `
-query ($productName: String!, $first: Int, $skip: Int) {
-  product(name: $productName) {
-    name
-    documents(first: $first, skip: $skip) {
-      count: totalCount
-      edges {
-        node {
-          product: productName
-          activeSubstances
-          highlights
-          created
-          docType
-          fileBytes: fileSizeInBytes
-          title
-          url
-        }
+query($searchTerm: String, $first: Int, $after: String, $documentTypes: [String!]) {
+  documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes) {
+    count: totalCount
+    edges {
+      cursor
+      node {
+        product: productName
+        activeSubstances
+        highlights
+        created
+        docType
+        fileBytes: fileSizeInBytes
+        title
+        url
       }
     }
   }
 }`;
 
-interface IProduct {
-  name: string;
+interface ISearchPage {
   count: number;
   documents: IDocument[];
 }
 
-const convertResponseToProduct = ({
-  product: {
-    name,
-    documents: { count, edges },
-  },
-}: IProductResponse): IProduct => {
+const convertResponseToSearchPage = ({
+  documents: { count, edges },
+}: ISearchPageResponse): ISearchPage => {
   return {
-    name,
     count,
     documents: edges.map(convertDocumentResponseToDocument),
   };
@@ -84,33 +75,42 @@ const convertDocumentResponseToDocument = ({
 };
 
 const getDocumentsForProduct = async ({
-  name,
+  searchTerm,
   page,
   pageSize,
-}: IProductPageInfo) => {
+  docTypes,
+}: ISearchPageInfo) => {
   const variables = {
-    productName: name,
+    searchTerm,
     first: pageSize,
-    skip: calculatePageStartRecord(page, pageSize),
+    after: makeCursor(page, pageSize),
+    documentTypes: docTypes,
   };
-  const { data } = await graphqlRequest<IProductResponse, typeof variables>({
+  const { data } = await graphqlRequest<ISearchPageResponse, typeof variables>({
     query,
     variables,
   });
 
-  return convertResponseToProduct(data);
+  return convertResponseToSearchPage(data);
 };
 
-interface IProductPageInfo {
-  name: string;
+interface ISearchPageInfo {
+  searchTerm: string;
   page: number;
   pageSize: number;
+  docTypes: DocType[];
 }
+
+export const makeCursor = (page: number, pageSize: number): string => {
+  const skip = calculatePageStartRecord(page, pageSize);
+
+  return Buffer.from((skip - 1).toString()).toString('base64');
+};
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-export const documents = new DataLoader<IProductPageInfo, IProduct>(
+export const searchResults = new DataLoader<ISearchPageInfo, ISearchPage>(
   async productPages => {
     return Promise.all(productPages.map(getDocumentsForProduct));
   },

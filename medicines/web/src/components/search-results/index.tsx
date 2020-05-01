@@ -173,7 +173,7 @@ const searchResultsNumberingInformation = (
 };
 
 const normalizeDescription = (description: string): string => {
-  if (!description) {
+  if (!description || typeof description !== 'string') {
     return description;
   }
 
