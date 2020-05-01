@@ -7,12 +7,8 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
-import { IDocument, IProduct } from '../../model/substance';
-import {
-  docSearch,
-  DocType,
-  ISearchResults,
-} from '../../services/azure-search';
+import { IDocument } from '../../model/substance';
+import { docSearch, DocType } from '../../services/azure-search';
 import { documents } from '../../services/documents-loader';
 import Events from '../../services/events';
 import {
@@ -63,8 +59,9 @@ const azureDocumentsLoader = async ({
 const graphQlProductLoader = async ({
   name,
   page,
+  docTypes,
 }: IProductPageInfo): Promise<IProductResult> => {
-  return documents.load({ name, page, pageSize });
+  return documents.load({ name, page, pageSize, docTypes });
 };
 
 const App: NextPage = () => {
@@ -154,7 +151,7 @@ const App: NextPage = () => {
     });
   };
 
-  const handleToggleDocType = async (docTypeToToggle: DocType) => {
+  const handleToggleDocType = (docTypeToToggle: DocType) => {
     const enabledDocTypes = Array.from(docTypes);
     if (enabledDocTypes.includes(docTypeToToggle)) {
       const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
