@@ -147,6 +147,7 @@ impl Search for AzureSearchClient {
             &self.config,
         )?;
 
+        tracing::debug!("Requesting from URL: {}", &request.url());
         self.client
             .execute(request)
             .await?
