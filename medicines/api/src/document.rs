@@ -129,7 +129,7 @@ pub async fn get_documents(
                 offset,
             },
             true,
-            build_filter(document_types, product_name),
+            build_filter(document_types, product_name).as_deref(),
         )
         .await?;
 
@@ -215,7 +215,7 @@ mod test {
             _search_term: &str,
             _pagination: search_client::AzurePagination,
             _include_count: bool,
-            _filter: Option<String>,
+            _filter: Option<&str>,
         ) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),

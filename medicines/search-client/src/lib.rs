@@ -77,7 +77,7 @@ pub trait Search {
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-        filter: Option<String>,
+        filter: Option<&str>,
     ) -> Result<IndexResults, reqwest::Error>;
 
     async fn filter_by_collection_field(
@@ -121,7 +121,7 @@ impl Search for AzureSearchClient {
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-        filter: Option<String>,
+        filter: Option<&str>,
     ) -> Result<IndexResults, reqwest::Error> {
         search(
             search_term,
@@ -177,12 +177,11 @@ impl Search for AzureSearchClient {
     }
 }
 
-
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
-    filter: Option<String>,
+    filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<reqwest::Request, reqwest::Error> {
@@ -321,7 +320,7 @@ async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
-    filter: Option<String>,
+    filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
 ) -> Result<IndexResults, reqwest::Error> {
@@ -466,7 +465,7 @@ mod test {
                 offset: 50,
             }),
             Some(true),
-            Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')".to_string()),
+            Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')"),
             &client,
             &config,
         )
