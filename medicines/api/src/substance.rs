@@ -83,7 +83,7 @@ fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> 
         .map(|(&substance, prods)| {
             let products = prods
                 .iter()
-                .map(|(&name, _docs)| Product::new(name.into()))
+                .map(|(&name, docs)| Product::new(name.into(), Some(docs.to_owned())))
                 .collect();
 
             Substance::new(substance.into(), products)
@@ -161,10 +161,10 @@ mod tests {
 
         let results = IndexResults {
             search_results: vec![
-                zonismade_25mg.clone(),
-                zonismade_50mg.clone(),
-                zonismade_50mg_repeat.clone(),
-                zolmitriptan.clone(),
+                zonismade_25mg,
+                zonismade_50mg,
+                zonismade_50mg_repeat,
+                zolmitriptan,
             ],
             context: "https://mhraproductsnonprod.search.windows.net/indexes(\'products-index\')/$metadata#docs(*)".into(),
             count: None
@@ -177,13 +177,14 @@ mod tests {
                 "ZOLMITRIPTAN".into(),
                 vec![Product::new(
                     "ZOMIG RAPIMELT 2.5 MG ORODISPERSIBLE TABLETS".into(),
+                    None,
                 )],
             ),
             Substance::new(
                 "ZONISAMIDE".into(),
                 vec![
-                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into()),
-                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into()),
+                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into(), None),
+                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into(), None),
                 ],
             ),
         ];
@@ -210,8 +211,7 @@ mod tests {
 
         let results = IndexResults {
             search_results: vec![
-                index_result.clone(),
-
+                index_result,
             ],
             context: "https://mhraproductsnonprod.search.windows.net/indexes(\'products-index\')/$metadata#docs(*)".into(),
             count: None
@@ -223,6 +223,7 @@ mod tests {
             "ZIDOVUDINE".into(),
             vec![Product::new(
                 "LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS".into(),
+                None,
             )],
         )];
 

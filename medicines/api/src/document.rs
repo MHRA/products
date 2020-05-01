@@ -288,8 +288,8 @@ mod test {
         ]
     }
 
-    fn given_a_search_client(search_results: &Vec<IndexResult>) -> TestAzureSearchClient {
-        TestAzureSearchClient::new(search_results.clone())
+    fn given_a_search_client(search_results: &[IndexResult]) -> TestAzureSearchClient {
+        TestAzureSearchClient::new(search_results.to_owned())
     }
 
     fn when_we_get_the_first_page_of_documents(search_client: impl Search) -> Documents {
@@ -325,7 +325,7 @@ mod test {
         ];
         let edges = &documents_response.edges;
         let actual_names = edges
-            .into_iter()
+            .iter()
             .map(|edge| edge.node.product_name.as_ref().unwrap());
         assert!(actual_names.eq(expected_names));
 
@@ -344,7 +344,7 @@ mod test {
         let expected_names = vec!["fourth last", "third last", "second last", "last"];
         let edges = &documents_response.edges;
         let actual_names = edges
-            .into_iter()
+            .iter()
             .map(|edge| edge.node.product_name.as_ref().unwrap());
 
         assert!(actual_names.eq(expected_names));
