@@ -1,10 +1,25 @@
+resource "azurerm_monitor_action_group" "support" {
+  name                = "CriticalAlertsAction"
+  resource_group_name = var.resource_group_name
+  short_name          = "support"
+
+  dynamic "email_receiver" {
+    for_each = var.support_email_addresses
+    content {
+      name                    = email_receiver.value
+      email_address           = email_receiver.value
+      use_common_alert_schema = true
+    }
+  }
+}
+
 resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_alert" {
   name                = "Medicine API Errors (${var.environment})"
   location            = var.location
   resource_group_name = var.resource_group_name
 
   action {
-    action_group           = []
+    action_group           = [azurerm_monitor_action_group.support.id]
     email_subject          = "Medicine API Errors (${var.environment})"
     custom_webhook_payload = "{}"
   }
@@ -22,9 +37,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "medicines_api_errors_ale
   | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
   | extend correlation_id = tostring(LogEntry.span.correlation_id)
-  | extend message = tostring(LogEntry.span.message)
+  | extend message = tostring(LogEntry.fields.message)
   | extend level = tostring(LogEntry.level)
   | where level == "ERROR"
+  | order by TimeGenerated desc
 
   QUERY
   severity       = 1
@@ -42,7 +58,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
   resource_group_name = var.resource_group_name
 
   action {
-    action_group           = []
+    action_group           = [azurerm_monitor_action_group.support.id]
     email_subject          = "Doc Index Updater Errors (${var.environment})"
     custom_webhook_payload = "{}"
   }
@@ -60,9 +76,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "doc_index_updater_errors
   | project parse_json(LogEntry), TimeGenerated, ContainerID
   | render table
   | extend correlation_id = tostring(LogEntry.span.correlation_id)
-  | extend message = tostring(LogEntry.span.message)
+  | extend message = tostring(LogEntry.fields.message)
   | extend level = tostring(LogEntry.level)
   | where level == "ERROR"
+  | order by TimeGenerated desc
   QUERY
   severity       = 1
   frequency      = 5

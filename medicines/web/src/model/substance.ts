@@ -14,3 +14,14 @@ export function isSubstance(obj: any): obj is ISubstance {
 export function isIndex(obj: any): obj is ISubstance {
   return obj.products === undefined && obj.count === undefined;
 }
+
+export interface IDocument {
+  activeSubstances: string[];
+  context: string;
+  created: string;
+  docType: string;
+  fileSize: string;
+  name: string;
+  product: string;
+  url: string;
+}
