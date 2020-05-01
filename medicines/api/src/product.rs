@@ -27,6 +27,7 @@ impl Product {
         &self,
         first: Option<i32>,
         skip: Option<i32>,
+        after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
         get_documents(
@@ -34,6 +35,7 @@ impl Product {
             "",
             first,
             skip,
+            after,
             document_types,
             Some(self.name.clone()),
         )

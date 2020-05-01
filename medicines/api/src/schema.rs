@@ -53,6 +53,7 @@ impl QueryRoot {
         search: Option<String>,
         first: Option<i32>,
         skip: Option<i32>,
+        after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
         get_documents(
@@ -60,6 +61,7 @@ impl QueryRoot {
             search.as_deref().unwrap_or(" "),
             first,
             skip,
+            after,
             document_types,
             None,
         )
