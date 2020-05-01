@@ -52,14 +52,14 @@ impl QueryRoot {
         context: &AzureContext,
         search: Option<String>,
         first: Option<i32>,
-        after: Option<String>,
+        skip: Option<i32>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
         get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
-            after,
+            skip,
             document_types,
             None,
         )

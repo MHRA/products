@@ -107,19 +107,12 @@ pub async fn get_documents(
     client: &impl Search,
     search: &str,
     first: Option<i32>,
-    after: Option<String>,
+    skip: Option<i32>,
     document_types: Option<Vec<DocumentType>>,
     product_name: Option<String>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
-    let offset = match after {
-        Some(after) => {
-            let bytes = base64::decode(after)?;
-            let string = std::str::from_utf8(&bytes)?;
-            string.parse::<i32>()? + 1
-        }
-        None => 0,
-    };
+    let offset = skip.unwrap_or_default();
 
     let azure_result = client
         .search_with_pagination_and_filter(
@@ -305,7 +298,7 @@ mod test {
             &search_client,
             "Search string",
             None,
-            Some(base64::encode("1229").to_string()),
+            Some(1230),
             None,
             None,
         ))

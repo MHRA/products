@@ -26,14 +26,14 @@ impl Product {
     async fn documents(
         &self,
         first: Option<i32>,
-        after: Option<String>,
+        skip: Option<i32>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
         get_documents(
             &search_client::AzureSearchClient::new(),
             "",
             first,
-            after,
+            skip,
             document_types,
             Some(self.name.clone()),
         )
