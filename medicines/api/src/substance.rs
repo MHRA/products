@@ -161,14 +161,18 @@ mod tests {
 
         let results = IndexResults {
             search_results: vec![
-                zonismade_25mg,
-                zonismade_50mg,
-                zonismade_50mg_repeat,
-                zolmitriptan,
+                zonismade_25mg.clone(),
+                zonismade_50mg.clone(),
+                zonismade_50mg_repeat.clone(),
+                zolmitriptan.clone(),
             ],
             context: "https://mhraproductsnonprod.search.windows.net/indexes(\'products-index\')/$metadata#docs(*)".into(),
             count: None
         };
+
+        let zon50: Vec<Document> = vec![zonismade_50mg.into(), zonismade_50mg_repeat.into()];
+        let zon25: Vec<Document> = vec![zonismade_25mg.into()];
+        let zol: Vec<Document> = vec![zolmitriptan.into()];
 
         let formatted = format_search_results(results, letter);
 
@@ -177,14 +181,14 @@ mod tests {
                 "ZOLMITRIPTAN".into(),
                 vec![Product::new(
                     "ZOMIG RAPIMELT 2.5 MG ORODISPERSIBLE TABLETS".into(),
-                    None,
+                    Some(zol),
                 )],
             ),
             Substance::new(
                 "ZONISAMIDE".into(),
                 vec![
-                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into(), None),
-                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into(), None),
+                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into(), Some(zon25)),
+                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into(), Some(zon50)),
                 ],
             ),
         ];
@@ -208,6 +212,7 @@ mod tests {
                 "Z, ZIDOVUDINE, LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS",
             ],
         );
+        let document: Document = index_result.clone().into();
 
         let results = IndexResults {
             search_results: vec![
@@ -223,7 +228,7 @@ mod tests {
             "ZIDOVUDINE".into(),
             vec![Product::new(
                 "LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS".into(),
-                None,
+                Some(vec![document]),
             )],
         )];
 
