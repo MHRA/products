@@ -16,6 +16,12 @@ pub struct Document {
     url: Option<String>,
 }
 
+impl Document {
+    pub fn is_doc_type(&self, doc_type: &DocumentType) -> bool {
+        self.doc_type == Some(doc_type.to_search_str().to_owned())
+    }
+}
+
 impl From<IndexResult> for Document {
     fn from(r: IndexResult) -> Self {
         Self {

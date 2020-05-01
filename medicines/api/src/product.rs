@@ -1,5 +1,7 @@
 use crate::{
-    document::{self, get_documents, Document, DocumentType},
+    document::{
+        self, get_documents, get_documents_graph_from_documents_vector, Document, DocumentType,
+    },
     substance::Substance,
 };
 use juniper::FieldResult;
@@ -38,24 +40,47 @@ impl Product {
         offset: i32,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
-        let docs = get_documents(
-            &search_client::AzureSearchClient::new(),
-            "",
-            first,
-            offset,
-            document_types,
-            Some(self.name.clone()),
-        )
-        .await
-        .map_err(|e| {
-            tracing::error!(
-                "Error fetching documents from Azure search service: {:?}",
-                e
-            );
-            juniper::FieldError::new("Error fetching documents", juniper::Value::null())
-        })?
-        .into();
-        Ok(docs)
+        if let Some(docs) = self.documents.clone() {
+            let docs = match document_types {
+                Some(document_types) => docs
+                    .into_iter()
+                    .filter(|x| document_types.iter().any(|f| x.is_doc_type(f)))
+                    .collect(),
+                None => docs,
+            };
+
+            let total_count = docs.len() as i32;
+
+            let docs = match first {
+                Some(t) => docs.into_iter().take(t as usize).collect(),
+                None => docs,
+            };
+
+            Ok(get_documents_graph_from_documents_vector(
+                docs,
+                offset,
+                total_count,
+            ))
+        } else {
+            let docs = get_documents(
+                &search_client::AzureSearchClient::new(),
+                "",
+                first,
+                offset,
+                document_types,
+                Some(self.name.clone()),
+            )
+            .await
+            .map_err(|e| {
+                tracing::error!(
+                    "Error fetching documents from Azure search service: {:?}",
+                    e
+                );
+                juniper::FieldError::new("Error fetching documents", juniper::Value::null())
+            })?
+            .into();
+            Ok(docs)
+        }
     }
 }
 
