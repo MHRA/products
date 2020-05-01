@@ -70,6 +70,7 @@ module cluster {
   cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
   lb_route_table_id                     = data.azurerm_route_table.load_balancer.id
   default_node_count                    = "3"
+  support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
 }
 
 # Service Bus

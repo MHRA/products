@@ -29,3 +29,8 @@ variable "CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS" {
 variable "CLUSTER_ROUTE_NEXT_HOP" {
   description = "Next hop for default route"
 }
+
+variable "SUPPORT_EMAIL_ADDRESSES" {
+  type        = list(string)
+  description = "A list of email addresses for first line support alerts to be sent to."
+}
