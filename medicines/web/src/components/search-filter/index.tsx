@@ -80,7 +80,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
       <h2>Filter documents by</h2>
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
-      {generateCheckboxFor(DocType.Par, 'Public Assesment Reports')}
+      {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
     </StyledSearchFilter>
   );
 };
