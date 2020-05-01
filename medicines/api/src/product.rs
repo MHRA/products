@@ -37,9 +37,14 @@ impl Product {
     async fn documents(
         &self,
         first: Option<i32>,
-        offset: i32,
+        offset: Option<i32>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
+        let offset = match offset {
+            Some(a) => a,
+            None => 0,
+        };
+
         if let Some(docs) = self.documents.clone() {
             let docs = match document_types {
                 Some(document_types) => docs
