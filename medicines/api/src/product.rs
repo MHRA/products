@@ -31,7 +31,7 @@ impl Product {
     ) -> FieldResult<document::Documents> {
         get_documents(
             &search_client::AzureSearchClient::new(),
-            "".to_string(),
+            "",
             first,
             after,
             document_types,

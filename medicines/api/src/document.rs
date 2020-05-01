@@ -105,7 +105,7 @@ pub fn get_documents_graph_from_documents_vector(
 
 pub async fn get_documents(
     client: &impl Search,
-    search: String,
+    search: &str,
     first: Option<i32>,
     after: Option<String>,
     document_types: Option<Vec<DocumentType>>,
@@ -291,7 +291,7 @@ mod test {
     fn when_we_get_the_first_page_of_documents(search_client: impl Search) -> Documents {
         block_on(get_documents(
             &search_client,
-            "Search string".to_string(),
+            "Search string",
             None,
             None,
             None,
@@ -303,7 +303,7 @@ mod test {
     fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
         block_on(get_documents(
             &search_client,
-            "Search string".to_string(),
+            "Search string",
             None,
             Some(base64::encode("1229").to_string()),
             None,
