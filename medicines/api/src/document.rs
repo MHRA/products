@@ -108,9 +108,9 @@ pub async fn get_documents(
     search: &str,
     first: Option<i32>,
     skip: Option<i32>,
-    after: Option<String>,
+    after: Option<&str>,
     document_types: Option<Vec<DocumentType>>,
-    product_name: Option<String>,
+    product_name: Option<&str>,
 ) -> Result<Documents, anyhow::Error> {
     let result_count = first.unwrap_or(10);
     let offset = match (after, skip) {
@@ -326,7 +326,7 @@ mod test {
             "Search string",
             None,
             None,
-            Some(base64::encode("1229".to_string())),
+            Some(&base64::encode("1229".to_string())),
             None,
             None,
         ))
