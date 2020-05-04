@@ -1,5 +1,6 @@
 import DataLoader from 'dataloader';
 import { IDocument } from '../model/substance';
+import { DocType } from './azure-search';
 import { graphqlRequest } from './graphql';
 
 interface IDocuments {
@@ -26,10 +27,10 @@ interface IDocumentResponse {
 }
 
 const query = `
-query ($productName: String!, $first: Int, $skip: Int) {
+query ($productName: String!, $first: Int, $skip: Int, $docTypes: [DocumentType!]) {
   product(name: $productName) {
     name
-    documents(first: $first, skip: $skip) {
+    documents(first: $first, skip: $skip, documentTypes: $docTypes) {
       count: totalCount
       edges {
         node {
@@ -87,12 +88,15 @@ const getDocumentsForProduct = async ({
   name,
   page,
   pageSize,
+  docTypes,
 }: IProductPageInfo) => {
   const variables = {
     productName: name,
     first: pageSize,
     skip: calculatePageStartRecord(page, pageSize),
+    docTypes: docTypes.map(s => s.toUpperCase()),
   };
+
   const { data } = await graphqlRequest<IProductResponse, typeof variables>({
     query,
     variables,
@@ -105,6 +109,7 @@ interface IProductPageInfo {
   name: string;
   page: number;
   pageSize: number;
+  docTypes: DocType[];
 }
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>

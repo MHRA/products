@@ -61,7 +61,7 @@ impl QueryRoot {
             search.as_deref().unwrap_or(" "),
             first,
             skip,
-            after,
+            after.as_deref(),
             document_types,
             None,
         )

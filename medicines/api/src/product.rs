@@ -35,9 +35,9 @@ impl Product {
             "",
             first,
             skip,
-            after,
+            after.as_deref(),
             document_types,
-            Some(self.name.clone()),
+            Some(&self.name),
         )
         .await
         .map_err(|e| {
