@@ -14,7 +14,7 @@ fn hello_world() -> anyhow::Result<()> {
                 .recv_string()
                 .await
                 .unwrap();
-            assert_eq!(string, "Hello, Me\n".to_string());
+            assert_eq!(string, "Hello there, Me\n".to_string());
             Ok(())
         });
 

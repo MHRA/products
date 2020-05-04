@@ -21,6 +21,6 @@ mod test {
 
     #[test]
     fn test_hello() {
-        assert_eq!("Hello, SomeName\n", hello(String::from("SomeName")));
+        assert_eq!("Hello there, SomeName\n", hello(String::from("SomeName")));
     }
 }
