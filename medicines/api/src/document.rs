@@ -55,21 +55,11 @@ fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge> {
 
 fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: i32) -> Documents {
     let result_count = edges.len() as i32;
-    let has_previous_page = offset != 0;
-    let has_next_page = offset + result_count < total_count;
-    let start_cursor = base64::encode(offset.to_string());
-    let end_cursor =
-        base64::encode(std::cmp::min(total_count, offset + result_count - 1).to_string());
 
     Documents {
         edges,
         total_count,
-        page_info: PageInfo {
-            has_previous_page,
-            has_next_page,
-            start_cursor,
-            end_cursor,
-        },
+        page_info: PageInfo::build(offset, result_count, total_count),
     }
 }
 
