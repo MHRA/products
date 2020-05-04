@@ -4,7 +4,7 @@ use crate::{
     substance::Substance,
 };
 use juniper::FieldResult;
-use search_client::{models::IndexResult, Search};
+use search_client::Search;
 use std::convert::TryInto;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -89,38 +89,40 @@ impl Product {
     }
 }
 
-pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
-    match &document.product_name {
-        Some(document_product_name) => {
-            // Try to find an existing product.
-            let existing_product = products
-                .iter_mut()
-                .find(|product| document_product_name == &product.name);
+pub fn handle_doc(document: &Document, products: &mut Vec<Product>) {
+    if let Some(document_product_name) = document.product_name() {
+        // Try to find an existing product.
+        let existing_product = products
+            .iter_mut()
+            .find(|product| document_product_name == &product.name);
 
-            match existing_product {
-                Some(existing_product) => {
-                    existing_product.add(document.to_owned().try_into().unwrap())
-                }
-                None => products.push(Product::new(
-                    document_product_name.to_owned(),
-                    Some(vec![document.to_owned().try_into().unwrap()]),
-                )),
-            }
+        match existing_product {
+            Some(existing_product) => existing_product.add(document.to_owned()),
+            None => products.push(Product::new(
+                document_product_name.to_owned(),
+                Some(vec![document.to_owned()]),
+            )),
         }
-        None => {}
     }
 }
 
 pub async fn get_substance_with_products(
     substance_name: &str,
     client: &impl Search,
-) -> Result<Substance, reqwest::Error> {
+) -> Result<Substance, anyhow::Error> {
     let azure_result = client
         .filter_by_collection_field("substance_name", substance_name)
         .await?;
 
+    let docs = azure_result
+        .search_results
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect::<Result<Vec<Document>, _>>()?;
+
     let mut products = Vec::<Product>::new();
-    for document in azure_result.search_results {
+
+    for document in docs {
         handle_doc(&document, &mut products);
     }
 
@@ -136,9 +138,10 @@ pub async fn get_product(product_name: String) -> Result<Product, reqwest::Error
 #[cfg(test)]
 mod test {
     use super::*;
+    use search_client::models::IndexResult;
 
-    fn azure_result_factory(product_name: Option<String>) -> IndexResult {
-        IndexResult {
+    fn azure_result_factory(product_name: Option<String>) -> Document {
+        let result = IndexResult {
             product_name,
             doc_type: "SPC".to_string(),
             created: Some("yes".to_string()),
@@ -155,7 +158,9 @@ mod test {
             substance_name: Vec::new(),
             suggestions: Vec::new(),
             title: "dummy's guide to medicines".to_string(),
-        }
+        };
+
+        result.try_into().unwrap()
     }
 
     #[test]
