@@ -43,9 +43,12 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
     toggleDocType,
     currentlyEnabledDocTypes,
   } = props;
+
   const toggleDocTypeForThisCheckbox = () =>
     toggleDocType(docTypeForThisCheckbox);
+
   const id = `filter-${docTypeForThisCheckbox.toLowerCase()}`;
+
   return (
     <div className="checkbox-row">
       <div className="checkbox">
@@ -66,15 +69,10 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
 };
 
 const SearchFilter: React.FC<ISearchFilterProps> = props => {
-  const generateCheckboxFor = (docType: DocType, name: string) => {
-    return (
-      <DocTypeCheckbox
-        {...props}
-        docTypeForThisCheckbox={docType}
-        name={name}
-      />
-    );
-  };
+  const generateCheckboxFor = (docType: DocType, name: string) => (
+    <DocTypeCheckbox {...props} docTypeForThisCheckbox={docType} name={name} />
+  );
+
   return (
     <StyledSearchFilter>
       <h2>Filter documents by</h2>

@@ -73,7 +73,7 @@ impl Product {
                 first,
                 offset,
                 document_types,
-                Some(self.name.clone()),
+                Some(&self.name),
             )
             .await
             .map_err(|e| {
