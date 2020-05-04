@@ -116,10 +116,25 @@ mod test {
 
     use test_case::test_case;
 
-    #[test_case("LTE=".to_string(), 0)]
-    #[test_case("MA==".to_string(), 1)]
-    #[test_case(base64::encode("1229".to_string()), 1230)]
+    #[test_case("LTE=".to_string(), 0; "for the first page of results")]
+    #[test_case("MA==".to_string(), 1; "for grabbing the second result onwards")]
+    #[test_case("OQ==".to_string(), 10; "for the second page of results when pagesize is 10")]
+    #[test_case(base64::encode("1229".to_string()), 1230; "for as late as page 124")]
     fn test_convert_after_to_offset(encoded: String, expected: i32) {
         assert_eq!(convert_after_to_offset(encoded).unwrap(), expected);
+    }
+
+    #[test_case(Some(10), Some("LTE=".to_string()), 15, 0; "matches after when only after is provided")]
+    #[test_case(Some(10), None, 15, 10; "matches skip when only skip is provided")]
+    #[test_case(None, Some("LTE=".to_string()), 15, 0; "matches after when both are provided")]
+    #[test_case(None, None, 10, 10; "matches default when neither are provided")]
+    fn test_get_offset_or_default(
+        skip: Option<i32>,
+        after: Option<String>,
+        default: i32,
+        expected: i32,
+    ) {
+        let offset = get_offset_or_default(skip, after, default);
+        assert_eq!(offset, expected);
     }
 }
