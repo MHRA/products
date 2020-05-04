@@ -10,6 +10,7 @@ use warp::{
 
 mod azure_context;
 mod document;
+mod document_type;
 mod pagination;
 mod product;
 mod schema;

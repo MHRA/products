@@ -1,7 +1,6 @@
 use crate::{
-    document::{
-        self, get_documents, get_documents_graph_from_documents_vector, Document, DocumentType,
-    },
+    document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
+    document_type::DocumentType,
     substance::Substance,
 };
 use juniper::FieldResult;

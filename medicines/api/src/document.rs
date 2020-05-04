@@ -1,9 +1,11 @@
-use crate::{pagination, pagination::PageInfo};
+use crate::{
+    document_type::{DocTypeParseError, DocumentType},
+    pagination,
+    pagination::PageInfo,
+};
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
 use std::convert::TryFrom;
-use std::fmt::{Display, Formatter};
-use std::str::FromStr;
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -78,65 +80,6 @@ fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: 
         page_info: PageInfo::build(offset, result_count, total_count),
     }
 }
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, juniper::GraphQLEnum)]
-pub enum DocumentType {
-    Spc,
-    Pil,
-    Par,
-}
-
-impl DocumentType {
-    fn to_search_str(&self) -> &str {
-        match self {
-            DocumentType::Spc => "Spc",
-            DocumentType::Pil => "Pil",
-            DocumentType::Par => "Par",
-        }
-    }
-}
-
-impl FromStr for DocumentType {
-    type Err = DocTypeParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_ascii_uppercase().as_str() {
-            "SPC" => Ok(Self::Spc),
-            "PIL" => Ok(Self::Pil),
-            "PAR" => Ok(Self::Par),
-            _ => Err(DocTypeParseError {
-                source: s.to_string(),
-            }),
-        }
-    }
-}
-
-impl Display for DocumentType {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DocumentType::Spc => write!(f, "SPC"),
-            DocumentType::Pil => write!(f, "PIL"),
-            DocumentType::Par => write!(f, "PAR"),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DocTypeParseError {
-    source: String,
-}
-
-impl Display for DocTypeParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Could not parse DocumentType from string: {}",
-            self.source
-        )
-    }
-}
-
-impl std::error::Error for DocTypeParseError {}
 
 pub fn get_documents_graph_from_documents_vector(
     docs: Vec<Document>,

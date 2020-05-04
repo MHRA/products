@@ -1,7 +1,4 @@
-use crate::{
-    document::{DocTypeParseError, Document},
-    product::Product,
-};
+use crate::{document::Document, document_type::DocTypeParseError, product::Product};
 use search_client::{models::IndexResults, Search};
 use std::collections::BTreeMap;
 use std::convert::TryInto;
@@ -24,6 +21,7 @@ impl Substance {
     fn name(&self) -> &str {
         &self.name
     }
+
     fn products(&self) -> &Vec<Product> {
         &self.products
     }
