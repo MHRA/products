@@ -79,7 +79,7 @@ impl QueryRoot {
 
 fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
     match (after, skip) {
-        (Some(encoded), _) => match base_64_decode(encoded) {
+        (Some(encoded), _) => match convert_after_to_offset(encoded) {
             Ok(a) => a,
             _ => default,
         },
@@ -88,7 +88,7 @@ fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32)
     }
 }
 
-fn base_64_decode(encoded: String) -> Result<i32, anyhow::Error> {
+fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
     let bytes = base64::decode(encoded)?;
     let string = std::str::from_utf8(&bytes)?;
     Ok(string.parse::<i32>()? + 1)
@@ -114,9 +114,12 @@ pub fn create_schema() -> Schema {
 mod test {
     use super::*;
 
-    #[test]
-    fn test_base_64_decode() {
-        let encoded = base64::encode("1229".to_string());
-        assert_eq!(base_64_decode(encoded).unwrap(), 1230);
+    use test_case::test_case;
+
+    #[test_case("LTE=".to_string(), 0)]
+    #[test_case("MA==".to_string(), 1)]
+    #[test_case(base64::encode("1229".to_string()), 1230)]
+    fn test_convert_after_to_offset(encoded: String, expected: i32) {
+        assert_eq!(convert_after_to_offset(encoded).unwrap(), expected);
     }
 }
