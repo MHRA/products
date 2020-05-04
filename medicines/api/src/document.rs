@@ -131,7 +131,7 @@ pub async fn get_documents(
                 offset,
             },
             true,
-            build_filter(document_types, product_name.as_deref()).as_deref(),
+            build_filter(document_types, product_name).as_deref(),
         )
         .await?;
 
