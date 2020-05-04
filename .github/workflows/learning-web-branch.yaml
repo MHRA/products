@@ -28,7 +28,7 @@ jobs:
 
       - name: Install modules
         working-directory: learning/web
-        run: yarn run install --frozen-lockfile
+        run: yarn install
 
       # - name: Run tests with coverage
       #   working-directory: learning/web
@@ -36,7 +36,7 @@ jobs:
 
       - name: Build
         working-directory: learning/web
-        run: yarn run build
+        run: yarn build
         env:
           PATH_PREFIX: "/"
 
