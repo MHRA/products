@@ -6,6 +6,7 @@ use crate::{
 };
 use juniper::FieldResult;
 use search_client::{models::IndexResult, Search};
+use std::convert::TryInto;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
@@ -49,7 +50,7 @@ impl Product {
             let docs = match document_types {
                 Some(document_types) => docs
                     .into_iter()
-                    .filter(|x| document_types.iter().any(|f| x.is_doc_type(f)))
+                    .filter(|x| document_types.iter().any(|&f| x.is_doc_type(f)))
                     .collect(),
                 None => docs,
             };
@@ -98,10 +99,12 @@ pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
                 .find(|product| document_product_name == &product.name);
 
             match existing_product {
-                Some(existing_product) => existing_product.add(document.to_owned().into()),
+                Some(existing_product) => {
+                    existing_product.add(document.to_owned().try_into().unwrap())
+                }
                 None => products.push(Product::new(
                     document_product_name.to_owned(),
-                    Some(vec![document.to_owned().into()]),
+                    Some(vec![document.to_owned().try_into().unwrap()]),
                 )),
             }
         }
@@ -138,7 +141,7 @@ mod test {
     fn azure_result_factory(product_name: Option<String>) -> IndexResult {
         IndexResult {
             product_name,
-            doc_type: "dummy".to_string(),
+            doc_type: "SPC".to_string(),
             created: Some("yes".to_string()),
             facets: Vec::new(),
             file_name: "README.markdown".to_string(),

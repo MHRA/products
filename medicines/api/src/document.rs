@@ -1,6 +1,9 @@
 use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
 use search_client::{models::IndexResult, Search};
+use std::convert::TryFrom;
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -10,26 +13,39 @@ pub struct Document {
     title: Option<String>,
     highlights: Option<Vec<String>>,
     created: Option<String>,
-    doc_type: Option<String>, // TODO: use DocumentType enum below
+    doc_type: Option<DocumentType>,
     file_size_in_bytes: Option<i32>,
     name: Option<String>,
     url: Option<String>,
 }
 
 impl Document {
-    pub fn is_doc_type(&self, doc_type: &DocumentType) -> bool {
-        self.doc_type == Some(doc_type.to_search_str().to_owned())
+    pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
+        self.doc_type == Some(doc_type)
+    }
+
+    pub fn product_name(&self) -> Option<&str> {
+        self.product_name.as_deref()
+    }
+
+    pub fn substances(&self) -> impl Iterator<Item = &str> {
+        self.active_substances
+            .iter()
+            .flat_map(|s| s.iter())
+            .map(|s| s.as_str())
     }
 }
 
-impl From<IndexResult> for Document {
-    fn from(r: IndexResult) -> Self {
-        Self {
+impl TryFrom<IndexResult> for Document {
+    type Error = DocTypeParseError;
+
+    fn try_from(r: IndexResult) -> Result<Self, Self::Error> {
+        Ok(Self {
             product_name: r.product_name,
             active_substances: Some(r.substance_name),
             title: Some(r.title),
             created: r.created,
-            doc_type: Some(r.doc_type),
+            doc_type: Some(r.doc_type.parse()?),
             file_size_in_bytes: Some(r.metadata_storage_size),
             name: Some(r.file_name),
             url: Some(r.metadata_storage_path),
@@ -37,7 +53,7 @@ impl From<IndexResult> for Document {
                 Some(a) => Some(a.content),
                 _ => None,
             },
-        }
+        })
     }
 }
 
@@ -63,7 +79,7 @@ fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: 
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, juniper::GraphQLEnum)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, juniper::GraphQLEnum)]
 pub enum DocumentType {
     Spc,
     Pil,
@@ -80,8 +96,23 @@ impl DocumentType {
     }
 }
 
-impl std::fmt::Display for DocumentType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl FromStr for DocumentType {
+    type Err = DocTypeParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_ascii_uppercase().as_str() {
+            "SPC" => Ok(Self::Spc),
+            "PIL" => Ok(Self::Pil),
+            "PAR" => Ok(Self::Par),
+            _ => Err(DocTypeParseError {
+                source: s.to_string(),
+            }),
+        }
+    }
+}
+
+impl Display for DocumentType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             DocumentType::Spc => write!(f, "SPC"),
             DocumentType::Pil => write!(f, "PIL"),
@@ -89,6 +120,23 @@ impl std::fmt::Display for DocumentType {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct DocTypeParseError {
+    source: String,
+}
+
+impl Display for DocTypeParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Could not parse DocumentType from string: {}",
+            self.source
+        )
+    }
+}
+
+impl std::error::Error for DocTypeParseError {}
 
 pub fn get_documents_graph_from_documents_vector(
     docs: Vec<Document>,
@@ -135,9 +183,9 @@ pub async fn get_documents(
 
     let docs = azure_result
         .search_results
-        .iter()
-        .map(|search_result| Document::from(search_result.clone()))
-        .collect();
+        .into_iter()
+        .map(|search_result| Document::try_from(search_result))
+        .collect::<Result<_, _>>()?;
 
     let total_count = azure_result.count.unwrap_or(0);
 
