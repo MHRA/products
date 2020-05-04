@@ -131,7 +131,7 @@ pub async fn get_documents(
                 offset,
             },
             true,
-            build_filter(document_types, product_name).as_deref(),
+            build_filter(document_types, product_name.as_deref()).as_deref(),
         )
         .await?;
 
@@ -152,32 +152,36 @@ pub async fn get_documents(
 
 fn build_filter(
     document_types: Option<Vec<DocumentType>>,
-    product_name: Option<String>,
+    product_name: Option<&str>,
 ) -> Option<String> {
-    match (document_types, product_name) {
-        (Some(document_types), Some(product_name)) => Some(format!(
-            "({} and {})",
-            build_product_name_filter(product_name),
-            build_document_types_filter(document_types)
-        )),
-        (Some(document_types), None) => Some(build_document_types_filter(document_types)),
-        (None, Some(product_name)) => Some(build_product_name_filter(product_name)),
-        (None, None) => None,
+    let docs_filter = document_types.and_then(build_document_types_filter);
+    let products_filter = product_name.map(build_product_name_filter);
+
+    let filters: Vec<String> = products_filter.into_iter().chain(docs_filter).collect();
+
+    match &filters[..] {
+        [] => None,
+        [filter] => Some(filter.clone()),
+        _ => Some(format!("({})", filters.join(" and "))),
     }
 }
 
-fn build_document_types_filter(document_types: Vec<DocumentType>) -> String {
-    format!(
+fn build_document_types_filter(document_types: Vec<DocumentType>) -> Option<String> {
+    if document_types.is_empty() {
+        return None;
+    }
+
+    Some(format!(
         "({})",
         document_types
             .into_iter()
             .map(|document_type| format!("doc_type eq '{}'", document_type.to_search_str()))
             .collect::<Vec<_>>()
             .join(" or ")
-    )
+    ))
 }
 
-fn build_product_name_filter(product_name: String) -> String {
+fn build_product_name_filter(product_name: &str) -> String {
     format!("(product_name eq '{}')", product_name)
 }
 
@@ -396,25 +400,38 @@ mod test {
 
     #[test_case(None, None, None)]
     #[test_case(
+        Some(vec![]),
+        None,
+        None
+    )]
+    #[test_case(
         Some(vec![DocumentType::Spc, DocumentType::Pil,DocumentType::Par,]),
-        Some("IBUPROFEN 100MG CAPLETS".to_string()),
-        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par'))".to_string())
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par'))")
     )]
     #[test_case(
         Some(vec![DocumentType::Spc,  DocumentType::Pil,DocumentType::Par,]),
         None,
-        Some("(doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par')".to_string())
+        Some("(doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par')")
     )]
     #[test_case(
         None,
-        Some("IBUPROFEN 100MG CAPLETS".to_string()),
-        Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')".to_string())
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')")
+    )]
+    #[test_case(
+        Some(vec![]),
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')")
     )]
     fn test_build_filter(
         document_types: Option<Vec<DocumentType>>,
-        product_name: Option<String>,
-        expected_filter: Option<String>,
+        product_name: Option<&str>,
+        expected_filter: Option<&str>,
     ) {
-        assert_eq!(expected_filter, build_filter(document_types, product_name));
+        assert_eq!(
+            expected_filter.map(|s| s.to_string()),
+            build_filter(document_types, product_name)
+        );
     }
 }
