@@ -83,7 +83,7 @@ fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> 
         .map(|(&substance, prods)| {
             let products = prods
                 .iter()
-                .map(|(&name, _docs)| Product::new(name.into()))
+                .map(|(&name, docs)| Product::new(name.into(), Some(docs.to_owned())))
                 .collect();
 
             Substance::new(substance.into(), products)
@@ -170,6 +170,10 @@ mod tests {
             count: None
         };
 
+        let zon50: Vec<Document> = vec![zonismade_50mg.into(), zonismade_50mg_repeat.into()];
+        let zon25: Vec<Document> = vec![zonismade_25mg.into()];
+        let zol: Vec<Document> = vec![zolmitriptan.into()];
+
         let formatted = format_search_results(results, letter);
 
         let expected = vec![
@@ -177,13 +181,14 @@ mod tests {
                 "ZOLMITRIPTAN".into(),
                 vec![Product::new(
                     "ZOMIG RAPIMELT 2.5 MG ORODISPERSIBLE TABLETS".into(),
+                    Some(zol),
                 )],
             ),
             Substance::new(
                 "ZONISAMIDE".into(),
                 vec![
-                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into()),
-                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into()),
+                    Product::new("ZONISAMIDE ARISTO 25 MG HARD CAPSULES".into(), Some(zon25)),
+                    Product::new("ZONISAMIDE ARISTO 50 MG HARD CAPSULES".into(), Some(zon50)),
                 ],
             ),
         ];
@@ -207,11 +212,11 @@ mod tests {
                 "Z, ZIDOVUDINE, LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS",
             ],
         );
+        let document: Document = index_result.clone().into();
 
         let results = IndexResults {
             search_results: vec![
-                index_result.clone(),
-
+                index_result,
             ],
             context: "https://mhraproductsnonprod.search.windows.net/indexes(\'products-index\')/$metadata#docs(*)".into(),
             count: None
@@ -223,6 +228,7 @@ mod tests {
             "ZIDOVUDINE".into(),
             vec![Product::new(
                 "LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS".into(),
+                Some(vec![document]),
             )],
         )];
 

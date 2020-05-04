@@ -16,6 +16,12 @@ pub struct Document {
     url: Option<String>,
 }
 
+impl Document {
+    pub fn is_doc_type(&self, doc_type: &DocumentType) -> bool {
+        self.doc_type == Some(doc_type.to_search_str().to_owned())
+    }
+}
+
 impl From<IndexResult> for Document {
     fn from(r: IndexResult) -> Self {
         Self {
@@ -49,21 +55,11 @@ fn get_document_edges(docs: Vec<Document>, offset: i32) -> Vec<DocumentEdge> {
 
 fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: i32) -> Documents {
     let result_count = edges.len() as i32;
-    let has_previous_page = offset != 0;
-    let has_next_page = offset + result_count < total_count;
-    let start_cursor = base64::encode(offset.to_string());
-    let end_cursor =
-        base64::encode(std::cmp::min(total_count, offset + result_count - 1).to_string());
 
     Documents {
         edges,
         total_count,
-        page_info: PageInfo {
-            has_previous_page,
-            has_next_page,
-            start_cursor,
-            end_cursor,
-        },
+        page_info: PageInfo::build(offset, result_count, total_count),
     }
 }
 
@@ -103,25 +99,27 @@ pub fn get_documents_graph_from_documents_vector(
     get_documents_from_edges(edges, offset, total_count)
 }
 
+pub struct AzureDocumentResult {
+    docs: Vec<Document>,
+    offset: i32,
+    total_count: i32,
+}
+
+impl Into<Documents> for AzureDocumentResult {
+    fn into(self) -> Documents {
+        get_documents_graph_from_documents_vector(self.docs, self.offset, self.total_count)
+    }
+}
+
 pub async fn get_documents(
     client: &impl Search,
     search: &str,
     first: Option<i32>,
-    skip: Option<i32>,
-    after: Option<&str>,
+    offset: i32,
     document_types: Option<Vec<DocumentType>>,
     product_name: Option<&str>,
-) -> Result<Documents, anyhow::Error> {
+) -> Result<AzureDocumentResult, anyhow::Error> {
     let result_count = first.unwrap_or(10);
-    let offset = match (after, skip) {
-        (Some(encoded), _) => {
-            let bytes = base64::decode(encoded)?;
-            let string = std::str::from_utf8(&bytes)?;
-            string.parse::<i32>()? + 1
-        }
-        (None, Some(offset)) => offset,
-        _ => 0,
-    };
 
     let azure_result = client
         .search_with_pagination_and_filter(
@@ -143,11 +141,11 @@ pub async fn get_documents(
 
     let total_count = azure_result.count.unwrap_or(0);
 
-    Ok(get_documents_graph_from_documents_vector(
+    Ok(AzureDocumentResult {
         docs,
-        offset,
         total_count,
-    ))
+        offset,
+    })
 }
 
 fn build_filter(
@@ -290,8 +288,8 @@ mod test {
         ]
     }
 
-    fn given_a_search_client(search_results: &Vec<IndexResult>) -> TestAzureSearchClient {
-        TestAzureSearchClient::new(search_results.clone())
+    fn given_a_search_client(search_results: &[IndexResult]) -> TestAzureSearchClient {
+        TestAzureSearchClient::new(search_results.to_owned())
     }
 
     fn when_we_get_the_first_page_of_documents(search_client: impl Search) -> Documents {
@@ -299,12 +297,12 @@ mod test {
             &search_client,
             "Search string",
             None,
-            None,
-            None,
+            0,
             None,
             None,
         ))
         .unwrap()
+        .into()
     }
 
     fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
@@ -312,25 +310,12 @@ mod test {
             &search_client,
             "Search string",
             None,
-            Some(1230),
-            None,
-            None,
-            None,
-        ))
-        .unwrap()
-    }
-
-    fn when_we_get_the_last_page_of_documents_using_after(search_client: impl Search) -> Documents {
-        block_on(get_documents(
-            &search_client,
-            "Search string",
-            None,
-            None,
-            Some(&base64::encode("1229".to_string())),
+            1230,
             None,
             None,
         ))
         .unwrap()
+        .into()
     }
 
     fn then_we_have_the_first_page(documents_response: &Documents) {
@@ -340,7 +325,7 @@ mod test {
         ];
         let edges = &documents_response.edges;
         let actual_names = edges
-            .into_iter()
+            .iter()
             .map(|edge| edge.node.product_name.as_ref().unwrap());
         assert!(actual_names.eq(expected_names));
 
@@ -359,7 +344,7 @@ mod test {
         let expected_names = vec!["fourth last", "third last", "second last", "last"];
         let edges = &documents_response.edges;
         let actual_names = edges
-            .into_iter()
+            .iter()
             .map(|edge| edge.node.product_name.as_ref().unwrap());
 
         assert!(actual_names.eq(expected_names));
@@ -387,14 +372,6 @@ mod test {
         let search_results = given_last_page_of_search_results();
         let search_client = given_a_search_client(&search_results);
         let response = when_we_get_the_last_page_of_documents(search_client);
-        then_we_have_the_last_page(&response);
-    }
-
-    #[test]
-    fn test_get_documents_last_page_using_after() {
-        let search_results = given_last_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_last_page_of_documents_using_after(search_client);
         then_we_have_the_last_page(&response);
     }
 

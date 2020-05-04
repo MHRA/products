@@ -56,12 +56,13 @@ impl QueryRoot {
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
-        get_documents(
+        let offset = get_offset_or_default(skip, after, 0);
+
+        let docs = get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
-            skip,
-            after.as_deref(),
+            offset,
             document_types,
             None,
         )
@@ -69,8 +70,28 @@ impl QueryRoot {
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
             juniper::FieldError::new("Error fetching search results", juniper::Value::null())
-        })
+        })?
+        .into();
+
+        Ok(docs)
     }
+}
+
+fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
+    match (after, skip) {
+        (Some(encoded), _) => match convert_after_to_offset(encoded) {
+            Ok(a) => a,
+            _ => default,
+        },
+        (None, Some(offset)) => offset,
+        _ => default,
+    }
+}
+
+fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
+    let bytes = base64::decode(encoded)?;
+    let string = std::str::from_utf8(&bytes)?;
+    Ok(string.parse::<i32>()? + 1)
 }
 
 pub struct MutationRoot;
@@ -87,4 +108,33 @@ impl SubscriptionRoot {}
 
 pub fn create_schema() -> Schema {
     Schema::new(QueryRoot {}, MutationRoot {}, SubscriptionRoot {})
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    use test_case::test_case;
+
+    #[test_case("LTE=".to_string(), 0; "for the first page of results")]
+    #[test_case("MA==".to_string(), 1; "for grabbing the second result onwards")]
+    #[test_case("OQ==".to_string(), 10; "for the second page of results when pagesize is 10")]
+    #[test_case(base64::encode("1229".to_string()), 1230; "for as late as page 124")]
+    fn test_convert_after_to_offset(encoded: String, expected: i32) {
+        assert_eq!(convert_after_to_offset(encoded).unwrap(), expected);
+    }
+
+    #[test_case(Some(10), Some("LTE=".to_string()), 15, 0; "matches after when only after is provided")]
+    #[test_case(Some(10), None, 15, 10; "matches skip when only skip is provided")]
+    #[test_case(None, Some("LTE=".to_string()), 15, 0; "matches after when both are provided")]
+    #[test_case(None, None, 10, 10; "matches default when neither are provided")]
+    fn test_get_offset_or_default(
+        skip: Option<i32>,
+        after: Option<String>,
+        default: i32,
+        expected: i32,
+    ) {
+        let offset = get_offset_or_default(skip, after, default);
+        assert_eq!(offset, expected);
+    }
 }
