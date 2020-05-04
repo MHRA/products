@@ -24,7 +24,7 @@ interface IDocumentResponse {
 }
 
 const query = `
-query($searchTerm: String, $first: Int, $after: String, $documentTypes: [String!]) {
+query($searchTerm: String, $first: Int, $after: String, $documentTypes: [DocumentType!]) {
   documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes) {
     count: totalCount
     edges {
