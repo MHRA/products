@@ -12,7 +12,7 @@ async fn hello_handler(req: Request<()>) -> tide::Result<String> {
 }
 
 fn hello(name: String) -> String {
-    format!("Hello, {}\n", name)
+    format!("Hello there, {}\n", name)
 }
 
 #[cfg(test)]
