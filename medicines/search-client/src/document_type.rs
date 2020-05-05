@@ -13,16 +13,6 @@ pub enum DocumentType {
     Par,
 }
 
-impl DocumentType {
-    pub fn to_search_str(&self) -> &str {
-        match self {
-            DocumentType::Spc => "Spc",
-            DocumentType::Pil => "Pil",
-            DocumentType::Par => "Par",
-        }
-    }
-}
-
 impl FromStr for DocumentType {
     type Err = DocTypeParseError;
 
@@ -41,9 +31,9 @@ impl FromStr for DocumentType {
 impl Display for DocumentType {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            DocumentType::Spc => write!(f, "SPC"),
-            DocumentType::Pil => write!(f, "PIL"),
-            DocumentType::Par => write!(f, "PAR"),
+            DocumentType::Spc => write!(f, "Spc"),
+            DocumentType::Pil => write!(f, "Pil"),
+            DocumentType::Par => write!(f, "Par"),
         }
     }
 }
@@ -70,9 +60,9 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case("SPC")]
-    #[test_case("PIL")]
-    #[test_case("PAR")]
+    #[test_case("Spc")]
+    #[test_case("Pil")]
+    #[test_case("Par")]
     fn parses_and_formats_to_a_string(doc_type: &str) {
         use pretty_assertions::assert_eq;
 

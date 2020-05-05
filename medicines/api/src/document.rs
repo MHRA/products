@@ -161,7 +161,7 @@ fn build_document_types_filter(document_types: Vec<DocumentType>) -> Option<Stri
         "({})",
         document_types
             .into_iter()
-            .map(|document_type| format!("doc_type eq '{}'", document_type.to_search_str()))
+            .map(|document_type| format!("doc_type eq '{}'", document_type))
             .collect::<Vec<_>>()
             .join(" or ")
     ))
