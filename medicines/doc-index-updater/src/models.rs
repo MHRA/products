@@ -59,6 +59,17 @@ pub struct JobStatusResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct ParUploadRequest {
+    pub jwt_token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct ParUploadResponse {
+    pub email: String,
+    pub authenticated: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Document {
     pub id: String,
     pub name: String,

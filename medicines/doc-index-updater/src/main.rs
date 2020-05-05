@@ -46,6 +46,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
+                    .or(document_manager::upload_par::upload_par_file())
                     .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
