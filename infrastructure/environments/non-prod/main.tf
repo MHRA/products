@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version = "=2.2.0"
+  version = "=2.8.0"
   features {}
 }
 
@@ -68,7 +68,7 @@ data "azurerm_virtual_network" "cluster" {
 
 resource "azurerm_subnet" "load_balancer" {
   name                 = "adarz-spoke-products-sn-01"
-  address_prefix       = "10.5.65.0/26"
+  address_prefixes     = ["10.5.65.0/26"]
   resource_group_name  = data.azurerm_virtual_network.cluster.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.cluster.name
 }
