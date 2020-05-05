@@ -1,10 +1,9 @@
 use crate::{
     document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
-    document_type::DocumentType,
     substance::Substance,
 };
 use juniper::FieldResult;
-use search_client::Search;
+use search_client::{models::DocumentType, Search};
 use std::convert::TryInto;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -143,7 +142,7 @@ mod test {
     fn azure_result_factory(product_name: Option<String>) -> Document {
         let result = IndexResult {
             product_name,
-            doc_type: "SPC".to_string(),
+            doc_type: DocumentType::Spc,
             created: Some("yes".to_string()),
             facets: Vec::new(),
             file_name: "README.markdown".to_string(),

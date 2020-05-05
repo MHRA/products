@@ -1,10 +1,9 @@
-use crate::{
-    document_type::{DocTypeParseError, DocumentType},
-    pagination,
-    pagination::PageInfo,
-};
+use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
-use search_client::{models::IndexResult, Search};
+use search_client::{
+    models::{DocumentType, IndexResult},
+    Search,
+};
 use std::convert::TryFrom;
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
@@ -38,16 +37,14 @@ impl Document {
     }
 }
 
-impl TryFrom<IndexResult> for Document {
-    type Error = DocTypeParseError;
-
-    fn try_from(r: IndexResult) -> Result<Self, Self::Error> {
-        Ok(Self {
+impl From<IndexResult> for Document {
+    fn from(r: IndexResult) -> Self {
+        Self {
             product_name: r.product_name,
             active_substances: Some(r.substance_name),
             title: Some(r.title),
             created: r.created,
-            doc_type: Some(r.doc_type.parse()?),
+            doc_type: Some(r.doc_type),
             file_size_in_bytes: Some(r.metadata_storage_size),
             name: Some(r.file_name),
             url: Some(r.metadata_storage_path),
@@ -55,7 +52,7 @@ impl TryFrom<IndexResult> for Document {
                 Some(a) => Some(a.content),
                 _ => None,
             },
-        })
+        }
     }
 }
 
@@ -237,7 +234,7 @@ mod test {
     fn given_a_search_result(product_name: &str) -> IndexResult {
         IndexResult {
             product_name: Some(product_name.to_string()),
-            doc_type: "Spc".to_string(),
+            doc_type: DocumentType::Spc,
             file_name: "our_id".to_string(),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),

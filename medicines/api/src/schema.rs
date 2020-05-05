@@ -3,10 +3,10 @@ use juniper::{FieldResult, RootNode};
 use crate::{
     azure_context::AzureContext,
     document::{get_documents, Documents},
-    document_type::DocumentType,
     product::{get_product, get_substance_with_products, Product},
     substance::{get_substances_starting_with_letter, Substance},
 };
+use search_client::models::DocumentType;
 
 pub struct QueryRoot;
 

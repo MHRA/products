@@ -1,7 +1,9 @@
-use crate::{document::Document, document_type::DocTypeParseError, product::Product};
-use search_client::{models::IndexResults, Search};
+use crate::{document::Document, product::Product};
+use search_client::{
+    models::{DocTypeParseError, IndexResults},
+    Search,
+};
 use std::collections::BTreeMap;
-use std::convert::TryInto;
 
 #[derive(Debug, PartialEq)]
 pub struct Substance {
@@ -53,21 +55,17 @@ fn format_search_results(
         .into_iter()
         .filter(|result| result.facets.iter().any(|s| s == &letter_string))
         .filter_map(|result| {
-            result
-                .try_into()
-                .map(|doc: Document| {
-                    let substance = doc
-                        .substances()
-                        .find(|s| s.starts_with(letter))?
-                        .to_string();
+            let doc: Document = result.into();
 
-                    let product = doc.product_name()?.to_string();
+            let substance = doc
+                .substances()
+                .find(|s| s.starts_with(letter))?
+                .to_string();
 
-                    Some((substance, product, doc))
-                })
-                .transpose()
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+            let product = doc.product_name()?.to_string();
+
+            Some((substance, product, doc))
+        });
 
     for (substance, product, doc) in documents {
         match substances.get_mut(&substance) {
@@ -106,11 +104,11 @@ fn format_search_results(
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
-    use search_client::models::{IndexResult, IndexResults};
+    use search_client::models::{DocumentType, IndexResult, IndexResults};
 
     fn index_result(product_name: &str, substance_name: &[&str], facets: &[&str]) -> IndexResult {
         IndexResult {
-            doc_type: "Spc".into(),
+            doc_type: DocumentType::Spc,
             file_name: "CON1587463572172".into(),
             metadata_storage_name: "4e99070c7e5d3682675b2becd972ec44ef35b20c".into(),
             metadata_storage_path: "https://mhraproductsnonprod.blob.core.windows.net/docs/4e99070c7e5d3682675b2becd972ec44ef35b20c".into(),
@@ -181,12 +179,9 @@ mod tests {
             count: None
         };
 
-        let zon50: Vec<Document> = vec![
-            zonismade_50mg.try_into().unwrap(),
-            zonismade_50mg_repeat.try_into().unwrap(),
-        ];
-        let zon25: Vec<Document> = vec![zonismade_25mg.try_into().unwrap()];
-        let zol: Vec<Document> = vec![zolmitriptan.try_into().unwrap()];
+        let zon50: Vec<Document> = vec![zonismade_50mg.into(), zonismade_50mg_repeat.into()];
+        let zon25: Vec<Document> = vec![zonismade_25mg.into()];
+        let zol: Vec<Document> = vec![zolmitriptan.into()];
 
         let formatted = format_search_results(results, letter).unwrap();
 
@@ -226,7 +221,7 @@ mod tests {
                 "Z, ZIDOVUDINE, LAMIVUDINE/ZIDOVUDINE 150 MG/300 MG FILM-COATED TABLETS",
             ],
         );
-        let document: Document = index_result.clone().try_into().unwrap();
+        let document: Document = index_result.clone().into();
 
         let results = IndexResults {
             search_results: vec![
