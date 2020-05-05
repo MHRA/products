@@ -4,7 +4,6 @@ use search_client::{
     models::{DocumentType, IndexResult},
     Search,
 };
-use std::convert::TryFrom;
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -124,8 +123,8 @@ pub async fn get_documents(
     let docs = azure_result
         .search_results
         .into_iter()
-        .map(|search_result| Document::try_from(search_result))
-        .collect::<Result<_, _>>()?;
+        .map(|search_result| Document::from(search_result))
+        .collect();
 
     let total_count = azure_result.count.unwrap_or(0);
 
