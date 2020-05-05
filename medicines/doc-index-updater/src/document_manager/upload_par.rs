@@ -2,7 +2,8 @@ use crate::{
     auth_manager,
     models::{ParUploadRequest, ParUploadResponse},
 };
-use azure_jwt;
+use azure_jwt::AzureAuth;
+
 use warp::{reply::Json, Filter, Rejection, Reply};
 
 pub fn upload_par_file() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
@@ -18,17 +19,25 @@ pub fn upload_par_file() -> impl Filter<Extract = impl Reply, Error = Rejection>
 }
 
 async fn upload_par_handler(par_upload: ParUploadRequest) -> Result<Json, Rejection> {
-    let authenticated = auth(par_upload.jwt_token);
+    let authenticated = auth(par_upload.jwt_token.clone());
 
-    Ok(warp::reply::json(&par_upload))
+    Ok(warp::reply::json(&authenticated))
 }
 
-fn auth(token: &str) -> ParUploadResponse {
+fn auth(token: String) -> ParUploadResponse {
     let mut az_auth = AzureAuth::new("c690f864-0c73-45a5-a1d0-0267b031f722").unwrap();
 
-    let decoded_token = az_auth.validate_token(&token).expect("validated");
-    ParUploadResponse {
-        email: decoded_token.claims.preferred_username,
-        authenticated: true,
+    let decoded_token = az_auth.validate_token(token.as_str());
+    match decoded_token {
+        Ok(x) => ParUploadResponse {
+            email: x.claims.preferred_username,
+            authenticated: true,
+            error: None,
+        },
+        Err(x) => ParUploadResponse {
+            email: None,
+            authenticated: false,
+            error: Some(format!("{}", x)),
+        },
     }
 }

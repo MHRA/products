@@ -65,8 +65,9 @@ pub struct ParUploadRequest {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct ParUploadResponse {
-    pub email: String,
+    pub email: Option<String>,
     pub authenticated: bool,
+    pub error: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
