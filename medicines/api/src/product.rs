@@ -4,7 +4,6 @@ use crate::{
 };
 use juniper::FieldResult;
 use search_client::{models::DocumentType, Search};
-use std::convert::TryInto;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
@@ -113,15 +112,11 @@ pub async fn get_substance_with_products(
         .filter_by_collection_field("substance_name", substance_name)
         .await?;
 
-    let docs = azure_result
-        .search_results
-        .into_iter()
-        .map(TryInto::try_into)
-        .collect::<Result<Vec<Document>, _>>()?;
-
     let mut products = Vec::<Product>::new();
 
-    for document in docs {
+    for result in azure_result.search_results {
+        let document = result.into();
+
         handle_doc(&document, &mut products);
     }
 
@@ -159,7 +154,7 @@ mod test {
             title: "dummy's guide to medicines".to_string(),
         };
 
-        result.try_into().unwrap()
+        result.into()
     }
 
     #[test]
