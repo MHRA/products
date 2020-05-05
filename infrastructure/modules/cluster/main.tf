@@ -12,7 +12,7 @@ resource "azurerm_public_ip" "products_ip" {
 resource "azurerm_subnet" "cluster" {
   name                 = var.cluster_subnet_name
   resource_group_name  = var.vnet_resource_group
-  address_prefix       = var.cluster_subnet_cidr
+  address_prefixes     = [var.cluster_subnet_cidr]
   virtual_network_name = var.vnet_name
 }
 
