@@ -20,7 +20,7 @@ impl std::fmt::Display for JobStatus {
             JobStatus::Accepted => write!(f, "Accepted"),
             JobStatus::Done => write!(f, "Done"),
             JobStatus::NotFound => write!(f, "NotFound"),
-            JobStatus::Error { message, code } => write!("Error({}: {})", code, message),
+            JobStatus::Error { message, code } => write!(f, "Error({}: {})", code, message),
         }
     }
 }
