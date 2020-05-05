@@ -64,12 +64,21 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 }
 
+data "azurerm_kubernetes_cluster" "cluster" {
+  # By reading `name` out of the cluster we make terraform defer reading from
+  # the resource until after it's been created.
+  #
+  # See note in `data.azurerm_subnet.cluster_nodes` below
+  name                = split("/", azurerm_kubernetes_cluster.cluster.id)[8]
+  resource_group_name = azurerm_kubernetes_cluster.cluster.resource_group_name
+}
+
 data "azurerm_subnet" "cluster_nodes" {
   # We read the `name` off the cluster to create an implicit dependency on it. Otherwise if we try
   # and read from this data source before the cluster and its route table have been created the
   # `route_table_id` attribute will be null when we try to read it in `azurerm_route.cluster_nodes`
   # below.
-  name                 = split("/", azurerm_kubernetes_cluster.cluster.default_node_pool[0].vnet_subnet_id)[10]
+  name                 = split("/", data.azurerm_kubernetes_cluster.cluster.agent_pool_profile[0].vnet_subnet_id)[10]
   resource_group_name  = azurerm_subnet.cluster.resource_group_name
   virtual_network_name = azurerm_subnet.cluster.virtual_network_name
 }
