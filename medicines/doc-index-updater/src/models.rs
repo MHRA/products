@@ -1,7 +1,7 @@
 use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
-use core::fmt;
 use regex::Regex;
+use search_client::models::DocumentType;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -145,30 +145,6 @@ impl Into<XMLJobStatusResponse> for JobStatusResponse {
             id: self.id.to_string(),
             status: self.status.to_string(),
         }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum DocumentType {
-    #[serde(rename = "SPC")]
-    Spc,
-    #[serde(rename = "PIL")]
-    Pil,
-    #[serde(rename = "PAR")]
-    Par,
-}
-
-impl fmt::Display for DocumentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match &self {
-                DocumentType::Spc => "Spc",
-                DocumentType::Pil => "Pil",
-                DocumentType::Par => "Par",
-            }
-        )
     }
 }
 

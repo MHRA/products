@@ -1,11 +1,8 @@
 use super::sanitiser::{SanitisedString, VecSanitisedString};
-use crate::{
-    create_manager::Blob,
-    models::{Document, DocumentType},
-};
+use crate::{create_manager::Blob, models::Document};
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
-use search_client::models::IndexEntry;
+use search_client::models::{DocumentType, IndexEntry};
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -100,7 +97,7 @@ impl From<Blob> for IndexEntry {
             title: blob.metadata.title.to_string(),
             pl_number: vec![blob.metadata.pl_number.to_string()],
             file_name: blob.metadata.file_name.to_string(),
-            doc_type: blob.metadata.doc_type.to_string(),
+            doc_type: blob.metadata.doc_type,
             suggestions: vec![],
             substance_name: blob.metadata.active_substances.to_vec_string(),
             facets: blob.metadata.facets(),
@@ -173,7 +170,8 @@ pub fn extract_product_licences(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::{DocumentType, FileSource};
+    use crate::models::FileSource;
+    use search_client::models::DocumentType;
 
     #[test]
     fn derive_metadata() {
@@ -229,13 +227,13 @@ mod test {
             "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned(),
         ];
         let expected = vec![
-            "H", 
-            "H, HYDROCHLOROTHIAZIDE", 
+            "H",
+            "H, HYDROCHLOROTHIAZIDE",
             "H, HYDROCHLOROTHIAZIDE, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
             "L",
-            "L, L-TEST", 
+            "L, L-TEST",
             "L, L-TEST, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
-            "L, LOSARTAN POTASSIUM", 
+            "L, LOSARTAN POTASSIUM",
             "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
         ];
         assert_eq!(

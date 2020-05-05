@@ -193,7 +193,10 @@ mod test {
         state_manager::test::TestJobStatusClient,
     };
     use search_client::{
-        models::{AzureIndexChangedResult, AzureIndexChangedResults, IndexResult, IndexResults},
+        models::{
+            AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, IndexResult,
+            IndexResults,
+        },
         Search,
     };
     use std::env;
@@ -481,7 +484,7 @@ mod test {
 
     fn given_an_index_search_result() -> IndexResult {
         IndexResult {
-            doc_type: "Spc".to_string(),
+            doc_type: DocumentType::Spc,
             file_name: "our_id".to_string(),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),
