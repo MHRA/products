@@ -1,0 +1,25 @@
+matrix:
+  - name: Markdown
+    apsell:
+      mode: none
+    dictionary:
+      wordlists:
+        - docs/words.txt
+      output: wordlist.dic
+      encoding: utf-8
+    pipeline:
+      - pyspelling.filters.markdown:
+      - pyspelling.filters.html:
+    sources:
+      - "**/*.md"
+  - name: Text
+    sources:
+      - "**/*.txt"
+    dictionary:
+      wordlists:
+        - docs/words.txt
+      output: wordlist.dic
+      encoding: utf-8
+    pipeline:
+      - pyspelling.filters.text:
+          convert_encoding: utf-8
