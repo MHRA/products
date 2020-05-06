@@ -1,6 +1,6 @@
 use doc_index_updater::{
     auth_manager::AuthenticationFailed, create_manager, delete_manager, document_manager,
-    get_env_or_default, health, state_manager,
+    get_env_or_default, health, pars_upload, state_manager,
 };
 use state_manager::get_client;
 use std::{convert::Infallible, error, net::SocketAddr, time::Duration};
@@ -46,6 +46,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
+                    .or(pars_upload::handler(state.clone()))
                     .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
