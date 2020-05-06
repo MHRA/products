@@ -61,9 +61,6 @@ struct UploadResponse<'a> {
     path: &'a str,
 }
 
-#[derive(Debug)]
-struct ParsUpload {}
-
 async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>), SubmissionError> {
     let parts: Vec<Part> =
         form_data
