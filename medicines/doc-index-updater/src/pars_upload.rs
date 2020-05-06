@@ -1,50 +1,140 @@
-use crate::state_manager::{with_state, StateManager};
-use anyhow::anyhow;
+use crate::{
+    create_manager::{create_blob, models::BlobMetadata},
+    models::DocumentType,
+    storage_client,
+};
 use bytes::BufMut;
 use futures::future::join_all;
-use futures::{stream, StreamExt, TryStreamExt};
-use std::collections::HashMap;
+use futures::TryStreamExt;
+use serde::Serialize;
 use warp::{
     filters::multipart::{FormData, Part},
-    reject,
-    reply::{Json, Xml},
     Filter, Rejection, Reply,
 };
 
-pub fn handler(
-    state_manager: StateManager,
-) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+pub fn handler() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("pars")
         .and(warp::post())
-        .and(warp::multipart::form())
-        .and(with_state(state_manager))
+        .and(warp::multipart::form().max_length(100 * 1024 * 1024))
         .and_then(upload_pars_handler)
 }
 
-async fn upload_pars_handler(
-    form_data: FormData,
-    state_manager: StateManager,
-) -> Result<impl Reply, Rejection> {
-    dbg!(&form_data);
+async fn upload_pars_handler(form_data: FormData) -> Result<impl Reply, Rejection> {
+    tracing::debug!("Received PARS submission");
 
-    let parts: Vec<Part> = form_data.try_collect().await.map_err(|e| {
-        warp::reject::custom(UploadError {
-            message: format!("Error receiving data: {}", e),
-        })
+    let storage_client = storage_client::factory()
+        .map_err(|e| {
+            tracing::error!("Error creating storage client: {:?}", e);
+            warp::reject::custom(SubmissionError::UploadError {
+                message: format!("Couldn't create storage client: {:?}", e),
+            })
+        })?
+        .azure_client;
+
+    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
+        tracing::debug!("Error reading PARS upload: {:?}", e);
+        warp::reject::custom(e)
     })?;
 
-    let fields: Vec<UploadField> = join_all(parts.into_iter().map(read_upload_part))
+    dbg!(&metadata);
+
+    let blob = create_blob(&storage_client, &file_data, metadata)
         .await
-        .into_iter()
-        .collect::<Result<_, _>>()
-        .map_err(|e| warp::reject::custom(e))?;
+        .map_err(|e| {
+            tracing::error!("Error uploading file to blob storage: {:?}", e);
+            warp::reject::custom(SubmissionError::UploadError {
+                message: format!("Error uploading to blob storage: {:?}", e),
+            })
+        })?;
 
-    dbg!(fields);
+    dbg!(&blob);
 
-    Ok(warp::reply())
+    Ok(warp::reply::json(&UploadResponse {
+        name: &blob.name,
+        path: &blob.path,
+    }))
 }
 
-async fn read_upload_part(part: Part) -> Result<UploadField, UploadError> {
+#[derive(Debug, Serialize)]
+struct UploadResponse<'a> {
+    name: &'a str,
+    path: &'a str,
+}
+
+#[derive(Debug)]
+struct ParsUpload {}
+
+async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>), SubmissionError> {
+    let parts: Vec<Part> =
+        form_data
+            .try_collect()
+            .await
+            .map_err(|e| SubmissionError::UploadError {
+                message: format!("Error receiving data: {}", e),
+            })?;
+
+    let fields: Vec<(String, UploadFieldValue)> = join_all(parts.into_iter().map(read_upload_part))
+        .await
+        .into_iter()
+        .collect::<Result<_, _>>()?;
+
+    let file_name = fields
+        .iter()
+        .find(|(name, _)| name == "file")
+        .and_then(|(_, field)| field.file_name())
+        .ok_or(SubmissionError::MissingField { name: "file" })?
+        .into();
+
+    let active_substances = fields
+        .iter()
+        .filter(|(name, _)| name == "active_substances")
+        .filter_map(|(_, field)| field.value())
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>()
+        .into();
+
+    let title = fields
+        .iter()
+        .find(|(name, _)| name == "title")
+        .and_then(|(_, field)| field.value())
+        .ok_or(SubmissionError::MissingField { name: "title" })?
+        .into();
+
+    let author = fields
+        .iter()
+        .find(|(name, _)| name == "author")
+        .and_then(|(_, field)| field.value())
+        .ok_or(SubmissionError::MissingField { name: "author" })?
+        .into();
+
+    let pl_number = fields
+        .iter()
+        .find(|(name, _)| name == "pl_number")
+        .and_then(|(_, field)| field.value())
+        .ok_or(SubmissionError::MissingField { name: "pl_number" })?
+        .into();
+
+    let metadata = BlobMetadata::new(
+        file_name,
+        DocumentType::Par,
+        title,
+        pl_number,
+        vec![],
+        active_substances,
+        author,
+        None,
+    );
+
+    let file_data = fields
+        .into_iter()
+        .find(|(name, _)| name == "file")
+        .and_then(|(_, field)| field.into_file_data())
+        .ok_or(SubmissionError::MissingField { name: "file" })?;
+
+    Ok((metadata, file_data))
+}
+
+async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), SubmissionError> {
     let name = part.name().to_string();
 
     let file_name = part.filename().map(|s| s.to_string());
@@ -56,45 +146,60 @@ async fn read_upload_part(part: Part) -> Result<UploadField, UploadError> {
             async move { Ok(vec) }
         })
         .await
-        .map_err(|e| UploadError {
+        .map_err(|e| SubmissionError::UploadError {
             message: format!("Error receiving data: {}", e),
         })?;
 
     let field = match file_name {
-        Some(file_name) => UploadField::File {
-            name,
+        Some(file_name) => UploadFieldValue::File {
             file_name: file_name.into(),
             data,
         },
-        None => UploadField::Text {
-            name,
+        None => UploadFieldValue::Text {
             value: std::str::from_utf8(&data)
-                .map_err(|e| UploadError {
+                .map_err(|e| SubmissionError::UploadError {
                     message: format!("Error decoding field to utf-8: {}", e),
                 })?
                 .to_string(),
         },
     };
 
-    Ok(field)
+    Ok((name, field))
 }
 
 #[derive(Debug)]
-enum UploadField {
-    Text {
-        name: String,
-        value: String,
-    },
-    File {
-        name: String,
-        file_name: String,
-        data: Vec<u8>,
-    },
+enum UploadFieldValue {
+    Text { value: String },
+    File { file_name: String, data: Vec<u8> },
+}
+
+impl UploadFieldValue {
+    fn value(&self) -> Option<&str> {
+        match self {
+            UploadFieldValue::Text { value } => Some(value),
+            _ => None,
+        }
+    }
+
+    fn file_name(&self) -> Option<&str> {
+        match self {
+            UploadFieldValue::File { file_name, data: _ } => Some(file_name),
+            _ => None,
+        }
+    }
+
+    fn into_file_data(self) -> Option<Vec<u8>> {
+        match self {
+            UploadFieldValue::File { file_name: _, data } => Some(data),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug)]
-struct UploadError {
-    message: String,
+enum SubmissionError {
+    UploadError { message: String },
+    MissingField { name: &'static str },
 }
 
-impl warp::reject::Reject for UploadError {}
+impl warp::reject::Reject for SubmissionError {}

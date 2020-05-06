@@ -21,6 +21,27 @@ pub struct BlobMetadata {
 }
 
 impl BlobMetadata {
+    pub fn new(
+        file_name: String,
+        doc_type: DocumentType,
+        title: String,
+        pl_number: String,
+        product_names: Vec<String>,
+        active_substances: Vec<String>,
+        author: String,
+        keywords: Option<Vec<String>>,
+    ) -> Self {
+        BlobMetadata {
+            file_name: file_name.into(),
+            doc_type: doc_type.into(),
+            title: title.into(),
+            pl_number: pl_number.into(),
+            product_names: product_names.into(),
+            active_substances: active_substances.into(),
+            author: author.into(),
+            keywords: keywords.map(|keywords| keywords.into()),
+        }
+    }
     fn facets(&self) -> Vec<String> {
         create_facets_by_active_substance(
             self.product_names.clone(),
@@ -229,13 +250,13 @@ mod test {
             "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned(),
         ];
         let expected = vec![
-            "H", 
-            "H, HYDROCHLOROTHIAZIDE", 
+            "H",
+            "H, HYDROCHLOROTHIAZIDE",
             "H, HYDROCHLOROTHIAZIDE, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
             "L",
-            "L, L-TEST", 
+            "L, L-TEST",
             "L, L-TEST, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
-            "L, LOSARTAN POTASSIUM", 
+            "L, LOSARTAN POTASSIUM",
             "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
         ];
         assert_eq!(
