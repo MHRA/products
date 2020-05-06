@@ -21,9 +21,6 @@ class MyDocument extends Document {
 
           <div className="govuk-width-container">
             <main className="govuk-main-wrapper " id="main-content" role="main">
-              <h1 class="govuk-heading-xl">
-                Public Assessment Reports (PARs) upload
-              </h1>
               <Main />
             </main>
           </div>
