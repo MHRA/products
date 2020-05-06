@@ -1,4 +1,4 @@
-name: hello-world
+name: check-spelling
 
 on:
   push:
@@ -19,4 +19,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check Spelling
-        uses: rojopolis/spellcheck-github-actions@v0.3.0
+        uses: rojopolis/spellcheck-github-actions
