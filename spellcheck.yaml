@@ -1,7 +1,9 @@
 matrix:
   - name: Markdown
-    apsell:
-      mode: none
+    hunspell:
+      d: en_GB
+    sources:
+      - "**/*.md"
     dictionary:
       wordlists:
         - docs/words.txt
@@ -10,9 +12,9 @@ matrix:
     pipeline:
       - pyspelling.filters.markdown:
       - pyspelling.filters.html:
-    sources:
-      - "**/*.md"
   - name: Text
+    hunspell:
+      d: en_GB
     sources:
       - "**/*.txt"
     dictionary:

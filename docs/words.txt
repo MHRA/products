@@ -2,6 +2,7 @@ AKS
 ArgoCD
 az
 Bitnami
+CLI
 config
 dev
 dev
@@ -9,14 +10,15 @@ DevOps
 EKS
 env
 GCP
-GCP
 GDS
 github
+GitOps
 GKE
 GraphQL
 https
 HTTPS
 Istio
+jq
 JWT
 Kubernetes
 lang
@@ -38,6 +40,7 @@ ServiceEntry
 ServicePrincipalName
 src
 Stellent
+Terraform
 TLS
 todo
 toolchain
@@ -48,3 +51,7 @@ VirtualService
 VMs
 www
 yaml
+MakeUpSomeName
+sp
+appId
+backend
