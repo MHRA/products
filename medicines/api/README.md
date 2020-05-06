@@ -29,7 +29,7 @@ You should also have installed:
 4. Once compiled, open a browser tab and go to http://127.0.0.1:8000/healthz
 5. You should see **OK** rendered on the page
 
-To see the graphql explorer, go to http://127.0.0.1:8000/graphiql.
+To see the GraphQL explorer, go to http://127.0.0.1:8000/graphiql.
 
 ## Running in Docker container 🐳
 
@@ -39,7 +39,7 @@ To see the graphql explorer, go to http://127.0.0.1:8000/graphiql.
 4. Open the browser and go to `http://localhost:8080/healthz`
 5. You should see an **Ok** and a server log in your terminal
 
-To see the graphql explorer, go to http://127.0.0.1:8080/graphiql.
+To see the GraphQL explorer, go to http://127.0.0.1:8080/graphiql.
 
 ## Deploy API pod in Kubernetes cluster ⎈
 
