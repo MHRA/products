@@ -5,6 +5,7 @@ import { useState } from "react";
 const ParUpload = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [formState, setFormState] = useState(null);
+  const [submission, setSubmission] = useState({});
   const onSubmit = (event) => {
     event.persist();
 
@@ -14,7 +15,14 @@ const ParUpload = () => {
 
     setFormState(formData);
 
-    setPageNumber(1);
+    fetch("http://localhost:8000/pars", {
+      body: formData,
+      method: "POST",
+      mode: "cors",
+    }).then((response) => {
+      setSubmission(response.json());
+      setPageNumber(1);
+    });
   };
 
   if (typeof window != "undefined") {
@@ -45,7 +53,7 @@ const ParUpload = () => {
       </form>
     </>
   ) : (
-    <Para>Hello</Para>
+    <Para>{submission}</Para>
   );
 };
 

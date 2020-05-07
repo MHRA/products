@@ -5,7 +5,10 @@ use doc_index_updater::{
 use state_manager::get_client;
 use std::{convert::Infallible, error, net::SocketAddr, time::Duration};
 use tracing::Level;
-use warp::{http::StatusCode, Filter};
+use warp::{
+    http::{Method, StatusCode},
+    Filter,
+};
 
 const PORT: u16 = 8000;
 
@@ -35,6 +38,10 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let create_state = state.clone();
     let delete_state = state.clone();
 
+    let cors = warp::cors()
+        .allow_methods(vec![Method::POST])
+        .allow_any_origin();
+
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
@@ -46,7 +53,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
-                    .or(pars_upload::handler())
+                    .or(pars_upload::handler().with(cors))
                     .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
