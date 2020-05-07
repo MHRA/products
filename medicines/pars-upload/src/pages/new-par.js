@@ -7,7 +7,7 @@ const ParUpload = () => {
   const [formState, setFormState] = useState(null);
   const [submission, setSubmission] = useState({});
   const onSubmit = (event) => {
-    event.persist();
+    event.preventDefault();
 
     console.log("submit", event);
 
@@ -19,8 +19,8 @@ const ParUpload = () => {
       body: formData,
       method: "POST",
       mode: "cors",
-    }).then((response) => {
-      setSubmission(response.json());
+    }).then(async (response) => {
+      setSubmission(await response.json());
       setPageNumber(1);
     });
   };
@@ -53,7 +53,12 @@ const ParUpload = () => {
       </form>
     </>
   ) : (
-    <Para>{submission}</Para>
+    <ul>
+      <li>Name: {submission.name},</li>
+      <li>
+        Url: <a href={submission.path}>{submission.path}</a>
+      </li>
+    </ul>
   );
 };
 
