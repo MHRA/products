@@ -36,6 +36,10 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     client_secret = var.client_secret
   }
 
+  role_based_access_control {
+    enabled = true
+  }
+
   network_profile {
     network_plugin = "kubenet"
   }
