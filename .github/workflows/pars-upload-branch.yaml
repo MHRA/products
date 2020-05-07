@@ -1,0 +1,57 @@
+name: pars-upload-branch
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!master"
+    paths:
+      - medicines/pars-upload/**
+      - .github/workflows/pars-upload-branch.yaml
+
+jobs:
+  build:
+    name: robin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "13.11"
+
+      - name: Install modules
+        working-directory: medicines/pars-upload
+        run: yarn && yarn install
+
+      - name: Run tests with coverage
+        working-directory: medicines/pars-upload
+        run: yarn test:ci
+
+      - name: Build and export
+        working-directory: medicines/pars-upload
+        run: yarn build && yarn export
+
+      - name: Run cypress end-to-end tests
+        working-directory: medicines/pars-upload
+        run: mkdir -p cypress/screenshots && yarn test-e2e
+
+      - name: Upload cypress screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-cypress-screenshots
+          path: medicines/web/cypress/screenshots
+
+      - name: Upload cypress videos
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: medicines-cypress-videos
+          path: medicines/web/cypress/videos
+
+      - name: Accessibility check
+        working-directory: medicines/web
+        run: yarn a11y
