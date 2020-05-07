@@ -1,8 +1,29 @@
 import { Para, H1 } from "../typography";
 import { Button } from "../button";
+import { useState } from "react";
 
 const ParUpload = () => {
-  return (
+  const [pageNumber, setPageNumber] = useState(0);
+  const [formState, setFormState] = useState(null);
+  const onSubmit = (event) => {
+    event.persist();
+
+    console.log("submit", event);
+
+    const formData = new FormData(event.target);
+
+    setFormState(formData);
+
+    setPageNumber(1);
+  };
+
+  if (typeof window != "undefined") {
+    window.formData = formState;
+  }
+
+  console.log("form data", formState ? formState.get("file") : null);
+
+  return pageNumber == 0 ? (
     <>
       <H1>New Public Assessment Report</H1>
 
@@ -11,11 +32,7 @@ const ParUpload = () => {
         Please add one product at a time.
       </Para>
 
-      <form
-      //   method="POST"
-      //   action="http://localhost:8000/pars"
-      //   enctype="multipart/form-data"
-      >
+      <form onSubmit={onSubmit}>
         <Field name="product_names" label="Product names" />
         <Field name="title" label="Title" />
         <Field name="file" label="File" type="file" />
@@ -27,6 +44,8 @@ const ParUpload = () => {
         <Button>Continue</Button>
       </form>
     </>
+  ) : (
+    <Para>Hello</Para>
   );
 };
 
