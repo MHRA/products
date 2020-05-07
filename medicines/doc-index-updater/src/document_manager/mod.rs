@@ -7,7 +7,10 @@ use crate::{
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
+use futures::{StreamExt, TryStreamExt};
+
 use time::Duration;
+use tokio::{fs::File, io::AsyncWriteExt};
 use tracing_futures::Instrument;
 use uuid::Uuid;
 use warp::{
@@ -111,6 +114,20 @@ async fn delete_document_xml_handler(
     Ok(warp::reply::xml(&r))
 }
 
+async fn stream_handler(
+    filename: String,
+    stream: impl futures::Stream<Item = Result<impl warp::Buf, warp::Error>>,
+) -> Result<Json, Rejection> {
+    let file = File::create(filename).await.unwrap();
+
+    stream.try_for_each(|s| async {
+        &file.write(&s.to_bytes()).await;
+        Ok(())
+    });
+
+    Ok(warp::reply::json(&"{}"))
+}
+
 async fn delete_document_json_handler(
     document_content_id: String,
     state_manager: StateManager,
@@ -168,6 +185,13 @@ pub fn delete_document(
         .and(auth_manager::with_basic_auth())
         .and(with_state(state_manager))
         .and_then(delete_document_json_handler)
+}
+
+pub fn stream_doc() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    warp::path!("stream" / String)
+        .and(warp::post())
+        .and(warp::filters::body::stream())
+        .and_then(stream_handler)
 }
 
 pub fn delete_document_xml(
