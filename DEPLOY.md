@@ -12,7 +12,7 @@ First we need to set up a new storage account for storing the Terraform state:
 ./scripts/create-storage-account.sh
 ```
 
-The output of which we need to export (will look somthing like this):
+The output of which we need to export (will look something like this):
 
 ```bash
 export TF_VAR_STORAGE_ACCOUNT_NAME=tfstate29645

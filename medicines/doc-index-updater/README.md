@@ -46,7 +46,7 @@ Then run `make set-sftp-keys` to pull the public/private keys for development an
 
 Add `SENTINEL_SFTP_USERNAME=username` (where username is whatever you set in the step above, e.g. `SENTINEL_SFTP_USERNAME=localsftpuser`) to `.env.overrides`.
 
-Navigate to `~/.ssh` dir and install the public key on your locahost server by running:
+Navigate to `~/.ssh` dir and install the public key on your localhost server by running:
 `ssh-copy-id -f -i ./doc_index_updater <YOUR_SFTP_USERNAME>@localhost`
 This will add the public key to your localhost `~/.ssh/authorized_keys` file.
 

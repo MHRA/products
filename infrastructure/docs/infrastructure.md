@@ -31,7 +31,7 @@ To run the following steps, first you should:
 
 ## Provisioning a new environment
 
-**Avoid this step if an enviroment is created**
+**Avoid this step if an environment is created**
 
 This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
 

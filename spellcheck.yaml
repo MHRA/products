@@ -1,0 +1,32 @@
+matrix:
+  - name: Markdown
+    hunspell:
+      d: en_GB
+    sources:
+      - "**/*.md"
+    dictionary:
+      wordlists:
+        - docs/words.txt
+      output: wordlist.dic
+      encoding: utf-8
+    pipeline:
+      - pyspelling.filters.markdown:
+      - pyspelling.filters.html:
+          ignores:
+            - :matches(code, pre)
+            - a:matches(.magiclink-compare, .magiclink-commit)
+            - span.keys
+            - :matches(.MathJax_Preview, .md-nav__link, .md-footer-custom-text, .md-source__repository, .headerlink, .md-icon)
+  - name: Text
+    hunspell:
+      d: en_GB
+    sources:
+      - "**/*.txt"
+    dictionary:
+      wordlists:
+        - docs/words.txt
+      output: wordlist.dic
+      encoding: utf-8
+    pipeline:
+      - pyspelling.filters.text:
+          convert_encoding: utf-8
