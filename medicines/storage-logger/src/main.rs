@@ -1,19 +1,20 @@
 #[macro_use]
 extern crate lazy_static;
-use azure_sdk_core::prelude::*;
-use azure_sdk_storage_blob::Blob;
+use azure_sdk_core::{errors::AzureError, prelude::*};
+use azure_sdk_storage_blob::{blob::responses::ListBlobsResponse, Blob};
 use azure_sdk_storage_core::prelude::Client;
 use chrono::{DateTime, Utc};
-use futures::stream::StreamExt;
+use futures::stream::{Stream, StreamExt};
 use regex::Regex;
-use std::error::Error;
+use std::{error::Error, pin::Pin};
 
 #[tokio::main]
 async fn main() {
     let _ = get_blob_contents().await;
 }
 
-async fn get_blob_contents() -> Result<(), Box<dyn Error>> {
+fn get_stream<T>(
+) -> Result<Pin<Box<impl Stream<Item = Result<ListBlobsResponse, AzureError>>  + 'static>>, AzureError> {
     let account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
@@ -25,19 +26,22 @@ async fn get_blob_contents() -> Result<(), Box<dyn Error>> {
 
     let client = Client::new(&account, &master_key)?;
 
-    let mut stream = Box::pin(
+    Ok(Box::pin(
         client
             .list_blobs()
             .with_container_name(&container_name)
             .with_include_metadata()
             .stream(),
-    );
+    ))
+}
+
+async fn get_blob_contents() -> Result<(), Box<dyn Error>> {
+    let mut stream = get_stream()?;
 
     let mut count: i32 = 0;
     let mut blob_list: Vec<String> = vec![String::from("Blob name, CON, PLs, created, modified")];
 
     while let Some(value) = stream.next().await {
-        // let len = value?.incomplete_vector.len();
         for cont in value?.incomplete_vector.iter() {
             if count > 2 {
                 break;
