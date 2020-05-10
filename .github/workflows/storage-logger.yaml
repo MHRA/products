@@ -1,10 +1,9 @@
 name: doc-index-updater-master
 
 on:
-  push:
-    paths:
-      - medicines/storage-logger/**
-      - .github/workflows/storage-logger.yaml
+  schedule:
+    # 12pm every Friday
+    - cron: "0 12 * * 5"
 
 jobs:
   build-and-test:
@@ -24,8 +23,8 @@ jobs:
       - name: Run storage log
         working-directory: ./products/medicines/storage-logger
         env:
-          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT_NONPROD }}
-          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_MASTER_KEY_NONPROD }}
-          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME_NONPROD }}
-          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NAME_NONPROD }}
+          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
+          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_MASTER_KEY }}
+          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME }}
+          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NAME }}
         run: cargo run
