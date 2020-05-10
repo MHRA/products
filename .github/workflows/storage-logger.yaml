@@ -1,0 +1,31 @@
+name: doc-index-updater-master
+
+on:
+  push:
+    paths:
+      - medicines/storage-logger/**
+      - .github/workflows/storage-logger.yaml
+
+jobs:
+  build-and-test:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./products/medicines/storage-logger
+        run: cargo test
+
+      - name: Run storage log
+        working-directory: ./products/medicines/storage-logger
+        env:
+          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT_NONPROD }}
+          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_ACCOUNT_KEY_NONPROD }}
+          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NONPROD }}
+          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NONPROD }}
+        run: cargo run
