@@ -150,9 +150,18 @@ mod test {
         }
     }
 
-    fn get_test_blob(name: String, container_name: String, date: DateTime<Utc>, pl: String, file_name: String) -> Blob {
-        let mut metadata: HashMap<String,String> = HashMap::new();
-        metadata.insert(String::from("pl_number"), String::from(format!("[\"{}\"]", pl)));
+    fn get_test_blob(
+        name: String,
+        container_name: String,
+        date: DateTime<Utc>,
+        pl: String,
+        file_name: String,
+    ) -> Blob {
+        let mut metadata: HashMap<String, String> = HashMap::new();
+        metadata.insert(
+            String::from("pl_number"),
+            String::from(format!("[\"{}\"]", pl)),
+        );
         metadata.insert(String::from("file_name"), file_name);
         Blob {
             name,
@@ -200,8 +209,10 @@ mod test {
         let pl = String::from("PL1234567");
         let file_name = String::from("CON1234567");
         let blob = get_test_blob(name, container_name, date, pl, file_name);
-        let expected = String::from("test_blog, CON1234567, PL1234567, 1996-12-20 00:39:57 UTC, 1996-12-20 00:39:57 UTC");
-        
+        let expected = String::from(
+            "test_blog, CON1234567, PL1234567, 1996-12-20 00:39:57 UTC, 1996-12-20 00:39:57 UTC",
+        );
+
         let actual = extract_blob_strings(&blob);
 
         assert_eq!(actual[0], expected);
