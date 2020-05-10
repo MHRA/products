@@ -40,7 +40,9 @@ async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
             .stream(),
     );
 
-    let mut blob_list: Vec<String> = vec![String::from("Blob name, CON, PLs, created, modified, Doc type")];
+    let mut blob_list: Vec<String> = vec![String::from(
+        "Blob name,CON,PLs,created,modified,Doc type",
+    )];
 
     while let Some(value) = blob_stream.next().await {
         for blob in value?.incomplete_vector.iter() {
@@ -161,7 +163,7 @@ mod test {
         date: DateTime<Utc>,
         pl: String,
         file_name: String,
-        doc_type: String
+        doc_type: String,
     ) -> Blob {
         let mut metadata: HashMap<String, String> = HashMap::new();
         metadata.insert(
