@@ -40,7 +40,7 @@ async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
             .stream(),
     );
 
-    let mut blob_list: Vec<String> = vec![String::from("Blob name, CON, PLs, created, modified")];
+    let mut blob_list: Vec<String> = vec![String::from("Blob name, CON, PLs, created, modified, Doc type")];
 
     while let Some(value) = blob_stream.next().await {
         for blob in value?.incomplete_vector.iter() {
@@ -76,11 +76,16 @@ fn extract_blob_strings(blob: &Blob) -> Vec<String> {
         None => vec![String::from("")],
     };
 
+    let doc_type = match blob.metadata.get("doc_type") {
+        Some(doc_type) => doc_type.to_owned(),
+        None => String::from(""),
+    };
+
     let mut blob_strings = vec![];
     for pl in pls {
         blob_strings.push(format!(
-            "{}, {}, {}, {}, {}",
-            blob.name, con, pl, created, modified
+            "{},{},{},{},{},{}",
+            blob.name, con, pl, created, modified, doc_type
         ));
     }
 
@@ -156,6 +161,7 @@ mod test {
         date: DateTime<Utc>,
         pl: String,
         file_name: String,
+        doc_type: String
     ) -> Blob {
         let mut metadata: HashMap<String, String> = HashMap::new();
         metadata.insert(
@@ -163,6 +169,7 @@ mod test {
             String::from(format!("[\"{}\"]", pl)),
         );
         metadata.insert(String::from("file_name"), file_name);
+        metadata.insert(String::from("doc_type"), doc_type);
         Blob {
             name,
             container_name,
@@ -208,9 +215,10 @@ mod test {
         let container_name = String::from("test_container");
         let pl = String::from("PL1234567");
         let file_name = String::from("CON1234567");
-        let blob = get_test_blob(name, container_name, date, pl, file_name);
+        let doc_type = String::from("Spc");
+        let blob = get_test_blob(name, container_name, date, pl, file_name, doc_type);
         let expected = String::from(
-            "test_blog, CON1234567, PL1234567, 1996-12-20 00:39:57 UTC, 1996-12-20 00:39:57 UTC",
+            "test_blog,CON1234567,PL1234567,1996-12-20 00:39:57 UTC,1996-12-20 00:39:57 UTC,Spc",
         );
 
         let actual = extract_blob_strings(&blob);
