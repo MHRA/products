@@ -25,7 +25,7 @@ jobs:
         working-directory: ./products/medicines/storage-logger
         env:
           STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT_NONPROD }}
-          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_ACCOUNT_KEY_NONPROD }}
-          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NONPROD }}
-          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NONPROD }}
+          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_MASTER_KEY_NONPROD }}
+          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME_NONPROD }}
+          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NAME_NONPROD }}
         run: cargo run
