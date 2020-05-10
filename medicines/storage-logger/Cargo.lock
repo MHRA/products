@@ -35,6 +35,7 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 [[package]]
 name = "azure_sdk_core"
 version = "0.43.1"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#bcbc63238180d5acc699886675ee0c6152cb08f5"
 dependencies = [
  "RustyXML",
  "base64 0.11.0",
@@ -64,6 +65,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_storage_blob"
 version = "0.43.1"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#bcbc63238180d5acc699886675ee0c6152cb08f5"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
@@ -94,6 +96,7 @@ dependencies = [
 [[package]]
 name = "azure_sdk_storage_core"
 version = "0.43.1"
+source = "git+https://github.com/MindFlavor/AzureSDKForRust#bcbc63238180d5acc699886675ee0c6152cb08f5"
 dependencies = [
  "RustyXML",
  "azure_sdk_core",
