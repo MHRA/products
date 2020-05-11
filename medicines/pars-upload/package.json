@@ -5,12 +5,18 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "a11y": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test-e2e": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e-interactive": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run --headed; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test": "yarn jest",
+    "test:ci": "yarn jest --coverage --ci"
   },
   "dependencies": {
     "classnames": "^2.2.6",
+    "core-js": "^3.4.7",
     "govuk-frontend": "^3.6.0",
     "next": "^9.3.6",
     "next-compose-plugins": "^2.2.0",
@@ -20,6 +26,16 @@
     "sass": "^1.26.5"
   },
   "devDependencies": {
-    "imagemin-optipng": "^7.1.0"
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "babel-jest": "^26.0.1",
+    "cypress": "^3.8.3",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-to-json": "^3.4.4",
+    "imagemin-optipng": "^7.1.0",
+    "jest": "^25.1.0",
+    "pa11y-ci": "^2.3.0",
+    "react-test-renderer": "^16.13.1"
   }
 }
