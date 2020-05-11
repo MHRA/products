@@ -12,11 +12,15 @@ export const Header = () => (
       className="govuk-header__container govuk-width-container"
     >
       <div className="govuk-header__logo">
-        <a href="/" className="govuk-header__link govuk-header__link--homepage">
-          <span className="sr-only">MHRA PARs upload homepage</span>
+        <a
+          href="/"
+          className="govuk-header__link govuk-header__link--homepage"
+          style={{ color: 'black' }}
+        >
           <span className="govuk-header__logotype">
             <MhraLogo />
           </span>
+          MHRA PARs upload homepage
         </a>
       </div>
     </div>
