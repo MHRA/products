@@ -95,7 +95,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(&storage_client, &file, metadata.clone()).await?;
+    let blob = create_blob(&storage_client, &file, metadata).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
@@ -107,7 +107,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     Ok(message.job_id)
 }
 
-async fn create_blob(
+pub async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
     metadata: BlobMetadata,
@@ -149,11 +149,12 @@ async fn create_blob(
     })
 }
 
+#[derive(Debug)]
 pub struct Blob {
-    metadata: BlobMetadata,
-    name: String,
-    size: usize,
-    path: String,
+    pub metadata: BlobMetadata,
+    pub name: String,
+    pub size: usize,
+    pub path: String,
 }
 
 #[cfg(test)]

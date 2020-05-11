@@ -419,6 +419,7 @@ dependencies = [
  "azure_sdk_storage_blob",
  "azure_sdk_storage_core",
  "base64 0.11.0",
+ "bytes",
  "chrono",
  "futures",
  "hyper",
