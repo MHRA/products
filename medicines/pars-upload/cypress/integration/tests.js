@@ -3,6 +3,6 @@ describe('PARs upload homepage', function () {
     cy.server();
     cy.visit('/');
     cy.contains('Upload a new document').click();
-    cy.get("input[type='text']").type('Craig');
+    cy.get("input[name='product_names']").type('Craig');
   });
 });
