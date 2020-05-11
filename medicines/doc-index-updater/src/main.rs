@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
 
     let cors = warp::cors()
         .allow_methods(vec![Method::POST])
-        .allow_any_origin();
+        .allow_origin("http://localhost:3000");
 
     let _ = tokio::join!(
         tokio::spawn(async move {
