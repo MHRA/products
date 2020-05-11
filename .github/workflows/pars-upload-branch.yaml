@@ -43,15 +43,15 @@ jobs:
         if: failure()
         with:
           name: medicines-cypress-screenshots
-          path: medicines/web/cypress/screenshots
+          path: medicines/pars-upload/cypress/screenshots
 
       - name: Upload cypress videos
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: medicines-cypress-videos
-          path: medicines/web/cypress/videos
+          path: medicines/pars-upload/cypress/videos
 
       - name: Accessibility check
-        working-directory: medicines/web
+        working-directory: medicines/pars-upload
         run: yarn a11y
