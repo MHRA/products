@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: robin
+    name: Build, test and check pars-upload
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
