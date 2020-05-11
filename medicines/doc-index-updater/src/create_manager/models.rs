@@ -21,6 +21,7 @@ pub struct BlobMetadata {
 }
 
 impl BlobMetadata {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         file_name: String,
         doc_type: DocumentType,
@@ -33,9 +34,9 @@ impl BlobMetadata {
     ) -> Self {
         BlobMetadata {
             file_name: file_name.into(),
-            doc_type: doc_type.into(),
+            doc_type,
             title: title.into(),
-            pl_number: pl_number.into(),
+            pl_number,
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),
