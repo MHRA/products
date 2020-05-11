@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "a11y": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -34,6 +35,7 @@
     "enzyme-to-json": "^3.4.4",
     "imagemin-optipng": "^7.1.0",
     "jest": "^25.1.0",
+    "pa11y-ci": "^2.3.0",
     "react-test-renderer": "^16.13.1"
   }
 }
