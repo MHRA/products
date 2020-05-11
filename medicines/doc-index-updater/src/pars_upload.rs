@@ -87,8 +87,7 @@ async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>)
         .filter(|(name, _)| name == "active_substances")
         .filter_map(|(_, field)| field.value())
         .map(|s| s.to_string())
-        .collect::<Vec<String>>()
-        .into();
+        .collect::<Vec<String>>();
 
     let title = fields
         .iter()
@@ -148,10 +147,7 @@ async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), Subm
         })?;
 
     let field = match file_name {
-        Some(file_name) => UploadFieldValue::File {
-            file_name: file_name.into(),
-            data,
-        },
+        Some(file_name) => UploadFieldValue::File { file_name, data },
         None => UploadFieldValue::Text {
             value: std::str::from_utf8(&data)
                 .map_err(|e| SubmissionError::UploadError {
