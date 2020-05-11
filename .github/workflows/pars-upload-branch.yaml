@@ -30,9 +30,9 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn test:ci
 
-      - name: Build and export
+      - name: Build
         working-directory: medicines/pars-upload
-        run: yarn build && yarn export
+        run: yarn build
 
       - name: Run cypress end-to-end tests
         working-directory: medicines/pars-upload
