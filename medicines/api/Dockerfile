@@ -1,5 +1,5 @@
 
-FROM rust:1.40 AS build
+FROM rust:1.43.1 AS build
 
 WORKDIR /usr/src/api
 
