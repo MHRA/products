@@ -18,6 +18,28 @@ pub struct BlobMetadata {
 }
 
 impl BlobMetadata {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        file_name: String,
+        doc_type: DocumentType,
+        title: String,
+        pl_number: String,
+        product_names: Vec<String>,
+        active_substances: Vec<String>,
+        author: String,
+        keywords: Option<Vec<String>>,
+    ) -> Self {
+        BlobMetadata {
+            file_name: file_name.into(),
+            doc_type,
+            title: title.into(),
+            pl_number,
+            product_names: product_names.into(),
+            active_substances: active_substances.into(),
+            author: author.into(),
+            keywords: keywords.map(|keywords| keywords.into()),
+        }
+    }
     fn facets(&self) -> Vec<String> {
         create_facets_by_active_substance(
             self.product_names.clone(),

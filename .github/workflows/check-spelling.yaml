@@ -1,0 +1,22 @@
+name: check-spelling
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "**/*.md"
+      - "**/*.txt"
+      - .github/workflows/check-spelling.yaml
+
+jobs:
+  check:
+    name: Check spelling
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+
+      - name: Check Spelling
+        uses: rojopolis/spellcheck-github-actions@0.2.0

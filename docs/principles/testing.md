@@ -24,7 +24,7 @@ GraphQL APIs should be tested by Jest.
 JavaScript and TypeScript helpers should be tested by Jest.
 Where Typescript support is required, [Jest supports this via `@babel/preset-typescript`][jest typescript]
 
-### React componenents tested by Enzyme
+### React components tested by Enzyme
 
 React components should be tested by [Enzyme via Jest][enzyme].
 

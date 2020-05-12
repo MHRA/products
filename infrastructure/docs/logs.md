@@ -12,7 +12,7 @@ More background on the infrastructure as a whole can be found at [`./infrastruct
 
 ## Prometheus Logs
 
-[Prometheus][prometheus] gathers logs from a [kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [istio][istio], which we use to manage ingress and egress from our [kubernetes][kubernetes] cluster.
+[Prometheus][prometheus] gathers logs from a [Kubernetes][kubernetes] cluster. It runs as a kubernetes pod automatically included with [Istio][istio], which we use to manage ingress and egress from our [Kubernetes][kubernetes] cluster.
 
 To view the logs, use one of the following means:
 
@@ -24,9 +24,9 @@ For more on getting started with Prometheus, [go to the Prometheus docs][prometh
 ### Viewing a cluster Prometheus dashboard locally
 
 You will need to target a specific kubernetes cluster for which you'd like to see logs.
-See our [docs on connection to a kubernetes cluster](./kubernetes.md#connecting-to-a-kubernetes-cluster).
+See our [docs on connection to a Kubernetes cluster](./kubernetes.md#connecting-to-a-kubernetes-cluster).
 
-Once you're targeting a kubernetes cluster, run the following command to see its logs.
+Once you're targeting a Kubernetes cluster, run the following command to see its logs.
 
 ```
 istioctl dashboard prometheus

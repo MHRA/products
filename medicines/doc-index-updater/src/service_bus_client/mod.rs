@@ -63,11 +63,11 @@ pub struct RetrievedMessage<T: Message> {
     pub message: T,
     peek_lock: PeekLockResponse,
 }
-pub trait RemoveableMessage<T: Message>: Removeable {
+pub trait RemovableMessage<T: Message>: Removable {
     fn get_message(&self) -> T;
 }
 
-impl<T> RemoveableMessage<T> for RetrievedMessage<T>
+impl<T> RemovableMessage<T> for RetrievedMessage<T>
 where
     T: Message + Sync + Send,
 {
@@ -77,12 +77,12 @@ where
 }
 
 #[async_trait]
-pub trait Removeable {
+pub trait Removable {
     async fn remove(&mut self) -> Result<String, anyhow::Error>;
 }
 
 #[async_trait]
-impl<T> Removeable for RetrievedMessage<T>
+impl<T> Removable for RetrievedMessage<T>
 where
     T: Message + Send + Sync,
 {
@@ -193,7 +193,7 @@ impl DocIndexUpdaterQueue {
     ) -> anyhow::Result<()>
     where
         T: Message,
-        RetrievedMessage<T>: ProcessRetrievalError + Removeable,
+        RetrievedMessage<T>: ProcessRetrievalError + Removable,
     {
         tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
@@ -220,7 +220,7 @@ async fn process<T>(
 ) -> anyhow::Result<()>
 where
     T: Message,
-    RetrievedMessage<T>: ProcessRetrievalError + Removeable,
+    RetrievedMessage<T>: ProcessRetrievalError + Removable,
 {
     let processing_result = retrieval.message.clone().process().await;
 
@@ -240,13 +240,13 @@ where
 #[cfg(test)]
 pub mod test {
     use super::*;
-    pub struct TestRemoveableMessage<T: Message> {
+    pub struct TestRemovableMessage<T: Message> {
         pub remove_was_called: bool,
         pub message: T,
     }
 
     #[async_trait]
-    impl<T> Removeable for TestRemoveableMessage<T>
+    impl<T> Removable for TestRemovableMessage<T>
     where
         T: Message + Send + Sync,
     {
@@ -257,7 +257,7 @@ pub mod test {
     }
 
     #[async_trait]
-    impl<T> RemoveableMessage<T> for TestRemoveableMessage<T>
+    impl<T> RemovableMessage<T> for TestRemovableMessage<T>
     where
         T: Message + Sync + Send,
     {

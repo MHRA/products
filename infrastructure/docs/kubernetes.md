@@ -65,7 +65,7 @@ kubectl get nodes
    kubectl get pods --namespace istio-system
    ```
 
-1. Note you will need to install an SSL certificate and private key. There is a `./certs.sh` for a self-sign, or you can obtain a vaid cert from Let's Encrypt (e.g. using [`acme.sh`](https://acme.sh/)). Note that you may need to restart the ingress gateway pod to pick up the new certs.
+1. Note you will need to install an SSL certificate and private key. There is a `./certs.sh` for a self-sign, or you can obtain a valid cert from Let's Encrypt (e.g. using [`acme.sh`](https://acme.sh/)). Note that you may need to restart the ingress gateway pod to pick up the new certs.
 
    ```bash
    kubectl create -n istio-system secret tls istio-ingressgateway-certs --key key.txt --cert crt.txt

@@ -3,7 +3,7 @@ extern crate doc_index_updater;
 mod support;
 use doc_index_updater::{
     models::{DeleteMessage, JobStatus},
-    service_bus_client::{delete_factory, Removeable},
+    service_bus_client::{delete_factory, Removable},
 };
 
 use support::{
