@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { H1, Para } from '../typography';
 import { Button } from '../button';
 import { RadioList } from '../form';
+import { Layout } from '../layout';
 
 const Index = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const Index = () => {
   };
 
   return (
-    <>
+    <Layout>
       <H1>
         <abbr
           title="Public Assessment Reports"
@@ -49,7 +50,7 @@ const Index = () => {
 
         <Button>Continue</Button>
       </form>
-    </>
+    </Layout>
   );
 };
 

@@ -1,38 +1,41 @@
-import { Para, H1 } from "../typography";
-import { Button } from "../button";
-import { useState } from "react";
+import { useState } from 'react';
+import { Layout } from '../layout';
+import { Para, H1 } from '../typography';
+import { Button } from '../button';
+import { BackLink } from '../back-link';
 
 const ParUpload = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [formState, setFormState] = useState(null);
   const [submission, setSubmission] = useState({});
+
   const onSubmit = (event) => {
     event.preventDefault();
 
-    console.log("submit", event);
+    console.log('submit', event);
 
     const formData = new FormData(event.target);
 
     setFormState(formData);
 
-    fetch("http://localhost:8000/pars", {
+    fetch('http://localhost:8000/pars', {
       body: formData,
-      method: "POST",
-      mode: "cors",
+      method: 'POST',
+      mode: 'cors',
     }).then(async (response) => {
       setSubmission(await response.json());
       setPageNumber(1);
     });
   };
 
-  if (typeof window != "undefined") {
+  if (typeof window != 'undefined') {
     window.formData = formState;
   }
 
-  console.log("form data", formState ? formState.get("file") : null);
+  console.log('form data', formState ? formState.get('file') : null);
 
   return pageNumber == 0 ? (
-    <>
+    <Layout intro={<BackLink href="/" />}>
       <H1>New Public Assessment Report</H1>
 
       <Para>
@@ -51,7 +54,7 @@ const ParUpload = () => {
 
         <Button>Continue</Button>
       </form>
-    </>
+    </Layout>
   ) : (
     <ul>
       <li>Name: {submission.name},</li>
@@ -62,7 +65,7 @@ const ParUpload = () => {
   );
 };
 
-const Field = ({ name, label, type = "text", required = true }) => {
+const Field = ({ name, label, type = 'text', required = true }) => {
   const id = `form-field-${name}`;
 
   return (
@@ -71,7 +74,7 @@ const Field = ({ name, label, type = "text", required = true }) => {
         {label}
       </label>
       <input
-        className={type === "file" ? "govuk-file-upload" : "govuk-input"}
+        className={type === 'file' ? 'govuk-file-upload' : 'govuk-input'}
         id={id}
         name={name}
         type={type}
