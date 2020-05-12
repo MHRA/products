@@ -45,7 +45,6 @@ RUN apt-get update && apt-get install -y \
   tini \
   libssl-dev \
   openssl \
-  curl \
   ;
 
 RUN useradd svc
