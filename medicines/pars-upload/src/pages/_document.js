@@ -17,7 +17,7 @@ class MyDocument extends Document {
         <Head />
 
         <body className="govuk-template__body">
-          <a href="#main-content" class="govuk-skip-link">
+          <a href="#main-content" className="govuk-skip-link">
             Skip to main content
           </a>
 

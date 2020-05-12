@@ -1,4 +1,5 @@
 import { MhraLogo } from './mhra_logo';
+import { ScreenReaderOnly } from './screen_reader_only';
 
 export const Header = () => (
   <header
@@ -20,7 +21,7 @@ export const Header = () => (
           <span className="govuk-header__logotype">
             <MhraLogo />
           </span>
-          MHRA PARs upload homepage
+          <ScreenReaderOnly>MHRA PARs upload homepage</ScreenReaderOnly>
         </a>
       </div>
     </div>
