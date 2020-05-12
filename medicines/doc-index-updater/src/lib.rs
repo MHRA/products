@@ -11,6 +11,7 @@ pub mod delete_manager;
 pub mod document_manager;
 pub mod health;
 pub mod models;
+pub mod pars_upload;
 pub mod service_bus_client;
 pub mod state_manager;
 pub mod storage_client;
