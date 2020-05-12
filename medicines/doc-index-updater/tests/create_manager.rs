@@ -3,7 +3,7 @@ extern crate doc_index_updater;
 mod support;
 use doc_index_updater::{
     models::CreateMessage,
-    service_bus_client::{create_factory, Removeable},
+    service_bus_client::{create_factory, Removable},
 };
 use support::{get_message_safely, get_ok, get_test_create_message};
 use tokio_test::block_on;
