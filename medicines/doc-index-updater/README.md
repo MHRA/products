@@ -14,10 +14,11 @@ For SPCs and PILs, a server called Sentinel sends either a _Delete_ or a _Create
 _(Work in progress.)_
 
 1. a medical writer accesses the [PARs upload form](../pars-upload) and enters metadata and supplies a PDF file
-2. the upload form submits the metadata and the file to the _doc-index_updater_
-3. the _doc-index-updater_ uploads the PDF file to a blob storage container in Azure for temporary storage with a timeout of an hour
-4. the _doc-index-updater_ pushes the blob information along with the submitted metadata to the Azure Service Bus "create" queue to be picked up by the _doc-index-updater_'s _create_manager_ service worker
-5. the _create_manager_ service worker retrieves the message from the Azure Service Bus queue, and uses the metadata and temporary blob storage details to add the new PAR PDF to the search service index and permanent blob storage
+2. the upload form submits the metadata and the file to the _doc-index-updater_
+3. the _doc-index-updater_ responds to the upload form with a job id for tracking the job status
+4. the _doc-index-updater_ uploads the PDF file to a blob storage container in Azure for temporary storage with a timeout of an hour
+5. the _doc-index-updater_ pushes the blob information along with the submitted metadata to the Azure Service Bus "create" queue to be picked up by the _doc-index-updater_'s _create_manager_ service worker
+6. the _create_manager_ service worker retrieves the message from the Azure Service Bus queue, and uses the metadata and temporary blob storage details to add the new PAR PDF to the search service index and permanent blob storage
 
 The new PAR PDF will then be available from the products.mhra.gov.uk website.
 
