@@ -6,8 +6,9 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.28"
-async-std = { version = "1.5.0", features = ["unstable", "attributes"] }
-tide = { git = "https://github.com/http-rs/tide" }
+futures = "0.3.5"
+smol = "0.1.4"
+tide = "0.8.1"
 
 [dev-dependencies]
 http-types = "1.2.0"

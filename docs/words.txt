@@ -154,11 +154,13 @@ README
 redis
 replicaCount
 repo
+Req
 roadmap
 runtime
 rustc
 scala
 scalability
+Sec
 SEO
 Serverless
 ServiceEntry
@@ -175,6 +177,7 @@ SPCs
 src
 SSL
 SSR
+Stdev
 Stellent
 stunnel
 subnets
@@ -203,6 +206,7 @@ WCAG
 webupdates
 WNxqFQ
 workspaces
+wrk
 www
 xJhl
 XP
