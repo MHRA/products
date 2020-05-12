@@ -28,6 +28,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@testing-library/cypress": "^6.0.0",
     "babel-jest": "^26.0.1",
     "cypress": "^3.8.3",
     "enzyme": "^3.11.0",
@@ -36,6 +37,7 @@
     "imagemin-optipng": "^7.1.0",
     "jest": "^25.1.0",
     "pa11y-ci": "^2.3.0",
-    "react-test-renderer": "^16.13.1"
+    "react-test-renderer": "^16.13.1",
+    "wait-on": "^5.0.0"
   }
 }
