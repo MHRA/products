@@ -25,7 +25,11 @@ class MyDocument extends Document {
 
           <div className="govuk-width-container">
             <main className="govuk-main-wrapper " id="main-content" role="main">
-              <Main />
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                  <Main />
+                </div>
+              </div>
             </main>
           </div>
 
