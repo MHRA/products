@@ -1,4 +1,10 @@
-export const RadioList = ({ title, options, name, required = false }) => (
+export const RadioList = ({
+  title,
+  options,
+  name,
+  required = false,
+  onChange = null,
+}) => (
   <div className="govuk-form-group">
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -14,6 +20,7 @@ export const RadioList = ({ title, options, name, required = false }) => (
               type="radio"
               value={value}
               required={required}
+              onChange={onChange}
             />
             <label
               className="govuk-label govuk-radios__label"
