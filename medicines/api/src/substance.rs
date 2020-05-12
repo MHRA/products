@@ -42,15 +42,23 @@ pub async fn get_substances_starting_with_letter(
     Ok(format_search_results(azure_result, upper_letter)?)
 }
 
+#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
+struct SubstanceName(String);
+
+#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
+struct ProductName(String);
+
 fn format_search_results(
     results: IndexResults,
     letter: char,
 ) -> Result<Vec<Substance>, DocTypeParseError> {
-    let mut substances: BTreeMap<String, BTreeMap<String, Vec<Document>>> = BTreeMap::new();
+    // Using a BTreeMap (instead of HashMap) so that the keys are sorted alphabetically.
+    let mut substances: BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>> =
+        BTreeMap::new();
 
     let letter_string = letter.to_string();
 
-    let documents = results
+    results
         .search_results
         .into_iter()
         .filter(|result| result.facets.iter().any(|s| s == &letter_string))
@@ -64,40 +72,56 @@ fn format_search_results(
 
             let product = doc.product_name()?.to_string();
 
-            Some((substance, product, doc))
+            Some((SubstanceName(substance), ProductName(product), doc))
+        })
+        .for_each(|(substance, product, doc)| {
+            add_product_for_substance(&mut substances, substance, product, doc);
         });
-
-    for (substance, product, doc) in documents {
-        match substances.get_mut(&substance) {
-            None => {
-                let mut map = BTreeMap::new();
-                map.insert(product, vec![doc]);
-                substances.insert(substance, map);
-            }
-            Some(map) => match map.get_mut(&product) {
-                Some(docs) => {
-                    docs.push(doc);
-                }
-                None => {
-                    map.insert(product, vec![doc]);
-                }
-            },
-        }
-    }
 
     let substances_vec = substances
         .into_iter()
-        .map(|(substance, prods)| {
-            let products = prods
+        .map(|(SubstanceName(substance), products)| {
+            let products_vec = products
                 .into_iter()
-                .map(|(name, docs)| Product::new(name, Some(docs)))
+                .map(|(ProductName(name), docs)| Product::new(name, Some(docs)))
                 .collect();
 
-            Substance::new(substance, products)
+            Substance::new(substance, products_vec)
         })
         .collect();
 
     Ok(substances_vec)
+}
+
+fn add_product_for_substance(
+    substances: &mut BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>>,
+    substance: SubstanceName,
+    product: ProductName,
+    doc: Document,
+) {
+    match substances.get_mut(&substance) {
+        None => {
+            let mut products = BTreeMap::new();
+            products.insert(product, vec![doc]);
+            substances.insert(substance, products);
+        }
+        Some(mut products) => add_document_for_product(&mut products, product, doc),
+    }
+}
+
+fn add_document_for_product(
+    products: &mut BTreeMap<ProductName, Vec<Document>>,
+    name: ProductName,
+    document: Document,
+) {
+    match products.get_mut(&name) {
+        Some(docs) => {
+            docs.push(document);
+        }
+        None => {
+            products.insert(name, vec![document]);
+        }
+    };
 }
 
 #[cfg(test)]
