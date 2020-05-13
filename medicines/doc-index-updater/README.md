@@ -87,6 +87,8 @@ If you are using the shared environments, grab the shared envs…
 Environment variables are shared via Azure key vault.
 
 To get them, run `make get-env`.
+Note that you'll have to have followed the instructions on [connecting to an existing kubernetes cluster](../../infrastructure/docs/kubernetes.md#connecting-to-a-kubernetes-cluster) before this will work,
+as it has the instructions on installing the Azure CLI and authenticating to Azure.
 
 ### via Azure portal
 
