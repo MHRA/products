@@ -37,7 +37,7 @@ fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
     Ok(client)
 }
 
-async fn add_form_to_blob_storage(
+async fn add_form_to_temporary_blob_storage(
     _job_id: Uuid,
     form_data: FormData,
 ) -> Result<Blob, SubmissionError> {
@@ -60,6 +60,11 @@ async fn add_form_to_blob_storage(
     Ok(blob)
 }
 
+async fn queue_pars_upload(job_id: Uuid, form_data: FormData) -> Result<(), SubmissionError> {
+    let _blob = add_form_to_temporary_blob_storage(job_id, form_data).await?;
+    Ok(())
+}
+
 async fn upload_pars_handler(
     form_data: FormData,
     state_manager: impl JobStatusClient,
@@ -68,9 +73,7 @@ async fn upload_pars_handler(
 
     let job_id = accept_job(&state_manager).await?.id;
 
-    let _ = tokio::join!(tokio::spawn(async move {
-        let _ = add_form_to_blob_storage(job_id, form_data).await;
-    }),);
+    let _ = tokio::join!(tokio::spawn(queue_pars_upload(job_id, form_data)),);
 
     Ok(warp::reply::json(&UploadResponse {
         job_id: &job_id.to_string(),
