@@ -48,7 +48,7 @@ async fn add_form_to_temporary_blob_storage(
         e
     })?;
 
-    let blob = create_blob(&storage_client, &file_data, metadata)
+    let blob = create_blob(&storage_client, &file_data, metadata, Some("temp".to_owned()))
         .await
         .map_err(|e| {
             tracing::error!("Error uploading file to blob storage: {:?}", e);
