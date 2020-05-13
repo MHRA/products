@@ -77,6 +77,7 @@ pub struct Document {
 pub enum FileSource {
     #[serde(alias = "sentinel")]
     Sentinel,
+    TemporaryAzureBlobStorage,
 }
 
 impl Into<Document> for XMLDocument {

@@ -1,7 +1,7 @@
 use crate::{
     create_manager::{create_blob, models::BlobMetadata, Blob},
-    document_manager::accept_job,
-    models::DocumentType,
+    document_manager::{accept_job, check_in_document_handler},
+    models::{Document, DocumentType, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client,
 };
@@ -48,32 +48,63 @@ async fn add_form_to_temporary_blob_storage(
         e
     })?;
 
-    let blob = create_blob(&storage_client, &file_data, metadata, Some("temp".to_owned()))
-        .await
-        .map_err(|e| {
-            tracing::error!("Error uploading file to blob storage: {:?}", e);
-            SubmissionError::UploadError {
-                message: format!("Couldn't create blob: {:?}", e),
-            }
-        })?;
+    let blob = create_blob(
+        &storage_client,
+        &file_data,
+        metadata,
+        Some("temp".to_owned()),
+    )
+    .await
+    .map_err(|e| {
+        tracing::error!("Error uploading file to blob storage: {:?}", e);
+        SubmissionError::UploadError {
+            message: format!("Couldn't create blob: {:?}", e),
+        }
+    })?;
 
     Ok(blob)
 }
 
-async fn queue_pars_upload(job_id: Uuid, form_data: FormData) -> Result<(), SubmissionError> {
+fn document_from_form_data(_form_data: Blob) -> Document {
+    Document {
+        id: "id".to_owned(),
+        name: "name".to_owned(),
+        document_type: DocumentType::Par,
+        author: "author".to_owned(),
+        products: Vec::new(),
+        keywords: None,
+        pl_number: "pl_number".to_owned(),
+        active_substances: Vec::new(),
+        file_source: FileSource::TemporaryAzureBlobStorage,
+        file_path: "file_path".to_owned(),
+    }
+}
+
+async fn queue_pars_upload(
+    job_id: Uuid,
+    form_data: FormData,
+    state_manager: impl JobStatusClient,
+) -> Result<(), SubmissionError> {
     let _blob = add_form_to_temporary_blob_storage(job_id, form_data).await?;
+    let document = document_from_form_data(_blob);
+
+    let _ = check_in_document_handler(document, state_manager).await;
     Ok(())
 }
 
 async fn upload_pars_handler(
     form_data: FormData,
-    state_manager: impl JobStatusClient,
+    state_manager: StateManager,
 ) -> Result<impl Reply, Rejection> {
     tracing::debug!("Received PARS submission");
 
     let job_id = accept_job(&state_manager).await?.id;
 
-    let _ = tokio::join!(tokio::spawn(queue_pars_upload(job_id, form_data)),);
+    let _ = tokio::join!(tokio::spawn(queue_pars_upload(
+        job_id,
+        form_data,
+        state_manager.clone(),
+    )),);
 
     Ok(warp::reply::json(&UploadResponse {
         job_id: &job_id.to_string(),
