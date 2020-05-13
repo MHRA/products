@@ -65,18 +65,21 @@ async fn add_form_to_temporary_blob_storage(
     Ok(blob)
 }
 
-fn document_from_form_data(_form_data: Blob) -> Document {
+fn document_from_form_data(blob: Blob) -> Document {
     Document {
-        id: "id".to_owned(),
-        name: "name".to_owned(),
+        id: blob.metadata.file_name.to_string(),
+        name: blob.metadata.title.to_string(),
         document_type: DocumentType::Par,
-        author: "author".to_owned(),
-        products: Vec::new(),
-        keywords: None,
-        pl_number: "pl_number".to_owned(),
-        active_substances: Vec::new(),
+        author: blob.metadata.author.to_string(),
+        products: blob.metadata.product_names.to_vec_string(),
+        keywords: match blob.metadata.keywords {
+            Some(a) => Some(a.to_vec_string()),
+            None => None,
+        },
+        pl_number: blob.metadata.pl_number,
+        active_substances: blob.metadata.active_substances.to_vec_string(),
         file_source: FileSource::TemporaryAzureBlobStorage,
-        file_path: "file_path".to_owned(),
+        file_path: blob.path,
     }
 }
 
