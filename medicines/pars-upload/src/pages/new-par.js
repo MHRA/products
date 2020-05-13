@@ -17,23 +17,33 @@ const ParUpload = () => {
     formData ? formData.getAll('active_substance').length : 1,
   );
 
-  const onSubmit = (event) => {
-    event.preventDefault();
-
-    const nextStep = event.nativeEvent.submitter.value;
-
-    const formData = new FormData(event.target);
+  const saveCurrentPage = () => {
+    const formData = new FormData(formRef.current);
 
     setProducts((products) => {
       const newProducts = [...products];
       newProducts[pageIndex] = formData;
       return newProducts;
     });
+  };
 
-    if (nextStep === 'add-another') {
+  const onSubmit = (event) => {
+    event.preventDefault();
+
+    saveCurrentPage();
+
+    console.log('submitting form', formData);
+  };
+
+  const onAddAnotherProduct = (event) => {
+    event.preventDefault();
+
+    const isValid = formRef.current.reportValidity();
+
+    if (isValid) {
+      saveCurrentPage();
+
       setPageIndex((i) => i + 1);
-    } else {
-      console.log('submitting form', formData);
     }
   };
 
@@ -81,10 +91,10 @@ const ParUpload = () => {
           Add another active substance
         </Button>
         <LicenseNumber />
-        <Button secondary value="add-another">
+        <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
         </Button>{' '}
-        <Button value="continue">Continue</Button>
+        <Button>Continue</Button>
       </form>
     </Layout>
   );
