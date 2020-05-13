@@ -9,7 +9,7 @@ default: ## Run locally
 
 .PHONY: test
 test: ## Run tests [TEST=test_name (optional)]
-	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST && cargo clippy
 
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file

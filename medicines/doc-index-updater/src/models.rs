@@ -1,7 +1,7 @@
 use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
-use core::fmt;
 use regex::Regex;
+use search_client::models::DocumentType;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -16,18 +16,18 @@ pub enum JobStatus {
 
 impl std::fmt::Display for JobStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        let a = match self {
-            JobStatus::Accepted => "Accepted".to_string(),
-            JobStatus::Done => "Done".to_string(),
-            JobStatus::NotFound => "NotFound".to_string(),
-            JobStatus::Error { message, code } => format!("Error({}: {})", code, message),
-        };
-        write!(f, "{}", a)
+        match self {
+            JobStatus::Accepted => write!(f, "Accepted"),
+            JobStatus::Done => write!(f, "Done"),
+            JobStatus::NotFound => write!(f, "NotFound"),
+            JobStatus::Error { message, code } => write!(f, "Error({}: {})", code, message),
+        }
     }
 }
 
 impl FromStr for JobStatus {
     type Err = String;
+
     fn from_str(s: &str) -> Result<JobStatus, Self::Err> {
         match s {
             "Accepted" => Ok(JobStatus::Accepted),
@@ -145,30 +145,6 @@ impl Into<XMLJobStatusResponse> for JobStatusResponse {
             id: self.id.to_string(),
             status: self.status.to_string(),
         }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum DocumentType {
-    #[serde(rename = "SPC")]
-    Spc,
-    #[serde(rename = "PIL")]
-    Pil,
-    #[serde(rename = "PAR")]
-    Par,
-}
-
-impl fmt::Display for DocumentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match &self {
-                DocumentType::Spc => "Spc",
-                DocumentType::Pil => "Pil",
-                DocumentType::Par => "Par",
-            }
-        )
     }
 }
 

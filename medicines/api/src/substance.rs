@@ -1,5 +1,8 @@
 use crate::{document::Document, product::Product};
-use search_client::{models::IndexResults, Search};
+use search_client::{
+    models::{DocTypeParseError, IndexResults},
+    Search,
+};
 use std::collections::BTreeMap;
 
 #[derive(Debug, PartialEq)]
@@ -20,6 +23,7 @@ impl Substance {
     fn name(&self) -> &str {
         &self.name
     }
+
     fn products(&self) -> &Vec<Product> {
         &self.products
     }
@@ -28,78 +32,107 @@ impl Substance {
 pub async fn get_substances_starting_with_letter(
     client: &impl Search,
     letter: char,
-) -> reqwest::Result<Vec<Substance>> {
+) -> anyhow::Result<Vec<Substance>> {
     let upper_letter = letter.to_ascii_uppercase();
 
     let azure_result = client
         .filter_by_collection_field("facets", &upper_letter.to_string())
         .await?;
 
-    Ok(format_search_results(azure_result, upper_letter))
+    Ok(format_search_results(azure_result, upper_letter)?)
 }
 
-fn format_search_results(results: IndexResults, letter: char) -> Vec<Substance> {
-    let mut substances: BTreeMap<&str, BTreeMap<&str, Vec<Document>>> = BTreeMap::new();
+#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
+struct SubstanceName(String);
+
+#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
+struct ProductName(String);
+
+fn format_search_results(
+    results: IndexResults,
+    letter: char,
+) -> Result<Vec<Substance>, DocTypeParseError> {
+    // Using a BTreeMap (instead of HashMap) so that the keys are sorted alphabetically.
+    let mut substances: BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>> =
+        BTreeMap::new();
 
     let letter_string = letter.to_string();
 
     results
         .search_results
-        .iter()
+        .into_iter()
         .filter(|result| result.facets.iter().any(|s| s == &letter_string))
         .filter_map(|result| {
-            let substance_name = result
-                .substance_name
-                .iter()
-                .find(|&s| s.starts_with(letter))?
-                .as_str();
+            let doc: Document = result.into();
 
-            let product_name = result.product_name.as_ref()?.as_str();
+            let substance = doc
+                .substances()
+                .find(|s| s.starts_with(letter))?
+                .to_string();
 
-            let doc: Document = result.clone().into();
+            let product = doc.product_name()?.to_string();
 
-            Some((substance_name, product_name, doc))
+            Some((SubstanceName(substance), ProductName(product), doc))
         })
-        .for_each(
-            |(substance, product, doc)| match substances.get_mut(substance) {
-                None => {
-                    let mut map = BTreeMap::new();
-                    map.insert(product, vec![doc]);
-                    substances.insert(substance, map);
-                }
-                Some(map) => match map.get_mut(product) {
-                    Some(docs) => {
-                        docs.push(doc);
-                    }
-                    None => {
-                        map.insert(product, vec![doc]);
-                    }
-                },
-            },
-        );
+        .for_each(|(substance, product, doc)| {
+            add_product_for_substance(&mut substances, substance, product, doc);
+        });
 
-    substances
-        .iter()
-        .map(|(&substance, prods)| {
-            let products = prods
-                .iter()
-                .map(|(&name, docs)| Product::new(name.into(), Some(docs.to_owned())))
+    let substances_vec = substances
+        .into_iter()
+        .map(|(SubstanceName(substance), products)| {
+            let products_vec = products
+                .into_iter()
+                .map(|(ProductName(name), docs)| Product::new(name, Some(docs)))
                 .collect();
 
-            Substance::new(substance.into(), products)
+            Substance::new(substance, products_vec)
         })
-        .collect()
+        .collect();
+
+    Ok(substances_vec)
+}
+
+fn add_product_for_substance(
+    substances: &mut BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>>,
+    substance: SubstanceName,
+    product: ProductName,
+    doc: Document,
+) {
+    match substances.get_mut(&substance) {
+        None => {
+            let mut products = BTreeMap::new();
+            products.insert(product, vec![doc]);
+            substances.insert(substance, products);
+        }
+        Some(mut products) => add_document_for_product(&mut products, product, doc),
+    }
+}
+
+fn add_document_for_product(
+    products: &mut BTreeMap<ProductName, Vec<Document>>,
+    name: ProductName,
+    document: Document,
+) {
+    match products.get_mut(&name) {
+        Some(docs) => {
+            docs.push(document);
+        }
+        None => {
+            products.insert(name, vec![document]);
+        }
+    };
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
-    use search_client::models::{IndexResult, IndexResults};
+    use search_client::models::{DocumentType, IndexResult, IndexResults};
 
     fn index_result(product_name: &str, substance_name: &[&str], facets: &[&str]) -> IndexResult {
         IndexResult {
-            doc_type: "Spc".into(),
+            doc_type: DocumentType::Spc,
             file_name: "CON1587463572172".into(),
             metadata_storage_name: "4e99070c7e5d3682675b2becd972ec44ef35b20c".into(),
             metadata_storage_path: "https://mhraproductsnonprod.blob.core.windows.net/docs/4e99070c7e5d3682675b2becd972ec44ef35b20c".into(),
@@ -174,7 +207,7 @@ mod tests {
         let zon25: Vec<Document> = vec![zonismade_25mg.into()];
         let zol: Vec<Document> = vec![zolmitriptan.into()];
 
-        let formatted = format_search_results(results, letter);
+        let formatted = format_search_results(results, letter).unwrap();
 
         let expected = vec![
             Substance::new(
@@ -222,7 +255,7 @@ mod tests {
             count: None
         };
 
-        let formatted = format_search_results(results, letter);
+        let formatted = format_search_results(results, letter).unwrap();
 
         let expected = vec![Substance::new(
             "ZIDOVUDINE".into(),

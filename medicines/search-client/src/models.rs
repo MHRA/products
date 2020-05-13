@@ -1,3 +1,4 @@
+pub use crate::document_type::{DocTypeParseError, DocumentType};
 use chrono::{SecondsFormat, Utc};
 use core::fmt::Debug;
 use serde_derive::{Deserialize, Serialize};
@@ -5,13 +6,12 @@ use std::clone::Clone;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct AzureHighlight {
-    #[serde(rename = "content")]
     pub content: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct IndexResult {
-    pub doc_type: String,
+    pub doc_type: DocumentType,
     pub file_name: String,
     pub metadata_storage_name: String,
     pub metadata_storage_path: String,
@@ -86,7 +86,7 @@ pub struct IndexEntry {
     pub metadata_storage_last_modified: String,
     pub metadata_storage_content_md5: String,
     pub metadata_storage_name: String,
-    pub doc_type: String,
+    pub doc_type: DocumentType,
     pub suggestions: Vec<String>,
     pub substance_name: Vec<String>,
     pub facets: Vec<String>,
@@ -118,21 +118,47 @@ impl From<IndexResult> for IndexEntry {
                 Some(k) => k,
                 None => "".to_owned(),
             },
-            title: res.title.clone(),
+            title: res.title,
             pl_number: vec![],
-            file_name: res.file_name.clone(),
-            doc_type: res.doc_type.clone(),
-            suggestions: res.suggestions.clone(),
-            substance_name: res.substance_name.clone(),
-            facets: res.facets.clone(),
+            file_name: res.file_name,
+            doc_type: res.doc_type,
+            suggestions: res.suggestions,
+            substance_name: res.substance_name,
+            facets: res.facets,
             metadata_storage_content_type: String::default(),
             metadata_storage_size: res.metadata_storage_size as usize,
             metadata_storage_last_modified: Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
             metadata_storage_content_md5: String::default(),
-            metadata_storage_name: res.metadata_storage_name.clone(),
-            metadata_storage_path: res.metadata_storage_path.clone(),
+            metadata_storage_name: res.metadata_storage_name,
+            metadata_storage_path: res.metadata_storage_path,
             metadata_content_type: String::default(),
             metadata_language: String::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn deserializes_correctly() {
+        let json = "{\"@odata.context\":\"https://mhraproductsproduction.search.windows.net/indexes('products-index')/$metadata#docs(*)\",\"@odata.count\":4,\"value\":[
+            {\"@search.score\":1.0,\"rev_label\":\"1\",\"metadata_storage_path\":\"https://mhraproductsproduction.blob.core.windows.net/docs/2f81f987a17ab865c4b6302a2711709794f6b3de\",\"product_name\":\"LARIAM 250MG TABLETS\",\"created\":\"2019-12-20T05:07:00+00:00\",\"release_state\":\"Y\",\"keywords\":null,\"title\":\"leaflet MAH BRAND_PLPI 20774-1329.pdf\",\"file_name\":\"CON1576818432234\",\"metadata_storage_size\":181194,\"metadata_storage_name\":\"2f81f987a17ab865c4b6302a2711709794f6b3de\",\"doc_type\":\"Pil\",\"suggestions\":[],\"substance_name\":[\"MEFLOQUINE\"],\"facets\":[\"M\",\"M, MEFLOQUINE\",\"M, MEFLOQUINE, LARIAM 250MG TABLETS\"]},
+            {\"@search.score\":1.0,\"rev_label\":\"1\",\"metadata_storage_path\":\"https://mhraproductsproduction.blob.core.windows.net/docs/bda052785cf870d1249269797b36a856cd2ed8ed\",\"product_name\":\"LARIAM 250MG TABLETS\",\"created\":\"2019-08-09T05:23:00+00:00\",\"release_state\":\"Y\",\"keywords\":null,\"title\":\"leaflet MAH BRAND_PL 27041-0012.pdf\",\"file_name\":\"CON1565324634716\",\"metadata_storage_size\":394446,\"metadata_storage_name\":\"bda052785cf870d1249269797b36a856cd2ed8ed\",\"doc_type\":\"Pil\",\"suggestions\":[],\"substance_name\":[\"MEFLOQUINE HYDROCHLORIDE\"],\"facets\":[\"M\",\"M, MEFLOQUINE HYDROCHLORIDE\",\"M, MEFLOQUINE HYDROCHLORIDE, LARIAM 250MG TABLETS\"]},
+            {\"@search.score\":1.0,\"rev_label\":\"1\",\"metadata_storage_path\":\"https://mhraproductsproduction.blob.core.windows.net/docs/4183369448f303b3d15b8edf002db03434183773\",\"product_name\":\"LARIAM 250MG TABLETS\",\"created\":\"2020-01-10T05:06:00+00:00\",\"release_state\":\"Y\",\"keywords\":null,\"title\":\"leaflet MAH BRAND_PLPI 20636-1861.pdf\",\"file_name\":\"CON1578632786776\",\"metadata_storage_size\":184883,\"metadata_storage_name\":\"4183369448f303b3d15b8edf002db03434183773\",\"doc_type\":\"Pil\",\"suggestions\":[],\"substance_name\":[\"MEFLOQUINE HYDROCHLORIDE\"],\"facets\":[\"M\",\"M, MEFLOQUINE HYDROCHLORIDE\",\"M, MEFLOQUINE HYDROCHLORIDE, LARIAM 250MG TABLETS\"]},
+            {\"@search.score\":1.0,\"rev_label\":\"1\",\"metadata_storage_path\":\"https://mhraproductsproduction.blob.core.windows.net/docs/947128e7c11cb9f45aada193748f24ec6cdc5b52\",\"product_name\":\"LARIAM 250MG TABLETS\",\"created\":\"2019-08-09T05:23:00+00:00\",\"release_state\":\"Y\",\"keywords\":null,\"title\":\"spc-doc_PL 27041-0012.pdf\",\"file_name\":\"CON1565324634426\",\"metadata_storage_size\":71288,\"metadata_storage_name\":\"947128e7c11cb9f45aada193748f24ec6cdc5b52\",\"doc_type\":\"Spc\",\"suggestions\":[],\"substance_name\":[\"MEFLOQUINE HYDROCHLORIDE\"],\"facets\":[\"M\",\"M, MEFLOQUINE HYDROCHLORIDE\",\"M, MEFLOQUINE HYDROCHLORIDE, LARIAM 250MG TABLETS\"]}
+        ]}";
+
+        let results: IndexResults = serde_json::from_str(json).unwrap();
+
+        assert_eq!(results.search_results.len(), 4);
+        assert_eq!(
+            results.search_results[0].product_name,
+            Some("LARIAM 250MG TABLETS".into())
+        );
+        assert_eq!(results.search_results[0].doc_type, DocumentType::Pil);
+        assert_eq!(results.search_results[3].doc_type, DocumentType::Spc);
     }
 }

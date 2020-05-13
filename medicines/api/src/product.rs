@@ -1,11 +1,9 @@
 use crate::{
-    document::{
-        self, get_documents, get_documents_graph_from_documents_vector, Document, DocumentType,
-    },
+    document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };
 use juniper::FieldResult;
-use search_client::{models::IndexResult, Search};
+use search_client::{models::DocumentType, Search};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
@@ -49,7 +47,7 @@ impl Product {
             let docs = match document_types {
                 Some(document_types) => docs
                     .into_iter()
-                    .filter(|x| document_types.iter().any(|f| x.is_doc_type(f)))
+                    .filter(|x| document_types.iter().any(|&f| x.is_doc_type(f)))
                     .collect(),
                 None => docs,
             };
@@ -89,36 +87,36 @@ impl Product {
     }
 }
 
-pub fn handle_doc(document: &IndexResult, products: &mut Vec<Product>) {
-    match &document.product_name {
-        Some(document_product_name) => {
-            // Try to find an existing product.
-            let existing_product = products
-                .iter_mut()
-                .find(|product| document_product_name == &product.name);
+pub fn handle_doc(document: &Document, products: &mut Vec<Product>) {
+    if let Some(document_product_name) = document.product_name() {
+        // Try to find an existing product.
+        let existing_product = products
+            .iter_mut()
+            .find(|product| document_product_name == &product.name);
 
-            match existing_product {
-                Some(existing_product) => existing_product.add(document.to_owned().into()),
-                None => products.push(Product::new(
-                    document_product_name.to_owned(),
-                    Some(vec![document.to_owned().into()]),
-                )),
-            }
+        match existing_product {
+            Some(existing_product) => existing_product.add(document.to_owned()),
+            None => products.push(Product::new(
+                document_product_name.to_owned(),
+                Some(vec![document.to_owned()]),
+            )),
         }
-        None => {}
     }
 }
 
 pub async fn get_substance_with_products(
     substance_name: &str,
     client: &impl Search,
-) -> Result<Substance, reqwest::Error> {
+) -> Result<Substance, anyhow::Error> {
     let azure_result = client
         .filter_by_collection_field("substance_name", substance_name)
         .await?;
 
     let mut products = Vec::<Product>::new();
-    for document in azure_result.search_results {
+
+    for result in azure_result.search_results {
+        let document = result.into();
+
         handle_doc(&document, &mut products);
     }
 
@@ -134,11 +132,12 @@ pub async fn get_product(product_name: String) -> Result<Product, reqwest::Error
 #[cfg(test)]
 mod test {
     use super::*;
+    use search_client::models::IndexResult;
 
-    fn azure_result_factory(product_name: Option<String>) -> IndexResult {
-        IndexResult {
+    fn azure_result_factory(product_name: Option<String>) -> Document {
+        let result = IndexResult {
             product_name,
-            doc_type: "dummy".to_string(),
+            doc_type: DocumentType::Spc,
             created: Some("yes".to_string()),
             facets: Vec::new(),
             file_name: "README.markdown".to_string(),
@@ -153,7 +152,9 @@ mod test {
             substance_name: Vec::new(),
             suggestions: Vec::new(),
             title: "dummy's guide to medicines".to_string(),
-        }
+        };
+
+        result.into()
     }
 
     #[test]
