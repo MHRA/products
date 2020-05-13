@@ -185,6 +185,7 @@ const LicenseNumber = () => (
         className="govuk-select"
         id="license_number_type"
         name="license_number_type"
+        required
       >
         <option value="Product license">PL</option>
         <option value="PLPI">HR</option>
@@ -198,6 +199,9 @@ const LicenseNumber = () => (
         id="license_part_one"
         name="license_part_one"
         type="text"
+        pattern="[0-9]{5}"
+        title="5 digits"
+        required
       />
       {' / '}
       <ScreenReaderOnly>
@@ -208,6 +212,9 @@ const LicenseNumber = () => (
         id="license_part_two"
         name="license_part_two"
         type="text"
+        pattern="[0-9]{4}"
+        title="4 digits"
+        required
       />
     </fieldset>
   </FormGroup>
