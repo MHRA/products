@@ -192,7 +192,7 @@ const LicenseNumber = () => (
         <option value="THR">THR</option>
       </select>{' '}
       <ScreenReaderOnly>
-        <label htmlFor="license_part_one">First chunk</label>
+        <label htmlFor="license_part_one">First five digits</label>
       </ScreenReaderOnly>
       <input
         className="govuk-input govuk-input--width-5"
@@ -205,7 +205,7 @@ const LicenseNumber = () => (
       />
       {' / '}
       <ScreenReaderOnly>
-        <label htmlFor="license_part_two">Second chunk</label>
+        <label htmlFor="license_part_two">Last four digits</label>
       </ScreenReaderOnly>
       <input
         className="govuk-input govuk-input--width-5"

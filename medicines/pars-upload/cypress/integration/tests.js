@@ -57,8 +57,8 @@ describe('PARs upload form', () => {
       .parent()
       .within(() => {
         cy.findByLabelText('Type').select('HR');
-        cy.findByLabelText('First chunk').type('12345');
-        cy.findByLabelText('Second chunk').type('ABC123');
+        cy.findByLabelText('First five digits').type('12345');
+        cy.findByLabelText('Last four digits').type('6789');
       });
 
     cy.findByText('Add another product').click();
