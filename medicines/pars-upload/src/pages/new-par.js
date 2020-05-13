@@ -47,10 +47,22 @@ const ParUpload = () => {
     }
   };
 
+  const goToPage = (newPageIndex) => {
+    saveCurrentPage();
+
+    setPageIndex(newPageIndex);
+  };
+
+  const onClickBack =
+    pageIndex > 0
+      ? (event) => {
+          event.preventDefault();
+          goToPage(pageIndex - 1);
+        }
+      : null;
+
   return (
-    <Layout
-      intro={<BackLink href="/" /> /* TODO: go back to previous product */}
-    >
+    <Layout intro={<BackLink href="/" onClick={onClickBack} />}>
       <H1>New Public Assessment Report</H1>
 
       <Para>
@@ -60,7 +72,7 @@ const ParUpload = () => {
 
       <PreviousProductsSummary
         products={products.slice(0, pageIndex)}
-        goToPage={(index) => setPageIndex(index)}
+        goToPage={goToPage}
       />
 
       <form key={pageIndex} onSubmit={onSubmit} ref={formRef}>
@@ -84,8 +96,7 @@ const ParUpload = () => {
           secondary
           type="button"
           onClick={() => {
-            console.log(activeSubstancesCount);
-            setNumActiveSubstances((c) => c + 1);
+            setNumActiveSubstances((n) => n + 1);
           }}
         >
           Add another active substance

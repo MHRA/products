@@ -1,7 +1,11 @@
 import Link from 'next/link';
 
-export const BackLink = ({ href }) => (
-  <Link href={href}>
-    <a className="govuk-back-link">Back</a>
-  </Link>
-);
+export const BackLink = ({ href, onClick }) => {
+  const anchor = <a className="govuk-back-link">Back</a>;
+
+  return onClick ? (
+    React.cloneElement(anchor, { onClick, href })
+  ) : (
+    <Link href={href}>{anchor}</Link>
+  );
+};
