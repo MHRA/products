@@ -31,7 +31,7 @@ pub struct FailedToAddToQueue;
 
 impl warp::reject::Reject for FailedToAddToQueue {}
 
-async fn accept_job(
+pub async fn accept_job(
     state_manager: &impl JobStatusClient,
 ) -> Result<JobStatusResponse, MyRedisError> {
     let id = Uuid::new_v4();
