@@ -95,7 +95,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(&storage_client, &file, metadata).await?;
+    let blob = create_blob(&storage_client, &file, metadata, None).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
@@ -111,8 +111,14 @@ pub async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
     metadata: BlobMetadata,
+    temp_signature: Option<String>,
 ) -> Result<Blob, anyhow::Error> {
     let name = hash::sha1(&file_data);
+    let name = match temp_signature {
+        Some(x) => format!("{}/{}", x, name),
+        None => name,
+    };
+
     let file_digest = md5::compute(&file_data[..]);
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");

@@ -7,14 +7,14 @@ use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct BlobMetadata {
-    file_name: SanitisedString,
-    doc_type: DocumentType,
-    title: SanitisedString,
-    pl_number: String,
-    product_names: VecSanitisedString,
-    active_substances: VecSanitisedString,
-    author: SanitisedString,
-    keywords: Option<VecSanitisedString>,
+    pub file_name: SanitisedString,
+    pub doc_type: DocumentType,
+    pub title: SanitisedString,
+    pub pl_number: String,
+    pub product_names: VecSanitisedString,
+    pub active_substances: VecSanitisedString,
+    pub author: SanitisedString,
+    pub keywords: Option<VecSanitisedString>,
 }
 
 impl BlobMetadata {

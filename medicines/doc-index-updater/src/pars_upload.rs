@@ -1,5 +1,8 @@
 use crate::{
-    create_manager::{create_blob, models::BlobMetadata},
+    create_manager::{create_blob, models::BlobMetadata, Blob},
+    document_manager::{accept_job, check_in_document_handler},
+    models::{Document, FileSource},
+    state_manager::{with_state, JobStatusClient, StateManager},
     storage_client,
 };
 use bytes::BufMut;
@@ -7,58 +10,114 @@ use futures::future::join_all;
 use futures::TryStreamExt;
 use search_client::models::DocumentType;
 use serde::Serialize;
+use storage_client::BlobClient;
+use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
     Filter, Rejection, Reply,
 };
 
-pub fn handler() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+pub fn handler(
+    state_manager: StateManager,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("pars")
         .and(warp::post())
         .and(warp::multipart::form().max_length(100 * 1024 * 1024))
+        .and(with_state(state_manager))
         .and_then(upload_pars_handler)
 }
 
-async fn upload_pars_handler(form_data: FormData) -> Result<impl Reply, Rejection> {
-    tracing::debug!("Received PARS submission");
+fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
+    let client = storage_client::factory().map_err(|e| {
+        tracing::error!("Error creating storage client: {:?}", e);
+        SubmissionError::UploadError {
+            message: format!("Couldn't create storage client: {:?}", e),
+        }
+    })?;
 
-    let storage_client = storage_client::factory()
-        .map_err(|e| {
-            tracing::error!("Error creating storage client: {:?}", e);
-            warp::reject::custom(SubmissionError::UploadError {
-                message: format!("Couldn't create storage client: {:?}", e),
-            })
-        })?
-        .azure_client;
+    Ok(client)
+}
+
+async fn add_form_to_temporary_blob_storage(
+    _job_id: Uuid,
+    form_data: FormData,
+) -> Result<Blob, SubmissionError> {
+    let storage_client = storage_client_factory()?.azure_client;
 
     let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
         tracing::debug!("Error reading PARS upload: {:?}", e);
-        warp::reject::custom(e)
+        e
     })?;
 
-    dbg!(&metadata);
+    let blob = create_blob(
+        &storage_client,
+        &file_data,
+        metadata,
+        Some("temp".to_owned()),
+    )
+    .await
+    .map_err(|e| {
+        tracing::error!("Error uploading file to blob storage: {:?}", e);
+        SubmissionError::UploadError {
+            message: format!("Couldn't create blob: {:?}", e),
+        }
+    })?;
 
-    let blob = create_blob(&storage_client, &file_data, metadata)
-        .await
-        .map_err(|e| {
-            tracing::error!("Error uploading file to blob storage: {:?}", e);
-            warp::reject::custom(SubmissionError::UploadError {
-                message: format!("Error uploading to blob storage: {:?}", e),
-            })
-        })?;
+    Ok(blob)
+}
 
-    dbg!(&blob);
+fn document_from_form_data(blob: Blob) -> Document {
+    Document {
+        id: blob.metadata.file_name.to_string(),
+        name: blob.metadata.title.to_string(),
+        document_type: DocumentType::Par,
+        author: blob.metadata.author.to_string(),
+        products: blob.metadata.product_names.to_vec_string(),
+        keywords: match blob.metadata.keywords {
+            Some(a) => Some(a.to_vec_string()),
+            None => None,
+        },
+        pl_number: blob.metadata.pl_number,
+        active_substances: blob.metadata.active_substances.to_vec_string(),
+        file_source: FileSource::TemporaryAzureBlobStorage,
+        file_path: blob.path,
+    }
+}
+
+async fn queue_pars_upload(
+    job_id: Uuid,
+    form_data: FormData,
+    state_manager: impl JobStatusClient,
+) -> Result<(), SubmissionError> {
+    let _blob = add_form_to_temporary_blob_storage(job_id, form_data).await?;
+    let document = document_from_form_data(_blob);
+
+    let _ = check_in_document_handler(document, state_manager).await;
+    Ok(())
+}
+
+async fn upload_pars_handler(
+    form_data: FormData,
+    state_manager: StateManager,
+) -> Result<impl Reply, Rejection> {
+    tracing::debug!("Received PARS submission");
+
+    let job_id = accept_job(&state_manager).await?.id;
+
+    let _ = tokio::join!(tokio::spawn(queue_pars_upload(
+        job_id,
+        form_data,
+        state_manager.clone(),
+    )),);
 
     Ok(warp::reply::json(&UploadResponse {
-        name: &blob.name,
-        path: &blob.path,
+        job_id: &job_id.to_string(),
     }))
 }
 
 #[derive(Debug, Serialize)]
 struct UploadResponse<'a> {
-    name: &'a str,
-    path: &'a str,
+    job_id: &'a str,
 }
 
 async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>), SubmissionError> {

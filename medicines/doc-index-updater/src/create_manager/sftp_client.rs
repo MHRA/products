@@ -106,6 +106,7 @@ async fn retrieve_file_from_sftp(
 pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, SftpError> {
     let mut sentinel_sftp_client = match source {
         FileSource::Sentinel => sentinel_sftp_factory().await?,
+        FileSource::TemporaryAzureBlobStorage => unimplemented!(),
     };
     let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
     let mut bytes = Vec::<u8>::new();
