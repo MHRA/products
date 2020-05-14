@@ -8,6 +8,7 @@ use crate::{
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
+use search_client::models::DocumentType;
 use serde::Serialize;
 use storage_client::BlobClient;
 use uuid::Uuid;

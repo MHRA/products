@@ -1,12 +1,13 @@
-import Link from "next/link";
-import classes from "classnames";
+import Link from 'next/link';
+import classes from 'classnames';
 
-export const Button = ({ children, secondary = false }) => (
+export const Button = ({ children, secondary = false, ...props }) => (
   <button
-    className={classes("govuk-button", {
-      "govuk-button--secondary": secondary,
+    className={classes('govuk-button', {
+      'govuk-button--secondary': secondary,
     })}
     data-module="govuk-button"
+    {...props}
   >
     {children}
   </button>

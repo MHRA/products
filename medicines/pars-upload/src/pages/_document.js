@@ -14,21 +14,16 @@ class MyDocument extends Document {
         lang="en"
         className="govuk-template js history flexbox no-flexboxtweener fixedsticky-withoutfixedfixed"
       >
-        <Head>
-          <title>Public Assessment Reports (PARs) upload</title>
-        </Head>
+        <Head />
+
         <body className="govuk-template__body">
-          <a href="#main-content" class="govuk-skip-link">
+          <a href="#main-content" className="govuk-skip-link">
             Skip to main content
           </a>
 
           <Header />
 
-          <div className="govuk-width-container">
-            <main className="govuk-main-wrapper " id="main-content" role="main">
-              <Main />
-            </main>
-          </div>
+          <Main />
 
           <Footer />
 

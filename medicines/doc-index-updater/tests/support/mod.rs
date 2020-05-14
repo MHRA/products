@@ -1,10 +1,11 @@
 #![allow(dead_code)]
 use core::{fmt::Debug, future::Future};
 use doc_index_updater::{
-    models::{CreateMessage, DeleteMessage, Document, DocumentType, FileSource, Message},
+    models::{CreateMessage, DeleteMessage, Document, FileSource, Message},
     service_bus_client::{DocIndexUpdaterQueue, RetrieveFromQueueError, RetrievedMessage},
 };
 use redis::{self, Value};
+use search_client::models::DocumentType;
 use std::{fs, io, process, thread::sleep, time::Duration};
 use tokio_test::block_on;
 use uuid::Uuid;

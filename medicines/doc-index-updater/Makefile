@@ -8,7 +8,7 @@ default: ## Run locally
 
 .PHONY: test
 test: ## Run tests [TEST=test_name (optional)]
-	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST && cargo clippy
 
 .PHONY: e2e
 e2e: ## Run end to end acceptance tests [TEST=test_name (optional)]

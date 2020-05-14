@@ -8466,10 +8466,10 @@ react-is@^16.12.0, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-i
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.0.tgz#0f37c3613c34fe6b37cd7f763a0d6293ab15c527"
   integrity sha512-GFMtL0vHkiBv9HluwNZTggSn/sCyEt9n02aM0dSAjGGyqyNlAyftYm4phPxdvCigG15JreC5biwxCgTAJZ7yAA==
 
-react-schemaorg@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/react-schemaorg/-/react-schemaorg-1.0.1.tgz#c8865a81861f424181efaa2f5919164287c920c4"
-  integrity sha512-nt/37U4yORyYL5y2ZL4f5mtVtuchqo9I2vMSVPEHkV9cPsqQJLsYrhHkPkJmecN7DTqHue9D3v2gnPoVmFp0DQ==
+react-schemaorg@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-schemaorg/-/react-schemaorg-1.0.2.tgz#3ae275f8033084441ba48809e0f0d73590e7a6ac"
+  integrity sha512-V3+7QNOsKW5I8eaTxfpaFMVCnODcv42mg6t9n+R2Sc10nzaHqmSlIIMv5HgJ7mRw4UionHnHRL4z7Vs0YQmwlg==
 
 react-test-renderer@^16.0.0-0:
   version "16.13.0"
