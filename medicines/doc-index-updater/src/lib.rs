@@ -15,6 +15,7 @@ pub mod pars_upload;
 pub mod service_bus_client;
 pub mod state_manager;
 pub mod storage_client;
+pub mod temporary_blob_storage;
 
 pub fn get_env_or_default<T>(key: &str, default: T) -> T
 where
