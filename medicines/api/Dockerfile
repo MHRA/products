@@ -43,6 +43,7 @@ FROM debian:buster-slim AS release
 
 RUN apt-get update && apt-get install -y \
   tini \
+  ca-certificates \
   libssl-dev \
   openssl \
   ;
