@@ -1,7 +1,15 @@
-import "govuk-frontend/govuk/all.scss";
+import 'govuk-frontend/govuk/all.scss';
+import Head from 'next/head';
 
 function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Head>
+        <title>Public Assessment Reports (PARs) upload</title>
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 }
 
 // Only uncomment this method if you have blocking data requirements for
