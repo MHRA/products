@@ -1,7 +1,7 @@
 use crate::{
     create_manager::{create_blob, models::BlobMetadata, Blob},
     document_manager::{accept_job, check_in_document_handler},
-    models::{Document, DocumentType, FileSource},
+    models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client,
 };
