@@ -1,3 +1,4 @@
+mod document_type;
 pub mod models;
 
 use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
@@ -387,6 +388,7 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+    use pretty_assertions::assert_eq;
 
     fn given_we_have_a_search_client() -> reqwest::Client {
         reqwest::Client::new()

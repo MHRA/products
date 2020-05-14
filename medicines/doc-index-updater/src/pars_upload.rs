@@ -1,11 +1,11 @@
 use crate::{
     create_manager::{create_blob, models::BlobMetadata},
-    models::DocumentType,
     storage_client,
 };
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
+use search_client::models::DocumentType;
 use serde::Serialize;
 use warp::{
     filters::multipart::{FormData, Part},
