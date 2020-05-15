@@ -1,23 +1,47 @@
 import 'govuk-frontend/govuk/all.scss';
 import Head from 'next/head';
-import { SignInRequest } from '../auth/signInRequest';
 import { useState } from 'react';
+import { SignInRequest } from '../auth/signInRequest';
+import { Header } from '../header';
+import { Footer } from '../footer';
+import { signIn } from '../auth/authPopup';
 
 function App({ Component, pageProps }) {
-  const [account, setAccount] = useState(0);
+  const [auth, setAuth] = useState(null);
 
-  console.log('xxxxxxx');
-  console.log(account);
+  const triggerSignIn = () => {
+    signIn().then(setAuth);
+  };
+
+  const signOut = () => {
+    if (auth) {
+      auth.signOut();
+    }
+    setAuth(null);
+  };
+
   return (
     <>
       <Head>
         <title>Public Assessment Reports (PARs) upload</title>
       </Head>
-      {account ? (
+
+      <Header
+        account={auth ? auth.account : null}
+        signOut={signOut}
+        signIn={triggerSignIn}
+      />
+
+      {auth ? (
         <Component {...pageProps} />
       ) : (
-        <SignInRequest onSignIn={(account) => setAccount(account)} />
+        <SignInRequest
+          signIn={triggerSignIn}
+          onSignIn={(auth) => setAuth(auth)}
+        />
       )}
+
+      <Footer />
     </>
   );
 }
