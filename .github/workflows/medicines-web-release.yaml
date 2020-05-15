@@ -94,8 +94,8 @@ jobs:
           prerelease: false
 
       - name: Deploy products web to static site in azure storage
-        uses: lauchacarro/Azure-Storage-Action@master
+        uses: lauchacarro/Azure-Storage-Action@9225056
         with:
           enabled-static-website: true
           folder: medicines/web/dist
-          connection-string: ${{ secrets.AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}
+          connection-string: ${{ secrets. AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}
