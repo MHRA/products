@@ -1,7 +1,8 @@
+use crate::temporary_blob_storage::StorageClientError;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_core::prelude::Client;
+use client::BlobClient;
 
-pub use client::BlobClient;
 pub use client::StorageClient;
 pub use delete::DeleteBlob;
 pub use get::GetBlob;
@@ -26,4 +27,16 @@ pub fn factory() -> Result<BlobClient, AzureError> {
         Ok(_) => Ok(BlobClient::new(Client::new(&storage_account, &master_key)?)),
         Err(e) => Err(AzureError::Base64DecodeError(e)),
     }
+}
+
+pub fn storage_client_factory_with_a_slightly_different_error_type(
+) -> Result<BlobClient, StorageClientError> {
+    let client = factory().map_err(|e| {
+        tracing::error!("Error creating storage client: {:?}", e);
+        StorageClientError::ClientError {
+            message: format!("Couldn't create storage client: {:?}", e),
+        }
+    })?;
+
+    Ok(client)
 }
