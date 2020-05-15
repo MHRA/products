@@ -392,7 +392,7 @@ mod test {
                     e.to_string(),
                     ProcessMessageError::FailedDeletingBlob(
                         "storage_name".to_string(),
-                        "Generic error: blob could not be deleted".to_string()
+                        "ClientError { message: \"blob could not be deleted\" }".to_string()
                     )
                     .to_string()
                 );
