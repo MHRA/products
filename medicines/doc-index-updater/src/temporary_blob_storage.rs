@@ -29,7 +29,10 @@ pub enum StorageClientError {
     ClientError { message: String },
 }
 
-pub struct TemporaryBlobStorage {}
+pub struct TemporaryBlobStorage {
+    container_name: String,
+    prefix: String,
+}
 
 fn storage_client_factory() -> Result<BlobClient, StorageClientError> {
     let client = storage_client::factory().map_err(|e| {
@@ -42,19 +45,28 @@ fn storage_client_factory() -> Result<BlobClient, StorageClientError> {
     Ok(client)
 }
 
+impl Default for TemporaryBlobStorage {
+    fn default() -> Self {
+        let container_name =
+            std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+        Self {
+            container_name,
+            prefix: "temp/".to_owned(),
+        }
+    }
+}
+
 #[async_trait]
 impl StorageClient for TemporaryBlobStorage {
     async fn add_file(self, file_data: &[u8]) -> Result<StorageFile, StorageClientError> {
         let storage_client = storage_client_factory()?.azure_client;
 
-        let container_name =
-            std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
         let file_digest = md5::compute(&file_data[..]);
-        let name = format!("temp/{}", hash::sha1(&file_data));
+        let name = format!("{}{}", &self.prefix, hash::sha1(&file_data));
 
         storage_client
             .put_block_blob()
-            .with_container_name(&container_name)
+            .with_container_name(&self.container_name)
             .with_blob_name(&name)
             .with_content_type("application/pdf")
             .with_body(&file_data[..])
@@ -75,11 +87,8 @@ impl StorageClient for TemporaryBlobStorage {
     async fn get_file(self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
         let mut storage_client = storage_client_factory()?;
 
-        let container_name =
-            std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
-
         let file_data = storage_client
-            .get_blob(&container_name, &storage_file.name)
+            .get_blob(&self.container_name, &storage_file.name)
             .await
             .map_err(|e| {
                 tracing::error!("Error retrieving file from blob storage: {:?}", e);
