@@ -22,13 +22,13 @@ The `doc-index-updater` pod is an API for the Sentinel Batch export. It is writt
 
 In order to provide a more streamlined process for updating PARS on the website, the current plan is to add a web portal that will allow medical writers to make changes to the PARS on the site.
 
-This would be a simple, static site, hosted in Azure Blob Storage (as with the current Products and Learning sites). The site would have a form to enter information about the PAR (title, associated PL's, active substances, and so on), and an upload field to upload the PAR in PDF form. The form would be based on a design developed in collaboration with the medical writers, making use of web components provided by gov-uk and would, therefore, conform to the GDS standards.
+This would be a simple, static site, hosted in Azure Blob Storage (as with the current Products and Learning sites). The site would have a form to enter information about the PAR (title, associated PLs, active substances, and so on), and an upload field to upload the PAR in PDF form. The form would be based on a design developed in collaboration with the medical writers, making use of web components provided by gov-uk and would, therefore, conform to the GDS standards.
 
 Access to the form would be restricted to a whitelisted set of IPs, representing MHRA's public IP range, by the CDN. If a user tried to access it from an IP address outside of this range, they would be presented with a blocked access page.
 
 Authentication and authorization would be provided by Azure's Active Directory (AD) service. The email addresses of approved medical writers would be added and assigned to a specific group within Aure AD, that would authorise them to edit PARS.
 
-When arriving at the site (from within MHRA's network), they would be prompted to log-in. Their login request would be validated by Azure AD and an ID JWT token returned. Once completed, the PAR form would be submitted, along with the JWT token, to a new PAR endpoint on the Document Index Updater. An authorization policy in Istio would ensure that any requests to this endpoint are accompanied by a valid, Azure-signed JWT token that contains the necessary claim to make changes to PARS (granted by membership of the group, definted within AD).
+When arriving at the site (from within MHRA's network), they would be prompted to log-in. Their login request would be validated by Azure AD and an ID JWT token returned. Once completed, the PAR form would be submitted, along with the JWT token, to a new PAR endpoint on the Document Index Updater. An authorization policy in Istio would ensure that any requests to this endpoint are accompanied by a valid, Azure-signed JWT token that contains the necessary claim to make changes to PARS (granted by membership of the group, defined within AD).
 
 The Document Index Updater would then upload the new document to blob storage and the Azure search index being used by the site, after which the document would be instantly accessible on the products website.
 

@@ -16,6 +16,7 @@ auth
 authorisation
 Authorisation
 authorisations
+authorise
 authorised
 az
 azurecr
@@ -85,6 +86,7 @@ incrementing
 Infrastucture
 Init
 io
+IPs
 Istio
 jetstack
 jMHESRNZIU
@@ -143,6 +145,7 @@ PDFs
 PII
 PIL
 PILs
+PLs
 PRs
 PySpelling
 QoURBFoXXQpZp
