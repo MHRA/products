@@ -18,7 +18,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
-mod hash;
+pub mod hash;
 pub mod models;
 mod sanitiser;
 mod search_index;
@@ -95,7 +95,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(&storage_client, &file, metadata, None).await?;
+    let blob = create_blob(&storage_client, &file, metadata).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
@@ -107,17 +107,12 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     Ok(message.job_id)
 }
 
-pub async fn create_blob(
+async fn create_blob(
     storage_client: &azure_sdk_storage_core::prelude::Client,
     file_data: &[u8],
     metadata: BlobMetadata,
-    temp_signature: Option<String>,
 ) -> Result<Blob, anyhow::Error> {
     let name = hash::sha1(&file_data);
-    let name = match temp_signature {
-        Some(x) => format!("{}/{}", x, name),
-        None => name,
-    };
 
     let file_digest = md5::compute(&file_data[..]);
     let container_name =

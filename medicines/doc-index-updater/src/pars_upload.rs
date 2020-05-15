@@ -1,19 +1,16 @@
 use crate::{
-    create_manager::{create_blob, models::BlobMetadata, Blob},
+    create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
-    storage_client,
     temporary_blob_storage::TemporaryBlobStorage,
     temporary_blob_storage::{StorageClient, StorageFile},
 };
-
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
 use search_client::models::DocumentType;
 use serde::Serialize;
-use storage_client::BlobClient;
 use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
@@ -30,45 +27,13 @@ pub fn handler(
         .and_then(upload_pars_handler)
 }
 
-fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
-    let client = storage_client::factory().map_err(|e| {
-        tracing::error!("Error creating storage client: {:?}", e);
-        SubmissionError::UploadError {
-            message: format!("Couldn't create storage client: {:?}", e),
-        }
-    })?;
-
-    Ok(client)
-}
-
-async fn add_form_to_temporary_blob_storage(
+async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
-    form_data: FormData,
-) -> Result<(StorageFile, BlobMetadata), SubmissionError> {
-    let storage_client = storage_client_factory()?.azure_client;
-
-    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
-        tracing::debug!("Error reading PARS upload: {:?}", e);
-        e
-    })?;
-
+    file_data: Vec<u8>,
+) -> Result<StorageFile, SubmissionError> {
     let storage_client = TemporaryBlobStorage {};
-    let blob = storage_client.add_file(&file_data);
-    // create_blob(
-    //     &storage_client,
-    //     &file_data,
-    //     metadata,
-    //     Some("temp".to_owned()),
-    // )
-    // .await
-    // .map_err(|e| {
-    //     tracing::error!("Error uploading file to blob storage: {:?}", e);
-    //     SubmissionError::UploadError {
-    //         message: format!("Couldn't create blob: {:?}", e),
-    //     }
-    // })?;
-
-    Ok((blob, metadata))
+    let storage_file = storage_client.add_file(&file_data).await?;
+    Ok(storage_file)
 }
 
 fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) -> Document {
@@ -94,8 +59,12 @@ async fn queue_pars_upload(
     form_data: FormData,
     state_manager: impl JobStatusClient,
 ) -> Result<(), SubmissionError> {
-    let (blob, metadata) = add_form_to_temporary_blob_storage(job_id, form_data).await?;
-    let document = document_from_form_data(blob, metadata);
+    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
+        tracing::debug!("Error reading PARS upload: {:?}", e);
+        e
+    })?;
+    let storage_file = add_file_to_temporary_blob_storage(job_id, file_data).await?;
+    let document = document_from_form_data(storage_file, metadata);
 
     let _ = check_in_document_handler(document, state_manager).await;
     Ok(())
@@ -254,7 +223,7 @@ impl UploadFieldValue {
 }
 
 #[derive(Debug)]
-enum SubmissionError {
+pub enum SubmissionError {
     UploadError { message: String },
     MissingField { name: &'static str },
 }
