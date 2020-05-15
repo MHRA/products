@@ -1,6 +1,6 @@
 use super::{
     models::{StorageClientError, StorageFile},
-    storage_client_factory_with_a_slightly_different_error_type, GetBlob, StorageClient,
+    GetBlob, StorageClient,
 };
 use crate::create_manager::hash;
 use async_trait::async_trait;
@@ -9,12 +9,14 @@ use azure_sdk_core::{
     MetadataSupport,
 };
 use azure_sdk_storage_blob::Blob;
+use azure_sdk_storage_core::client::Client;
 use std::collections::HashMap;
 
 pub struct AzureBlobStorage {
-    container_name: String,
+    pub container_name: String,
     prefix: String,
     storage_account: String,
+    master_key: String,
 }
 
 impl Default for AzureBlobStorage {
@@ -29,11 +31,14 @@ impl AzureBlobStorage {
             std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
         let storage_account =
             std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
+        let master_key = std::env::var("STORAGE_MASTER_KEY")
+            .expect("Set env variable STORAGE_MASTER_KEY first!");
 
         Self {
             container_name,
             prefix: "temp/".to_owned(),
             storage_account,
+            master_key,
         }
     }
     pub fn permanent() -> Self {
@@ -41,11 +46,32 @@ impl AzureBlobStorage {
             std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
         let storage_account =
             std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
+        let master_key = std::env::var("STORAGE_MASTER_KEY")
+            .expect("Set env variable STORAGE_MASTER_KEY first!");
 
         Self {
             container_name,
             prefix: "".to_owned(),
             storage_account,
+            master_key,
+        }
+    }
+
+    pub fn get_azure_client(&self) -> Result<Client, StorageClientError> {
+        match base64::decode(&self.master_key) {
+            Ok(_) => Ok(
+                Client::new(&self.storage_account, &self.master_key).map_err(|e| {
+                    StorageClientError::ClientError {
+                        message: format!("Couldn't create storage client: {:?}", e),
+                    }
+                })?,
+            ),
+            Err(e) => Err(StorageClientError::ClientError {
+                message: format!(
+                    "Couldn't decode master key to create storage client: {:?}",
+                    e
+                ),
+            }),
         }
     }
 }
@@ -53,12 +79,11 @@ impl AzureBlobStorage {
 #[async_trait]
 impl StorageClient for AzureBlobStorage {
     async fn add_file(
-        self,
+        &self,
         file_data: &[u8],
         metadata_ref: HashMap<&str, &str>,
     ) -> Result<StorageFile, StorageClientError> {
-        let storage_client =
-            storage_client_factory_with_a_slightly_different_error_type()?.azure_client;
+        let storage_client = self.get_azure_client()?;
 
         let file_digest = md5::compute(&file_data[..]);
         let name = format!("{}{}", &self.prefix, hash::sha1(&file_data));
@@ -87,11 +112,9 @@ impl StorageClient for AzureBlobStorage {
 
         Ok(StorageFile { name, path })
     }
-    async fn get_file(self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
-        let mut storage_client = storage_client_factory_with_a_slightly_different_error_type()?;
-
-        let file_data = storage_client
-            .get_blob(&self.container_name, &storage_file.name)
+    async fn get_file(&self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
+        let file_data = self
+            .get_blob(&storage_file.name)
             .await
             .map_err(|e| {
                 tracing::error!("Error retrieving file from blob storage: {:?}", e);

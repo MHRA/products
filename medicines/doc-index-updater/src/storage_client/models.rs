@@ -1,3 +1,5 @@
+use azure_sdk_core::errors::AzureError;
+
 pub struct StorageFile {
     pub name: String,
     pub path: String,
@@ -8,4 +10,12 @@ pub enum StorageClientError {
     RetrievalError { message: String },
     UploadError { message: String },
     ClientError { message: String },
+}
+
+impl From<AzureError> for StorageClientError {
+    fn from(e: AzureError) -> Self {
+        Self::ClientError {
+            message: format!("Azure error: {:?}", e),
+        }
+    }
 }

@@ -3,7 +3,7 @@ use crate::{
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
-    storage_client::{models::StorageFile, StorageClient, TemporaryBlobStorage},
+    storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
 use bytes::BufMut;
 use futures::future::join_all;
@@ -31,7 +31,7 @@ async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
     file_data: Vec<u8>,
 ) -> Result<StorageFile, SubmissionError> {
-    let storage_client = TemporaryBlobStorage::default();
+    let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
         .add_file(&file_data, HashMap::new())
         .await

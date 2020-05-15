@@ -14,7 +14,7 @@ use search_client::{
     CreateIndexEntry, DeleteIndexEntry, Search,
 };
 use std::time::Duration;
-use storage_client::DeleteBlob;
+use storage_client::{AzureBlobStorage, DeleteBlob};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
@@ -106,8 +106,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
-    let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+    let storage_client = AzureBlobStorage::permanent();
 
     process_delete_message(message, storage_client, search_client).await
 }
@@ -117,8 +116,6 @@ async fn process_delete_message(
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
-    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
-
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -135,10 +132,7 @@ async fn process_delete_message(
         .await?;
     tracing::debug!("Deleted blob {} from index", &blob_name);
 
-    if let Err(e) = storage_client
-        .delete_blob(&storage_container_name, &blob_name)
-        .await
-    {
+    if let Err(e) = storage_client.delete_blob(&blob_name).await {
         tracing::debug!(
             "Error deleting blob: {:?}, re-creating index: {:?}",
             e,
@@ -153,15 +147,11 @@ async fn process_delete_message(
             })?;
         return Err(ProcessMessageError::FailedDeletingBlob(
             blob_name.clone(),
-            e.to_string(),
+            format!("{:?}", e),
         ));
     }
 
-    tracing::info!(
-        "Successfully deleted blob {} from storage container {}",
-        &blob_name,
-        &storage_container_name
-    );
+    tracing::info!("Successfully deleted blob {}", &blob_name);
 
     Ok(message.job_id)
 }
@@ -185,7 +175,6 @@ pub async fn get_index_record_from_content_id(
 #[cfg(test)]
 mod test {
     use super::*;
-    use azure_sdk_core::errors::AzureError;
     use pretty_assertions::assert_eq;
 
     use crate::{
@@ -200,6 +189,7 @@ mod test {
         Search,
     };
     use std::env;
+    use storage_client::test::TestAzureStorageClient;
     use tokio_test::block_on;
 
     #[test]
@@ -698,27 +688,6 @@ mod test {
             };
 
             Ok(AzureIndexChangedResults::new(index_changed_result))
-        }
-    }
-
-    struct TestAzureStorageClient {
-        pub can_delete_blob: bool,
-    }
-
-    #[async_trait]
-    impl DeleteBlob for TestAzureStorageClient {
-        async fn delete_blob(
-            &mut self,
-            _container_name: &str,
-            _blob_name: &str,
-        ) -> Result<(), AzureError> {
-            if self.can_delete_blob {
-                Ok(())
-            } else {
-                Err(AzureError::GenericErrorWithText(
-                    "blob could not be deleted".to_string(),
-                ))
-            }
         }
     }
 }

@@ -1,29 +1,20 @@
-use super::client::BlobClient;
-use super::BlobResponse;
+use super::{models::StorageClientError, AzureBlobStorage, BlobResponse};
 use async_trait::async_trait;
-use azure_sdk_core::{errors::AzureError, prelude::*};
+use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::Blob;
 
 #[async_trait]
 pub trait GetBlob {
-    async fn get_blob(
-        &mut self,
-        container_name: &str,
-        blob_name: &str,
-    ) -> Result<BlobResponse, AzureError>;
+    async fn get_blob(&self, blob_name: &str) -> Result<BlobResponse, StorageClientError>;
 }
 
 #[async_trait]
-impl GetBlob for BlobClient {
-    async fn get_blob(
-        &mut self,
-        container_name: &str,
-        blob_name: &str,
-    ) -> Result<BlobResponse, AzureError> {
+impl GetBlob for AzureBlobStorage {
+    async fn get_blob(&self, blob_name: &str) -> Result<BlobResponse, StorageClientError> {
         let blob = self
-            .azure_client
+            .get_azure_client()?
             .get_blob()
-            .with_container_name(&container_name)
+            .with_container_name(&self.container_name)
             .with_blob_name(&blob_name)
             .finalize()
             .await?;
