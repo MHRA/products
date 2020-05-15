@@ -10,7 +10,10 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() {
-    let _ = create_blob_log().await;
+    match create_blob_log().await {
+        Ok(()) => println!("Finished successfully"),
+        Err(e) => println!("{:?}", e),
+    };
 }
 
 async fn create_blob_log() -> Result<(), Box<dyn Error>> {
@@ -40,9 +43,8 @@ async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
             .stream(),
     );
 
-    let mut blob_list: Vec<String> = vec![String::from(
-        "Blob name,CON,PLs,created,modified,Doc type",
-    )];
+    let mut blob_list: Vec<String> =
+        vec![String::from("Blob name,CON,PLs,created,modified,Doc type")];
 
     while let Some(value) = blob_stream.next().await {
         for blob in value?.incomplete_vector.iter() {
@@ -70,9 +72,9 @@ fn extract_blob_strings(blob: &Blob) -> Vec<String> {
     let pls = match blob.metadata.get("pl_number") {
         Some(pls_string) => {
             let pls_vec = get_pls_vec_from_string(pls_string);
-            match pls_vec.is_empty() {
-                true => vec![String::from("")],
-                false => pls_vec,
+            match !pls_vec.is_empty() {
+                true => pls_vec,
+                false => vec![String::from("")],
             }
         }
         None => vec![String::from("")],
@@ -95,25 +97,28 @@ fn extract_blob_strings(blob: &Blob) -> Vec<String> {
 }
 
 async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(), AzureError> {
-    let contents_log_container_name = std::env::var("STORAGE_CONTAINER_BACKUP_NAME")
-        .expect("Set env variable STORAGE_MASTER_KEY first!");
+    // let contents_log_container_name = std::env::var("STORAGE_CONTAINER_BACKUP_NAME")
+    //     .expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    let blobs_as_string = blob_list.join("\n");
-    let file_data = blobs_as_string.as_bytes();
-    let file_digest = md5::compute(&file_data[..]);
+    // let blobs_as_string = blob_list.join("\n");
+    // let file_data = blobs_as_string.as_bytes();
+    // let file_digest = md5::compute(&file_data[..]);
 
-    let now: DateTime<Utc> = Utc::now();
-    let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
+    // let now: DateTime<Utc> = Utc::now();
+    // let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
 
-    client
-        .put_block_blob()
-        .with_container_name(&contents_log_container_name)
-        .with_blob_name(&blob_name)
-        .with_content_type("text/csv")
-        .with_body(&file_data[..])
-        .with_content_md5(&file_digest[..])
-        .finalize()
-        .await?;
+    for line in blob_list {
+        println!("{}", line);
+    }
+    // client
+    //     .put_block_blob()
+    //     .with_container_name(&contents_log_container_name)
+    //     .with_blob_name(&blob_name)
+    //     .with_content_type("text/csv")
+    //     .with_body(&file_data[..])
+    //     .with_content_md5(&file_digest[..])
+    //     .finalize()
+    //     .await?;
 
     Ok(())
 }
