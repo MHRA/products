@@ -19,6 +19,7 @@ authorisations
 authorise
 authorised
 az
+Azure
 azurecr
 backend
 BD

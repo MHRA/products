@@ -26,7 +26,7 @@ This would be a simple, static site, hosted in Azure Blob Storage (as with the c
 
 Access to the form would be restricted to a whitelisted set of IPs, representing MHRA's public IP range, by the CDN. If a user tried to access it from an IP address outside of this range, they would be presented with a blocked access page.
 
-Authentication and authorization would be provided by Azure's Active Directory (AD) service. The email addresses of approved medical writers would be added and assigned to a specific group within Aure AD, that would authorise them to edit PARS.
+Authentication and authorization would be provided by Azure's Active Directory (AD) service. The email addresses of approved medical writers would be added and assigned to a specific group within Azure AD, that would authorise them to edit PARS.
 
 When arriving at the site (from within MHRA's network), they would be prompted to log-in. Their login request would be validated by Azure AD and an ID JWT token returned. Once completed, the PAR form would be submitted, along with the JWT token, to a new PAR endpoint on the Document Index Updater. An authorization policy in Istio would ensure that any requests to this endpoint are accompanied by a valid, Azure-signed JWT token that contains the necessary claim to make changes to PARS (granted by membership of the group, defined within AD).
 
