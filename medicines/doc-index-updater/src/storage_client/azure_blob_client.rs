@@ -11,19 +11,19 @@ use azure_sdk_core::{
 use azure_sdk_storage_blob::Blob;
 use std::collections::HashMap;
 
-pub struct TemporaryBlobStorage {
+pub struct AzureBlobStorage {
     container_name: String,
     prefix: String,
     storage_account: String,
 }
 
-impl Default for TemporaryBlobStorage {
+impl Default for AzureBlobStorage {
     fn default() -> Self {
         Self::temporary()
     }
 }
 
-impl TemporaryBlobStorage {
+impl AzureBlobStorage {
     pub fn temporary() -> Self {
         let container_name =
             std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
@@ -51,7 +51,7 @@ impl TemporaryBlobStorage {
 }
 
 #[async_trait]
-impl StorageClient for TemporaryBlobStorage {
+impl StorageClient for AzureBlobStorage {
     async fn add_file(
         self,
         file_data: &[u8],

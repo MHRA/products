@@ -3,7 +3,7 @@ use azure_sdk_storage_core::prelude::Client;
 use client::BlobClient;
 use models::StorageClientError;
 
-pub use azure_blob_client::TemporaryBlobStorage;
+pub use azure_blob_client::AzureBlobStorage;
 pub use client::StorageClient;
 pub use delete::DeleteBlob;
 pub use get::GetBlob;

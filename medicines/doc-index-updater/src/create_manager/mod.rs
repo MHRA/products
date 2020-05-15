@@ -6,7 +6,7 @@ use crate::{
         RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
-    storage_client::{StorageClient, TemporaryBlobStorage},
+    storage_client::{AzureBlobStorage, StorageClient},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -90,7 +90,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(TemporaryBlobStorage::permanent(), &file, metadata).await?;
+    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);

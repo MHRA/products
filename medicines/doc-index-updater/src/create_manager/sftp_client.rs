@@ -2,7 +2,7 @@ use crate::{
     models::FileSource,
     storage_client::{
         models::{StorageClientError, StorageFile},
-        StorageClient, TemporaryBlobStorage,
+        AzureBlobStorage, StorageClient,
     },
 };
 use anyhow::anyhow;
@@ -130,7 +130,7 @@ async fn get_file_from_sentinel_sftp(filepath: String) -> Result<Vec<u8>, SftpEr
 async fn get_file_from_temporary_blob_storage(
     filepath: String,
 ) -> Result<Vec<u8>, StorageClientError> {
-    let storage_client = TemporaryBlobStorage::default();
+    let storage_client = AzureBlobStorage::temporary();
     let a = storage_client
         .get_file(StorageFile {
             name: filepath.clone(),
