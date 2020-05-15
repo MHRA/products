@@ -1,4 +1,4 @@
-use crate::temporary_blob_storage::{StorageClientError, StorageFile};
+use super::models::{StorageClientError, StorageFile};
 use async_trait::async_trait;
 use azure_sdk_storage_core::prelude::Client;
 use std::collections::HashMap;

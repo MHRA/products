@@ -1,3 +1,7 @@
+use super::{
+    models::{StorageClientError, StorageFile},
+    GetBlob,
+};
 use crate::{
     create_manager::hash,
     storage_client::{self, StorageClient},
@@ -9,19 +13,6 @@ use azure_sdk_core::{
 };
 use azure_sdk_storage_blob::Blob;
 use std::collections::HashMap;
-use storage_client::GetBlob;
-
-pub struct StorageFile {
-    pub name: String,
-    pub path: String,
-}
-
-#[derive(Debug)]
-pub enum StorageClientError {
-    RetrievalError { message: String },
-    UploadError { message: String },
-    ClientError { message: String },
-}
 
 pub struct TemporaryBlobStorage {
     container_name: String,

@@ -6,8 +6,7 @@ use crate::{
         RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
-    storage_client::StorageClient,
-    temporary_blob_storage::TemporaryBlobStorage,
+    storage_client::{StorageClient, TemporaryBlobStorage},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
