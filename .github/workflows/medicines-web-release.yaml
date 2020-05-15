@@ -99,4 +99,4 @@ jobs:
         with:
           enabled-static-website: true
           folder: medicines/web/dist
-          connection-string: ${{ secrets. AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}
+          connection-string: ${{ secrets.AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}
