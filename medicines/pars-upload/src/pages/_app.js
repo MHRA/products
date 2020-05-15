@@ -1,10 +1,10 @@
 import 'govuk-frontend/govuk/all.scss';
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SignInRequest } from '../auth/signInRequest';
 import { Header } from '../header';
 import { Footer } from '../footer';
-import { signIn } from '../auth/authPopup';
+import { signIn, getAccount } from '../auth/authPopup';
 
 function App({ Component, pageProps }) {
   const [auth, setAuth] = useState(null);
@@ -12,6 +12,10 @@ function App({ Component, pageProps }) {
   const triggerSignIn = () => {
     signIn().then(setAuth);
   };
+
+  useEffect(() => {
+    setAuth(getAccount());
+  }, []);
 
   const signOut = () => {
     if (auth) {
