@@ -40,6 +40,42 @@ impl DeleteBlob for BlobClient {
     }
 }
 
+#[async_trait]
+pub trait GetBlob {
+    async fn get_blob(
+        &mut self,
+        container_name: &str,
+        blob_name: &str,
+    ) -> Result<BlobResponse, AzureError>;
+}
+
+pub struct BlobResponse {
+    pub blob_name: String,
+    pub data: Vec<u8>,
+}
+
+#[async_trait]
+impl GetBlob for BlobClient {
+    async fn get_blob(
+        &mut self,
+        container_name: &str,
+        blob_name: &str,
+    ) -> Result<BlobResponse, AzureError> {
+        let blob = self
+            .azure_client
+            .get_blob()
+            .with_container_name(&container_name)
+            .with_blob_name(&blob_name)
+            .finalize()
+            .await?;
+
+        Ok(BlobResponse {
+            blob_name: blob.blob.name,
+            data: blob.data,
+        })
+    }
+}
+
 pub fn factory() -> Result<BlobClient, AzureError> {
     let storage_account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");

@@ -32,7 +32,13 @@ async fn add_file_to_temporary_blob_storage(
     file_data: Vec<u8>,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = TemporaryBlobStorage {};
-    let storage_file = storage_client.add_file(&file_data).await?;
+    let storage_file =
+        storage_client
+            .add_file(&file_data)
+            .await
+            .map_err(|e| SubmissionError::UploadError {
+                message: format!("Problem talking to temporary blob storage: {:?}", e),
+            })?;
     Ok(storage_file)
 }
 
@@ -223,7 +229,7 @@ impl UploadFieldValue {
 }
 
 #[derive(Debug)]
-pub enum SubmissionError {
+enum SubmissionError {
     UploadError { message: String },
     MissingField { name: &'static str },
 }
