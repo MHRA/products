@@ -1,13 +1,23 @@
 import 'govuk-frontend/govuk/all.scss';
 import Head from 'next/head';
+import { SignInRequest } from '../auth/signInRequest';
+import { useState } from 'react';
 
 function App({ Component, pageProps }) {
+  const [account, setAccount] = useState(0);
+
+  console.log('xxxxxxx');
+  console.log(account);
   return (
     <>
       <Head>
         <title>Public Assessment Reports (PARs) upload</title>
       </Head>
-      <Component {...pageProps} />
+      {account ? (
+        <Component {...pageProps} />
+      ) : (
+        <SignInRequest onSignIn={(account) => setAccount(account)} />
+      )}
     </>
   );
 }
