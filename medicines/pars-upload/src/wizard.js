@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const Wizard = ({ initialSteps, success: Success }) => {
+export const Wizard = ({ initialSteps, success: Success, onComplete }) => {
   const [steps, setSteps] = useState(() =>
     initialSteps.map(({ type, component }) => ({ type, component, data: null }))
   )
@@ -18,7 +18,12 @@ export const Wizard = ({ initialSteps, success: Success }) => {
 
   const onSubmit = (formDataForPage) => {
     setPageData(formDataForPage)
-    setPageIndex(pageIndex + 1)
+    const newIndex = pageIndex + 1
+    if (newIndex < steps.length) {
+      setPageIndex(newIndex)
+    } else {
+      onComplete(steps)
+    }
   }
 
   const onRepeatPage = (formData) => {

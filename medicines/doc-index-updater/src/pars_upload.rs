@@ -14,17 +14,23 @@ use storage_client::BlobClient;
 use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
-    Filter, Rejection, Reply,
+     Filter, Rejection, Reply,
 };
 
 pub fn handler(
     state_manager: StateManager,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    let cors = warp::cors()
+        .allow_any_origin() // TODO restrict to a specific domain once we know what it is
+        .allow_header("authorization")
+        .allow_methods(vec!["GET", "POST"]);
+
     warp::path!("pars")
         .and(warp::post())
         .and(warp::multipart::form().max_length(100 * 1024 * 1024))
         .and(with_state(state_manager))
         .and_then(upload_pars_handler)
+        .with(cors)
 }
 
 fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
