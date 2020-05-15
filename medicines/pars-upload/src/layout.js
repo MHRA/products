@@ -8,4 +8,4 @@ export const Layout = ({ intro = null, children }) => (
       </div>
     </main>
   </div>
-);
+)

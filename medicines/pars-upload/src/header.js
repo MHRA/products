@@ -1,5 +1,5 @@
-import { MhraLogo } from './mhra_logo';
-import { ScreenReaderOnly } from './screen_reader_only';
+import { MhraLogo } from './mhra_logo'
+import { ScreenReaderOnly } from './screen_reader_only'
 
 export const Header = () => (
   <header
@@ -26,4 +26,4 @@ export const Header = () => (
       </div>
     </div>
   </header>
-);
+)

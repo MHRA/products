@@ -1,23 +1,23 @@
-import { useRouter } from 'next/router';
-import { H1, Para } from '../typography';
-import { Button } from '../button';
-import { RadioList } from '../form';
-import { Layout } from '../layout';
+import { useRouter } from 'next/router'
+import { H1, Para } from '../typography'
+import { Button } from '../button'
+import { RadioList } from '../form'
+import { Layout } from '../layout'
 
 const Index = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const onSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    const data = new FormData(event.target);
+    const data = new FormData(event.target)
 
-    router.push(data.get('what-you-up-to'));
-  };
+    router.push(data.get('what-you-up-to'))
+  }
 
   const onChange = (event) => {
-    router.prefetch(event.target.value);
-  };
+    router.prefetch(event.target.value)
+  }
 
   return (
     <Layout>
@@ -51,7 +51,7 @@ const Index = () => {
         <Button>Continue</Button>
       </form>
     </Layout>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index

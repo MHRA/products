@@ -1,5 +1,5 @@
-import 'govuk-frontend/govuk/all.scss';
-import Head from 'next/head';
+import 'govuk-frontend/govuk/all.scss'
+import Head from 'next/head'
 
 function App({ Component, pageProps }) {
   return (
@@ -9,7 +9,7 @@ function App({ Component, pageProps }) {
       </Head>
       <Component {...pageProps} />
     </>
-  );
+  )
 }
 
 // Only uncomment this method if you have blocking data requirements for
@@ -24,4 +24,4 @@ function App({ Component, pageProps }) {
 //   return { ...appProps }
 // }
 
-export default App;
+export default App

@@ -1,6 +1,6 @@
 export const FormGroup = ({ children }) => (
   <div className="govuk-form-group">{children}</div>
-);
+)
 
 export const RadioList = ({
   title,
@@ -37,6 +37,6 @@ export const RadioList = ({
       </div>
     </fieldset>
   </FormGroup>
-);
+)
 
-const inputElementId = (name, index) => `form-${name}-${index}`;
+const inputElementId = (name, index) => `form-${name}-${index}`
