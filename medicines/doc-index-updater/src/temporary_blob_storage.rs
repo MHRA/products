@@ -20,7 +20,6 @@ pub trait StorageClient {
 
 pub struct StorageFile {
     pub name: String,
-    pub path: String,
 }
 
 #[derive(Debug)]
@@ -69,16 +68,8 @@ impl StorageClient for TemporaryBlobStorage {
                 }
             })?;
 
-        let storage_account =
-            std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-        let path = format!(
-            "https://{}.blob.core.windows.net/{}/{}",
-            &storage_account, &container_name, &name
-        );
-
         Ok(StorageFile {
             name: name.to_owned(),
-            path,
         })
     }
     async fn get_file(self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {

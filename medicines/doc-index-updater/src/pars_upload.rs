@@ -56,7 +56,7 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
         pl_number: metadata.pl_number,
         active_substances: metadata.active_substances.to_vec_string(),
         file_source: FileSource::TemporaryAzureBlobStorage,
-        file_path: storage_file.path,
+        file_path: storage_file.name,
     }
 }
 

@@ -1,4 +1,9 @@
-use crate::models::FileSource;
+use crate::{
+    models::FileSource,
+    temporary_blob_storage::{
+        StorageClient, StorageClientError, StorageFile, TemporaryBlobStorage,
+    },
+};
 use anyhow::anyhow;
 use async_ssh2::{Session, Sftp};
 use std::net::TcpStream;
@@ -104,13 +109,29 @@ async fn retrieve_file_from_sftp(
 }
 
 pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, SftpError> {
-    let mut sentinel_sftp_client = match source {
-        FileSource::Sentinel => sentinel_sftp_factory().await?,
-        FileSource::TemporaryAzureBlobStorage => unimplemented!(),
-    };
+    match source {
+        FileSource::Sentinel => get_file_from_sentinel_sftp(filepath).await,
+        FileSource::TemporaryAzureBlobStorage => get_file_from_temporary_blob_storage(filepath)
+            .await
+            .map_err(|e| SftpError::Other(anyhow!("{:?}", e))),
+    }
+}
+
+async fn get_file_from_sentinel_sftp(filepath: String) -> Result<Vec<u8>, SftpError> {
+    let mut sentinel_sftp_client = sentinel_sftp_factory().await?;
     let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
     let mut bytes = Vec::<u8>::new();
     let size = file.read_to_end(&mut bytes).await?;
     tracing::debug!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
     Ok(bytes)
+}
+
+async fn get_file_from_temporary_blob_storage(
+    filepath: String,
+) -> Result<Vec<u8>, StorageClientError> {
+    let storage_client = TemporaryBlobStorage {};
+    let a = storage_client
+        .get_file(StorageFile { name: filepath })
+        .await?;
+    Ok(a)
 }
