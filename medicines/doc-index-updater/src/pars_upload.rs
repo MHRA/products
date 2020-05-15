@@ -3,8 +3,8 @@ use crate::{
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
-    temporary_blob_storage::TemporaryBlobStorage,
-    temporary_blob_storage::{StorageClient, StorageFile},
+    storage_client::StorageClient,
+    temporary_blob_storage::{StorageFile, TemporaryBlobStorage},
 };
 use bytes::BufMut;
 use futures::future::join_all;

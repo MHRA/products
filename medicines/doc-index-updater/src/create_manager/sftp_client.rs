@@ -1,8 +1,7 @@
 use crate::{
     models::FileSource,
-    temporary_blob_storage::{
-        StorageClient, StorageClientError, StorageFile, TemporaryBlobStorage,
-    },
+    storage_client::StorageClient,
+    temporary_blob_storage::{StorageClientError, StorageFile, TemporaryBlobStorage},
 };
 use anyhow::anyhow;
 use async_ssh2::{Session, Sftp};

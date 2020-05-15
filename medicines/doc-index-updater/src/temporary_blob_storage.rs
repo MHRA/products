@@ -1,6 +1,6 @@
 use crate::{
     create_manager::hash,
-    storage_client::{self, BlobClient},
+    storage_client::{self, BlobClient, StorageClient},
 };
 use async_trait::async_trait;
 use azure_sdk_core::{
@@ -10,19 +10,6 @@ use azure_sdk_core::{
 use azure_sdk_storage_blob::Blob;
 use std::collections::HashMap;
 use storage_client::GetBlob;
-
-#[async_trait]
-pub trait StorageClient {
-    async fn add_file(
-        self,
-        file_data: &[u8],
-        metadata_ref: HashMap<&str, &str>,
-    ) -> Result<StorageFile, StorageClientError>;
-    async fn get_file(
-        self,
-        storage_file_identifier: StorageFile,
-    ) -> Result<Vec<u8>, StorageClientError>;
-}
 
 pub struct StorageFile {
     pub name: String,
