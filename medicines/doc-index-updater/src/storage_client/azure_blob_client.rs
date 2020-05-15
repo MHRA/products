@@ -1,11 +1,8 @@
 use super::{
     models::{StorageClientError, StorageFile},
-    GetBlob,
+    storage_client_factory_with_a_slightly_different_error_type, GetBlob, StorageClient,
 };
-use crate::{
-    create_manager::hash,
-    storage_client::{self, StorageClient},
-};
+use crate::create_manager::hash;
 use async_trait::async_trait;
 use azure_sdk_core::{
     BlobNameSupport, BodySupport, ContainerNameSupport, ContentMD5Support, ContentTypeSupport,
@@ -61,8 +58,7 @@ impl StorageClient for TemporaryBlobStorage {
         metadata_ref: HashMap<&str, &str>,
     ) -> Result<StorageFile, StorageClientError> {
         let storage_client =
-            storage_client::storage_client_factory_with_a_slightly_different_error_type()?
-                .azure_client;
+            storage_client_factory_with_a_slightly_different_error_type()?.azure_client;
 
         let file_digest = md5::compute(&file_data[..]);
         let name = format!("{}{}", &self.prefix, hash::sha1(&file_data));
@@ -92,8 +88,7 @@ impl StorageClient for TemporaryBlobStorage {
         Ok(StorageFile { name, path })
     }
     async fn get_file(self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
-        let mut storage_client =
-            storage_client::storage_client_factory_with_a_slightly_different_error_type()?;
+        let mut storage_client = storage_client_factory_with_a_slightly_different_error_type()?;
 
         let file_data = storage_client
             .get_blob(&self.container_name, &storage_file.name)
