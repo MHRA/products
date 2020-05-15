@@ -8,11 +8,16 @@ use azure_sdk_core::{
     MetadataSupport,
 };
 use azure_sdk_storage_blob::Blob;
+use std::collections::HashMap;
 use storage_client::GetBlob;
 
 #[async_trait]
 pub trait StorageClient {
-    async fn add_file(self, file_data: &[u8]) -> Result<StorageFile, StorageClientError>;
+    async fn add_file(
+        self,
+        file_data: &[u8],
+        metadata_ref: HashMap<&str, &str>,
+    ) -> Result<StorageFile, StorageClientError>;
     async fn get_file(
         self,
         storage_file_identifier: StorageFile,
@@ -21,6 +26,7 @@ pub trait StorageClient {
 
 pub struct StorageFile {
     pub name: String,
+    pub path: String,
 }
 
 #[derive(Debug)]
@@ -33,6 +39,7 @@ pub enum StorageClientError {
 pub struct TemporaryBlobStorage {
     container_name: String,
     prefix: String,
+    storage_account: String,
 }
 
 fn storage_client_factory() -> Result<BlobClient, StorageClientError> {
@@ -48,11 +55,33 @@ fn storage_client_factory() -> Result<BlobClient, StorageClientError> {
 
 impl Default for TemporaryBlobStorage {
     fn default() -> Self {
+        Self::temporary()
+    }
+}
+
+impl TemporaryBlobStorage {
+    pub fn temporary() -> Self {
         let container_name =
             std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+        let storage_account =
+            std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
+
         Self {
             container_name,
             prefix: "temp/".to_owned(),
+            storage_account,
+        }
+    }
+    pub fn permanent() -> Self {
+        let container_name =
+            std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+        let storage_account =
+            std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
+
+        Self {
+            container_name,
+            prefix: "".to_owned(),
+            storage_account,
         }
     }
 }
@@ -86,9 +115,12 @@ impl StorageClient for TemporaryBlobStorage {
                 }
             })?;
 
-        Ok(StorageFile {
-            name: name.to_owned(),
-        })
+        let path = format!(
+            "https://{}.blob.core.windows.net/{}/{}",
+            &self.storage_account, &self.container_name, &name
+        );
+
+        Ok(StorageFile { name, path })
     }
     async fn get_file(self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
         let mut storage_client = storage_client_factory()?;

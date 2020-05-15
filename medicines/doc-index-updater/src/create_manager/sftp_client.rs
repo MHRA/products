@@ -131,7 +131,10 @@ async fn get_file_from_temporary_blob_storage(
 ) -> Result<Vec<u8>, StorageClientError> {
     let storage_client = TemporaryBlobStorage::default();
     let a = storage_client
-        .get_file(StorageFile { name: filepath })
+        .get_file(StorageFile {
+            name: filepath.clone(),
+            path: filepath,
+        })
         .await?;
     Ok(a)
 }

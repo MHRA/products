@@ -11,6 +11,7 @@ use futures::future::join_all;
 use futures::TryStreamExt;
 use search_client::models::DocumentType;
 use serde::Serialize;
+use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
@@ -32,13 +33,12 @@ async fn add_file_to_temporary_blob_storage(
     file_data: Vec<u8>,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = TemporaryBlobStorage::default();
-    let storage_file =
-        storage_client
-            .add_file(&file_data)
-            .await
-            .map_err(|e| SubmissionError::UploadError {
-                message: format!("Problem talking to temporary blob storage: {:?}", e),
-            })?;
+    let storage_file = storage_client
+        .add_file(&file_data, HashMap::new())
+        .await
+        .map_err(|e| SubmissionError::UploadError {
+            message: format!("Problem talking to temporary blob storage: {:?}", e),
+        })?;
     Ok(storage_file)
 }
 
