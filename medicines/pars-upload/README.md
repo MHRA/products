@@ -29,20 +29,17 @@ yarn test-e2e
 
 ## Authentication
 
-The pages are protected by Azure Active Directory. Sign In will display a popup window where the normal Microsoft Identity Authentication (the same as office 365) will present itself.
+The pages are protected by Azure Active Directory Single Sign On (SSO).
+ 
+The `Sign In` button will display a popup window where Microsoft Identity Authentication SSO will present itself.
+Users will authenticate in the normal way for their Azure Active Directory, including 2FA if it is setup on the account.
 
+`NEXT_PUBLIC_AUTHORITY_URL` and `NEXT_PUBLIC_CLIENT_ID` are set in `.env` and used to identify the [Azure App Registration](https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-client-application-configuration) to use.
 
+The user is authenticated against the configured Azure App Registration and a JWT token is stored on their behalf in browser session storage.
 
-For development, this can be disabled by running yarn with the disable auth flag enabled.
-```sh
-yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn dev
-```
-or when running acceptance tests..
-```sh
-yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn test-e2e
-```
+Use the following command to populate `.env` from Azure Key Vault.
 
-Onward calls to upload the document, use JWT tokens produced by the authority configured in the environment variables in the .env file. Use the following command to get .env from Azure Key Vault.
 ```sh
 make get-env
 ```
