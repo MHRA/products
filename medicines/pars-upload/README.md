@@ -37,11 +37,12 @@ For development, this can be disabled by running yarn with the disable auth flag
 ```sh
 yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn dev
 ```
-or when running acceptance tests
+or when running acceptance tests..
 ```sh
 yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn test-e2e
 ```
-Onward calls to upload the document, use JWT tokens produced by the authority configured in the environment variables in the .env file. Use the following command to get .env from azure keyvault
+
+Onward calls to upload the document, use JWT tokens produced by the authority configured in the environment variables in the .env file. Use the following command to get .env from Azure Key Vault.
 ```sh
 make get-env
 ```
