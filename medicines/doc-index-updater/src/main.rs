@@ -124,6 +124,7 @@ async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, Infa
         code = StatusCode::UNAUTHORIZED;
         message = "AUTHENTICATION_FAILED";
     } else {
+        tracing::error!("Internal server error: {:?}", err);
         code = StatusCode::INTERNAL_SERVER_ERROR;
         message = "UNHANDLED_REJECTION";
     }
