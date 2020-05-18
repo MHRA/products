@@ -185,9 +185,11 @@ async fn read_pars_upload(
 
     let pl_number = fields
         .iter()
-        .find(|(name, _)| name == "pl_number")
+        .find(|(name, _)| name == "license_number")
         .and_then(|(_, field)| field.value())
-        .ok_or(SubmissionError::MissingField { name: "pl_number" })?
+        .ok_or(SubmissionError::MissingField {
+            name: "license_number",
+        })?
         .into();
 
     let metadata = BlobMetadata::new(

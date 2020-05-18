@@ -26,6 +26,7 @@ export const Products = ({
   const getFormData = () => {
     const formData = new FormData(formRef.current)
     formData.append('title', product_title(formData))
+    formData.append('license_number', license_number(formData))
 
     return formData
   }
@@ -186,21 +187,22 @@ const LicenseNumber = ({ formData }) => (
   </FormGroup>
 )
 
-const product_title = (formData) => {
+const product_title = (formData) =>
+  [
+    formData.get('product_name'),
+    formData.get('strength'),
+    formData.get('pharmaceutical_dose'),
+    license_number(formData),
+  ]
+    .filter((x) => x)
+    .join(', ')
+
+const license_number = (formData) => {
   const license_type = formData.get('license_number_type')
   const part_one = formData.get('license_part_one')
   const part_two = formData.get('license_part_two')
 
-  const license_number = `${license_type} ${part_one}/${part_two}`
-
-  return [
-    formData.get('product_name'),
-    formData.get('strength'),
-    formData.get('pharmaceutical_dose'),
-    license_number,
-  ]
-    .filter((x) => x)
-    .join(', ')
+  return `${license_type} ${part_one}/${part_two}`
 }
 
 const range = (x) => {
