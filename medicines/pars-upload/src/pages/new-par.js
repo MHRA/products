@@ -5,7 +5,7 @@ import { BackLink } from '../back-link'
 import { ReviewSubmission } from '../review_submission'
 import { Wizard } from '../wizard'
 import { Field } from '../field'
-import { Products } from '../products_form'
+import { Products, product_title } from '../products_form'
 
 const ParUpload = () => {
   const onComplete = async (steps) => {
@@ -47,6 +47,12 @@ const combineFormDatas = (data) => {
     for (const [name, value] of page) {
       console.log(name, value)
       formData.append(name, value)
+    }
+
+    const is_product_form = page.has('product_name')
+
+    if (is_product_form) {
+      formData.append('title', product_title(formData))
     }
   }
 

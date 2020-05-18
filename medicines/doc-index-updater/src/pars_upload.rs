@@ -14,7 +14,8 @@ use storage_client::BlobClient;
 use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
-     Filter, Rejection, Reply,
+    http::{header, Method},
+    Filter, Rejection, Reply,
 };
 
 pub fn handler(
@@ -22,8 +23,9 @@ pub fn handler(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let cors = warp::cors()
         .allow_any_origin() // TODO restrict to a specific domain once we know what it is
-        .allow_header("authorization")
-        .allow_methods(vec!["GET", "POST"]);
+        .allow_headers(&[header::AUTHORIZATION])
+        .allow_methods(&[Method::POST])
+        .build();
 
     warp::path!("pars")
         .and(warp::post())
@@ -48,29 +50,35 @@ fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
 async fn add_form_to_temporary_blob_storage(
     _job_id: Uuid,
     form_data: FormData,
-) -> Result<Blob, SubmissionError> {
+) -> Result<Vec<Blob>, SubmissionError> {
     let storage_client = storage_client_factory()?.azure_client;
 
-    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
+    let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
         tracing::debug!("Error reading PARS upload: {:?}", e);
         e
     })?;
 
-    let blob = create_blob(
-        &storage_client,
-        &file_data,
-        metadata,
-        Some("temp".to_owned()),
-    )
-    .await
-    .map_err(|e| {
-        tracing::error!("Error uploading file to blob storage: {:?}", e);
-        SubmissionError::UploadError {
-            message: format!("Couldn't create blob: {:?}", e),
-        }
-    })?;
+    let mut blobs = Vec::with_capacity(metadatas.len());
 
-    Ok(blob)
+    for metadata in metadatas {
+        let blob = create_blob(
+            &storage_client,
+            &file_data,
+            metadata,
+            Some("temp".to_owned()),
+        )
+        .await
+        .map_err(|e| {
+            tracing::error!("Error uploading file to blob storage: {:?}", e);
+            SubmissionError::UploadError {
+                message: format!("Couldn't create blob: {:?}", e),
+            }
+        })?;
+
+        blobs.push(blob);
+    }
+
+    Ok(blobs)
 }
 
 fn document_from_form_data(blob: Blob) -> Document {
@@ -96,10 +104,16 @@ async fn queue_pars_upload(
     form_data: FormData,
     state_manager: impl JobStatusClient,
 ) -> Result<(), SubmissionError> {
-    let _blob = add_form_to_temporary_blob_storage(job_id, form_data).await?;
-    let document = document_from_form_data(_blob);
+    let blobs = add_form_to_temporary_blob_storage(job_id, form_data).await?;
 
-    let _ = check_in_document_handler(document, state_manager).await;
+    for blob in blobs {
+        let document = document_from_form_data(blob);
+
+        check_in_document_handler(document, &state_manager)
+            .await
+            .unwrap(); // TODO
+    }
+
     Ok(())
 }
 
@@ -111,11 +125,12 @@ async fn upload_pars_handler(
 
     let job_id = accept_job(&state_manager).await?.id;
 
-    let _ = tokio::join!(tokio::spawn(queue_pars_upload(
-        job_id,
-        form_data,
-        state_manager.clone(),
-    )),);
+    queue_pars_upload(job_id, form_data, state_manager)
+        .await
+        .map_err(|e| {
+            tracing::info!("Error queueing upload: {:?}", e);
+            warp::reject::custom(e)
+        })?;
 
     Ok(warp::reply::json(&UploadResponse {
         job_id: &job_id.to_string(),
@@ -127,7 +142,9 @@ struct UploadResponse<'a> {
     job_id: &'a str,
 }
 
-async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>), SubmissionError> {
+async fn read_pars_upload(
+    form_data: FormData,
+) -> Result<(Vec<BlobMetadata>, Vec<u8>), SubmissionError> {
     let parts: Vec<Part> =
         form_data
             .try_collect()
@@ -148,9 +165,11 @@ async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>)
         .ok_or(SubmissionError::MissingField { name: "file" })?
         .into();
 
+    let product_names = vec![];
+
     let active_substances = fields
         .iter()
-        .filter(|(name, _)| name == "active_substances")
+        .filter(|(name, _)| name == "active_substance")
         .filter_map(|(_, field)| field.value())
         .map(|s| s.to_string())
         .collect::<Vec<String>>();
@@ -162,12 +181,7 @@ async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>)
         .ok_or(SubmissionError::MissingField { name: "title" })?
         .into();
 
-    let author = fields
-        .iter()
-        .find(|(name, _)| name == "author")
-        .and_then(|(_, field)| field.value())
-        .ok_or(SubmissionError::MissingField { name: "author" })?
-        .into();
+    let author = "".to_string();
 
     let pl_number = fields
         .iter()
@@ -181,7 +195,7 @@ async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>)
         DocumentType::Par,
         title,
         pl_number,
-        vec![],
+        product_names,
         active_substances,
         author,
         None,
@@ -193,7 +207,7 @@ async fn read_pars_upload(form_data: FormData) -> Result<(BlobMetadata, Vec<u8>)
         .and_then(|(_, field)| field.into_file_data())
         .ok_or(SubmissionError::MissingField { name: "file" })?;
 
-    Ok((metadata, file_data))
+    Ok((vec![metadata], file_data))
 }
 
 async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), SubmissionError> {
