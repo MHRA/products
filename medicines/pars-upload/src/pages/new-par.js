@@ -48,12 +48,6 @@ const combineFormDatas = (data) => {
       console.log(name, value)
       formData.append(name, value)
     }
-
-    const is_product_form = page.has('product_name')
-
-    if (is_product_form) {
-      formData.append('title', product_title(formData))
-    }
   }
 
   return formData

@@ -7,23 +7,6 @@ import { BackLink } from './back-link'
 import { Field } from './field'
 import { Button } from './button'
 
-export const product_title = (formData) => {
-  const license_type = formData.get('license_number_type')
-  const part_one = formData.get('license_part_one')
-  const part_two = formData.get('license_part_two')
-
-  const license_number = `${license_type} ${part_one}/${part_two}`
-
-  return [
-    formData.get('product_name'),
-    formData.get('strength'),
-    formData.get('pharmaceutical_dose'),
-    license_number,
-  ]
-    .filter((x) => x)
-    .join(', ')
-}
-
 export const Products = ({
   currentStepData,
   currentStepIndex,
@@ -40,10 +23,17 @@ export const Products = ({
     currentStepData ? currentStepData.getAll('active_substance').length : 1
   )
 
+  const getFormData = () => {
+    const formData = new FormData(formRef.current)
+    formData.append('title', product_title(formData))
+
+    return formData
+  }
+
   const onSubmit = (event) => {
     event.preventDefault()
 
-    const formData = new FormData(formRef.current)
+    const formData = getFormData()
 
     console.log('submitting form', formData)
     submit(formData)
@@ -55,12 +45,12 @@ export const Products = ({
     const isValid = formRef.current.reportValidity()
 
     if (isValid) {
-      repeatPage(new FormData(formRef.current))
+      repeatPage(getFormData())
     }
   }
 
   const goToPage = (newPageIndex) => {
-    savePageState(new FormData(formRef.current))
+    savePageState(getFormData())
 
     go(newPageIndex)
   }
@@ -195,6 +185,23 @@ const LicenseNumber = ({ formData }) => (
     </fieldset>
   </FormGroup>
 )
+
+const product_title = (formData) => {
+  const license_type = formData.get('license_number_type')
+  const part_one = formData.get('license_part_one')
+  const part_two = formData.get('license_part_two')
+
+  const license_number = `${license_type} ${part_one}/${part_two}`
+
+  return [
+    formData.get('product_name'),
+    formData.get('strength'),
+    formData.get('pharmaceutical_dose'),
+    license_number,
+  ]
+    .filter((x) => x)
+    .join(', ')
+}
 
 const range = (x) => {
   const nums = []
