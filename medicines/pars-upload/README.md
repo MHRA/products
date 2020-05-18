@@ -18,6 +18,34 @@ To understand how to use it, see the [example use of the form][example doc].
 
 [example doc]: ./docs/example.md
 
+
+## Running acceptance tests
+
+Browser based acceptance tests are run using [cypress](https://www.cypress.io).
+
+```sh
+yarn test-e2e
+```
+
+## Authentication
+
+The pages are protected by Azure Active Directory. Sign In will display a popup window where the normal Microsoft Identity Authentication (the same as office 365) will present itself.
+
+
+
+For development, this can be disabled by running yarn with the disable auth flag enabled.
+```sh
+yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn dev
+```
+or when running acceptance tests
+```sh
+yarn && NEXT_PUBLIC_DISABLE_AUTH=true yarn test-e2e
+```
+Onward calls to upload the document, use JWT tokens produced by the authority configured in the environment variables in the .env file. Use the following command to get .env from azure keyvault
+```sh
+make get-env
+```
+
 ## Browser requirements
 
 This site is rendered client-side using _React_. Users must have JavaScript enabled.

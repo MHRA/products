@@ -3,10 +3,8 @@
 // visit https://azuread.github.io/microsoft-authentication-library-for-js/docs/msal/modules/_authenticationparameters_.html
 export const msalConfig = {
   auth: {
-    clientId: '26f95b21-63b2-475f-8a35-d39cea4cfd61',
-    authority:
-      'https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26',
-    redirectUri: 'http://localhost:3000',
+    clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
+    authority: process.env.NEXT_PUBLIC_AUTHORITY_URL,
   },
   cache: {
     cacheLocation: 'sessionStorage', // This configures where your cache will be stored

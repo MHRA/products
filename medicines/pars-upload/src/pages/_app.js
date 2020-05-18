@@ -29,14 +29,12 @@ function App({ Component, pageProps }) {
       <Head>
         <title>Public Assessment Reports (PARs) upload</title>
       </Head>
-
       <Header
         account={auth ? auth.account : null}
         signOut={signOut}
         signIn={triggerSignIn}
       />
-
-      {auth ? (
+      {process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true' || auth ? (
         <Component {...pageProps} />
       ) : (
         <SignInRequest
@@ -44,7 +42,6 @@ function App({ Component, pageProps }) {
           onSignIn={(auth) => setAuth(auth)}
         />
       )}
-
       <Footer />
     </>
   );
