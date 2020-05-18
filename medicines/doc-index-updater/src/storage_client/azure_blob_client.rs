@@ -19,12 +19,6 @@ pub struct AzureBlobStorage {
     master_key: String,
 }
 
-impl Default for AzureBlobStorage {
-    fn default() -> Self {
-        Self::temporary()
-    }
-}
-
 impl AzureBlobStorage {
     pub fn temporary() -> Self {
         let container_name =
