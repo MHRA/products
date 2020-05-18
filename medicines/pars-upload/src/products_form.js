@@ -7,6 +7,23 @@ import { BackLink } from './back-link'
 import { Field } from './field'
 import { Button } from './button'
 
+export const product_title = (formData) => {
+  const license_type = formData.get('license_number_type')
+  const part_one = formData.get('license_part_one')
+  const part_two = formData.get('license_part_two')
+
+  const license_number = `${license_type} ${part_one}/${part_two}`
+
+  return [
+    formData.get('product_name'),
+    formData.get('strength'),
+    formData.get('pharmaceutical_dose'),
+    license_number,
+  ]
+    .filter((x) => x)
+    .join(', ')
+}
+
 export const Products = ({
   currentStepData,
   currentStepIndex,
@@ -118,10 +135,7 @@ const PreviousProductsSummary = ({ products, goToPage }) => {
     <dl className="govuk-summary-list">
       {products.map(({ data, index }) => (
         <div key={index} className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">
-            {data.get('product_name')}
-          </dt>
-          {/* <dd className="govuk-summary-list__value">Sarah Philips</dd> */}
+          <dt className="govuk-summary-list__key">{product_title(data)}</dt>
           <dd className="govuk-summary-list__actions">
             <a
               href="#"
@@ -155,7 +169,7 @@ const LicenseNumber = ({ formData }) => (
         name="license_number_type"
         required
       >
-        <option value="Product license">PL</option>
+        <option value="PL">PL</option>
         <option value="PLPI">HR</option>
         <option value="THR">THR</option>
       </select>{' '}

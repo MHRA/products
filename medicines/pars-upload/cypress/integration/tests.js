@@ -37,14 +37,17 @@ describe('PARs upload form', () => {
 
   it('can add multiple products', () => {
     const productName = 'Ibuprofen pills'
+    const strength = 'Really powerful stuff'
+    const dose = 'some form'
+    const license = { type: 'THR', part_one: '12345', part_two: '6789' }
 
     cy.visit('/new-par')
 
     cy.findByLabelText('Product name').type(productName)
 
-    cy.findByLabelText('Strength').type('Really powerful stuff')
+    cy.findByLabelText('Strength').type(strength)
 
-    cy.findByLabelText('Pharmaceutical dose form').type('some form')
+    cy.findByLabelText('Pharmaceutical dose form').type(dose)
 
     cy.findByLabelText('Active substance').type('Ibuprofen')
 
@@ -56,13 +59,17 @@ describe('PARs upload form', () => {
       .parent()
       .parent()
       .within(() => {
-        cy.findByLabelText('Type').select('HR')
-        cy.findByLabelText('First five digits').type('12345')
-        cy.findByLabelText('Last four digits').type('6789')
+        cy.findByLabelText('Type').select(license.type)
+        cy.findByLabelText('First five digits').type(license.part_one)
+        cy.findByLabelText('Last four digits').type(license.part_two)
       })
 
     cy.findByText('Add another product').click()
 
-    cy.findByText(productName).should('exist')
+    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+
+    cy.findByText(
+      `${productName}, ${strength}, ${dose}, ${license_str}`
+    ).should('exist')
   })
 })
