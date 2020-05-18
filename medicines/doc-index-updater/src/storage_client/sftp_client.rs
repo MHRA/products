@@ -1,35 +1,30 @@
-use crate::{
-    models::FileSource,
-    storage_client::{
-        models::{StorageClientError, StorageFile},
-        AzureBlobStorage, StorageClient,
-    },
+use super::{
+    models::{BlobResponse, SftpError, StorageClientError},
+    GetBlob,
 };
 use anyhow::anyhow;
 use async_ssh2::{Session, Sftp};
+use async_trait::async_trait;
 use std::net::TcpStream;
-use thiserror::Error;
 use tokio::io::AsyncReadExt;
 
-#[derive(Error, Debug)]
-pub enum SftpError {
-    #[error("A TCP error connecting to server. ({0:?})")]
-    TcpError(#[from] std::io::Error),
-    #[error("An SSH error connecting to server. ({0:?})")]
-    Ssh2Error(#[from] async_ssh2::Error),
-    #[error("File could not be retrieved on server")]
-    CouldNotRetrieveFile,
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
+struct SftpInfo {
+    server: String,
+    user: String,
+    public_key_path: String,
+    private_key_path: String,
+    private_key_password: String,
 }
 
-async fn sentinel_sftp_factory() -> Result<Sftp, SftpError> {
-    let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
-    let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
-    let public_key_path = get_env_fail_fast("SENTINEL_PUBLIC_KEY_PATH").await;
-    let private_key_path = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PATH").await;
-    let private_key_password = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PASSWORD").await;
-
+async fn sentinel_sftp_factory(
+    SftpInfo {
+        server,
+        user,
+        public_key_path,
+        private_key_path,
+        private_key_password,
+    }: &SftpInfo,
+) -> Result<Sftp, SftpError> {
     tracing::debug!(
         message = format!(
             "Initiating Sentinel sftp connection with server: {} with user: {}",
@@ -78,9 +73,9 @@ pub async fn get_env_fail_fast(name: &str) -> String {
 
 async fn retrieve_file_from_sftp(
     sftp: &mut Sftp,
-    filepath: String,
-) -> Result<async_ssh2::File, anyhow::Error> {
-    let path = std::path::Path::new(&filepath);
+    filepath: &str,
+) -> Result<async_ssh2::File, StorageClientError> {
+    let path = std::path::Path::new(filepath);
 
     // Additional logging to debug observed sftp issue
     // in nonprod environment
@@ -109,33 +104,49 @@ async fn retrieve_file_from_sftp(
     })?)
 }
 
-pub async fn retrieve(source: FileSource, filepath: String) -> Result<Vec<u8>, SftpError> {
-    match source {
-        FileSource::Sentinel => get_file_from_sentinel_sftp(filepath).await,
-        FileSource::TemporaryAzureBlobStorage => get_file_from_temporary_blob_storage(filepath)
-            .await
-            .map_err(|e| SftpError::Other(anyhow!("{:?}", e))),
+pub struct SftpClient {
+    sftp_info: SftpInfo,
+}
+
+impl SftpClient {
+    pub async fn sentinel() -> Self {
+        let server = get_env_fail_fast("SENTINEL_SFTP_SERVER").await;
+        let user = get_env_fail_fast("SENTINEL_SFTP_USERNAME").await;
+        let public_key_path = get_env_fail_fast("SENTINEL_PUBLIC_KEY_PATH").await;
+        let private_key_path = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PATH").await;
+        let private_key_password = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PASSWORD").await;
+
+        Self {
+            sftp_info: SftpInfo {
+                server,
+                user,
+                public_key_path,
+                private_key_path,
+                private_key_password,
+            },
+        }
+    }
+
+    async fn get_sftp_connection(&self) -> Result<Sftp, SftpError> {
+        Ok(sentinel_sftp_factory(&self.sftp_info).await?)
     }
 }
 
-async fn get_file_from_sentinel_sftp(filepath: String) -> Result<Vec<u8>, SftpError> {
-    let mut sentinel_sftp_client = sentinel_sftp_factory().await?;
-    let mut file = retrieve_file_from_sftp(&mut sentinel_sftp_client, filepath.clone()).await?;
-    let mut bytes = Vec::<u8>::new();
-    let size = file.read_to_end(&mut bytes).await?;
-    tracing::debug!("File retrieved from SFTP at {} ({} bytes) ", filepath, size);
-    Ok(bytes)
-}
-
-async fn get_file_from_temporary_blob_storage(
-    filepath: String,
-) -> Result<Vec<u8>, StorageClientError> {
-    let storage_client = AzureBlobStorage::temporary();
-    let a = storage_client
-        .get_file(StorageFile {
-            name: filepath.clone(),
-            path: filepath,
+#[async_trait]
+impl GetBlob for SftpClient {
+    async fn get_blob(&self, blob_name: &str) -> Result<BlobResponse, StorageClientError> {
+        let mut file =
+            retrieve_file_from_sftp(&mut self.get_sftp_connection().await?, blob_name).await?;
+        let mut bytes = Vec::<u8>::new();
+        let size = file.read_to_end(&mut bytes).await.map_err(|e| anyhow!(e))?;
+        tracing::debug!(
+            "File retrieved from SFTP at {} ({} bytes) ",
+            blob_name,
+            size
+        );
+        Ok(BlobResponse {
+            blob_name: blob_name.to_owned(),
+            data: bytes,
         })
-        .await?;
-    Ok(a)
+    }
 }
