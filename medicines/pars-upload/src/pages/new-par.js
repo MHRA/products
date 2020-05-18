@@ -20,7 +20,7 @@ const ParUpload = () => {
     await fetch('http://localhost:8000/pars', {
       method: 'POST',
       headers: {
-        // Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: combined,
     })
