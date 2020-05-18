@@ -1,4 +1,7 @@
-use super::{models::StorageClientError, AzureBlobStorage, BlobResponse};
+use super::{
+    models::{BlobResponse, StorageClientError},
+    AzureBlobStorage,
+};
 use async_trait::async_trait;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::Blob;

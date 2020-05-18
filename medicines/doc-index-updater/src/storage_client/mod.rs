@@ -9,11 +9,6 @@ mod delete;
 mod get;
 pub mod models;
 
-pub struct BlobResponse {
-    pub blob_name: String,
-    pub data: Vec<u8>,
-}
-
 #[cfg(test)]
 pub mod test {
     use super::models::StorageClientError;

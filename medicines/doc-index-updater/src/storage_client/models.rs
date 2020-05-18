@@ -19,3 +19,8 @@ impl From<AzureError> for StorageClientError {
         }
     }
 }
+
+pub struct BlobResponse {
+    pub blob_name: String,
+    pub data: Vec<u8>,
+}
