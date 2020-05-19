@@ -81,7 +81,7 @@ async fn queue_pars_upload(
     for metadata in metadatas {
         let storage_file = add_file_to_temporary_blob_storage(job_id, &file_data)
             .await
-            .map_err(|e| warp::reject::custom(e))?;
+            .map_err(warp::reject::custom)?;
 
         let document = document_from_form_data(storage_file, metadata);
 
