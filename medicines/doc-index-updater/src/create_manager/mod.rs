@@ -6,19 +6,17 @@ use crate::{
         RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
-    storage_client,
+    storage_client::{AzureBlobStorage, StorageClient},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use azure_sdk_core::prelude::*;
-use azure_sdk_storage_blob::prelude::*;
 use search_index::add_blob_to_search_index;
 pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
-mod hash;
+pub mod hash;
 pub mod models;
 mod sanitiser;
 mod search_index;
@@ -84,9 +82,6 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     tracing::debug!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
-    let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?
-        .azure_client;
 
     let file = sftp_client::retrieve(
         message.document.file_source.clone(),
@@ -95,7 +90,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(&storage_client, &file, metadata, None).await?;
+    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
@@ -107,51 +102,27 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     Ok(message.job_id)
 }
 
-pub async fn create_blob(
-    storage_client: &azure_sdk_storage_core::prelude::Client,
+async fn create_blob(
+    storage_client: impl StorageClient,
     file_data: &[u8],
     metadata: BlobMetadata,
-    temp_signature: Option<String>,
 ) -> Result<Blob, anyhow::Error> {
-    let name = hash::sha1(&file_data);
-    let name = match temp_signature {
-        Some(x) => format!("{}/{}", x, name),
-        None => name,
-    };
-
-    let file_digest = md5::compute(&file_data[..]);
-    let container_name =
-        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
     let hashmap: HashMap<String, String> = metadata.clone().into();
     for (key, val) in &hashmap {
         metadata_ref.insert(&key, &val);
     }
 
-    storage_client
-        .put_block_blob()
-        .with_container_name(&container_name)
-        .with_blob_name(&name)
-        .with_content_type("application/pdf")
-        .with_metadata(&metadata_ref)
-        .with_body(&file_data[..])
-        .with_content_md5(&file_digest[..])
-        .finalize()
+    let storage_file = storage_client
+        .add_file(file_data, metadata_ref)
         .await
         .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
 
-    let storage_account =
-        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-    let path = format!(
-        "https://{}.blob.core.windows.net/{}/{}",
-        &storage_account, &container_name, &name
-    );
-
     Ok(Blob {
         metadata,
-        name,
+        name: storage_file.name,
         size: file_data.len(),
-        path,
+        path: storage_file.path,
     })
 }
 
