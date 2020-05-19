@@ -25,6 +25,15 @@ data "azurerm_resource_group" "products" {
   name = var.RESOURCE_GROUP_PRODUCTS
 }
 
+resource "azurerm_resource_group" "keyvault" {
+  name     = var.KEYVAULT_RESOURCE_GROUP
+  location = var.REGION
+
+  tags = {
+    environment = var.ENVIRONMENT
+  }
+}
+
 # website
 module "products" {
   source = "../../modules/products"
@@ -81,4 +90,17 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = data.azurerm_resource_group.products.name
+}
+
+# Key vault
+module keyvault {
+  source = "../../modules/keyvault"
+
+  environment                 = var.ENVIRONMENT
+  location                    = var.REGION
+  name                        = var.KEYVAULT_NAME
+  resource_group_name         = azurerm_resource_group.keyvault.name
+  access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
+  object_ids                  = var.KEYVAULT_PERSON_IDS
+  network_acls_default_action = "Deny"
 }
