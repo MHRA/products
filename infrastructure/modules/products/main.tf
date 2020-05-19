@@ -28,6 +28,29 @@ resource "azurerm_storage_container" "temporary-docs" {
   container_access_type = "blob"
 }
 
+resource "azurerm_storage_management_policy" "products" {
+  storage_account_id = azurerm_storage_account.products.id
+
+  rule {
+    name    = "remove_temporary_blobs"
+    enabled = true
+    filters {
+      prefix_match = ["temporary-docs"]
+      blob_types   = ["blockBlob"]
+    }
+    actions {
+      base_blob {
+        tier_to_cool_after_days_since_modification_greater_than    = 1
+        tier_to_archive_after_days_since_modification_greater_than = 2
+        delete_after_days_since_modification_greater_than          = 5
+      }
+      snapshot {
+        delete_after_days_since_creation_greater_than = 5
+      }
+    }
+  }
+}
+
 resource "azurerm_storage_container" "pars_upload_website" {
   name                  = "pars-upload-website"
   storage_account_name  = azurerm_storage_account.products.name
