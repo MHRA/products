@@ -113,6 +113,7 @@ resource "azurerm_cdn_endpoint" "pars" {
   location            = azurerm_cdn_profile.pars.location
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.products.primary_blob_host
+  origin_path         = "/${azurerm_storage_container.pars_upload_website.name}"
   origin {
     name      = "mhrapars${var.environment}"
     host_name = azurerm_storage_account.products.primary_blob_host
@@ -120,7 +121,7 @@ resource "azurerm_cdn_endpoint" "pars" {
   global_delivery_rule {
     url_rewrite_action {
       source_pattern = "/"
-      destination    = "/${azurerm_storage_container.pars_upload_website.name}/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
+      destination    = "/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
     }
   }
 }
