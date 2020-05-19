@@ -63,7 +63,7 @@ data "azurerm_storage_account_sas" "pars_upload_website" {
 
   resource_types {
     service   = false
-    container = true
+    container = false
     object    = true
   }
 
@@ -74,8 +74,8 @@ data "azurerm_storage_account_sas" "pars_upload_website" {
     file  = false
   }
 
-  start  = "2020-05-19"
-  expiry = "2022-05-19"
+  start  = timeadd(timestamp(), "-2h")
+  expiry = timeadd(timestamp(), "17520h") # 2 years
 
   permissions {
     read    = true
@@ -97,6 +97,31 @@ resource "azurerm_search_service" "search" {
 
   tags = {
     environment = var.environment
+  }
+}
+
+resource "azurerm_cdn_profile" "pars" {
+  name                = "mhrapars${var.environment}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku                 = "Standard_Microsoft"
+}
+
+resource "azurerm_cdn_endpoint" "pars" {
+  name                = "mhrapars${var.environment}"
+  profile_name        = azurerm_cdn_profile.pars.name
+  location            = azurerm_cdn_profile.pars.location
+  resource_group_name = var.resource_group_name
+  origin_host_header  = azurerm_storage_account.products.primary_blob_host
+  origin {
+    name      = "mhrapars${var.environment}"
+    host_name = azurerm_storage_account.products.primary_blob_host
+  }
+  global_delivery_rule {
+    url_rewrite_action {
+      source_pattern = "/"
+      destination    = "/${azurerm_storage_container.pars_upload_website.name}/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
+    }
   }
 }
 
