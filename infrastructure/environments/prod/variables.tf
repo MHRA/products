@@ -48,7 +48,7 @@ variable "KEYVAULT_NAME" {
   default     = "mhra-prod"
 }
 
-variable "KEYVAULT_PERSON_IDS" {
+variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
   type        = list(string)
   description = "IDs of objects (people etc) to associate access policies for"
   default     = []

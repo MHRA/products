@@ -14,7 +14,7 @@ variable "access_CIDR" {
   description = "CIDR range to whitelist for access to the keyvault"
 }
 
-variable "object_ids" {
+variable "authorised_person_ids" {
   description = "IDs of objects (people etc) to associate access policies for"
 }
 

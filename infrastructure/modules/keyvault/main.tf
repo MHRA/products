@@ -20,7 +20,7 @@ resource "azurerm_key_vault" "secrets_vault" {
   }
 
   dynamic "access_policy" {
-    for_each = var.object_ids
+    for_each = var.authorised_person_ids
     content {
       tenant_id = data.azurerm_client_config.current.tenant_id
       object_id = access_policy.value

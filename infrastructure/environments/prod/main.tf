@@ -101,6 +101,6 @@ module keyvault {
   name                        = var.KEYVAULT_NAME
   resource_group_name         = azurerm_resource_group.keyvault.name
   access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
-  object_ids                  = var.KEYVAULT_PERSON_IDS
+  authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
   network_acls_default_action = "Deny"
 }
