@@ -1,5 +1,5 @@
-const withPlugins = require("next-compose-plugins");
-const optimizedImages = require("next-optimized-images");
+const withPlugins = require('next-compose-plugins');
+const optimizedImages = require('next-optimized-images');
 
 module.exports = withPlugins([
   [
@@ -11,3 +11,7 @@ module.exports = withPlugins([
 
   // your other plugins here
 ]);
+
+module.exports = {
+  assetPrefix: 'assets',
+};
