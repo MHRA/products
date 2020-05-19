@@ -158,6 +158,7 @@ const LicenseNumber = ({ formData }) => (
         className="govuk-select"
         id="license_number_type"
         name="license_number_type"
+        defaultValue={formData.get('license_number_type') || undefined}
         required
       >
         <option value="PL">PL</option>
