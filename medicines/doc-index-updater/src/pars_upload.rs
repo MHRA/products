@@ -38,7 +38,7 @@ pub fn handler(
 
 async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
-    file_data: &Vec<u8>,
+    file_data: &[u8],
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
