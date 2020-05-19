@@ -84,5 +84,5 @@ jobs:
         with:
           enabled-static-website: false
           folder: medicines/pars-upload/dist
-          containerName: pars-upload-website
+          blob-container-name: pars-upload-website
           connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING_DEV }}
