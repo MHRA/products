@@ -32,7 +32,7 @@ resource "azurerm_storage_management_policy" "products" {
   storage_account_id = azurerm_storage_account.products.id
 
   rule {
-    name    = "remove_temporary_blobs"
+    name    = "removeTemporaryBlobs"
     enabled = true
     filters {
       prefix_match = ["temporary-docs"]
@@ -62,9 +62,9 @@ data "azurerm_storage_account_sas" "pars_upload_website" {
   https_only        = true
 
   resource_types {
-    service   = true
-    container = false
-    object    = false
+    service   = false
+    container = true
+    object    = true
   }
 
   services {
@@ -79,11 +79,11 @@ data "azurerm_storage_account_sas" "pars_upload_website" {
 
   permissions {
     read    = true
-    write   = true
+    write   = false
     delete  = false
     list    = false
-    add     = true
-    create  = true
+    add     = false
+    create  = false
     update  = false
     process = false
   }
