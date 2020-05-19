@@ -126,5 +126,5 @@ module keyvault {
   resource_group_name         = data.azurerm_resource_group.keyvault.name
   access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
   object_ids                  = var.KEYVAULT_PERSON_IDS
-  network_acls_default_action = "Deny"
+  network_acls_default_action = "Allow"
 }
