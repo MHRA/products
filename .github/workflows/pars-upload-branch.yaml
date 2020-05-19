@@ -77,3 +77,12 @@ jobs:
       - name: Accessibility check
         working-directory: medicines/pars-upload
         run: yarn a11y
+
+      - name: Deploy pars upload website to static site in azure storage (dev_
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
+        with:
+          enabled-static-website: false
+          folder: medicines/pars-upload/dist
+          containerName: pars-upload-website
+          connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING_DEV }}
