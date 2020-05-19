@@ -29,3 +29,7 @@ output "storage_account_name" {
 output "storage_account_primary_web_host" {
   value = azurerm_storage_account.products.primary_web_host
 }
+
+output "sas_url_query_string" {
+  value = data.azurerm_storage_account_sas.pars_upload_website.sas
+}
