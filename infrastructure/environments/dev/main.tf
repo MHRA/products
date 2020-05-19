@@ -45,6 +45,7 @@ module "products" {
   namespace           = local.namespace
   resource_group_name = azurerm_resource_group.products.name
   pars_reply_urls     = var.PARS_REPLY_URLS
+  pars_allowed_ips    = var.PARS_ALLOWED_IPS
 }
 
 # website

@@ -22,3 +22,8 @@ variable "search_sku" {
 variable "pars_reply_urls" {
   description = "The reply urls configured in the azure app registration"
 }
+
+variable "pars_allowed_ips" {
+  description = "List of allowed IP addresses for the pars upload website"
+}
+

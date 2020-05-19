@@ -40,3 +40,8 @@ variable "PARS_REPLY_URLS" {
   default     = ["http://localhost:3000"]
   description = "The reply urls configured in the azure app registration."
 }
+
+variable "PARS_ALLOWED_IPS" {
+  type        = list(string)
+  description = "List of allowed IP addresses for the pars upload website."
+}

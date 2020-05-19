@@ -118,7 +118,21 @@ resource "azurerm_cdn_endpoint" "pars" {
     name      = "mhrapars${var.environment}"
     host_name = azurerm_storage_account.products.primary_blob_host
   }
-  global_delivery_rule {
+  # global_delivery_rule {
+  #   url_rewrite_action {
+  #     source_pattern = "/"
+  #     destination    = "/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
+  #   }
+  # }
+
+  delivery_rule {
+    order = 1
+    name  = "ipRestrictionToMHRA"
+    remote_address_condition {
+      operator     = "IPMatch"
+      match_values = var.pars_allowed_ips
+    }
+
     url_rewrite_action {
       source_pattern = "/"
       destination    = "/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
