@@ -59,3 +59,14 @@ variable "default_node_count" {
 variable "support_email_addresses" {
   description = "A list of email addresses for first line support alerts to be sent to."
 }
+
+variable "log_cluster_diagnostics" {
+  type        = bool
+  description = "Whether diagnostics from the cluster should be logged to a storage container"
+  default     = false
+}
+
+variable "diagnostic_setting_name" {
+  description = "Name of the diagnostic collection setting that saves auditable logs from the cluster"
+  default     = ""
+}

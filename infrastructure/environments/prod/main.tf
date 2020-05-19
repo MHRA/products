@@ -71,6 +71,8 @@ module cluster {
   lb_route_table_id                     = data.azurerm_route_table.load_balancer.id
   default_node_count                    = "3"
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
+  log_cluster_diagnostics               = true
+  diagnostic_setting_name               = "production-cluster-diagnostics"
 }
 
 # Service Bus
