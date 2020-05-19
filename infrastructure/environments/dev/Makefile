@@ -16,3 +16,8 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--vault-name mhra-dev \
 	--name infrastructure-dev-env \
 	--file .env
+
+.PHONY: plan
+plan: ## Reads from .env and runs terraform plan with those variables
+	export $(cat .env .env.overrides 2> /dev/null | xargs) && \
+	terraform plan
