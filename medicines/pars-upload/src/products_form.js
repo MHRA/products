@@ -26,7 +26,6 @@ export const Products = ({
   const getFormData = () => {
     const formData = new FormData(formRef.current)
     formData.append('title', product_title(formData))
-    formData.append('license_number', license_number(formData))
 
     return formData
   }

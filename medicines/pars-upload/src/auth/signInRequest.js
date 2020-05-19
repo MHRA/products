@@ -1,6 +1,6 @@
-import { Button } from '../button';
-import { Para, H1 } from '../typography';
-import { Layout } from '../layout';
+import { Button } from '../button'
+import { Para, H1 } from '../typography'
+import { Layout } from '../layout'
 
 export const SignInRequest = ({ signIn }) => (
   <Layout>
@@ -21,4 +21,4 @@ export const SignInRequest = ({ signIn }) => (
       </Button>
     </Para>
   </Layout>
-);
+)
