@@ -125,46 +125,116 @@ async fn read_pars_upload(
                 message: format!("Error receiving data: {}", e),
             })?;
 
-    let fields: Vec<(String, UploadFieldValue)> = join_all(parts.into_iter().map(read_upload_part))
+    let fields: Vec<Field> = join_all(parts.into_iter().map(read_upload_part))
         .await
         .into_iter()
         .collect::<Result<_, _>>()?;
 
+    let GroupedFields {
+        products,
+        file_data,
+    } = groups_fields_by_product(fields)?;
+
+    let metadatas = products
+        .into_iter()
+        .map(product_form_data_to_blob_metadata)
+        .collect::<Result<_, _>>()?;
+
+    Ok((metadatas, file_data))
+}
+
+#[derive(Debug)]
+struct Field {
+    name: String,
+    value: UploadFieldValue,
+}
+
+#[derive(Debug)]
+struct GroupedFields {
+    products: Vec<Vec<Field>>,
+    file_data: Vec<u8>,
+}
+
+fn groups_fields_by_product(fields: Vec<Field>) -> Result<GroupedFields, SubmissionError> {
+    let mut products = Vec::new();
+    let mut file_field = None;
+
+    for field in fields {
+        if field.name == "file" {
+            file_field = Some(field.value);
+            continue;
+        }
+
+        if field.name == "product_name" {
+            products.push(vec![]);
+        }
+
+        match products.last_mut() {
+            Some(group) => {
+                group.push(field);
+            }
+            None => {
+                let group = vec![field];
+                products.push(group);
+            }
+        }
+    }
+
+    let file_data = file_field
+        .and_then(|field| field.into_file_data())
+        .ok_or(SubmissionError::MissingField { name: "file" })?;
+
+    Ok(GroupedFields {
+        products,
+        file_data,
+    })
+}
+
+fn product_form_data_to_blob_metadata(fields: Vec<Field>) -> Result<BlobMetadata, SubmissionError> {
     let file_name = fields
         .iter()
-        .find(|(name, _)| name == "file")
-        .and_then(|(_, field)| field.file_name())
+        .find(|field| field.name == "file")
+        .and_then(|field| field.value.file_name())
         .ok_or(SubmissionError::MissingField { name: "file" })?
         .into();
 
-    let product_names = vec![];
+    let product_name = fields
+        .iter()
+        .find(|field| field.name == "product_name")
+        .and_then(|field| field.value.value())
+        .ok_or(SubmissionError::MissingField {
+            name: "product_name",
+        })?
+        .into();
+
+    let product_names = vec![product_name];
 
     let active_substances = fields
         .iter()
-        .filter(|(name, _)| name == "active_substance")
-        .filter_map(|(_, field)| field.value())
+        .filter(|field| field.name == "active_substance")
+        .filter_map(|field| field.value.value())
         .map(|s| s.to_string())
         .collect::<Vec<String>>();
 
     let title = fields
         .iter()
-        .find(|(name, _)| name == "title")
-        .and_then(|(_, field)| field.value())
+        .find(|field| field.name == "title")
+        .and_then(|field| field.value.value())
         .ok_or(SubmissionError::MissingField { name: "title" })?
         .into();
 
-    let author = "".to_string();
-
     let pl_number = fields
         .iter()
-        .find(|(name, _)| name == "license_number")
-        .and_then(|(_, field)| field.value())
+        .find(|field| field.name == "license_number")
+        .and_then(|field| field.value.value())
         .ok_or(SubmissionError::MissingField {
             name: "license_number",
         })?
         .into();
 
-    let metadata = BlobMetadata::new(
+    let author = "".to_string();
+
+    Ok(BlobMetadata::new(
         file_name,
         DocumentType::Par,
         title,
@@ -173,18 +243,10 @@ async fn read_pars_upload(
         active_substances,
         author,
         None,
-    );
-
-    let file_data = fields
-        .into_iter()
-        .find(|(name, _)| name == "file")
-        .and_then(|(_, field)| field.into_file_data())
-        .ok_or(SubmissionError::MissingField { name: "file" })?;
-
-    Ok((vec![metadata], file_data))
+    ))
 }
 
-async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), SubmissionError> {
+async fn read_upload_part(part: Part) -> Result<Field, SubmissionError> {
     let name = part.name().to_string();
 
     let file_name = part.filename().map(|s| s.to_string());
@@ -200,7 +262,7 @@ async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), Subm
             message: format!("Error receiving data: {}", e),
         })?;
 
-    let field = match file_name {
+    let value = match file_name {
         Some(file_name) => UploadFieldValue::File { file_name, data },
         None => UploadFieldValue::Text {
             value: std::str::from_utf8(&data)
@@ -211,7 +273,7 @@ async fn read_upload_part(part: Part) -> Result<(String, UploadFieldValue), Subm
         },
     };
 
-    Ok((name, field))
+    Ok(Field { name, value })
 }
 
 #[derive(Debug)]
