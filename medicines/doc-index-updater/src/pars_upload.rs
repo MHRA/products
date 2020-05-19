@@ -38,11 +38,11 @@ pub fn handler(
 
 async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
-    file_data: Vec<u8>,
+    file_data: &Vec<u8>,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
-        .add_file(&file_data, HashMap::new())
+        .add_file(file_data, HashMap::new())
         .await
         .map_err(|e| SubmissionError::UploadError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
@@ -72,15 +72,21 @@ async fn queue_pars_upload(
     job_id: Uuid,
     form_data: FormData,
     state_manager: impl JobStatusClient,
-) -> Result<(), SubmissionError> {
-    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
+) -> Result<(), Rejection> {
+    let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
         tracing::debug!("Error reading PARS upload: {:?}", e);
-        e
+        warp::reject::custom(e)
     })?;
-    let storage_file = add_file_to_temporary_blob_storage(job_id, file_data).await?;
-    let document = document_from_form_data(storage_file, metadata);
 
-    let _ = check_in_document_handler(document, &state_manager).await;
+    for metadata in metadatas {
+        let storage_file = add_file_to_temporary_blob_storage(job_id, &file_data)
+            .await
+            .map_err(|e| warp::reject::custom(e))?;
+
+        let document = document_from_form_data(storage_file, metadata);
+
+        check_in_document_handler(document, &state_manager).await?;
+    }
 
     Ok(())
 }
@@ -93,12 +99,10 @@ async fn upload_pars_handler(
 
     let job_id = accept_job(&state_manager).await?.id;
 
-    queue_pars_upload(job_id, form_data, state_manager)
-        .await
-        .map_err(|e| {
-            tracing::info!("Error queueing upload: {:?}", e);
-            warp::reject::custom(e)
-        })?;
+    let span = tracing::info_span!("Queueing PARS upload", job_id = job_id.to_string().as_str());
+    let _enter = span.enter();
+
+    queue_pars_upload(job_id, form_data, state_manager).await?;
 
     Ok(warp::reply::json(&UploadResponse {
         job_id: &job_id.to_string(),
