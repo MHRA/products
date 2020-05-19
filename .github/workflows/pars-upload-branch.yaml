@@ -82,7 +82,7 @@ jobs:
         # master causes this step to fail so pointing to last working commit until fixed
         uses: lauchacarro/Azure-Storage-Action@9225056
         with:
-          enabled-static-website: false
+          enabled-static-website: true
           folder: medicines/pars-upload/dist
           blob-container-name: pars-upload-website
           connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING_DEV }}
