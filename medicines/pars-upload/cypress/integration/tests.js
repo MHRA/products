@@ -72,4 +72,54 @@ describe('PARs upload form', () => {
       `${productName}, ${strength}, ${dose}, ${license_str}`
     ).should('exist')
   })
+
+  it('can submit the form sucessfully', () => {
+    cy.visit('/new-par')
+
+    cy.findByLabelText('Product name').type('Ibuprofen pills')
+
+    cy.findByLabelText('Strength').type('Really powerful stuff')
+
+    cy.findByLabelText('Pharmaceutical dose form').type('some form')
+
+    cy.findByLabelText('Active substance').type('Ibuprofen')
+
+    cy.findByText('Add another active substance').click()
+
+    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+
+    const license = { type: 'THR', part_one: '12345', part_two: '6789' }
+
+    cy.findByText('Licence number')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByLabelText('Type').select(license.type)
+        cy.findByLabelText('First five digits').type(license.part_one)
+        cy.findByLabelText('Last four digits').type(license.part_two)
+      })
+
+    cy.findByText('Continue').click()
+
+    cy.findByText('Upload your PDF').should('exist')
+
+    const fileName = 'rabbit-anti-human-stuff.pdf'
+
+    cy.fixture(fileName).then((fileContent) => {
+      // The `upload` method is provided by https://github.com/abramenal/cypress-file-upload/tree/v3.5.3
+      cy.get('input[type=file]').upload({
+        fileContent,
+        fileName,
+        mimeType: 'application/pdf',
+      })
+    })
+
+    cy.findByText('Continue').click()
+
+    cy.findByText('Check your answers before sending the report').should(
+      'exist'
+    )
+
+    cy.findByText('Continue').click()
+  })
 })
