@@ -81,11 +81,11 @@ jobs:
       - name: Create .env file
         working-directory: medicaines/pars-upload
         run: |
-          echo 'NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61
-          NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26
-          NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net
-          NEXT_PUBLIC_DISABLE_AUTH=false
-          NEXT_PUBLIC_IS_STATIC_BUILD=true' > .env
+          echo NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61 >> .env
+          echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
+          echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net >> .env
+          echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
+          echo NEXT_PUBLIC_IS_STATIC_BUILD=true' >> .env
 
       - name: Build static site
         working-directory: medicines/pars-upload
