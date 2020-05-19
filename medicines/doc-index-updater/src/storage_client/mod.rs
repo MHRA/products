@@ -1,54 +1,34 @@
-use async_trait::async_trait;
-use azure_sdk_core::{errors::AzureError, prelude::*, DeleteSnapshotsMethod};
-use azure_sdk_storage_blob::Blob;
-use azure_sdk_storage_core::prelude::Client;
+pub use azure_blob_client::AzureBlobStorage;
+pub use client::StorageClient;
+pub use delete::DeleteBlob;
+pub use get::GetBlob;
 
-pub struct BlobClient {
-    pub azure_client: Client,
-}
+mod azure_blob_client;
+mod client;
+mod delete;
+mod get;
+pub mod models;
 
-impl BlobClient {
-    pub fn new(azure_client: Client) -> BlobClient {
-        BlobClient { azure_client }
+#[cfg(test)]
+pub mod test {
+    use super::models::StorageClientError;
+    use crate::storage_client::DeleteBlob;
+    use async_trait::async_trait;
+
+    pub struct TestAzureStorageClient {
+        pub can_delete_blob: bool,
     }
-}
 
-#[async_trait]
-pub trait DeleteBlob {
-    async fn delete_blob(
-        &mut self,
-        container_name: &str,
-        blob_name: &str,
-    ) -> Result<(), AzureError>;
-}
-
-#[async_trait]
-impl DeleteBlob for BlobClient {
-    async fn delete_blob(
-        &mut self,
-        container_name: &str,
-        blob_name: &str,
-    ) -> Result<(), AzureError> {
-        self.azure_client
-            .delete_blob()
-            .with_container_name(&container_name)
-            .with_blob_name(&blob_name)
-            .with_delete_snapshots_method(DeleteSnapshotsMethod::Include)
-            .finalize()
-            .await?;
-        Ok(())
-    }
-}
-
-pub fn factory() -> Result<BlobClient, AzureError> {
-    let storage_account =
-        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-
-    let master_key =
-        std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
-
-    match base64::decode(&master_key) {
-        Ok(_) => Ok(BlobClient::new(Client::new(&storage_account, &master_key)?)),
-        Err(e) => Err(AzureError::Base64DecodeError(e)),
+    #[async_trait]
+    impl DeleteBlob for TestAzureStorageClient {
+        async fn delete_blob(&mut self, _blob_name: &str) -> Result<(), StorageClientError> {
+            if self.can_delete_blob {
+                Ok(())
+            } else {
+                Err(StorageClientError::ClientError {
+                    message: "blob could not be deleted".to_string(),
+                })
+            }
+        }
     }
 }

@@ -1,6 +1,4 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import { Header } from '../header'
-import { Footer } from '../footer'
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -21,11 +19,7 @@ class MyDocument extends Document {
             Skip to main content
           </a>
 
-          <Header />
-
           <Main />
-
-          <Footer />
 
           <NextScript />
         </body>
