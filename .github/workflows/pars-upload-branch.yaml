@@ -78,7 +78,7 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn a11y
 
-      - name: Deploy pars upload website to static site in azure storage (dev_
+      - name: Deploy pars upload website to static site in azure storage (dev)
         # master causes this step to fail so pointing to last working commit until fixed
         uses: lauchacarro/Azure-Storage-Action@9225056
         with:
