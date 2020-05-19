@@ -18,3 +18,7 @@ variable "search_sku" {
   description = "Search Service SKU (e.g. basic/standard)"
   default     = "basic"
 }
+
+variable "pars_reply_urls" {
+  description = "The reply urls configured in the azure app registration"
+}
