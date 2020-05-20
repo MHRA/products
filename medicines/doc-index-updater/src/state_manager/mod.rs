@@ -2,7 +2,7 @@ pub use self::redis::{get_client, MyRedisError};
 use self::redis::{get_from_redis, set_in_redis};
 use crate::{
     auth_manager,
-    models::{JobStatus, JobStatusResponse, XMLJobStatusResponse},
+    models::{JobStatus, JobStatusResponse, JsonWebToken, XMLJobStatusResponse},
 };
 use ::redis::Client;
 use async_trait::async_trait;

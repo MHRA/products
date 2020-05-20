@@ -27,6 +27,7 @@ pub fn handler(
         .and(warp::post())
         .and(warp::multipart::form().max_length(100 * 1024 * 1024))
         .and(with_state(state_manager))
+        .and(warp::header("Authorization"))
         .and_then(upload_pars_handler)
 }
 
@@ -81,8 +82,11 @@ async fn queue_pars_upload(
 async fn upload_pars_handler(
     form_data: FormData,
     state_manager: StateManager,
+    authorization_header: String,
 ) -> Result<impl Reply, Rejection> {
     tracing::debug!("Received PARS submission");
+
+    let _json_web_token = decode_token_from_authorization_header(authorization_header);
 
     let job_id = accept_job(&state_manager).await?.id;
 
@@ -230,7 +234,9 @@ impl UploadFieldValue {
     }
 }
 
-fn decode_token(token: String) -> JsonWebToken {
+fn decode_token_from_authorization_header(authorization_header: String) -> JsonWebToken {
+    let token = authorization_header.split(" ").collect::<Vec<&str>>()[1];
+
     let token_message = dangerous_unsafe_decode::<Claims>(&token);
     tracing::debug!("{:?}", token_message);
 
