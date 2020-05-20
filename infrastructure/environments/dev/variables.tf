@@ -35,6 +35,28 @@ variable "SUPPORT_EMAIL_ADDRESSES" {
   description = "A list of email addresses for first line support alerts to be sent to."
 }
 
+variable "KEYVAULT_ACCESS_CIDR_BLOCKS" {
+  type        = list(string)
+  description = "CIDR blocks representing whitelisted IPs to access keyvault"
+  default     = []
+}
+
+variable "KEYVAULT_NAME" {
+  description = "Name of keyvault where secrets stored"
+  default     = "mhra-dev"
+}
+
+variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
+  type        = list(string)
+  description = "IDs of objects (people etc) to associate access policies for"
+  default     = []
+}
+
+variable "KEYVAULT_RESOURCE_GROUP" {
+  description = "Name of resource group where keyvault is deployed"
+  default     = "adazr-rg-1001"
+}
+
 variable "PARS_REPLY_URLS" {
   type        = list(string)
   default     = ["http://localhost:3000", "https://mhraparsdev.azureedge.net"]

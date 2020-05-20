@@ -31,11 +31,14 @@ resource "azurerm_resource_group" "products" {
   }
 }
 
+data "azurerm_resource_group" "keyvault" {
+  name = var.KEYVAULT_RESOURCE_GROUP
+}
+
 resource "azurerm_subnet_route_table_association" "load_balancer" {
   subnet_id      = azurerm_subnet.load_balancer.id
   route_table_id = data.azurerm_route_table.load_balancer.id
 }
-
 
 # website
 module "products" {
@@ -114,4 +117,17 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
+}
+
+# Key vault
+module keyvault {
+  source = "../../modules/keyvault"
+
+  environment                 = var.ENVIRONMENT
+  location                    = var.REGION
+  name                        = var.KEYVAULT_NAME
+  resource_group_name         = data.azurerm_resource_group.keyvault.name
+  access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
+  authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  network_acls_default_action = "Allow"
 }

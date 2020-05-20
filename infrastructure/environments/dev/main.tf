@@ -36,6 +36,10 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
   route_table_id = azurerm_route_table.load_balancer.id
 }
 
+data "azurerm_resource_group" "keyvault" {
+  name = var.KEYVAULT_RESOURCE_GROUP
+}
+
 # website
 module "products" {
   source = "../../modules/products"
@@ -110,4 +114,17 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
+}
+
+# Key vault
+module keyvault {
+  source = "../../modules/keyvault"
+
+  environment                 = var.ENVIRONMENT
+  location                    = var.REGION
+  name                        = var.KEYVAULT_NAME
+  resource_group_name         = data.azurerm_resource_group.keyvault.name
+  access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
+  authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  network_acls_default_action = "Allow"
 }
