@@ -22,4 +22,5 @@ variable "redis_use_firewall" {
 
 variable "redis_firewall_ip" {
   description = "IP allowed to access Redis Cache"
+  default     = ""
 }
