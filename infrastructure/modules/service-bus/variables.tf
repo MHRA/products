@@ -14,10 +14,12 @@ variable "name" {
   description = "name for the service bus namespace"
 }
 
-variable "redis_start_ip" {
-  description = "First IP in allowed IP range"
+variable "redis_use_firewall" {
+  type        = bool
+  description = "Whether to apply a firewall rule for Redis"
+  default     = false
 }
 
-variable "redis_end_ip" {
-  description = "Last IP in allowed IP range"
+variable "redis_firewall_ip" {
+  description = "IP allowed to access Redis Cache"
 }

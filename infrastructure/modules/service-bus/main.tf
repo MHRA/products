@@ -55,10 +55,11 @@ resource "azurerm_redis_cache" "doc_index_updater_redis" {
   sku_name            = "Standard"
 }
 
-resource "azurerm_redis_firewall_rule" "example" {
-  name                = "someIPrange"
-  redis_cache_name    = azurerm_redis_cache.example.name
-  resource_group_name = azurerm_resource_group.example.name
-  start_ip            = var.redis_start_ip
-  end_ip              = var.redis_end_ip
+resource "azurerm_redis_firewall_rule" "cluster" {
+  count               = var.redis_use_firewall ? 1 : 0
+  name                = "cluster_ip_range"
+  redis_cache_name    = azurerm_redis_cache.doc_index_updater_redis.name
+  resource_group_name = var.resource_group_name
+  start_ip            = var.redis_firewall_ip
+  end_ip              = var.redis_firewall_ip
 }

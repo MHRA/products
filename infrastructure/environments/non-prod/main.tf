@@ -109,6 +109,11 @@ module cpd {
   resource_group_name = azurerm_resource_group.products.name
 }
 
+data "azurerm_public_ip" "external" {
+  name                = split("/", module.cluster.load_balancer_public_outbound_ip_id)[8]
+  resource_group_name = split("/", module.cluster.load_balancer_public_outbound_ip_id)[4]
+}
+
 # Service Bus
 module service_bus {
   source = "../../modules/service-bus"
@@ -117,6 +122,8 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
+  redis_use_firewall  = true
+  redis_firewall_ip   = data.azurerm_public_ip.external.ip_address
 }
 
 # Key vault
