@@ -29,6 +29,6 @@ Kubernetes Role-based Access Control (RBAC) is used to ensure services have the 
 
 Any Personally Identifiable Information (PII) should be encrypted in transit (by enforcing TLS throughout) and at rest.
 
-## Vulnerabilities and attack vectors
+## Vulnerabilities and attack vectors
 
 Software versions should be kept up to date in order to ensure that security fixes for Common Vulnerabilities and Exposures (CVE) are consumed as soon as possible after becoming available. Nodes in clusters should be refreshed regularly, and new nodes created from up to date images. Containers should be built from up-to-date base images as they pass through the CI/CD pipeline. We will need to evolve policies for ensuring that this happens and is auditable (again the “everything as code” principle helps us with audit and traceability).

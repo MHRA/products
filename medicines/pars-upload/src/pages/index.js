@@ -3,6 +3,7 @@ import { H1, Para } from '../typography';
 import { Button } from '../button';
 import { RadioList } from '../form';
 import { Layout } from '../layout';
+import { signIn } from '../auth/authPopup';
 
 const Index = () => {
   const router = useRouter();
@@ -11,7 +12,6 @@ const Index = () => {
     event.preventDefault();
 
     const data = new FormData(event.target);
-
     router.push(data.get('what-you-up-to'));
   };
 

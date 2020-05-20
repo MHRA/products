@@ -82,6 +82,7 @@ http
 HTTP
 https
 HTTPS
+IaC
 ICO
 incrementing
 Infrastucture
@@ -180,6 +181,7 @@ spcpil
 SPCs
 src
 SSL
+SSO
 SSR
 Stdev
 Stellent

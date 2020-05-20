@@ -18,6 +18,7 @@ terraform {
 
 locals {
   namespace        = "mhraproductsnonprod"
+  pars_namespace   = "mhraparsnonprod"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
@@ -46,7 +47,9 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
+  pars_namespace      = local.pars_namespace
   resource_group_name = azurerm_resource_group.products.name
+  pars_reply_urls     = var.PARS_REPLY_URLS
 }
 
 # website

@@ -1,16 +1,16 @@
 use crate::{
-    create_manager::{create_blob, models::BlobMetadata, Blob},
+    create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
-    storage_client,
+    storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
 use search_client::models::DocumentType;
 use serde::Serialize;
-use storage_client::BlobClient;
+use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
     filters::multipart::{FormData, Part},
@@ -27,60 +27,35 @@ pub fn handler(
         .and_then(upload_pars_handler)
 }
 
-fn storage_client_factory() -> Result<BlobClient, SubmissionError> {
-    let client = storage_client::factory().map_err(|e| {
-        tracing::error!("Error creating storage client: {:?}", e);
-        SubmissionError::UploadError {
-            message: format!("Couldn't create storage client: {:?}", e),
-        }
-    })?;
-
-    Ok(client)
-}
-
-async fn add_form_to_temporary_blob_storage(
+async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
-    form_data: FormData,
-) -> Result<Blob, SubmissionError> {
-    let storage_client = storage_client_factory()?.azure_client;
-
-    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
-        tracing::debug!("Error reading PARS upload: {:?}", e);
-        e
-    })?;
-
-    let blob = create_blob(
-        &storage_client,
-        &file_data,
-        metadata,
-        Some("temp".to_owned()),
-    )
-    .await
-    .map_err(|e| {
-        tracing::error!("Error uploading file to blob storage: {:?}", e);
-        SubmissionError::UploadError {
-            message: format!("Couldn't create blob: {:?}", e),
-        }
-    })?;
-
-    Ok(blob)
+    file_data: Vec<u8>,
+) -> Result<StorageFile, SubmissionError> {
+    let storage_client = AzureBlobStorage::temporary();
+    let storage_file = storage_client
+        .add_file(&file_data, HashMap::new())
+        .await
+        .map_err(|e| SubmissionError::UploadError {
+            message: format!("Problem talking to temporary blob storage: {:?}", e),
+        })?;
+    Ok(storage_file)
 }
 
-fn document_from_form_data(blob: Blob) -> Document {
+fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) -> Document {
     Document {
-        id: blob.metadata.file_name.to_string(),
-        name: blob.metadata.title.to_string(),
+        id: metadata.file_name.to_string(),
+        name: metadata.title.to_string(),
         document_type: DocumentType::Par,
-        author: blob.metadata.author.to_string(),
-        products: blob.metadata.product_names.to_vec_string(),
-        keywords: match blob.metadata.keywords {
+        author: metadata.author.to_string(),
+        products: metadata.product_names.to_vec_string(),
+        keywords: match metadata.keywords {
             Some(a) => Some(a.to_vec_string()),
             None => None,
         },
-        pl_number: blob.metadata.pl_number,
-        active_substances: blob.metadata.active_substances.to_vec_string(),
+        pl_number: metadata.pl_number,
+        active_substances: metadata.active_substances.to_vec_string(),
         file_source: FileSource::TemporaryAzureBlobStorage,
-        file_path: blob.path,
+        file_path: storage_file.name,
     }
 }
 
@@ -89,8 +64,12 @@ async fn queue_pars_upload(
     form_data: FormData,
     state_manager: impl JobStatusClient,
 ) -> Result<(), SubmissionError> {
-    let _blob = add_form_to_temporary_blob_storage(job_id, form_data).await?;
-    let document = document_from_form_data(_blob);
+    let (metadata, file_data) = read_pars_upload(form_data).await.map_err(|e| {
+        tracing::debug!("Error reading PARS upload: {:?}", e);
+        e
+    })?;
+    let storage_file = add_file_to_temporary_blob_storage(job_id, file_data).await?;
+    let document = document_from_form_data(storage_file, metadata);
 
     let _ = check_in_document_handler(document, state_manager).await;
     Ok(())

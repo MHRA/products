@@ -14,7 +14,15 @@ variable "namespace" {
   description = "Namespace to use on cluster and storage"
 }
 
+variable "pars_namespace" {
+  description = "Namespace to use on cluster and storage for pars website"
+}
+
 variable "search_sku" {
   description = "Search Service SKU (e.g. basic/standard)"
   default     = "basic"
+}
+
+variable "pars_reply_urls" {
+  description = "The reply urls configured in the azure app registration"
 }

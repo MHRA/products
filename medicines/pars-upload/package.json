@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "export": "next build && next export",
     "test-e2e": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "test-e2e-interactive": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run --headed; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "test": "yarn jest",
@@ -21,6 +22,7 @@
     "next": "^9.3.6",
     "next-compose-plugins": "^2.2.0",
     "next-optimized-images": "^2.6.0",
+    "msal": "^1.3.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "sass": "^1.26.5"
