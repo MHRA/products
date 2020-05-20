@@ -16,8 +16,8 @@ resource "azurerm_storage_account" "logs" {
 resource "azurerm_monitor_diagnostic_setting" "cluster" {
   count              = var.log_cluster_diagnostics ? 1 : 0
   name               = var.diagnostic_setting_name
-  target_resource_id = "${azurerm_kubernetes_cluster.cluster.id}"
-  storage_account_id = "${azurerm_storage_account.logs[0].id}"
+  target_resource_id = azurerm_kubernetes_cluster.cluster.id
+  storage_account_id = azurerm_storage_account.logs[0].id
 
   dynamic "log" {
     for_each = var.diagnostic_log_types

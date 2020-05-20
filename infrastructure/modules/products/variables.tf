@@ -23,6 +23,7 @@ variable "search_sku" {
   default     = "basic"
 }
 
-variable "pars_reply_urls" {
-  description = "The reply urls configured in the azure app registration"
+variable "add_local_pars_reply_url" {
+  description = "Whether to add http://localhost:3000 to allowable redirect urls"
+  default     = false
 }
