@@ -13,16 +13,6 @@ resource "azurerm_storage_account" "logs" {
   }
 }
 
-variable "diagnostic_log_types" {
-  description = "Set of log types to create configuration for"
-  type        = list(string)
-  default = ["kube-apiserver",
-    "kube-audit",
-    "kube-controller-manager",
-    "kube-scheduler",
-  "cluster-autoscaler"]
-}
-
 resource "azurerm_monitor_diagnostic_setting" "cluster" {
   count              = var.log_cluster_diagnostics ? 1 : 0
   name               = var.diagnostic_setting_name

@@ -70,3 +70,13 @@ variable "diagnostic_setting_name" {
   description = "Name of the diagnostic collection setting that saves auditable logs from the cluster"
   default     = ""
 }
+
+variable "diagnostic_log_types" {
+  description = "Set of log types to create configuration for"
+  type        = list(string)
+  default = ["kube-apiserver",
+    "kube-audit",
+    "kube-controller-manager",
+    "kube-scheduler",
+  "cluster-autoscaler"]
+}
