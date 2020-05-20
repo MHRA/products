@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use std::net::TcpStream;
 use tokio::io::AsyncReadExt;
 
-struct SftpInfo {
+struct SftpConfig {
     server: String,
     user: String,
     public_key_path: String,
@@ -17,13 +17,13 @@ struct SftpInfo {
 }
 
 async fn sentinel_sftp_factory(
-    SftpInfo {
+    SftpConfig {
         server,
         user,
         public_key_path,
         private_key_path,
         private_key_password,
-    }: &SftpInfo,
+    }: &SftpConfig,
 ) -> Result<Sftp, SftpError> {
     tracing::debug!(
         message = format!(
@@ -105,7 +105,7 @@ async fn retrieve_file_from_sftp(
 }
 
 pub struct SftpClient {
-    sftp_info: SftpInfo,
+    sftp_info: SftpConfig,
 }
 
 impl SftpClient {
@@ -117,7 +117,7 @@ impl SftpClient {
         let private_key_password = get_env_fail_fast("SENTINEL_PRIVATE_KEY_PASSWORD").await;
 
         Self {
-            sftp_info: SftpInfo {
+            sftp_info: SftpConfig {
                 server,
                 user,
                 public_key_path,
