@@ -26,9 +26,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.27"
+version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "013a6e0a2cbe3d20f9c60b65458f7a7f7a5e636c5d0f45a5a6aee5d4b1f01785"
+checksum = "d9a60d744a80c30fcb657dfe2c1b22bcb3e814c1a1e3674f32bf5820b570fbff"
 
 [[package]]
 name = "ascii"
@@ -48,9 +48,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.24"
+version = "0.1.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "750b1c38a1dfadd108da0f01c08f4cdc7ff1bb39b325f9c82cc972361780a6e1"
+checksum = "da71fef07bc806586090247e971229289f64c210a278ee5ae419314eb386b31d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -419,6 +419,7 @@ dependencies = [
  "azure_sdk_storage_blob",
  "azure_sdk_storage_core",
  "base64 0.11.0",
+ "bytes",
  "chrono",
  "futures",
  "hyper",
@@ -1785,9 +1786,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da07b57ee2623368351e9a0488bb0b261322a15a6e0ae53e243cbdc0f4208da9"
+checksum = "a7894c8ed05b7a3a279aeb79025fdec1d3158080b75b98a08faf2806bb799edd"
 dependencies = [
  "itoa",
  "ryu",

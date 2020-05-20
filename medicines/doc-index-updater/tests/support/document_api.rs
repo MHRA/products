@@ -2,9 +2,10 @@ use super::get_ok;
 
 use doc_index_updater::{
     get_env,
-    models::{Document, DocumentType, FileSource, JobStatus, JobStatusResponse},
+    models::{Document, FileSource, JobStatus, JobStatusResponse},
 };
 use reqwest::Error;
+use search_client::models::DocumentType;
 use uuid::Uuid;
 
 pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> {

@@ -1,7 +1,7 @@
 use crate::{
     models::{DeleteMessage, JobStatus},
     service_bus_client::{
-        delete_factory, ProcessMessageError, ProcessRetrievalError, RemoveableMessage,
+        delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
@@ -14,7 +14,7 @@ use search_client::{
     CreateIndexEntry, DeleteIndexEntry, Search,
 };
 use std::time::Duration;
-use storage_client::DeleteBlob;
+use storage_client::{AzureBlobStorage, DeleteBlob};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
@@ -51,12 +51,12 @@ impl ProcessRetrievalError for RetrievedMessage<DeleteMessage> {
 }
 
 async fn handle_processing_error_for_delete_message<T>(
-    removeable_message: &mut T,
+    removable_message: &mut T,
     error: ProcessMessageError,
     state_manager: &impl JobStatusClient,
 ) -> anyhow::Result<()>
 where
-    T: RemoveableMessage<DeleteMessage>,
+    T: RemovableMessage<DeleteMessage>,
 {
     tracing::info!("Handling processing error. Setting error state in state manager");
 
@@ -71,27 +71,27 @@ where
 
             state_manager
                 .set_status(
-                    removeable_message.get_message().job_id,
+                    removable_message.get_message().job_id,
                     JobStatus::Error {
                         message: error_message,
                         code: "".to_string(),
                     },
                 )
                 .await?;
-            let _remove = removeable_message.remove().await?;
+            let _remove = removable_message.remove().await?;
         }
         ProcessMessageError::FailedRestoringIndex(_, _) => {
             tracing::error!("{}", error_message);
             state_manager
                 .set_status(
-                    removeable_message.get_message().job_id,
+                    removable_message.get_message().job_id,
                     JobStatus::Error {
                         message: error_message,
                         code: "".to_string(),
                     },
                 )
                 .await?;
-            let _remove = removeable_message.remove().await?;
+            let _remove = removable_message.remove().await?;
         }
         ProcessMessageError::FailedDeletingBlob(_, _) => {
             tracing::error!("{}", error_message);
@@ -106,8 +106,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     tracing::info!("Message received: {:?} ", message);
 
     let search_client = search_client::factory();
-    let storage_client = storage_client::factory()
-        .map_err(|e| anyhow!("Couldn't create storage client: {:?}", e))?;
+    let storage_client = AzureBlobStorage::permanent();
 
     process_delete_message(message, storage_client, search_client).await
 }
@@ -117,8 +116,6 @@ async fn process_delete_message(
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
-    let storage_container_name = std::env::var("STORAGE_CONTAINER").map_err(anyhow::Error::from)?;
-
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -135,10 +132,7 @@ async fn process_delete_message(
         .await?;
     tracing::debug!("Deleted blob {} from index", &blob_name);
 
-    if let Err(e) = storage_client
-        .delete_blob(&storage_container_name, &blob_name)
-        .await
-    {
+    if let Err(e) = storage_client.delete_blob(&blob_name).await {
         tracing::debug!(
             "Error deleting blob: {:?}, re-creating index: {:?}",
             e,
@@ -153,15 +147,11 @@ async fn process_delete_message(
             })?;
         return Err(ProcessMessageError::FailedDeletingBlob(
             blob_name.clone(),
-            e.to_string(),
+            format!("{:?}", e),
         ));
     }
 
-    tracing::info!(
-        "Successfully deleted blob {} from storage container {}",
-        &blob_name,
-        &storage_container_name
-    );
+    tracing::info!("Successfully deleted blob {}", &blob_name);
 
     Ok(message.job_id)
 }
@@ -185,35 +175,38 @@ pub async fn get_index_record_from_content_id(
 #[cfg(test)]
 mod test {
     use super::*;
-    use azure_sdk_core::errors::AzureError;
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage, service_bus_client::test::TestRemoveableMessage,
+        models::DeleteMessage, service_bus_client::test::TestRemovableMessage,
         state_manager::test::TestJobStatusClient,
     };
     use search_client::{
-        models::{AzureIndexChangedResult, AzureIndexChangedResults, IndexResult, IndexResults},
+        models::{
+            AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, IndexResult,
+            IndexResults,
+        },
         Search,
     };
     use std::env;
+    use storage_client::test::TestAzureStorageClient;
     use tokio_test::block_on;
 
     #[test]
     fn not_found_error_during_delete_removes_message_since_no_need_to_retry() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         assert_eq!(
-            removeable_message.remove_was_called, true,
+            removable_message.remove_was_called, true,
             "Didn't remove message, but should"
         );
     }
@@ -221,18 +214,18 @@ mod test {
     #[test]
     fn not_found_error_during_delete_sets_job_status_as_error() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let error = given_document_not_found_in_index();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         let result =
-            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+            block_on(state_manager.get_status(removable_message.get_message().job_id)).unwrap();
         assert_eq!(
             result.status,
             JobStatus::Error {
@@ -245,18 +238,18 @@ mod test {
     #[test]
     fn recoverable_error_during_delete_does_not_remove_message_from_servicebus() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let error = given_an_unknown_error();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         assert_eq!(
-            removeable_message.remove_was_called, false,
+            removable_message.remove_was_called, false,
             "Removed message, but shouldn't"
         );
     }
@@ -264,56 +257,56 @@ mod test {
     #[test]
     fn recoverable_error_during_delete_leaves_job_status_as_accepted() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
-        given_the_delete_job_is_accepted(removeable_message.get_message().job_id, &state_manager);
+        let mut removable_message = given_we_have_a_delete_message();
+        given_the_delete_job_is_accepted(removable_message.get_message().job_id, &state_manager);
         let error = given_an_unknown_error();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         let result =
-            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+            block_on(state_manager.get_status(removable_message.get_message().job_id)).unwrap();
         assert_eq!(result.status, JobStatus::Accepted);
     }
 
     #[test]
     fn failure_to_delete_blob_leaves_job_status_as_accepted() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
-        given_the_delete_job_is_accepted(removeable_message.get_message().job_id, &state_manager);
+        let mut removable_message = given_we_have_a_delete_message();
+        given_the_delete_job_is_accepted(removable_message.get_message().job_id, &state_manager);
         let error = given_a_delete_blob_error();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         let result =
-            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+            block_on(state_manager.get_status(removable_message.get_message().job_id)).unwrap();
         assert_eq!(result.status, JobStatus::Accepted);
     }
 
     #[test]
     fn failure_to_delete_blob_does_not_remove_message_from_service_bus() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let error = given_a_delete_blob_error();
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         assert_eq!(
-            removeable_message.remove_was_called, false,
+            removable_message.remove_was_called, false,
             "Removed message, but shouldn't"
         );
     }
@@ -321,19 +314,19 @@ mod test {
     #[test]
     fn failure_to_restore_index_removes_message_since_cannot_be_retried() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let blob_id = "Blob Id".to_string();
         let error = given_failure_to_restore_index(blob_id);
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         assert_eq!(
-            removeable_message.remove_was_called, true,
+            removable_message.remove_was_called, true,
             "Didn't remove message, but should"
         );
     }
@@ -341,19 +334,19 @@ mod test {
     #[test]
     fn failure_to_restore_index_leaves_job_status_as_error() {
         let state_manager = given_a_state_manager();
-        let mut removeable_message = given_we_have_a_delete_message();
+        let mut removable_message = given_we_have_a_delete_message();
         let blob_id = "Blob Id".to_string();
         let error = given_failure_to_restore_index(blob_id);
 
         block_on(handle_processing_error_for_delete_message(
-            &mut removeable_message,
+            &mut removable_message,
             error,
             &state_manager,
         ))
         .unwrap();
 
         let result =
-            block_on(state_manager.get_status(removeable_message.get_message().job_id)).unwrap();
+            block_on(state_manager.get_status(removable_message.get_message().job_id)).unwrap();
 
         let expected = JobStatus::Error {
             message: String::from("Cannot restore index for blob with ID Blob Id: Error message"),
@@ -365,13 +358,13 @@ mod test {
 
     #[test]
     fn index_with_doc_returns_success() {
-        let removeable_message = given_we_have_a_delete_message().message;
+        let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client();
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
-            removeable_message,
+            removable_message,
             storage_client,
             search_client,
         ));
@@ -381,13 +374,13 @@ mod test {
 
     #[test]
     fn failure_to_delete_blob_returns_expected_error() {
-        let removeable_message = given_we_have_a_delete_message().message;
+        let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
-            removeable_message,
+            removable_message,
             storage_client,
             search_client,
         ));
@@ -399,7 +392,7 @@ mod test {
                     e.to_string(),
                     ProcessMessageError::FailedDeletingBlob(
                         "storage_name".to_string(),
-                        "Generic error: blob could not be deleted".to_string()
+                        "ClientError { message: \"blob could not be deleted\" }".to_string()
                     )
                     .to_string()
                 );
@@ -409,13 +402,13 @@ mod test {
 
     #[test]
     fn failure_to_restore_index_returns_expected_error() {
-        let removeable_message = given_we_have_a_delete_message().message;
+        let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_restore_index();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
-            removeable_message,
+            removable_message,
             storage_client,
             search_client,
         ));
@@ -437,13 +430,13 @@ mod test {
 
     #[test]
     fn failure_to_delete_index_returns_expected_error() {
-        let removeable_message = given_we_have_a_delete_message().message;
+        let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_delete_index();
         let storage_client = given_a_storage_client();
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
-            removeable_message,
+            removable_message,
             storage_client,
             search_client,
         ));
@@ -481,7 +474,7 @@ mod test {
 
     fn given_an_index_search_result() -> IndexResult {
         IndexResult {
-            doc_type: "Spc".to_string(),
+            doc_type: DocumentType::Spc,
             file_name: "our_id".to_string(),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),
@@ -504,13 +497,13 @@ mod test {
         TestJobStatusClient::accepted()
     }
 
-    fn given_we_have_a_delete_message() -> TestRemoveableMessage<DeleteMessage> {
+    fn given_we_have_a_delete_message() -> TestRemovableMessage<DeleteMessage> {
         let delete_message = DeleteMessage {
             document_content_id: "our_id".to_owned(),
             job_id: Uuid::new_v4(),
         };
 
-        TestRemoveableMessage::<DeleteMessage> {
+        TestRemovableMessage::<DeleteMessage> {
             remove_was_called: false,
             message: delete_message,
         }
@@ -695,27 +688,6 @@ mod test {
             };
 
             Ok(AzureIndexChangedResults::new(index_changed_result))
-        }
-    }
-
-    struct TestAzureStorageClient {
-        pub can_delete_blob: bool,
-    }
-
-    #[async_trait]
-    impl DeleteBlob for TestAzureStorageClient {
-        async fn delete_blob(
-            &mut self,
-            _container_name: &str,
-            _blob_name: &str,
-        ) -> Result<(), AzureError> {
-            if self.can_delete_blob {
-                Ok(())
-            } else {
-                Err(AzureError::GenericErrorWithText(
-                    "blob could not be deleted".to_string(),
-                ))
-            }
         }
     }
 }

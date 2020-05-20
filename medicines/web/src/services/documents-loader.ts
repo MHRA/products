@@ -30,7 +30,7 @@ const query = `
 query ($productName: String!, $first: Int, $skip: Int, $docTypes: [DocumentType!]) {
   product(name: $productName) {
     name
-    documents(first: $first, skip: $skip, documentTypes: $docTypes) {
+    documents(first: $first, offset: $skip, documentTypes: $docTypes) {
       count: totalCount
       edges {
         node {

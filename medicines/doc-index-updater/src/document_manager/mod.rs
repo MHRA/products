@@ -33,7 +33,7 @@ pub struct FailedToAddToQueue;
 
 impl warp::reject::Reject for FailedToAddToQueue {}
 
-async fn accept_job(
+pub async fn accept_job(
     state_manager: &impl JobStatusClient,
 ) -> Result<JobStatusResponse, MyRedisError> {
     let id = Uuid::new_v4();
@@ -121,9 +121,9 @@ async fn delete_document_json_handler(
     Ok(warp::reply::json(&r))
 }
 
-async fn check_in_document_handler(
+pub async fn check_in_document_handler(
     doc: Document,
-    state_manager: StateManager,
+    state_manager: impl JobStatusClient,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = create_factory().await {
         let id = accept_job(&state_manager).await?.id;

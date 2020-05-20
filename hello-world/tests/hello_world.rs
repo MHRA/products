@@ -1,24 +1,21 @@
-use async_std::prelude::*;
-use async_std::task;
+use futures::prelude::*;
+use smol::{Task, Timer};
 use std::time::Duration;
 
 #[test]
-fn hello_world() -> anyhow::Result<()> {
-    task::block_on(async {
-        let server =
-            task::spawn(async { hello_world::create_app().listen("localhost:8080").await });
+fn hello_world() -> std::io::Result<()> {
+    let server = hello_world::create_app()
+        .listen("localhost:8080")
+        .map(|_| ());
 
-        let client = task::spawn(async {
-            task::sleep(Duration::from_millis(100)).await;
-            let string: String = surf::get("http://localhost:8080/hello/Me")
-                .recv_string()
-                .await
-                .unwrap();
-            assert_eq!(string, "Hello, Me\n".to_string());
-            Ok(())
-        });
+    let client = surf::get("http://localhost:8080/hello/Me")
+        .recv_string()
+        .map(|x| assert_eq!(x.unwrap(), "Hello, Me\n".to_string()));
 
-        server.race(client).await
-    })?;
-    Ok(())
+    smol::run(async {
+        Task::spawn(server).detach();
+        Timer::after(Duration::from_millis(100)).await;
+        Task::spawn(client).await;
+        Ok(())
+    })
 }

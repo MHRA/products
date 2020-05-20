@@ -2,6 +2,32 @@
 
 ![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
 
+- [Implementation details](#implementation-details) explain how the _doc-index-updater_ works
+- [Development how-to](#development-how-to) explains how to work on improving, fixing or extending the _doc-index-updater_
+
+## Implementation details
+
+For SPCs and PILs, a server called Sentinel sends either a _Delete_ or a _Create_ message. The latter includes details of how to retrieve the file to be created from Sentinel via SFTP.
+
+### For uploading new PARs
+
+_(Work in progress.)_
+
+1. a medical writer accesses the [PARs upload form](../pars-upload) and enters metadata and supplies a PDF file
+2. the upload form submits the metadata and the file to the _doc-index-updater_
+3. the _doc-index-updater_ responds to the upload form with a job id for tracking the job status
+4. the _doc-index-updater_ uploads the PDF file to a blob storage container in Azure for temporary storage with a prefix of `temp/`
+5. the _doc-index-updater_ pushes the blob information along with the submitted metadata to the Azure Service Bus "create" queue to be picked up by the _doc-index-updater_'s _create_manager_ service worker
+6. the _create_manager_ service worker retrieves the message from the Azure Service Bus queue, and uses the metadata and temporary blob storage details to add the new PAR PDF to the search service index and permanent blob storage
+
+The new PAR PDF will then be available from the products.mhra.gov.uk website.
+
+The `temp/` blob will be removed from the blob storage according the the storage [lifecycle management policy](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-lifecycle-management-concepts?tabs=azure-portal)
+
+## Development how-to
+
+The following guides explain how to get started developing the _doc-index-updater_.
+
 ## To build a docker image:
 
 ```sh
@@ -46,7 +72,7 @@ Then run `make set-sftp-keys` to pull the public/private keys for development an
 
 Add `SENTINEL_SFTP_USERNAME=username` (where username is whatever you set in the step above, e.g. `SENTINEL_SFTP_USERNAME=localsftpuser`) to `.env.overrides`.
 
-Navigate to `~/.ssh` dir and install the public key on your locahost server by running:
+Navigate to `~/.ssh` dir and install the public key on your localhost server by running:
 `ssh-copy-id -f -i ./doc_index_updater <YOUR_SFTP_USERNAME>@localhost`
 This will add the public key to your localhost `~/.ssh/authorized_keys` file.
 
@@ -63,6 +89,8 @@ If you are using the shared environments, grab the shared envs…
 Environment variables are shared via Azure key vault.
 
 To get them, run `make get-env`.
+Note that you'll have to have followed the instructions on [connecting to an existing kubernetes cluster](../../infrastructure/docs/kubernetes.md#connecting-to-a-kubernetes-cluster) before this will work,
+as it has the instructions on installing the Azure CLI and authenticating to Azure.
 
 ### via Azure portal
 

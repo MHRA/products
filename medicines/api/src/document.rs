@@ -1,6 +1,9 @@
 use crate::{pagination, pagination::PageInfo};
 use juniper::GraphQLObject;
-use search_client::{models::IndexResult, Search};
+use search_client::{
+    models::{DocumentType, IndexResult},
+    Search,
+};
 
 #[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 #[graphql(description = "A document")]
@@ -10,15 +13,26 @@ pub struct Document {
     title: Option<String>,
     highlights: Option<Vec<String>>,
     created: Option<String>,
-    doc_type: Option<String>, // TODO: use DocumentType enum below
+    doc_type: Option<DocumentType>,
     file_size_in_bytes: Option<i32>,
     name: Option<String>,
     url: Option<String>,
 }
 
 impl Document {
-    pub fn is_doc_type(&self, doc_type: &DocumentType) -> bool {
-        self.doc_type == Some(doc_type.to_search_str().to_owned())
+    pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
+        self.doc_type == Some(doc_type)
+    }
+
+    pub fn product_name(&self) -> Option<&str> {
+        self.product_name.as_deref()
+    }
+
+    pub fn substances(&self) -> impl Iterator<Item = &str> {
+        self.active_substances
+            .iter()
+            .flat_map(|s| s.iter())
+            .map(|s| s.as_str())
     }
 }
 
@@ -60,33 +74,6 @@ fn get_documents_from_edges(edges: Vec<DocumentEdge>, offset: i32, total_count: 
         edges,
         total_count,
         page_info: PageInfo::build(offset, result_count, total_count),
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, juniper::GraphQLEnum)]
-pub enum DocumentType {
-    Spc,
-    Pil,
-    Par,
-}
-
-impl DocumentType {
-    fn to_search_str(&self) -> &str {
-        match self {
-            DocumentType::Spc => "Spc",
-            DocumentType::Pil => "Pil",
-            DocumentType::Par => "Par",
-        }
-    }
-}
-
-impl std::fmt::Display for DocumentType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DocumentType::Spc => write!(f, "SPC"),
-            DocumentType::Pil => write!(f, "PIL"),
-            DocumentType::Par => write!(f, "PAR"),
-        }
     }
 }
 
@@ -135,8 +122,8 @@ pub async fn get_documents(
 
     let docs = azure_result
         .search_results
-        .iter()
-        .map(|search_result| Document::from(search_result.clone()))
+        .into_iter()
+        .map(|search_result| Document::from(search_result))
         .collect();
 
     let total_count = azure_result.count.unwrap_or(0);
@@ -173,7 +160,7 @@ fn build_document_types_filter(document_types: Vec<DocumentType>) -> Option<Stri
         "({})",
         document_types
             .into_iter()
-            .map(|document_type| format!("doc_type eq '{}'", document_type.to_search_str()))
+            .map(|document_type| format!("doc_type eq '{}'", document_type))
             .collect::<Vec<_>>()
             .join(" or ")
     ))
@@ -246,7 +233,7 @@ mod test {
     fn given_a_search_result(product_name: &str) -> IndexResult {
         IndexResult {
             product_name: Some(product_name.to_string()),
-            doc_type: "Spc".to_string(),
+            doc_type: DocumentType::Spc,
             file_name: "our_id".to_string(),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),

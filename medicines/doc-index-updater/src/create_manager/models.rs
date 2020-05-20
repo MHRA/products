@@ -1,26 +1,45 @@
 use super::sanitiser::{SanitisedString, VecSanitisedString};
-use crate::{
-    create_manager::Blob,
-    models::{Document, DocumentType},
-};
+use crate::{create_manager::Blob, models::Document};
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
-use search_client::models::IndexEntry;
+use search_client::models::{DocumentType, IndexEntry};
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct BlobMetadata {
-    file_name: SanitisedString,
-    doc_type: DocumentType,
-    title: SanitisedString,
-    pl_number: String,
-    product_names: VecSanitisedString,
-    active_substances: VecSanitisedString,
-    author: SanitisedString,
-    keywords: Option<VecSanitisedString>,
+    pub file_name: SanitisedString,
+    pub doc_type: DocumentType,
+    pub title: SanitisedString,
+    pub pl_number: String,
+    pub product_names: VecSanitisedString,
+    pub active_substances: VecSanitisedString,
+    pub author: SanitisedString,
+    pub keywords: Option<VecSanitisedString>,
 }
 
 impl BlobMetadata {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        file_name: String,
+        doc_type: DocumentType,
+        title: String,
+        pl_number: String,
+        product_names: Vec<String>,
+        active_substances: Vec<String>,
+        author: String,
+        keywords: Option<Vec<String>>,
+    ) -> Self {
+        BlobMetadata {
+            file_name: file_name.into(),
+            doc_type,
+            title: title.into(),
+            pl_number,
+            product_names: product_names.into(),
+            active_substances: active_substances.into(),
+            author: author.into(),
+            keywords: keywords.map(|keywords| keywords.into()),
+        }
+    }
     fn facets(&self) -> Vec<String> {
         create_facets_by_active_substance(
             self.product_names.clone(),
@@ -100,7 +119,7 @@ impl From<Blob> for IndexEntry {
             title: blob.metadata.title.to_string(),
             pl_number: vec![blob.metadata.pl_number.to_string()],
             file_name: blob.metadata.file_name.to_string(),
-            doc_type: blob.metadata.doc_type.to_string(),
+            doc_type: blob.metadata.doc_type,
             suggestions: vec![],
             substance_name: blob.metadata.active_substances.to_vec_string(),
             facets: blob.metadata.facets(),
@@ -173,7 +192,8 @@ pub fn extract_product_licences(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::{DocumentType, FileSource};
+    use crate::models::FileSource;
+    use search_client::models::DocumentType;
 
     #[test]
     fn derive_metadata() {
@@ -229,13 +249,13 @@ mod test {
             "LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS".to_owned(),
         ];
         let expected = vec![
-            "H", 
-            "H, HYDROCHLOROTHIAZIDE", 
+            "H",
+            "H, HYDROCHLOROTHIAZIDE",
             "H, HYDROCHLOROTHIAZIDE, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
             "L",
-            "L, L-TEST", 
+            "L, L-TEST",
             "L, L-TEST, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
-            "L, LOSARTAN POTASSIUM", 
+            "L, LOSARTAN POTASSIUM",
             "L, LOSARTAN POTASSIUM, LOSARTAN POTASSIUM / HYDROCHLOROTHIAZIDE 100 MG /25 MG FILM-COATED TABLETS",
         ];
         assert_eq!(

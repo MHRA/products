@@ -1,5 +1,5 @@
 
-FROM rust:1.40 AS build
+FROM rust:1.43.1 AS build
 
 WORKDIR /usr/src/api
 
@@ -43,9 +43,9 @@ FROM debian:buster-slim AS release
 
 RUN apt-get update && apt-get install -y \
   tini \
+  ca-certificates \
   libssl-dev \
   openssl \
-  curl \
   ;
 
 RUN useradd svc

@@ -30,12 +30,6 @@ jobs:
         working-directory: learning/web
         run: yarn test:ci
 
-      - name: Build
-        working-directory: learning/web
-        run: yarn build
-        env:
-          PATH_PREFIX: "/"
-
       - name: Run cypress end-to-end tests
         working-directory: learning/web
         run: mkdir -p cypress/screenshots && yarn test-e2e
@@ -60,6 +54,12 @@ jobs:
         env:
           ROOT_URL_DOMAIN: localhost
 
+      - name: Build
+        working-directory: learning/web
+        run: yarn build
+        env:
+          PATH_PREFIX: "/"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -74,7 +74,8 @@ jobs:
           prerelease: false
 
       - name: Deploy learning web to static site in azure storage
-        uses: lauchacarro/Azure-Storage-Action@master
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
         with:
           enabled-static-website: true
           folder: learning/web/public

@@ -18,3 +18,33 @@ Rust is used because it helps us write safe, reliable and fast services. It also
 1. Build a Docker image `make docker-build`
 1. Run docker image `make docker-run`
 1. Fork the repo, and submit a PR if you want to
+
+## Benchmarks
+
+1. Development build
+
+   ```
+   wrk -t4 -c100 -d30s http://127.0.0.1:3030/hello/me
+   Running 30s test @ http://127.0.0.1:3030/hello/me
+     4 threads and 100 connections
+     Thread Stats   Avg      Stdev     Max   +/- Stdev
+       Latency     2.77ms    2.21ms  25.48ms   81.43%
+       Req/Sec    10.12k   737.16    12.10k    68.94%
+     1212637 requests in 30.10s, 129.52MB read
+   Requests/sec:  40285.45
+   Transfer/sec:      4.30MB
+   ```
+
+2. Release build
+
+   ```
+   wrk -t4 -c100 -d30s http://127.0.0.1:3030/hello/me
+   Running 30s test @ http://127.0.0.1:3030/hello/me
+     4 threads and 100 connections
+     Thread Stats   Avg      Stdev     Max   +/- Stdev
+       Latency     0.88ms   79.78us   3.27ms   70.54%
+       Req/Sec    28.22k     1.66k   33.58k    67.61%
+     3381514 requests in 30.10s, 361.18MB read
+   Requests/sec: 112340.84
+   Transfer/sec:     12.00MB
+   ```

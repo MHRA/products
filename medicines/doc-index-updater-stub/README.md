@@ -23,7 +23,7 @@ DOCKER_BUILDKIT=1 docker build -t stub-document-manager-api
 docker run -p 8080:8080 -it --rm stub-document-manager-api
 ```
 
-The webserver listens on http://0.0.0.0:8080 by default.
+The web server listens on http://0.0.0.0:8080 by default.
 
 ## Deploying to Kubernetes
 

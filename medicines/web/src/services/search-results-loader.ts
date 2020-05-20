@@ -84,7 +84,7 @@ const getDocumentsForProduct = async ({
     searchTerm,
     first: pageSize,
     after: makeCursor(page, pageSize),
-    documentTypes: docTypes,
+    documentTypes: docTypes.map(s => s.toUpperCase()),
   };
   const { data } = await graphqlRequest<ISearchPageResponse, typeof variables>({
     query,

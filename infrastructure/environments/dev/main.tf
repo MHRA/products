@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version = "=2.2.0"
+  version = "=2.8.0"
   features {}
 }
 
@@ -18,6 +18,7 @@ terraform {
 
 locals {
   namespace        = "mhraproductsdevelopment"
+  pars_namespace   = "mhraparsdevelopment"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
@@ -35,6 +36,9 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
   route_table_id = azurerm_route_table.load_balancer.id
 }
 
+data "azurerm_resource_group" "keyvault" {
+  name = var.KEYVAULT_RESOURCE_GROUP
+}
 
 # website
 module "products" {
@@ -43,7 +47,9 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
+  pars_namespace      = local.pars_namespace
   resource_group_name = azurerm_resource_group.products.name
+  pars_reply_urls     = var.PARS_REPLY_URLS
 }
 
 # website
@@ -75,7 +81,7 @@ resource "azurerm_virtual_network" "cluster" {
 
 resource "azurerm_subnet" "load_balancer" {
   name                 = "adarz-spoke-products-dev-sn-01"
-  address_prefix       = "10.5.65.128/26"
+  address_prefixes     = ["10.5.65.128/26"]
   resource_group_name  = azurerm_virtual_network.cluster.resource_group_name
   virtual_network_name = azurerm_virtual_network.cluster.name
 }
@@ -108,4 +114,17 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
+}
+
+# Key vault
+module keyvault {
+  source = "../../modules/keyvault"
+
+  environment                 = var.ENVIRONMENT
+  location                    = var.REGION
+  name                        = var.KEYVAULT_NAME
+  resource_group_name         = data.azurerm_resource_group.keyvault.name
+  access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
+  authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  network_acls_default_action = "Allow"
 }

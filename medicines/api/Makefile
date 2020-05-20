@@ -9,7 +9,7 @@ default: ## Run locally
 
 .PHONY: test
 test: ## Run tests [TEST=test_name (optional)]
-	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST
+	export $$(cat .env .env.overrides 2> /dev/null | xargs) && cargo test $$TEST && cargo clippy
 
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file
@@ -63,6 +63,10 @@ docker-pull: ## Pull Docker image
 docker-push: ## Push Docker image
 	docker push $(image)
 	docker push $(image):$(tag)
+
+.PHONY: docker-retag
+docker-retag: ## Update tag of Docker image
+	docker tag ${image}:${tag} ${new_image}:${tag}
 
 .PHONY: help
 help: ## Display this help screen

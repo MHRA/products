@@ -1,0 +1,99 @@
+name: pars-upload-branch
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!master"
+    paths:
+      - medicines/pars-upload/**
+      - .github/workflows/pars-upload-branch.yaml
+
+jobs:
+  build:
+    name: Build, test and check pars-upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "13.11"
+
+      # Based on https://github.com/actions/cache/blob/master/examples.md#node---yarn
+      - name: Get yarn cache path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v1
+        name: Cache yarn dependencies
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('medicines/pars-upload/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      # See: https://github.com/zeit/next.js/blob/master/errors/no-cache.md
+      - uses: actions/cache@v1
+        name: Cache Next.js cache folder
+        with:
+          path: medicines/pars-upload/.next/cache
+          key: ${{ runner.os }}-next-js-${{ hashFiles('medicines/pars-upload/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-next-js-
+
+      - name: Install modules
+        working-directory: medicines/pars-upload
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests with coverage
+        working-directory: medicines/pars-upload
+        run: yarn test:ci
+
+      - name: Build
+        working-directory: medicines/pars-upload
+        run: yarn build
+
+      - name: Run cypress end-to-end tests
+        working-directory: medicines/pars-upload
+        run: mkdir -p cypress/screenshots && NEXT_PUBLIC_DISABLE_AUTH=true yarn test-e2e
+
+      - name: Upload cypress screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-cypress-screenshots
+          path: medicines/pars-upload/cypress/screenshots
+
+      - name: Upload cypress videos
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: medicines-cypress-videos
+          path: medicines/pars-upload/cypress/videos
+
+      - name: Accessibility check
+        working-directory: medicines/pars-upload
+        run: yarn a11y
+
+      - name: Create .env file
+        working-directory: medicaines/pars-upload
+        run: |
+          echo NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61 >> .env
+          echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
+          echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net >> .env
+          echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
+
+      - name: Build static site
+        working-directory: medicines/pars-upload
+        run: yarn export
+
+      - name: Deploy pars upload website to static site in azure storage (dev)
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
+        with:
+          enabled-static-website: true
+          folder: medicines/pars-upload/out
+          connection-string: ${{ secrets.AZURE_STORAGE_PARS_WEB_CONNECTION_STRING_DEV }}
