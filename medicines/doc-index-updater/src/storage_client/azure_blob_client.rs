@@ -52,20 +52,10 @@ impl AzureBlobStorage {
     }
 
     pub fn get_azure_client(&self) -> Result<Client, StorageClientError> {
-        match base64::decode(&self.master_key) {
-            Ok(_) => Ok(
-                Client::new(&self.storage_account, &self.master_key).map_err(|e| {
-                    StorageClientError::ClientError(format!(
-                        "Couldn't create storage client: {:?}",
-                        e
-                    ))
-                })?,
-            ),
-            Err(e) => Err(StorageClientError::ClientError(format!(
-                "Couldn't decode master key to create storage client: {:?}",
-                e
-            ))),
-        }
+        let client = base64::decode(&self.master_key)
+            .map(|_| Client::new(&self.storage_account, &self.master_key))?;
+
+        Ok(client?)
     }
 }
 

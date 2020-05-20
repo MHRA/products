@@ -1,4 +1,5 @@
 use azure_sdk_core::errors::AzureError;
+use base64::DecodeError;
 use thiserror::Error;
 
 pub struct StorageFile {
@@ -17,6 +18,8 @@ pub enum StorageClientError {
     #[error("Could not create client: {0}")]
     ClientError(String),
 
+    #[error(transparent)]
+    DecodeError(#[from] DecodeError),
     #[error(transparent)]
     OtherAzureError(#[from] AzureError),
     #[error(transparent)]
