@@ -237,7 +237,7 @@ fn product_form_data_to_blob_metadata(
 }
 
 fn get_field_as_string(
-    fields: &Vec<Field>,
+    fields: &[Field],
     field_name: &'static str,
 ) -> Result<String, SubmissionError> {
     fields
