@@ -56,9 +56,3 @@ variable "KEYVAULT_RESOURCE_GROUP" {
   description = "Name of resource group where keyvault is deployed"
   default     = "adazr-rg-1001"
 }
-
-variable "PARS_REPLY_URLS" {
-  type        = list(string)
-  default     = ["http://localhost:3000", "https://mhraparsdev.azureedge.net"]
-  description = "The reply urls configured in the azure app registration."
-}

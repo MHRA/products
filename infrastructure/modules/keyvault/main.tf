@@ -2,7 +2,7 @@ data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "secrets_vault" {
   name                = var.name
-  location            = var.location
+  location            = "uksouth"
   resource_group_name = var.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled = true

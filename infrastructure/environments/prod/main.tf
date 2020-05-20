@@ -45,7 +45,6 @@ module "products" {
   pars_namespace      = local.pars_namespace
   resource_group_name = data.azurerm_resource_group.products.name
   search_sku          = "standard"
-  pars_reply_urls     = var.PARS_REPLY_URLS
 }
 
 data "azurerm_route_table" "load_balancer" {

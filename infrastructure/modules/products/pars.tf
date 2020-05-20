@@ -18,7 +18,7 @@ resource "azurerm_storage_account" "pars" {
 
 resource "azurerm_cdn_profile" "pars" {
   name                = "mhrapars${var.environment}"
-  location            = var.location
+  location            = "westeurope"
   resource_group_name = var.resource_group_name
   sku                 = "Standard_Microsoft"
 }
