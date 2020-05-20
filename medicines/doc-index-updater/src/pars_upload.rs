@@ -236,7 +236,6 @@ impl UploadFieldValue {
 
 fn decode_token_from_authorization_header(authorization_header: String) -> JsonWebToken {
     let token = authorization_header.split(' ').collect::<Vec<&str>>()[1];
-
     let token_message = dangerous_unsafe_decode::<Claims>(&token);
     tracing::debug!("{:?}", token_message);
 
