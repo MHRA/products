@@ -7,6 +7,7 @@ pub trait StorageClient {
     async fn add_file(
         &self,
         file_data: &[u8],
+        license_number: &str,
         metadata_ref: HashMap<&str, &str>,
     ) -> Result<StorageFile, StorageClientError>;
     async fn get_file(

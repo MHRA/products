@@ -39,10 +39,11 @@ pub fn handler(
 async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
     file_data: &[u8],
+    license_number: &str,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
-        .add_file(file_data, HashMap::new())
+        .add_file(file_data, license_number, HashMap::new())
         .await
         .map_err(|e| SubmissionError::UploadError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
@@ -69,49 +70,53 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
 }
 
 async fn queue_pars_upload(
-    job_id: Uuid,
     form_data: FormData,
     state_manager: impl JobStatusClient,
-) -> Result<(), Rejection> {
+) -> Result<Vec<Uuid>, Rejection> {
     let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
         tracing::debug!("Error reading PARS upload: {:?}", e);
         warp::reject::custom(e)
     })?;
 
+    let mut job_ids = Vec::with_capacity(metadatas.len());
+
     for metadata in metadatas {
-        let storage_file = add_file_to_temporary_blob_storage(job_id, &file_data)
-            .await
-            .map_err(warp::reject::custom)?;
+        let job_id = accept_job(&state_manager).await?.id;
+
+        job_ids.push(job_id);
+
+        let storage_file =
+            add_file_to_temporary_blob_storage(job_id, &file_data, &metadata.pl_number)
+                .await
+                .map_err(warp::reject::custom)?;
 
         let document = document_from_form_data(storage_file, metadata);
 
         check_in_document_handler(document, &state_manager).await?;
     }
 
-    Ok(())
+    Ok(job_ids)
 }
 
 async fn upload_pars_handler(
     form_data: FormData,
     state_manager: StateManager,
 ) -> Result<impl Reply, Rejection> {
-    tracing::debug!("Received PARS submission");
+    let request_id = Uuid::new_v4();
 
-    let job_id = accept_job(&state_manager).await?.id;
-
-    let span = tracing::info_span!("Queueing PARS upload", job_id = job_id.to_string().as_str());
+    let span = tracing::info_span!("PARS upload", request_id = request_id.to_string().as_str());
     let _enter = span.enter();
 
-    queue_pars_upload(job_id, form_data, state_manager).await?;
+    tracing::debug!("Received PARS submission");
 
-    Ok(warp::reply::json(&UploadResponse {
-        job_id: &job_id.to_string(),
-    }))
+    let job_ids = queue_pars_upload(form_data, state_manager).await?;
+
+    Ok(warp::reply::json(&UploadResponse { job_ids }))
 }
 
 #[derive(Debug, Serialize)]
-struct UploadResponse<'a> {
-    job_id: &'a str,
+struct UploadResponse {
+    job_ids: Vec<Uuid>,
 }
 
 async fn read_pars_upload(
@@ -132,12 +137,13 @@ async fn read_pars_upload(
 
     let GroupedFields {
         products,
+        file_name,
         file_data,
     } = groups_fields_by_product(fields)?;
 
     let metadatas = products
         .into_iter()
-        .map(product_form_data_to_blob_metadata)
+        .map(|fields| product_form_data_to_blob_metadata(file_name.clone(), fields))
         .collect::<Result<_, _>>()?;
 
     Ok((metadatas, file_data))
@@ -152,6 +158,7 @@ struct Field {
 #[derive(Debug)]
 struct GroupedFields {
     products: Vec<Vec<Field>>,
+    file_name: String,
     file_data: Vec<u8>,
 }
 
@@ -180,34 +187,33 @@ fn groups_fields_by_product(fields: Vec<Field>) -> Result<GroupedFields, Submiss
         }
     }
 
+    let file_name = file_field
+        .as_ref()
+        .and_then(|field| field.file_name())
+        .ok_or(SubmissionError::MissingField { name: "file" })?
+        .to_string();
+
     let file_data = file_field
         .and_then(|field| field.into_file_data())
         .ok_or(SubmissionError::MissingField { name: "file" })?;
 
     Ok(GroupedFields {
         products,
+        file_name,
         file_data,
     })
 }
 
-fn product_form_data_to_blob_metadata(fields: Vec<Field>) -> Result<BlobMetadata, SubmissionError> {
-    let file_name = fields
-        .iter()
-        .find(|field| field.name == "file")
-        .and_then(|field| field.value.file_name())
-        .ok_or(SubmissionError::MissingField { name: "file" })?
-        .into();
-
-    let product_name = fields
-        .iter()
-        .find(|field| field.name == "product_name")
-        .and_then(|field| field.value.value())
-        .ok_or(SubmissionError::MissingField {
-            name: "product_name",
-        })?
-        .into();
+fn product_form_data_to_blob_metadata(
+    file_name: String,
+    fields: Vec<Field>,
+) -> Result<BlobMetadata, SubmissionError> {
+    let product_name = get_field_as_string(&fields, "product_name")?;
 
     let product_names = vec![product_name];
+
+    let title = get_field_as_string(&fields, "title")?;
+    let pl_number = get_field_as_string(&fields, "license_number")?;
 
     let active_substances = fields
         .iter()
@@ -215,22 +221,6 @@ fn product_form_data_to_blob_metadata(fields: Vec<Field>) -> Result<BlobMetadata
         .filter_map(|field| field.value.value())
         .map(|s| s.to_string())
         .collect::<Vec<String>>();
-
-    let title = fields
-        .iter()
-        .find(|field| field.name == "title")
-        .and_then(|field| field.value.value())
-        .ok_or(SubmissionError::MissingField { name: "title" })?
-        .into();
-
-    let pl_number = fields
-        .iter()
-        .find(|field| field.name == "license_number")
-        .and_then(|field| field.value.value())
-        .ok_or(SubmissionError::MissingField {
-            name: "license_number",
-        })?
-        .into();
 
     let author = "".to_string();
 
@@ -244,6 +234,18 @@ fn product_form_data_to_blob_metadata(fields: Vec<Field>) -> Result<BlobMetadata
         author,
         None,
     ))
+}
+
+fn get_field_as_string(
+    fields: &Vec<Field>,
+    field_name: &'static str,
+) -> Result<String, SubmissionError> {
+    fields
+        .iter()
+        .find(|field| field.name == field_name)
+        .and_then(|field| field.value.value())
+        .ok_or(SubmissionError::MissingField { name: field_name })
+        .map(|s| s.to_string())
 }
 
 async fn read_upload_part(part: Part) -> Result<Field, SubmissionError> {
