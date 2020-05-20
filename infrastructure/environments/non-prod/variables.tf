@@ -24,6 +24,7 @@ variable "ENVIRONMENT" {
 variable "CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS" {
   type        = list(string)
   description = "CIDR block destination for default route"
+  default     = []
 }
 
 variable "CLUSTER_ROUTE_NEXT_HOP" {
@@ -33,4 +34,33 @@ variable "CLUSTER_ROUTE_NEXT_HOP" {
 variable "SUPPORT_EMAIL_ADDRESSES" {
   type        = list(string)
   description = "A list of email addresses for first line support alerts to be sent to."
+  default     = []
+}
+
+variable "KEYVAULT_ACCESS_CIDR_BLOCKS" {
+  type        = list(string)
+  description = "CIDR blocks representing whitelisted IPs to access keyvault"
+  default     = []
+}
+
+variable "KEYVAULT_NAME" {
+  description = "Name of keyvault where secrets stored"
+  default     = "mhra-non-prod-02"
+}
+
+variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
+  type        = list(string)
+  description = "IDs of objects (people etc) to associate access policies for"
+  default     = []
+}
+
+variable "KEYVAULT_RESOURCE_GROUP" {
+  description = "Name of resource group where keyvault is deployed"
+  default     = "adazr-rg-1001"
+}
+
+variable "PARS_REPLY_URLS" {
+  type        = list(string)
+  default     = ["TBD"]
+  description = "The reply urls configured in the azure app registration."
 }
