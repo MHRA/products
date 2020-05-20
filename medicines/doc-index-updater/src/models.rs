@@ -59,12 +59,7 @@ pub struct JobStatusResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct ParUploadRequest {
-    pub jwt_token: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct ParUploadResponse {
+pub struct JsonWebToken {
     pub email: Option<String>,
     pub error: Option<String>,
 }

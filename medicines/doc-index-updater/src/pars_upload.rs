@@ -1,7 +1,7 @@
 use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
-    models::{Document, FileSource, ParUploadResponse},
+    models::{Document, FileSource, JsonWebToken},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
@@ -230,6 +230,21 @@ impl UploadFieldValue {
     }
 }
 
+fn decode_token(token: String) -> JsonWebToken {
+    let token_message = dangerous_unsafe_decode::<Claims>(&token);
+    tracing::debug!("{:?}", token_message);
+
+    match token_message {
+        Ok(t) => JsonWebToken {
+            email: Some(t.claims.preferred_username),
+            error: None,
+        },
+        Err(e) => JsonWebToken {
+            email: None,
+            error: Some(format!("{:?}", e)),
+        },
+    }
+}
 #[derive(Debug)]
 enum SubmissionError {
     UploadError { message: String },
@@ -237,22 +252,6 @@ enum SubmissionError {
 }
 
 impl warp::reject::Reject for SubmissionError {}
-
-fn decode_token(token: String) -> ParUploadResponse {
-    let token_message = dangerous_unsafe_decode::<Claims>(&token);
-    tracing::debug!("{:?}", token_message);
-
-    match token_message {
-        Ok(t) => ParUploadResponse {
-            email: Some(t.claims.preferred_username),
-            error: None,
-        },
-        Err(e) => ParUploadResponse {
-            email: None,
-            error: Some(format!("{:?}", e)),
-        },
-    }
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
