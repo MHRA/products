@@ -16,8 +16,6 @@ use warp::{
     Filter, Rejection, Reply,
 };
 
-pub mod upload_par;
-
 #[derive(Debug)]
 pub struct FailedToDispatchToQueue;
 

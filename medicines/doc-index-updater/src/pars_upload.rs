@@ -1,15 +1,18 @@
 use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
-    models::{Document, FileSource},
+    models::{Document, FileSource, ParUploadResponse},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
+use serde::{Deserialize, Serialize};
+
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
+use jsonwebtoken::dangerous_unsafe_decode;
 use search_client::models::DocumentType;
-use serde::Serialize;
+
 use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
@@ -234,3 +237,25 @@ enum SubmissionError {
 }
 
 impl warp::reject::Reject for SubmissionError {}
+
+fn decode_token(token: String) -> ParUploadResponse {
+    let token_message = dangerous_unsafe_decode::<Claims>(&token);
+    tracing::debug!("{:?}", token_message);
+
+    match token_message {
+        Ok(t) => ParUploadResponse {
+            email: Some(t.claims.preferred_username),
+            error: None,
+        },
+        Err(e) => ParUploadResponse {
+            email: None,
+            error: Some(format!("{:?}", e)),
+        },
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    sub: String,
+    preferred_username: String,
+}
