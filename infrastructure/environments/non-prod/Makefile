@@ -5,7 +5,7 @@ help: ## Display this help screen
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
-	  --vault-name mhra-non-prod \
+	  --vault-name mhra-non-prod-02 \
 	  --name infrastructure-non-prod-env \
 	  --query value \
 	  --output tsv | sort | sed '/^$$/d' > .env
@@ -13,7 +13,7 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-non-prod \
+	--vault-name mhra-non-prod-02 \
 	--name infrastructure-non-prod-env \
 	--file .env
 
