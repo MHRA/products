@@ -34,3 +34,9 @@ variable "SUPPORT_EMAIL_ADDRESSES" {
   type        = list(string)
   description = "A list of email addresses for first line support alerts to be sent to."
 }
+
+variable "PARS_REPLY_URLS" {
+  type        = list(string)
+  default     = ["TBD"]
+  description = "The reply urls configured in the azure app registration."
+}
