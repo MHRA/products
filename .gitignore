@@ -24,3 +24,6 @@
 # Cypress files
 **/cypress/videos/
 **/cypress/screenshots/
+
+# Redis
+dump.rdb

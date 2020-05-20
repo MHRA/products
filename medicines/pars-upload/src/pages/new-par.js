@@ -1,41 +1,59 @@
+import { useState } from 'react'
 import { Layout } from '../layout'
-import { H1 } from '../typography'
+import { H1, Para } from '../typography'
 import { Button } from '../button'
 import { BackLink } from '../back-link'
 import { ReviewSubmission } from '../review_submission'
 import { Wizard } from '../wizard'
 import { Field } from '../field'
-import { Products, product_title } from '../products_form'
+import { Products } from '../products_form'
 
 const ParUpload = () => {
+  const [submissionState, setSubmissionState] = useState()
+
   const onComplete = async (steps) => {
-    const combined = combineFormDatas(
-      steps.map(({ data }) => data).filter((data) => data)
-    )
+    setSubmissionState('submitting')
 
-    console.log(combined)
+    try {
+      const combined = combineFormDatas(
+        steps.map(({ data }) => data).filter((data) => data)
+      )
 
-    const token = 'token'
+      const token = 'token'
 
-    await fetch('http://localhost:8000/pars', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: combined,
-    })
+      await fetch('http://localhost:8000/pars', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: combined,
+      })
+
+      setSubmissionState('success')
+    } catch (e) {
+      setSubmissionState('error')
+    }
   }
 
-  return (
-    <Wizard
-      initialSteps={[
-        { type: 'product', component: Products },
-        { type: 'file', component: UploadPdf },
-        { type: 'review', component: ReviewSubmission },
-      ]}
-      onComplete={onComplete}
-    />
-  )
+  switch (submissionState) {
+    default:
+      return (
+        <Wizard
+          initialSteps={[
+            { type: 'product', component: Products },
+            { type: 'file', component: UploadPdf },
+            { type: 'review', component: ReviewSubmission },
+          ]}
+          onComplete={onComplete}
+        />
+      )
+    case 'submitting':
+      return <Para>Loading</Para>
+    case 'success':
+      return <Para>Success!</Para>
+    case 'error':
+      return <Para>Error :-(</Para>
+  }
 }
 
 const combineFormDatas = (data) => {

@@ -73,9 +73,7 @@ describe('PARs upload form', () => {
     ).should('exist')
   })
 
-  // TODO: currently pings the doc-index-updater running locally. Need to
-  // either run the doc-index-updater in CI or mock the endpoint
-  it.skip('can submit the form sucessfully', () => {
+  it('can submit the form sucessfully', () => {
     cy.visit('/new-par')
 
     cy.findByLabelText('Product name').type('Ibuprofen pills')
@@ -123,5 +121,7 @@ describe('PARs upload form', () => {
     )
 
     cy.findByText('Continue').click()
+
+    cy.findByText('Success!').should('exist')
   })
 })
