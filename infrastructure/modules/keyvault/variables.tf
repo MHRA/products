@@ -15,7 +15,7 @@ variable "access_CIDR" {
 }
 
 variable "authorised_person_ids" {
-  description = "IDs of objects (people etc) to associate access policies for"
+  description = "IDs of persons (incl scripted users) to associate access policies with"
 }
 
 variable "network_acls_default_action" {
