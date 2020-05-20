@@ -17,3 +17,5 @@
 - [Testing](./testing.md)
 
 - [Configuration](./config.md)
+
+- [Everything as Code](./everything-as-code.md)
