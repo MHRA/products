@@ -54,3 +54,11 @@ resource "azurerm_redis_cache" "doc_index_updater_redis" {
   resource_group_name = var.resource_group_name
   sku_name            = "Standard"
 }
+
+resource "azurerm_redis_firewall_rule" "example" {
+  name                = "someIPrange"
+  redis_cache_name    = azurerm_redis_cache.example.name
+  resource_group_name = azurerm_resource_group.example.name
+  start_ip            = var.redis_start_ip
+  end_ip              = var.redis_end_ip
+}

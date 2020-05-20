@@ -13,3 +13,11 @@ variable "environment" {
 variable "name" {
   description = "name for the service bus namespace"
 }
+
+variable "redis_start_ip" {
+  description = "First IP in allowed IP range"
+}
+
+variable "redis_end_ip" {
+  description = "Last IP in allowed IP range"
+}
