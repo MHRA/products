@@ -51,44 +51,6 @@ resource "azurerm_storage_management_policy" "products" {
   }
 }
 
-resource "azurerm_storage_container" "pars_upload_website" {
-  name                  = "pars-upload-website"
-  storage_account_name  = azurerm_storage_account.products.name
-  container_access_type = "private"
-}
-
-data "azurerm_storage_account_sas" "pars_upload_website" {
-  connection_string = azurerm_storage_account.products.primary_connection_string
-  https_only        = true
-
-  resource_types {
-    service   = false
-    container = false
-    object    = true
-  }
-
-  services {
-    blob  = true
-    queue = false
-    table = false
-    file  = false
-  }
-
-  start  = timeadd(timestamp(), "-2h")
-  expiry = timeadd(timestamp(), "17520h") # 2 years
-
-  permissions {
-    read    = true
-    write   = false
-    delete  = false
-    list    = false
-    add     = false
-    create  = false
-    update  = false
-    process = false
-  }
-}
-
 resource "azurerm_search_service" "search" {
   name                = var.namespace
   resource_group_name = var.resource_group_name
@@ -97,46 +59,6 @@ resource "azurerm_search_service" "search" {
 
   tags = {
     environment = var.environment
-  }
-}
-
-resource "azurerm_cdn_profile" "pars" {
-  name                = "mhrapars${var.environment}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
-resource "azurerm_cdn_endpoint" "pars" {
-  name                = "mhrapars${var.environment}"
-  profile_name        = azurerm_cdn_profile.pars.name
-  location            = azurerm_cdn_profile.pars.location
-  resource_group_name = var.resource_group_name
-  origin_host_header  = azurerm_storage_account.products.primary_blob_host
-  origin_path         = "/${azurerm_storage_container.pars_upload_website.name}"
-  origin {
-    name      = "mhrapars${var.environment}"
-    host_name = azurerm_storage_account.products.primary_blob_host
-  }
-  # global_delivery_rule {
-  #   url_rewrite_action {
-  #     source_pattern = "/"
-  #     destination    = "/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
-  #   }
-  # }
-
-  delivery_rule {
-    order = 1
-    name  = "ipRestrictionToMHRA"
-    remote_address_condition {
-      operator     = "IPMatch"
-      match_values = var.pars_allowed_ips
-    }
-
-    url_rewrite_action {
-      source_pattern = "/"
-      destination    = "/index.html${data.azurerm_storage_account_sas.pars_upload_website.sas}"
-    }
   }
 }
 

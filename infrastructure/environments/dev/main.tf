@@ -18,6 +18,7 @@ terraform {
 
 locals {
   namespace        = "mhraproductsdevelopment"
+  pars_namespace   = "mhraparsdevelopment"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
 }
 
@@ -35,7 +36,6 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
   route_table_id = azurerm_route_table.load_balancer.id
 }
 
-
 # website
 module "products" {
   source = "../../modules/products"
@@ -43,9 +43,9 @@ module "products" {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.namespace
+  pars_namespace      = local.pars_namespace
   resource_group_name = azurerm_resource_group.products.name
   pars_reply_urls     = var.PARS_REPLY_URLS
-  pars_allowed_ips    = var.PARS_ALLOWED_IPS
 }
 
 # website

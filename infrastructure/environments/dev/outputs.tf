@@ -54,7 +54,3 @@ output "storage_account_name" {
 output "storage_master_key" {
   value = module.products.storage_access_key
 }
-
-output "sas_url_query_string" {
-  value = module.products.sas_url_query_string
-}
