@@ -85,7 +85,6 @@ jobs:
           echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
           echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net >> .env
           echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
-          echo NEXT_PUBLIC_IS_STATIC_BUILD=true' >> .env
 
       - name: Build static site
         working-directory: medicines/pars-upload
@@ -97,5 +96,4 @@ jobs:
         with:
           enabled-static-website: true
           folder: medicines/pars-upload/out
-          blob-container-name: pars-upload-website
-          connection-string: ${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING_DEV }}
+          connection-string: ${{ secrets.AZURE_STORAGE_PARS_WEB_CONNECTION_STRING_DEV }}

@@ -11,8 +11,3 @@ module.exports = withPlugins([
 
   // your other plugins here
 ]);
-
-module.exports = {
-  assetPrefix:
-    process.env.NEXT_PUBLIC_IS_STATIC_BUILD === 'true' ? 'assets' : '',
-};
