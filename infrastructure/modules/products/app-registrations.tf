@@ -1,7 +1,7 @@
 resource "azuread_application" "pars-upload" {
   name                    = "pars-upload-${var.environment}"
   reply_urls              = concat(["https://${azurerm_cdn_endpoint.pars.host_name}"], var.add_local_pars_reply_url ? ["http://localhost:3000"] : [])
-  group_membership_claims = "All"
+  group_membership_claims = "SecurityGroup"
   homepage                = "https://${azurerm_cdn_endpoint.pars.host_name}" #don't think we need this
 
   app_role {
