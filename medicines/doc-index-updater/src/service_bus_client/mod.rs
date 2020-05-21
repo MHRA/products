@@ -1,8 +1,8 @@
 use crate::{
-    create_manager::SftpError,
     get_env_or_default,
     models::{JobStatus, Message},
     state_manager::{JobStatusClient, StateManager},
+    storage_client::models::StorageClientError,
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -99,7 +99,7 @@ where
 #[derive(Error, Debug)]
 pub enum ProcessMessageError {
     #[error(transparent)]
-    SftpError(#[from] SftpError),
+    StorageClientError(#[from] StorageClientError),
     #[error("Cannot find document with ID {0}")]
     DocumentNotFoundInIndex(String),
     #[error("Cannot delete blob with ID {0}: {1}")]
