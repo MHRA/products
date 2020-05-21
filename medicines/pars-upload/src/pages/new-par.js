@@ -19,9 +19,9 @@ const ParUpload = () => {
         steps.map(({ data }) => data).filter((data) => data)
       )
 
-      const token = 'token'
+      const token = 'token' // TODO
 
-      await fetch('http://localhost:8000/pars', {
+      const response = await fetch('http://localhost:8000/pars', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -29,9 +29,16 @@ const ParUpload = () => {
         body: combined,
       })
 
+      if (!response.ok) {
+        throw new Error(
+          `Error response from server: ${response.status} ${response.statusText}`
+        )
+      }
+
       setSubmissionState('success')
-    } catch (e) {
+    } catch (error) {
       setSubmissionState('error')
+      console.error('Error submitting form: ', error)
     }
   }
 
@@ -45,14 +52,13 @@ const ParUpload = () => {
             { type: 'review', component: ReviewSubmission },
           ]}
           onComplete={onComplete}
+          extraProps={{
+            submissionError: submissionState === 'error',
+          }}
         />
       )
-    case 'submitting':
-      return <Para>Loading</Para>
     case 'success':
       return <Para>Success!</Para>
-    case 'error':
-      return <Para>Error :-(</Para>
   }
 }
 
