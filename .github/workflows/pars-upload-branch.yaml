@@ -65,7 +65,9 @@ jobs:
         run: |
           yarn mock &
           server_pid=$!
-          yarn wait-on localhost:8000
+          echo "Mock server running on $server_pid"
+          yarn wait-on http://localhost:8000
+          echo "Mock server running on port 8000"
           mkdir -p cypress/screenshots
           yarn test-e2e
           kill "$server_pid"
