@@ -64,13 +64,7 @@ jobs:
 
       - name: Run cypress end-to-end tests
         working-directory: medicines/pars-upload
-        run: |
-          yarn mock &
-          server_pid=$!
-          yarn wait-on http://localhost:8000
-          mkdir -p cypress/screenshots
-          yarn test-e2e
-          kill "$server_pid"
+        run: make e2e
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1

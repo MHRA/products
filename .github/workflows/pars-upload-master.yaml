@@ -60,7 +60,7 @@ jobs:
 
       - name: Run cypress end-to-end tests
         working-directory: medicines/pars-upload
-        run: mkdir -p cypress/screenshots && NEXT_PUBLIC_DISABLE_AUTH=true yarn test-e2e
+        run: make e2e
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1
@@ -92,14 +92,14 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn export
 
-      - name: DEV - Deploy pars upload website to static site in azure storage 
+      - name: DEV - Deploy pars upload website to static site in azure storage
         # master causes this step to fail so pointing to last working commit until fixed
         uses: lauchacarro/Azure-Storage-Action@9225056
         with:
           enabled-static-website: true
           folder: medicines/pars-upload/out
           connection-string: ${{ secrets.AZURE_STORAGE_PARS_WEB_CONNECTION_STRING_DEV }}
-      
+
       - name: NON-PROD - Create .env file
         working-directory: medicines/pars-upload
         run: |
@@ -112,7 +112,7 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn export
 
-      - name: NON-PROD - Deploy pars upload website to static site in azure storage 
+      - name: NON-PROD - Deploy pars upload website to static site in azure storage
         # master causes this step to fail so pointing to last working commit until fixed
         uses: lauchacarro/Azure-Storage-Action@9225056
         with:
