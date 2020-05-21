@@ -8,9 +8,27 @@ import { signIn, getAccount } from '../auth/authPopup'
 
 function App({ Component, pageProps }) {
   const [auth, setAuth] = useState(null)
+  const [authError, setAuthError] = useState(null)
 
   const triggerSignIn = () => {
-    signIn().then(setAuth)
+    signIn()
+      .then(setAuth)
+      .catch((e) => handleAuthError(e.toString()))
+  }
+
+  function handleAuthError(error) {
+    if (error.startsWith('ClientAuthError:')) {
+      error = error.slice(16)
+
+      if (error.includes('Login_In_Progress')) {
+        error =
+          'Login popup is already open in another window, perhaps it is behind this window. Complete login on that window and then refresh this page.'
+      }
+
+      setAuthError(error)
+    } else {
+      setAuthError('Unknown error')
+    }
   }
 
   useEffect(() => {
@@ -40,6 +58,7 @@ function App({ Component, pageProps }) {
         <SignInRequest
           signIn={triggerSignIn}
           onSignIn={(auth) => setAuth(auth)}
+          error={authError}
         />
       )}
       <Footer />
