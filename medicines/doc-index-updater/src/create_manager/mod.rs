@@ -6,21 +6,23 @@ use crate::{
         RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
-    storage_client::{AzureBlobStorage, StorageClient},
+    storage_client::{
+        models::{SftpError, StorageClientError},
+        AzureBlobStorage, StorageClient,
+    },
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
 use search_index::add_blob_to_search_index;
-pub use sftp_client::SftpError;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
 pub mod hash;
 pub mod models;
+mod retrieve;
 mod sanitiser;
 mod search_index;
-mod sftp_client;
 
 pub async fn create_service_worker(
     time_to_wait: Duration,
@@ -62,7 +64,10 @@ async fn handle_processing_error_for_create_message<T>(
 where
     T: RemovableMessage<CreateMessage>,
 {
-    if let ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile) = error {
+    if let ProcessMessageError::StorageClientError(StorageClientError::SftpError(
+        SftpError::CouldNotRetrieveFile,
+    )) = error
+    {
         tracing::warn!("Couldn't find file. Updating state to Error and removing message.");
         let _ = state_manager
             .set_status(
@@ -83,7 +88,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
 
-    let file = sftp_client::retrieve(
+    let file = retrieve::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
     )
@@ -149,7 +154,9 @@ mod test {
     }
 
     fn given_file_not_found() -> ProcessMessageError {
-        ProcessMessageError::SftpError(SftpError::CouldNotRetrieveFile)
+        ProcessMessageError::StorageClientError(StorageClientError::SftpError(
+            SftpError::CouldNotRetrieveFile,
+        ))
     }
 
     fn given_we_have_a_create_message() -> TestRemovableMessage<CreateMessage> {

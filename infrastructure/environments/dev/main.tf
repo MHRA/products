@@ -44,12 +44,12 @@ data "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  namespace           = local.namespace
-  pars_namespace      = local.pars_namespace
-  resource_group_name = azurerm_resource_group.products.name
-  pars_reply_urls     = var.PARS_REPLY_URLS
+  environment              = var.ENVIRONMENT
+  location                 = var.REGION
+  namespace                = local.namespace
+  pars_namespace           = local.pars_namespace
+  resource_group_name      = azurerm_resource_group.products.name
+  add_local_pars_reply_url = true
 }
 
 # website

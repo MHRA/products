@@ -49,7 +49,6 @@ module "products" {
   namespace           = local.namespace
   pars_namespace      = local.pars_namespace
   resource_group_name = azurerm_resource_group.products.name
-  pars_reply_urls     = var.PARS_REPLY_URLS
 }
 
 # website
