@@ -1,10 +1,9 @@
 name: medicines-api-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - medicines/api/**
       - medicines/search-client/**
