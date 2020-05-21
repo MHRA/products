@@ -1,5 +1,5 @@
-import { MhraLogo } from './mhra_logo';
-import { ScreenReaderOnly } from './screen_reader_only';
+import { MhraLogo } from './mhra_logo'
+import { ScreenReaderOnly } from './screen_reader_only'
 
 export const Header = ({ account, signOut, signIn }) => {
   return (
@@ -26,7 +26,6 @@ export const Header = ({ account, signOut, signIn }) => {
           </a>
         </div>
       </div>
-
       <div
         className="govuk-width-container"
         style={{
@@ -55,8 +54,8 @@ export const Header = ({ account, signOut, signIn }) => {
         )}
       </div>
     </header>
-  );
-};
+  )
+}
 
 const buttonReset = {
   border: 'none',
@@ -69,4 +68,4 @@ const buttonReset = {
   lineHeight: 'normal',
   color: '#1d70b8',
   textDecoration: 'underline',
-};
+}

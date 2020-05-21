@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import classes from 'classnames';
+import Link from 'next/link'
+import classes from 'classnames'
 
 export const Button = ({ children, secondary = false, ...props }) => (
   <button
@@ -11,7 +11,7 @@ export const Button = ({ children, secondary = false, ...props }) => (
   >
     {children}
   </button>
-);
+)
 
 export const ButtonLink = ({ href, children }) => (
   <Link href={href}>
@@ -35,4 +35,4 @@ export const ButtonLink = ({ href, children }) => (
       </svg>
     </a>
   </Link>
-);
+)

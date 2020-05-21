@@ -5,10 +5,7 @@ use doc_index_updater::{
 use state_manager::get_client;
 use std::{convert::Infallible, error, net::SocketAddr, time::Duration};
 use tracing::Level;
-use warp::{
-    http::{Method, StatusCode},
-    Filter,
-};
+use warp::{http::StatusCode, Filter};
 
 const PORT: u16 = 8000;
 
@@ -38,9 +35,10 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let create_state = state.clone();
     let delete_state = state.clone();
 
-    let cors = warp::cors()
-        .allow_methods(vec![Method::POST])
-        .allow_origin("http://localhost:3000");
+    let pars_origin = get_env_or_default(
+        "PARS_UPLOAD_SITE_ORIGIN",
+        "http://localhost:3000".to_string(),
+    );
 
     let _ = tokio::join!(
         tokio::spawn(async move {
@@ -53,7 +51,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
-                    .or(pars_upload::handler(state.clone()).with(cors))
+                    .or(pars_upload::handler(state.clone(), &pars_origin))
                     .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
@@ -124,6 +122,7 @@ async fn handle_rejection(err: warp::Rejection) -> Result<impl warp::Reply, Infa
         code = StatusCode::UNAUTHORIZED;
         message = "AUTHENTICATION_FAILED";
     } else {
+        tracing::error!("Internal server error: {:?}", err);
         code = StatusCode::INTERNAL_SERVER_ERROR;
         message = "UNHANDLED_REJECTION";
     }

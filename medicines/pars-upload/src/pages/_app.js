@@ -1,28 +1,28 @@
-import 'govuk-frontend/govuk/all.scss';
-import Head from 'next/head';
-import { useState, useEffect } from 'react';
-import { SignInRequest } from '../auth/signInRequest';
-import { Header } from '../header';
-import { Footer } from '../footer';
-import { signIn, getAccount } from '../auth/authPopup';
+import 'govuk-frontend/govuk/all.scss'
+import Head from 'next/head'
+import { useState, useEffect } from 'react'
+import { SignInRequest } from '../auth/signInRequest'
+import { Header } from '../header'
+import { Footer } from '../footer'
+import { signIn, getAccount } from '../auth/authPopup'
 
 function App({ Component, pageProps }) {
-  const [auth, setAuth] = useState(null);
+  const [auth, setAuth] = useState(null)
 
   const triggerSignIn = () => {
-    signIn().then(setAuth);
-  };
+    signIn().then(setAuth)
+  }
 
   useEffect(() => {
-    setAuth(getAccount());
-  }, []);
+    setAuth(getAccount())
+  }, [])
 
   const signOut = () => {
     if (auth) {
-      auth.signOut();
+      auth.signOut()
     }
-    setAuth(null);
-  };
+    setAuth(null)
+  }
 
   return (
     <>
@@ -44,7 +44,7 @@ function App({ Component, pageProps }) {
       )}
       <Footer />
     </>
-  );
+  )
 }
 
 // Only uncomment this method if you have blocking data requirements for
@@ -59,4 +59,4 @@ function App({ Component, pageProps }) {
 //   return { ...appProps }
 // }
 
-export default App;
+export default App

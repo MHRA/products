@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+access-control-allow-headers: authorization
+access-control-allow-methods: POST
+access-control-allow-origin: http://localhost:3000
+content-length: 0
+date: Mon, 18 May 2020 16:13:06 GMT

@@ -84,7 +84,7 @@ where
 }
 
 pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMessageError> {
-    tracing::debug!("Message received: {:?} ", message);
+    tracing::debug!("Message received: {:?} ", &message);
 
     let search_client = search_client::factory();
 
@@ -119,7 +119,7 @@ async fn create_blob(
     }
 
     let storage_file = storage_client
-        .add_file(file_data, metadata_ref)
+        .add_file(file_data, &metadata.pl_number, metadata_ref)
         .await
         .map_err(|e| anyhow!("Couldn't upload to blob storage: {:?}", e))?;
 

@@ -51,4 +51,4 @@ export const MhraLogo = () => (
       fill="#031F73"
     />
   </svg>
-);
+)
