@@ -22,10 +22,12 @@ function App({ Component, pageProps }) {
 
       if (error.includes('Login_In_Progress')) {
         error =
-          'Login popup is already open in another window, perhaps it is behind this window.'
+          'Login popup is already open in another window, perhaps it is behind this window. Complete login on that window and then refresh this page.'
       }
 
       setAuthError(error)
+    } else {
+      setAuthError('Unknown error')
     }
   }
 
