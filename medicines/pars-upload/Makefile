@@ -19,12 +19,4 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 
 .PHONY: e2e
 e2e: ## Runs end-to-end tests, including dev and mock servers, and cleans up afterwards.
-	yarn mock & wait-on http://localhost:8000; \
-	mock_server_pid = $$!; \
-	NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; \
-	dev_server_pid=$$!; \
-	test_exit_code=$$?; \
-	yarn run cypress run; \
-	kill $${dev_server_pid}; \
-	kill $${mock_server_pid}; \
-	exit $${test_exit_code}
+	yarn test-e2e
