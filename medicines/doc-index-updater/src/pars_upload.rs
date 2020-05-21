@@ -1,15 +1,18 @@
 use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
-    models::{Document, FileSource},
+    models::{Document, FileSource, JsonWebToken},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
+use serde::{Deserialize, Serialize};
+
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
+use jsonwebtoken::{dangerous_unsafe_decode, errors::Error};
 use search_client::models::DocumentType;
-use serde::Serialize;
+
 use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
@@ -33,6 +36,7 @@ pub fn handler(
         // Max upload size is set to a very high limit here as the actual limit should be managed using istio
         .and(warp::multipart::form().max_length(1000 * 1024 * 1024))
         .and(with_state(state_manager))
+        .and(warp::header("Authorization"))
         .and_then(upload_pars_handler)
         .with(cors)
 }
@@ -102,13 +106,23 @@ async fn queue_pars_upload(
 async fn upload_pars_handler(
     form_data: FormData,
     state_manager: StateManager,
+    authorization_header: String,
 ) -> Result<impl Reply, Rejection> {
     let request_id = Uuid::new_v4();
-
     let span = tracing::info_span!("PARS upload", request_id = request_id.to_string().as_str());
     let _enter = span.enter();
-
     tracing::debug!("Received PARS submission");
+
+    let json_web_token = decode_token_from_authorization_header(authorization_header);
+
+    match json_web_token {
+        Ok(token) => {
+            tracing::info!("Uploader email: {}", token.email);
+        }
+        Err(e) => {
+            tracing::error!("Error decoding token: {:?}", e);
+        }
+    }
 
     let job_ids = queue_pars_upload(form_data, state_manager).await?;
 
@@ -308,6 +322,17 @@ impl UploadFieldValue {
     }
 }
 
+fn decode_token_from_authorization_header(
+    authorization_header: String,
+) -> Result<JsonWebToken, Error> {
+    let token = authorization_header.split("Bearer ").collect::<Vec<&str>>()[1];
+    let token_message = dangerous_unsafe_decode::<Claims>(&token)?;
+    tracing::debug!("{:?}", token_message);
+
+    Ok(JsonWebToken {
+        email: token_message.claims.preferred_username,
+    })
+}
 #[derive(Debug)]
 enum SubmissionError {
     UploadError { message: String },
@@ -315,3 +340,30 @@ enum SubmissionError {
 }
 
 impl warp::reject::Reject for SubmissionError {}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    sub: String,
+    preferred_username: String,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn decode_a_jwt_token_from_authorization_header() {
+        let token = decode_token_from_authorization_header(String::from("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNmY5NWIyMS02M2IyLTQ3NWYtOGEzNS1kMzljZWE0Y2ZkNjEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2L3YyLjAiLCJpYXQiOjE1ODk4MDg3MzEsIm5iZiI6MTU4OTgwODczMSwiZXhwIjoxNTkwMDU5NjI0LCJhaW8iOiJBVlFBcS84UEFBQUFLSFNQZXNxRHdzTzAvaDhpNHloMVAzeHBZN1NiRkNpVWNmVDlJeVQxUE1zNnVhdW5TQkE4aUdmZHFYU0tzTDQ5aUpaMFkzTXRtZm8vaVN5QXJkYklkL041MUhiSzI4R2tURm9mSmY1bGpOOD0iLCJoYXNncm91cHMiOiJ0cnVlIiwibmFtZSI6IkJsb2dncywgSm9lIiwibm9uY2UiOiJiNzI2Y2M4Zi03ODBlLTRhZmUtYTE2Yy0wYTlmMzUxN2ZiNDYiLCJvaWQiOiI5NGI3ODVhYi1mNDhmLTRmNmYtYjMyZi05ZWJlMjFmNmIwZWQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJKb2UuQmxvZ2dzQE1pY3Jvc29mdC5jb20iLCJzdWIiOiJtOFFYbXdKQVpGWDZDQ1k3NU1jV3pRUkMzcmVhOGRnbDJuNHRKbnNFNVowIiwidGlkIjoiZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2IiwidXRpIjoiT0JJQXhoLXFRa0dBb29zTVZRMU1BQSIsInZlciI6IjIuMCIsImp0aSI6ImNlMmM5NjA1LWM5MjAtNGJkMC04NWMwLTBlOTA0MGZlMTQ5MCJ9.KWRK8mVdljCG3hpYHMSVrhIipBIq4Z_wfM9zzKAlYPw"));
+        assert_eq!(
+            token.unwrap().email,
+            String::from("Joe.Bloggs@Microsoft.com")
+        );
+    }
+
+    #[test]
+    fn decode_a_badly_formatted_jwt_token_from_authorization_header() {
+        let token = decode_token_from_authorization_header(String::from("Bearer xxxx"));
+        assert!(token.is_err());
+    }
+}
