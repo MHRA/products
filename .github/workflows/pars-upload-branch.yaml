@@ -65,14 +65,13 @@ jobs:
         run: |
           yarn mock &
           server_pid=$!
-          echo "Mock server running on $server_pid"
+          echo "Next auth: $NEXT_PUBLIC_DISABLE_AUTH"
           yarn wait-on http://localhost:8000
-          echo "Mock server running on port 8000"
           mkdir -p cypress/screenshots
           yarn test-e2e
           kill "$server_pid"
         env:
-          NEXT_PUBLIC_DISABLE_AUTH: true
+          NEXT_PUBLIC_DISABLE_AUTH: "true"
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1
