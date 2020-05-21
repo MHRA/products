@@ -1,10 +1,9 @@
 name: medicines-web-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - medicines/web/**
       - .github/workflows/medicines-web-branch.yaml

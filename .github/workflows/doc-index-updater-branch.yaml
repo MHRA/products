@@ -1,10 +1,9 @@
 name: doc-index-updater-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - medicines/doc-index-updater/**
       - medicines/search-client/**

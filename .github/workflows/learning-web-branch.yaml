@@ -1,10 +1,9 @@
 name: learning-web-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - learning/web/**
       - .github/workflows/learning-web-branch.yaml
