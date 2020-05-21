@@ -1,10 +1,9 @@
 name: pars-upload-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - medicines/pars-upload/**
       - .github/workflows/pars-upload-branch.yaml

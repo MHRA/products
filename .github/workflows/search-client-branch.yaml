@@ -1,10 +1,9 @@
 name: search-client-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - "**"
-      - "!master"
+      - "master"
     paths:
       - medicines/search-client/**
       - .github/workflows/search-client-branch.yaml
