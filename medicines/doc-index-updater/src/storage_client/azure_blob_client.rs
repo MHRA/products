@@ -20,8 +20,8 @@ pub struct AzureBlobStorage {
 
 impl AzureBlobStorage {
     pub fn temporary() -> Self {
-        let container_name =
-            std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+        let container_name = std::env::var("STORAGE_CONTAINER_TEMPORARY")
+            .expect("Set env variable STORAGE_CONTAINER_TEMPORARY first!");
         let storage_account =
             std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
         let master_key = std::env::var("STORAGE_MASTER_KEY")
