@@ -33,4 +33,5 @@ resource "azurerm_cdn_endpoint" "pars" {
     name      = "mhrapars${var.environment}"
     host_name = azurerm_storage_account.pars.primary_web_host
   }
+  is_http_allowed = false
 }
