@@ -122,13 +122,13 @@ async fn upload_pars_handler(
             tracing::info!("Uploader groups: {:?}", token.groups);
 
             if is_medical_writer(token) {
+                tracing::error!("User wasn't in medical writers group");
                 return Err(warp::reject::custom(AuthenticationFailed));
             }
         }
         Err(e) => {
-            let error = format!("Error decoding token: {:?}", e);
-            tracing::error!("{}", error);
-            //Error::new(error)
+            tracing::error!("Error decoding token: {:?}", e);
+            return Err(warp::reject::custom(AuthenticationFailed));
         }
     }
 
