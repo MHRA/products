@@ -20,9 +20,10 @@ use warp::{
 
 pub fn handler(
     state_manager: StateManager,
+    pars_origin: &str,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let cors = warp::cors()
-        .allow_any_origin() // TODO restrict to a specific domain once we know what it is
+        .allow_origin(pars_origin)
         .allow_headers(&[header::AUTHORIZATION])
         .allow_methods(&[Method::POST])
         .build();

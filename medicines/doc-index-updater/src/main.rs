@@ -35,6 +35,11 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let create_state = state.clone();
     let delete_state = state.clone();
 
+    let pars_origin = get_env_or_default(
+        "PARS_UPLOAD_SITE_ORIGIN",
+        "http://localhost:3000".to_string(),
+    );
+
     let _ = tokio::join!(
         tokio::spawn(async move {
             warp::serve(
@@ -46,7 +51,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
                     .or(document_manager::check_in_document(state.clone()))
                     .or(document_manager::delete_document_xml(state.clone()))
                     .or(document_manager::delete_document(state.clone()))
-                    .or(pars_upload::handler(state.clone()))
+                    .or(pars_upload::handler(state.clone(), &pars_origin))
                     .recover(handle_rejection)
                     .with(warp::log("doc_index_updater")),
             )
