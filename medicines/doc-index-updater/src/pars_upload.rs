@@ -1,4 +1,5 @@
 use crate::{
+    auth_manager::AuthenticationFailed,
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource, JsonWebToken},
@@ -10,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
-use jsonwebtoken::{dangerous_unsafe_decode, errors::Error};
-use search_client::models::DocumentType;
+use jsonwebtoken::dangerous_unsafe_decode;
+use search_client::{get_env, models::DocumentType};
 
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -119,10 +120,22 @@ async fn upload_pars_handler(
         Ok(token) => {
             tracing::info!("Uploader email: {}", token.email);
             tracing::info!("Uploader groups: {:?}", token.groups);
+
+            if is_medical_writer(token) {
+                return Err(warp::reject::custom(AuthenticationFailed));
+            }
         }
         Err(e) => {
-            tracing::error!("Error decoding token: {:?}", e);
+            let error = format!("Error decoding token: {:?}", e);
+            tracing::error!("{}", error);
+            //Error::new(error)
         }
+    }
+
+    fn is_medical_writer(token: JsonWebToken) -> bool {
+        token
+            .groups
+            .contains(&get_env("MEDICAL_WRITERS_AD_GROUP_ID"))
     }
 
     let job_ids = queue_pars_upload(form_data, state_manager).await?;
@@ -325,7 +338,7 @@ impl UploadFieldValue {
 
 fn decode_token_from_authorization_header(
     authorization_header: String,
-) -> Result<JsonWebToken, Error> {
+) -> Result<JsonWebToken, jsonwebtoken::errors::Error> {
     let token = authorization_header.split("Bearer ").collect::<Vec<&str>>()[1];
     let token_message = dangerous_unsafe_decode::<Claims>(&token)?;
     tracing::debug!("{:?}", token_message);
