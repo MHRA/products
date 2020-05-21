@@ -9,6 +9,9 @@ on:
       - medicines/pars-upload/**
       - .github/workflows/pars-upload-branch.yaml
 
+env:
+  NEXT_PUBLIC_DISABLE_AUTH: "true"
+
 jobs:
   build:
     name: Build, test and check pars-upload
@@ -65,13 +68,10 @@ jobs:
         run: |
           yarn mock &
           server_pid=$!
-          echo "Next auth: $NEXT_PUBLIC_DISABLE_AUTH"
           yarn wait-on http://localhost:8000
           mkdir -p cypress/screenshots
           yarn test-e2e
           kill "$server_pid"
-        env:
-          NEXT_PUBLIC_DISABLE_AUTH: "true"
 
       - name: Upload cypress screenshots
         uses: actions/upload-artifact@v1
