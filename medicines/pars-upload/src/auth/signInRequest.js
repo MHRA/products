@@ -4,22 +4,6 @@ import { Layout } from '../layout'
 
 export const SignInRequest = ({ signIn, error }) => (
   <Layout>
-    <H1>
-      <abbr
-        title="Public Assessment Reports"
-        style={{ textDecoration: 'none' }}
-      >
-        PARs
-      </abbr>{' '}
-      upload
-    </H1>
-
-    <Para>If you are a medical writer, you can sign in to upload PARs.</Para>
-    <Para>
-      <Button type="button" onClick={signIn}>
-        Sign in
-      </Button>
-    </Para>
     {error ? (
       <div
         className="govuk-error-summary"
@@ -38,5 +22,21 @@ export const SignInRequest = ({ signIn, error }) => (
         </div>
       </div>
     ) : null}
+    <H1>
+      <abbr
+        title="Public Assessment Reports"
+        style={{ textDecoration: 'none' }}
+      >
+        PARs
+      </abbr>{' '}
+      upload
+    </H1>
+
+    <Para>If you are a medical writer, you can sign in to upload PARs.</Para>
+    <Para>
+      <Button type="button" onClick={signIn}>
+        Sign in
+      </Button>
+    </Para>
   </Layout>
 )
