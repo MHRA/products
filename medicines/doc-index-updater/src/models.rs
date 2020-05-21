@@ -61,6 +61,7 @@ pub struct JobStatusResponse {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonWebToken {
     pub email: String,
+    pub groups: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]

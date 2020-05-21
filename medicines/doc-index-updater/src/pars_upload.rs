@@ -118,6 +118,7 @@ async fn upload_pars_handler(
     match json_web_token {
         Ok(token) => {
             tracing::info!("Uploader email: {}", token.email);
+            tracing::info!("Uploader groups: {:?}", token.groups);
         }
         Err(e) => {
             tracing::error!("Error decoding token: {:?}", e);
@@ -331,6 +332,7 @@ fn decode_token_from_authorization_header(
 
     Ok(JsonWebToken {
         email: token_message.claims.preferred_username,
+        groups: token_message.claims.groups,
     })
 }
 #[derive(Debug)]
@@ -345,6 +347,12 @@ impl warp::reject::Reject for SubmissionError {}
 struct Claims {
     sub: String,
     preferred_username: String,
+    #[serde(default = "empty_groups")]
+    groups: Vec<String>,
+}
+
+fn empty_groups() -> Vec<String> {
+    vec![]
 }
 
 #[cfg(test)]
@@ -365,5 +373,17 @@ mod test {
     fn decode_a_badly_formatted_jwt_token_from_authorization_header() {
         let token = decode_token_from_authorization_header(String::from("Bearer xxxx"));
         assert!(token.is_err());
+    }
+
+    #[test]
+    fn decode_a_jwt_token_with_groups_from_authorization_header() {
+        let token = decode_token_from_authorization_header(String::from("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNmY5NWIyMS02M2IyLTQ3NWYtOGEzNS1kMzljZWE0Y2ZkNjEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2L3YyLjAiLCJpYXQiOjE1ODk4MDg3MzEsIm5iZiI6MTU4OTgwODczMSwiZXhwIjoxNTkwMDc5MzI5LCJhaW8iOiJBVlFBcS84UEFBQUFLSFNQZXNxRHdzTzAvaDhpNHloMVAzeHBZN1NiRkNpVWNmVDlJeVQxUE1zNnVhdW5TQkE4aUdmZHFYU0tzTDQ5aUpaMFkzTXRtZm8vaVN5QXJkYklkL041MUhiSzI4R2tURm9mSmY1bGpOOD0iLCJncm91cHMiOlsiNDE3NTExZjAtZTBjMS00OTNmLTg4NjktZjVhNTQ2MmZjODBiIiwiYmRiM2RmZTQtZTRmNi00ZTBiLWIwNWYtYjE4Y2NkNTg0OWFlIl0sIm5hbWUiOiJCbG9nZ3MsIEpvZSIsIm5vbmNlIjoiYjcyNmNjOGYtNzgwZS00YWZlLWExNmMtMGE5ZjM1MTdmYjQ2Iiwib2lkIjoiOTRiNzg1YWItZjQ4Zi00ZjZmLWIzMmYtOWViZTIxZjZiMGVkIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiSm9lLkJsb2dnc0BNaWNyb3NvZnQuY29tIiwic3ViIjoibThRWG13SkFaRlg2Q0NZNzVNY1d6UVJDM3JlYThkZ2wybjR0Sm5zRTVaMCIsInRpZCI6ImU1MjdlYTVjLTYyNTgtNGNkMi1hMjdmLThiZDIzN2VjNGMyNiIsInV0aSI6Ik9CSUF4aC1xUWtHQW9vc01WUTFNQUEiLCJ2ZXIiOiIyLjAiLCJqdGkiOiJjZTJjOTYwNS1jOTIwLTRiZDAtODVjMC0wZTkwNDBmZTE0OTAifQ.Eq2Wi_3C13Ik7BQWnOZnUnnU2Pn5L4pyKgI5B16CvwU"));
+        assert_eq!(
+            token.unwrap().groups,
+            vec![
+                String::from("417511f0-e0c1-493f-8869-f5a5462fc80b"),
+                String::from("bdb3dfe4-e4f6-4e0b-b05f-b18ccd5849ae")
+            ]
+        );
     }
 }
