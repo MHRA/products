@@ -10,6 +10,7 @@ on:
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: false
+  PARS_UPLOAD_URL: https://doc-index-updater.test.mhra.gov.uk/pars
 
 jobs:
   build:
@@ -88,6 +89,7 @@ jobs:
             echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
             echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net"
             echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
+            echo "PARS_UPLOAD_URL=\"$PARS_UPLOAD_URL\""
           } > .env
 
       - name: DEV - Build static site
@@ -110,6 +112,7 @@ jobs:
             echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
             echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsnonprod.azureedge.net"
             echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
+            echo "PARS_UPLOAD_URL=\"$PARS_UPLOAD_URL\""
           } > .env
 
       - name: NON-PROD - Build static site

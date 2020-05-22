@@ -10,6 +10,7 @@ on:
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: false
+  PARS_UPLOAD_URL: "http://localhost:8000"
 
 jobs:
   build:

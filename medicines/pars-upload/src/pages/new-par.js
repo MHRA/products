@@ -21,7 +21,7 @@ const ParUpload = () => {
 
       const token = 'token'
 
-      await fetch('http://localhost:8000/pars', {
+      await fetch(process.env.PARS_UPLOAD_URL, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
