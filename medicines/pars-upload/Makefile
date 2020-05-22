@@ -18,5 +18,9 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--file .env
 
 .PHONY: e2e
-e2e: ## Runs end-to-end tests, including dev and mock servers, and cleans up afterwards.
+e2e: ## Runs end-to-end tests, including dev server. Headless.
 	yarn test-e2e
+
+.PHONY: e2e-headed
+e2e-headed: ## Runs end-to-end tests, including dev server. Headed.
+	yarn test-e2e-headed
