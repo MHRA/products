@@ -1,3 +1,21 @@
+let polyfill
+
+// grab fetch polyfill from remote URL, could be also from a local package
+before(() => {
+  const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
+
+  cy.request(polyfillUrl).then((response) => {
+    polyfill = response.body
+  })
+})
+
+const mockSuccessfulSubmission = () =>
+  cy.route(
+    'POST',
+    'http://localhost:8000/pars',
+    'fixture:mock_submission_results.json'
+  )
+
 describe('Home page', () => {
   it('can get to the form page', () => {
     cy.server()
@@ -74,6 +92,10 @@ describe('PARs upload form', () => {
   })
 
   it('can submit the form sucessfully', () => {
+    cy.server()
+
+    mockSuccessfulSubmission()
+
     cy.visit('/new-par')
 
     cy.findByLabelText('Product name').type('Ibuprofen pills')
