@@ -5,13 +5,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "a11y": "yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "a11y": "yarn authless-server; server_pid=$!; yarn run pa11y-ci; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "dev": "next dev",
+    "authless-server": "NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000",
     "build": "next build",
     "start": "next start",
     "export": "next build && next export",
-    "test-e2e": "NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
-    "test-e2e-headed": "NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL --headed --no-exit; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e": "yarn authless-server; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e-headed": "yarn authless-server; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL --headed --no-exit; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "test": "yarn jest",
     "test:ci": "yarn jest --coverage --ci"
   },
