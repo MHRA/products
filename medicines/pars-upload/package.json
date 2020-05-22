@@ -9,10 +9,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "mock": "mockserver -p 8000 -m doc-index-updater-mocks",
     "export": "next build && next export",
-    "test-e2e": "yarn mock & wait-on http://localhost:8000; mock_server_pid=$!; NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run; test_exit_code=$?; kill \"$server_pid\"; kill \"$mock_server_pid\"; exit \"$test_exit_code\";",
-    "test-e2e-headed": "yarn mock & wait-on http://localhost:8000; mock_server_pid=$!; NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn run cypress run --headed; test_exit_code=$?; kill \"$server_pid\"; kill \"$mock_server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e": "NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
+    "test-e2e-headed": "NEXT_PUBLIC_DISABLE_AUTH=true yarn dev & wait-on http://localhost:3000; server_pid=$!; yarn cypress run --env PARS_UPLOAD_URL=$PARS_UPLOAD_URL --headed; test_exit_code=$?; kill \"$server_pid\"; exit \"$test_exit_code\";",
     "test": "yarn jest",
     "test:ci": "yarn jest --coverage --ci"
   },

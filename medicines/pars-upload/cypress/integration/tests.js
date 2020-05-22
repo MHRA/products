@@ -9,12 +9,42 @@ before(() => {
   })
 })
 
-const mockSuccessfulSubmission = () =>
-  cy.route(
-    'POST',
-    'http://localhost:8000/pars',
-    'fixture:mock_submission_results.json'
-  )
+Cypress.on('window:before:load', (win) => {
+  delete win.fetch
+  // since the application code does not ship with a polyfill
+  // load a polyfilled "fetch" from the test
+  win.eval(polyfill)
+  win.fetch = win.unfetch
+
+  // Clear out session storage so that the disclaimer is always presented.
+  win.sessionStorage.clear()
+})
+
+const parsUrl = Cypress.env('PARS_UPLOAD_URL')
+const baseUrl = Cypress.config().baseUrl
+
+const mockSuccessfulSubmission = () => {
+  expect(parsUrl).to.eq('http://example.com/pars')
+  cy.route({
+    method: 'OPTIONS',
+    url: parsUrl,
+    status: 200,
+    headers: {
+      'access-control-allow-headers': 'authorization',
+      'access-control-allow-methods': 'POST',
+      'access-control-allow-origin': baseUrl,
+      'content-length': '0',
+      date: 'Mon, 18 May 2020 16:13:06 GMT',
+    },
+    response: {},
+  })
+  cy.route({
+    method: 'POST',
+    url: parsUrl,
+    status: 200,
+    response: 'fixture:mock_submission_success.json',
+  })
+}
 
 describe('Home page', () => {
   it('can get to the form page', () => {
