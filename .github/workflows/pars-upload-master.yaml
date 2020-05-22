@@ -9,7 +9,7 @@ on:
       - .github/workflows/pars-upload-master.yaml
 
 env:
-  NEXT_PUBLIC_DISABLE_AUTH: "true"
+  NEXT_PUBLIC_DISABLE_AUTH: false
 
 jobs:
   build:
