@@ -61,7 +61,9 @@ const ParUpload = ({ account }) => {
         />
       )
     case 'success':
-      return <Success name={account.name} submittedAt={submittedAt} />
+      return (
+        <Success name={account ? account.name : ''} submittedAt={submittedAt} />
+      )
   }
 }
 

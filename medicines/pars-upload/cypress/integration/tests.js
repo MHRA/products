@@ -122,6 +122,10 @@ describe('PARs upload form', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('Success!').should('exist')
+    cy.findByText('Submission complete').should('exist')
+
+    cy.findByText('Submit another report').click()
+
+    cy.findByText('What are you doing today?').should('exist')
   })
 })
