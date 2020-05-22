@@ -9,7 +9,10 @@ on:
       - .github/workflows/pars-upload-branch.yaml
 
 env:
-  NEXT_PUBLIC_DISABLE_AUTH: "true"
+  NEXT_PUBLIC_DISABLE_AUTH: false
+  PARS_UPLOAD_URL: "http://localhost:8000/pars"
+  # above is for cypress, below is for next.js
+  NEXT_PUBLIC_PARS_UPLOAD_URL: "http://localhost:8000/pars"
 
 jobs:
   build:
@@ -79,3 +82,25 @@ jobs:
         with:
           name: medicines-cypress-videos
           path: medicines/pars-upload/cypress/videos
+
+      - name: DEV - Create .env file
+        working-directory: medicines/pars-upload
+        run: |
+          {
+            echo "NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61"
+            echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
+            echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net"
+            echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
+          } > .env
+
+      - name: DEV - Build static site
+        working-directory: medicines/pars-upload
+        run: yarn export
+
+      - name: DEV - Deploy pars upload website to static site in azure storage
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
+        with:
+          enabled-static-website: true
+          folder: medicines/pars-upload/out
+          connection-string: ${{ secrets.AZURE_STORAGE_PARS_WEB_CONNECTION_STRING_DEV }}

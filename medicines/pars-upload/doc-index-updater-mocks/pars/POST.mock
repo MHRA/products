@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-access-control-allow-headers: authorization
-access-control-allow-methods: POST
-access-control-allow-origin: http://localhost:3000
-date: Mon, 18 May 2020 16:13:06 GMT
-
-{
-  "job_ids": ["594151d6-c0f6-4f6d-b56c-6c47a85c5622"]
-}

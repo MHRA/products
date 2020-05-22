@@ -1,3 +1,50 @@
+let polyfill
+
+// grab fetch polyfill from remote URL, could be also from a local package
+before(() => {
+  const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
+
+  cy.request(polyfillUrl).then((response) => {
+    polyfill = response.body
+  })
+})
+
+Cypress.on('window:before:load', (win) => {
+  delete win.fetch
+  // since the application code does not ship with a polyfill
+  // load a polyfilled "fetch" from the test
+  win.eval(polyfill)
+  win.fetch = win.unfetch
+
+  // Clear out session storage so that the disclaimer is always presented.
+  win.sessionStorage.clear()
+})
+
+const parsUrl = Cypress.env('PARS_UPLOAD_URL')
+const baseUrl = Cypress.config().baseUrl
+
+const mockSuccessfulSubmission = () => {
+  cy.route({
+    method: 'OPTIONS',
+    url: parsUrl,
+    status: 200,
+    headers: {
+      'access-control-allow-headers': 'authorization',
+      'access-control-allow-methods': 'POST',
+      'access-control-allow-origin': baseUrl,
+      'content-length': '0',
+      date: 'Mon, 18 May 2020 16:13:06 GMT',
+    },
+    response: {},
+  })
+  cy.route({
+    method: 'POST',
+    url: parsUrl,
+    status: 200,
+    response: 'fixture:mock_submission_success.json',
+  })
+}
+
 describe('Home page', () => {
   it('can get to the form page', () => {
     cy.server()
@@ -185,6 +232,10 @@ describe('PARs upload form', () => {
   })
 
   it('can submit the form sucessfully', () => {
+    cy.server()
+
+    mockSuccessfulSubmission()
+
     cy.visit('/new-par')
 
     cy.findByLabelText('Product name').type('Ibuprofen pills')
