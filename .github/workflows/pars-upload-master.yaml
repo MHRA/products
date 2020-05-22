@@ -10,7 +10,9 @@ on:
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: "true"
-  PARS_UPLOAD_URL: https://doc-index-updater.test.mhra.gov.uk/pars
+  PARS_UPLOAD_URL: "https://doc-index-updater.test.mhra.gov.uk/pars"
+  # above is for cypress, below is for next.js
+  NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater.test.mhra.gov.uk/pars"
 
 jobs:
   build:
@@ -88,7 +90,6 @@ jobs:
           echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
           echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net >> .env
           echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
-          echo PARS_UPLOAD_URL=$PARS_UPLOAD_URL >> .env
 
       - name: DEV - Build static site
         working-directory: medicines/pars-upload
@@ -109,7 +110,6 @@ jobs:
           echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
           echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsnon-prod.azureedge.net >> .env
           echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
-          echo PARS_UPLOAD_URL=$PARS_UPLOAD_URL >> .env
 
       - name: NON-PROD - Build static site
         working-directory: medicines/pars-upload

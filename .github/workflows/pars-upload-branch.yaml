@@ -10,7 +10,9 @@ on:
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: "true"
-  PARS_UPLOAD_URL: "http://localhost:8000"
+  PARS_UPLOAD_URL: "http://localhost:8000/pars"
+  # above is for cypress, below is for next.js
+  NEXT_PUBLIC_PARS_UPLOAD_URL: "http://localhost:8000/pars"
 
 jobs:
   build:
