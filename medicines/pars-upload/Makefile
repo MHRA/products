@@ -16,3 +16,7 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 	--vault-name mhra-dev \
 	--name pars-env \
 	--file .env
+
+.PHONY: e2e
+e2e: ## Runs end-to-end tests, including dev and mock servers, and cleans up afterwards.
+	yarn test-e2e
