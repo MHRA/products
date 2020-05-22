@@ -24,7 +24,6 @@ const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
 const mockSuccessfulSubmission = () => {
-  expect(parsUrl).to.eq('http://example.com/pars')
   cy.route({
     method: 'OPTIONS',
     url: parsUrl,
