@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import css from './review_submission.module.css'
 import { Layout } from './layout'
 import { H1, Para, H3 } from './typography'
 import { Button } from './button'
@@ -11,6 +13,7 @@ export const ReviewSubmission = ({
   submit,
   submissionError,
   goBack,
+  goToPage,
 }) => {
   const pageData = steps.slice(0, currentStepIndex)
 
@@ -33,11 +36,23 @@ export const ReviewSubmission = ({
       {pageData.map(({ type, data }, i) => {
         const key = `${type}-${i}`
 
+        const goToFormPage = () => {
+          goToPage(i)
+        }
+
         switch (type) {
           case 'product':
-            return <ProductSummary key={key} data={data} />
+            return (
+              <ProductSummary
+                key={key}
+                data={data}
+                goToFormPage={goToFormPage}
+              />
+            )
           case 'file':
-            return <FileSummary key={key} data={data} />
+            return (
+              <FileSummary key={key} data={data} goToFormPage={goToFormPage} />
+            )
           default:
             return null
         }
@@ -50,8 +65,8 @@ export const ReviewSubmission = ({
   )
 }
 
-const ProductSummary = ({ data }) => (
-  <SummaryWrapper title={data.get('title')}>
+const ProductSummary = ({ data, goToFormPage }) => (
+  <SummaryWrapper title={data.get('title')} goToFormPage={goToFormPage}>
     <SummaryListWithoutActions
       items={[
         {
@@ -81,8 +96,8 @@ const ProductSummary = ({ data }) => (
   </SummaryWrapper>
 )
 
-const FileSummary = ({ data }) => (
-  <SummaryWrapper title="Document">
+const FileSummary = ({ data, goToFormPage }) => (
+  <SummaryWrapper title="Document" goToFormPage={goToFormPage}>
     <SummaryListWithoutActions
       items={[
         {
@@ -94,10 +109,28 @@ const FileSummary = ({ data }) => (
   </SummaryWrapper>
 )
 
-const SummaryWrapper = ({ title, children }) => (
-  <div className="govuk-!-margin-bottom-9">
-    <H3 component="h2">{title}</H3>
+const SummaryWrapper = ({ title, children, goToFormPage }) => {
+  const onClickChange = (event) => {
+    event.preventDefault()
+    goToFormPage()
+  }
 
-    {children}
-  </div>
-)
+  return (
+    <div className="govuk-!-margin-bottom-9">
+      <div className={css.flexRow}>
+        <H3 component="h2">{title}</H3>
+
+        <Link href="/new-par">
+          <a
+            className={`govuk-link govuk-link--no-visited-state ${css.changeLink}`}
+            onClick={onClickChange}
+          >
+            Change
+          </a>
+        </Link>
+      </div>
+
+      {children}
+    </div>
+  )
+}

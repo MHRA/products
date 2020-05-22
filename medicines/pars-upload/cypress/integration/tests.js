@@ -73,7 +73,7 @@ describe('PARs upload form', () => {
     ).should('exist')
   })
 
-  it.only('review page shows the correct information', () => {
+  it('review page shows the correct information', () => {
     const productName = 'Ibuprofen pills'
     const strength = 'Really powerful stuff'
     const dose = 'some form'
@@ -162,6 +162,7 @@ describe('PARs upload form', () => {
 
     cy.findByText('Document')
       .parent()
+      .parent()
       .within(() => {
         cy.findByText('Document name')
           .parent()
@@ -169,6 +170,18 @@ describe('PARs upload form', () => {
             cy.findByText(fileName).should('exist')
           })
       })
+
+    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+
+    cy.findByText(`${productName}, ${strength}, ${dose}, ${license_str}`)
+      .parent()
+      .within(() => {
+        cy.findByText('Change').click()
+      })
+
+    cy.findByText('New Public Assessment Report').should('exist')
+
+    cy.findByLabelText('Product name').should('have.value', productName)
   })
 
   it('can submit the form sucessfully', () => {
