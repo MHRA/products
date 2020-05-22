@@ -8,11 +8,11 @@ update_hosts_file() {
         ENV_POSTFIX=$1
     fi
 
-    sed "/.*argocd${ENV_POSTFIX}.test.mhra.gov.uk.*$/d" </etc/hosts >/tmp/hosts
+    sed "/.*doc-index-updater${ENV_POSTFIX}.test.mhra.gov.uk.*$/d" </etc/hosts >/tmp/hosts
 
     kubectl get services --namespace istio-system istio-ingressgateway -o json |
         jq '.status.loadBalancer.ingress[0].ip' |
-        sed -e "s!\"\([^\"]*\)\"!\1       argocd${ENV_POSTFIX}.test.mhra.gov.uk doc-index-updater${ENV_POSTFIX}.test.mhra.gov.uk medicines-api${ENV_POSTFIX}.test.mhra.gov.uk!" |
+        sed -e "s!\"\([^\"]*\)\"!\1       doc-index-updater${ENV_POSTFIX}.test.mhra.gov.uk medicines-api${ENV_POSTFIX}.test.mhra.gov.uk!" |
         cat >>/tmp/hosts
 }
 
