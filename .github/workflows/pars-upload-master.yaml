@@ -83,10 +83,12 @@ jobs:
       - name: DEV - Create .env file
         working-directory: medicines/pars-upload
         run: |
-          echo NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61 >> .env
-          echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
-          echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net >> .env
-          echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
+          {
+            echo "NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61"
+            echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
+            echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net"
+            echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
+          } > .env
 
       - name: DEV - Build static site
         working-directory: medicines/pars-upload
@@ -103,10 +105,12 @@ jobs:
       - name: NON-PROD - Create .env file
         working-directory: medicines/pars-upload
         run: |
-          echo NEXT_PUBLIC_CLIENT_ID=ac2b59e9-77ca-4d39-8186-b96d305c9aae >> .env
-          echo NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26 >> .env
-          echo NEXT_PUBLIC_REDIRECT_URI=https://mhraparsnon-prod.azureedge.net >> .env
-          echo NEXT_PUBLIC_DISABLE_AUTH=false >> .env
+          {
+            echo "NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61"
+            echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
+            echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsnonprod.azureedge.net"
+            echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
+          } > .env
 
       - name: NON-PROD - Build static site
         working-directory: medicines/pars-upload
