@@ -53,7 +53,7 @@ function App({ Component, pageProps }) {
         signIn={triggerSignIn}
       />
       {process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true' || auth ? (
-        <Component {...pageProps} />
+        <Component {...pageProps} account={auth ? auth.account : null} />
       ) : (
         <SignInRequest
           signIn={triggerSignIn}

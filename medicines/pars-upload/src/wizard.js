@@ -1,6 +1,11 @@
 import { useState } from 'react'
 
-export const Wizard = ({ initialSteps, success: Success, onComplete }) => {
+export const Wizard = ({
+  initialSteps,
+  success: Success,
+  onComplete,
+  extraProps,
+}) => {
   const [steps, setSteps] = useState(() =>
     initialSteps.map(({ type, component }) => ({ type, component, data: null }))
   )
@@ -57,6 +62,7 @@ export const Wizard = ({ initialSteps, success: Success, onComplete }) => {
       savePageState={setPageData}
       goBack={goBack}
       goToPage={(index) => setPageIndex(index)}
+      {...extraProps}
     />
   )
 }
