@@ -5,6 +5,7 @@ use anyhow::anyhow;
 use core::fmt::Display;
 use std::{env, str::FromStr};
 
+pub mod audit_logger;
 pub mod auth_manager;
 pub mod create_manager;
 pub mod delete_manager;

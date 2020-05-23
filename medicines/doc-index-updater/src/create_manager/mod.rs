@@ -1,4 +1,5 @@
 use crate::{
+    audit_logger::log_file_upload,
     create_manager::models::BlobMetadata,
     models::{CreateMessage, FileSource, JobStatus},
     service_bus_client::{
@@ -13,7 +14,6 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use search_index::add_blob_to_search_index;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
@@ -116,26 +116,6 @@ fn get_uploader_source(source: FileSource) -> String {
         FileSource::Sentinel => "sentinel".to_string(),
         FileSource::TemporaryAzureBlobStorage { uploader_email } => format!("{}", uploader_email),
     }
-}
-
-async fn log_file_upload(
-    blob_name: &String,
-    uploader_source: &String,
-    metadata: &BlobMetadata,
-) -> Result<(), anyhow::Error> {
-    let log_storage_client = AzureBlobStorage::log();
-    let file_name = get_log_file_name(Utc::now());
-    let contents = get_log_line(blob_name, uploader_source, metadata);
-    let _ = log_storage_client.append_to_file(file_name, &contents.as_bytes());
-    Ok(())
-}
-
-fn get_log_line(blob_name: &String, uploader_source: &String, metadata: &BlobMetadata) -> String {
-    format!("{},{},{:?}", blob_name, uploader_source, metadata)
-}
-
-fn get_log_file_name(date: DateTime<Utc>) -> String {
-    date.format("%Y-%m").to_string()
 }
 
 async fn create_blob(
