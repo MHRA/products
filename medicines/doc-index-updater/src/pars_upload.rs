@@ -56,7 +56,11 @@ async fn add_file_to_temporary_blob_storage(
     Ok(storage_file)
 }
 
-fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) -> Document {
+fn document_from_form_data(
+    storage_file: StorageFile,
+    uploader_email: String,
+    metadata: BlobMetadata,
+) -> Document {
     Document {
         id: metadata.file_name.to_string(),
         name: metadata.title.to_string(),
@@ -69,13 +73,14 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
         },
         pl_number: metadata.pl_number,
         active_substances: metadata.active_substances.to_vec_string(),
-        file_source: FileSource::TemporaryAzureBlobStorage,
+        file_source: FileSource::TemporaryAzureBlobStorage { uploader_email },
         file_path: storage_file.name,
     }
 }
 
 async fn queue_pars_upload(
     form_data: FormData,
+    uploader_email: String,
     state_manager: impl JobStatusClient,
 ) -> Result<Vec<Uuid>, Rejection> {
     let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
@@ -95,7 +100,7 @@ async fn queue_pars_upload(
                 .await
                 .map_err(warp::reject::custom)?;
 
-        let document = document_from_form_data(storage_file, metadata);
+        let document = document_from_form_data(storage_file, uploader_email.clone(), metadata);
 
         check_in_document_handler(document, &state_manager).await?;
     }
@@ -113,20 +118,25 @@ async fn upload_pars_handler(
     let _enter = span.enter();
     tracing::debug!("Received PARS submission");
 
-    let json_web_token = decode_token_from_authorization_header(authorization_header);
+    let uploader_email = get_uploader_email_from_header(authorization_header);
 
+    let job_ids = queue_pars_upload(form_data, uploader_email, state_manager).await?;
+
+    Ok(warp::reply::json(&UploadResponse { job_ids }))
+}
+
+fn get_uploader_email_from_header(authorization_header: String) -> String {
+    let json_web_token = decode_token_from_authorization_header(authorization_header);
     match json_web_token {
         Ok(token) => {
-            tracing::info!("Uploader email: {}", token.email);
+            tracing::info!("Uploader email: {}", &token.email);
+            token.email
         }
         Err(e) => {
             tracing::error!("Error decoding token: {:?}", e);
+            "Error extracting from token".to_string()
         }
     }
-
-    let job_ids = queue_pars_upload(form_data, state_manager).await?;
-
-    Ok(warp::reply::json(&UploadResponse { job_ids }))
 }
 
 #[derive(Debug, Serialize)]
@@ -365,5 +375,19 @@ mod test {
     fn decode_a_badly_formatted_jwt_token_from_authorization_header() {
         let token = decode_token_from_authorization_header(String::from("Bearer xxxx"));
         assert!(token.is_err());
+    }
+
+    #[test]
+    fn extract_uploader_email_from_header() {
+        let valid_header = String::from("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNmY5NWIyMS02M2IyLTQ3NWYtOGEzNS1kMzljZWE0Y2ZkNjEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2L3YyLjAiLCJpYXQiOjE1ODk4MDg3MzEsIm5iZiI6MTU4OTgwODczMSwiZXhwIjoxNTkwMDU5NjI0LCJhaW8iOiJBVlFBcS84UEFBQUFLSFNQZXNxRHdzTzAvaDhpNHloMVAzeHBZN1NiRkNpVWNmVDlJeVQxUE1zNnVhdW5TQkE4aUdmZHFYU0tzTDQ5aUpaMFkzTXRtZm8vaVN5QXJkYklkL041MUhiSzI4R2tURm9mSmY1bGpOOD0iLCJoYXNncm91cHMiOiJ0cnVlIiwibmFtZSI6IkJsb2dncywgSm9lIiwibm9uY2UiOiJiNzI2Y2M4Zi03ODBlLTRhZmUtYTE2Yy0wYTlmMzUxN2ZiNDYiLCJvaWQiOiI5NGI3ODVhYi1mNDhmLTRmNmYtYjMyZi05ZWJlMjFmNmIwZWQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJKb2UuQmxvZ2dzQE1pY3Jvc29mdC5jb20iLCJzdWIiOiJtOFFYbXdKQVpGWDZDQ1k3NU1jV3pRUkMzcmVhOGRnbDJuNHRKbnNFNVowIiwidGlkIjoiZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2IiwidXRpIjoiT0JJQXhoLXFRa0dBb29zTVZRMU1BQSIsInZlciI6IjIuMCIsImp0aSI6ImNlMmM5NjA1LWM5MjAtNGJkMC04NWMwLTBlOTA0MGZlMTQ5MCJ9.KWRK8mVdljCG3hpYHMSVrhIipBIq4Z_wfM9zzKAlYPw");
+        let extracted_email = get_uploader_email_from_header(valid_header);
+        assert_eq!(extracted_email, "Joe.Bloggs@Microsoft.com");
+    }
+
+    #[test]
+    fn extract_uploader_email_from_header_with_badly_formatted_jwt_token() {
+        let invalid_header = String::from("Bearer xxxx");
+        let extracted_email = get_uploader_email_from_header(invalid_header);
+        assert_eq!(extracted_email, "Error extracting from token");
     }
 }

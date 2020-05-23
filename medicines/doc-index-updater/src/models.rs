@@ -82,7 +82,9 @@ pub struct Document {
 pub enum FileSource {
     #[serde(alias = "sentinel")]
     Sentinel,
-    TemporaryAzureBlobStorage,
+    TemporaryAzureBlobStorage {
+        uploader_email: String,
+    },
 }
 
 impl Into<Document> for XMLDocument {

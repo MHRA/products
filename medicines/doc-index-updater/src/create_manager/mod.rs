@@ -1,6 +1,6 @@
 use crate::{
     create_manager::models::BlobMetadata,
-    models::{CreateMessage, JobStatus},
+    models::{CreateMessage, FileSource, JobStatus},
     service_bus_client::{
         create_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
@@ -13,6 +13,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use search_index::add_blob_to_search_index;
 use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
@@ -88,6 +89,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
 
+    let uploader_source = get_uploader_source(message.document.file_source.clone());
     let file = retrieve::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
@@ -95,7 +97,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata).await?;
+    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata.clone()).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
@@ -104,7 +106,36 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::info!("Successfully added {} to index.", &name);
 
+    log_file_upload(&name, &uploader_source, &metadata).await?;
+
     Ok(message.job_id)
+}
+
+fn get_uploader_source(source: FileSource) -> String {
+    match source {
+        FileSource::Sentinel => "sentinel".to_string(),
+        FileSource::TemporaryAzureBlobStorage { uploader_email } => format!("{}", uploader_email),
+    }
+}
+
+async fn log_file_upload(
+    blob_name: &String,
+    uploader_source: &String,
+    metadata: &BlobMetadata,
+) -> Result<(), anyhow::Error> {
+    let log_storage_client = AzureBlobStorage::log();
+    let file_name = get_log_file_name(Utc::now());
+    let contents = get_log_line(blob_name, uploader_source, metadata);
+    let _ = log_storage_client.append_to_file(file_name, &contents.as_bytes());
+    Ok(())
+}
+
+fn get_log_line(blob_name: &String, uploader_source: &String, metadata: &BlobMetadata) -> String {
+    format!("{},{},{:?}", blob_name, uploader_source, metadata)
+}
+
+fn get_log_file_name(date: DateTime<Utc>) -> String {
+    date.format("%Y-%m").to_string()
 }
 
 async fn create_blob(
@@ -147,6 +178,7 @@ mod test {
         service_bus_client::test::TestRemovableMessage,
         state_manager::test::TestJobStatusClient,
     };
+    use test_case::test_case;
     use tokio_test::block_on;
 
     fn given_an_error_has_occurred() -> ProcessMessageError {
@@ -209,5 +241,12 @@ mod test {
             removable_message.remove_was_called,
             "Message should be removed"
         );
+    }
+
+    #[test_case(FileSource::Sentinel, "sentinel".to_string())]
+    #[test_case(FileSource::TemporaryAzureBlobStorage { uploader_email: "test@email.com".to_string() }, "test@email.com".to_string())]
+    fn test_get_uploader_source(source: FileSource, expected_output: String) {
+        let actual = get_uploader_source(source);
+        assert_eq!(actual, expected_output);
     }
 }
