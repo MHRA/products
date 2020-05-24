@@ -1,16 +1,16 @@
-name: doc-index-updater-master
+name: medicines-api-master
 
 on:
   push:
     branches:
       - master
     paths:
-      - medicines/doc-index-updater/**
+      - medicines/api/**
       - medicines/search-client/**
-      - .github/workflows/doc-index-updater-master.yaml
+      - .github/workflows/medicines-api/medicines-api-master.yaml
 
 env:
-  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
 
 jobs:
   build-and-test:
@@ -31,13 +31,13 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Set .env.build
-        working-directory: ./products/medicines/doc-index-updater
+        working-directory: products/medicines/api
         run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
         env:
           SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
 
       - name: Build, test and push Docker image
-        working-directory: ./products/medicines/doc-index-updater
+        working-directory: products/medicines/api
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG
@@ -58,7 +58,7 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            cd deployments/doc-index-updater/overlays/non-prod
+            cd deployments/medicines-api/overlays/non-prod
 
             kustomize edit set image $DIGEST
 

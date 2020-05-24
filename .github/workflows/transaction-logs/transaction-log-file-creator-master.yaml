@@ -1,0 +1,24 @@
+name: transaction-log-file-creator-master
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - medicines/transaction-log-file-creator/**
+      - .github/workflows/transaction-logs/transaction-log-file-creator-master.yaml
+
+jobs:
+  build-and-test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./products/medicines/transaction-log-file-creator
+        run: cargo test

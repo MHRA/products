@@ -1,0 +1,33 @@
+name: scheduled-transaction-log-file-creator
+
+on:
+  # schedule:
+  #   # Midnight on the first day of every month
+  #   - cron:  '0 0 1 * *'
+  push:
+    paths:
+      - medicines/storage-logger/**
+      - .github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml
+
+jobs:
+  build-and-test:
+    name: Test and Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./products/medicines/transaction-log-file-creator
+        run: cargo test
+
+      - name: Run storage log
+        working-directory: ./products/medicines/transaction-log-file-creator
+        env:
+          LOG_STORAGE_CONTAINER_NAME: ${{ secrets.LOG_STORAGE_CONTAINER_NAME }}
+          LOG_STORAGE_MASTER_KEY: ${{ secrets.LOG_STORAGE_MASTER_KEY }}
+          LOG_STORAGE_ACCOUNT: ${{ secrets.LOG_STORAGE_ACCOUNT }}
+        run: cargo run

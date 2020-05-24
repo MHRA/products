@@ -1,13 +1,16 @@
-name: medicines-api-branch
+name: doc-index-updater-branch
 
 on:
   pull_request:
     branches:
       - "master"
     paths:
-      - medicines/api/**
+      - medicines/doc-index-updater/**
       - medicines/search-client/**
-      - .github/workflows/medicines-api-branch.yaml
+      - .github/workflows/doc-index-updater/doc-index-updater-branch.yaml
+
+env:
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 
 jobs:
   build-and-test:
@@ -19,13 +22,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set .env.build
-        working-directory: ./medicines/api
+        working-directory: ./medicines/doc-index-updater
         run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
         env:
           SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
 
-      - name: Build docker image
-        working-directory: ./medicines/api
+      - name: Build and test Docker image
+        working-directory: ./medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-branch tag=$TAG
