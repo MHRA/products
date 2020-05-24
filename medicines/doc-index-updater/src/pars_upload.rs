@@ -56,11 +56,7 @@ async fn add_file_to_temporary_blob_storage(
     Ok(storage_file)
 }
 
-fn document_from_form_data(
-    storage_file: StorageFile,
-    uploader_email: String,
-    metadata: BlobMetadata,
-) -> Document {
+fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) -> Document {
     Document {
         id: metadata.file_name.to_string(),
         name: metadata.title.to_string(),
@@ -73,7 +69,7 @@ fn document_from_form_data(
         },
         pl_number: metadata.pl_number,
         active_substances: metadata.active_substances.to_vec_string(),
-        file_source: FileSource::TemporaryAzureBlobStorage { uploader_email },
+        file_source: FileSource::TemporaryAzureBlobStorage,
         file_path: storage_file.name,
     }
 }
@@ -100,9 +96,9 @@ async fn queue_pars_upload(
                 .await
                 .map_err(warp::reject::custom)?;
 
-        let document = document_from_form_data(storage_file, uploader_email.clone(), metadata);
+        let document = document_from_form_data(storage_file, metadata);
 
-        check_in_document_handler(document, &state_manager).await?;
+        check_in_document_handler(document, &state_manager, Some(uploader_email)).await?;
     }
 
     Ok(job_ids)

@@ -82,9 +82,7 @@ pub struct Document {
 pub enum FileSource {
     #[serde(alias = "sentinel")]
     Sentinel,
-    TemporaryAzureBlobStorage {
-        uploader_email: String,
-    },
+    TemporaryAzureBlobStorage,
 }
 
 impl Into<Document> for XMLDocument {
@@ -160,12 +158,14 @@ impl Into<XMLJobStatusResponse> for JobStatusResponse {
 pub struct CreateMessage {
     pub job_id: Uuid,
     pub document: Document,
+    pub initiator_email: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
     pub document_content_id: String,
+    pub initiator_email: Option<String>,
 }
 
 #[async_trait]
@@ -248,6 +248,7 @@ pub mod test {
         CreateMessage {
             job_id: id,
             document: get_test_document(),
+            initiator_email: None,
         }
     }
 

@@ -59,39 +59,6 @@ mod test {
     }
 
     #[test]
-    fn test_get_log_line_with_sentinel_file_source() {
-        let doc = Document {
-            id: "CON123456".to_string(),
-            name: "Paracetamol Plus PL 12345/6789".to_string(),
-            document_type: DocumentType::Spc,
-            author: "JRR Tolkien".to_string(),
-            products: vec![
-                "Effective product 1".to_string(),
-                "Effective product 2".to_string(),
-            ],
-            keywords: Some(vec![
-                "Very good for you".to_string(),
-                "Cures headaches".to_string(),
-                "PL 12345/6789".to_string(),
-            ]),
-            pl_number: "PL 12345/6789".to_string(),
-            active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
-            file_path: "location/on/disk".to_string(),
-            file_source: FileSource::Sentinel,
-        };
-        let blob_name = "1kdlkjd1229ui09askjsadkl12da".to_string();
-        let date = chrono::DateTime::<Utc>::from(
-            DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
-        );
-
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: Sentinel, file_path: \"location/on/disk\" }".to_string();
-
-        let actual = get_log_file_upload_body(&blob_name, doc, &date);
-
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
     fn test_get_log_line_with_temporary_file_source() {
         let doc = Document {
             id: "CON123456".to_string(),
@@ -110,9 +77,7 @@ mod test {
             pl_number: "PL 12345/6789".to_string(),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
-            file_source: FileSource::TemporaryAzureBlobStorage {
-                uploader_email: "example@email.com".to_string(),
-            },
+            file_source: FileSource::TemporaryAzureBlobStorage,
         };
         let blob_name = "1kdlkjd1229ui09askjsadkl12da".to_string();
         let date = chrono::DateTime::<Utc>::from(
