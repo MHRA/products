@@ -1,7 +1,7 @@
 use crate::{
     audit_logger::log_file_upload,
     create_manager::models::BlobMetadata,
-    models::{CreateMessage, FileSource, JobStatus},
+    models::{CreateMessage, JobStatus},
     service_bus_client::{
         create_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
@@ -89,13 +89,13 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
 
-    let uploader_source = get_uploader_source(message.document.file_source.clone());
     let file = retrieve::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
     )
     .await?;
 
+    let document = message.document.clone();
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata.clone()).await?;
     let name = blob.name.clone();
@@ -106,16 +106,9 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::info!("Successfully added {} to index.", &name);
 
-    log_file_upload(&name, &uploader_source, &metadata).await?;
+    log_file_upload(&name, document).await?;
 
     Ok(message.job_id)
-}
-
-fn get_uploader_source(source: FileSource) -> String {
-    match source {
-        FileSource::Sentinel => "sentinel".to_string(),
-        FileSource::TemporaryAzureBlobStorage { uploader_email } => format!("{}", uploader_email),
-    }
 }
 
 async fn create_blob(
@@ -158,7 +151,6 @@ mod test {
         service_bus_client::test::TestRemovableMessage,
         state_manager::test::TestJobStatusClient,
     };
-    use test_case::test_case;
     use tokio_test::block_on;
 
     fn given_an_error_has_occurred() -> ProcessMessageError {
@@ -221,12 +213,5 @@ mod test {
             removable_message.remove_was_called,
             "Message should be removed"
         );
-    }
-
-    #[test_case(FileSource::Sentinel, "sentinel".to_string())]
-    #[test_case(FileSource::TemporaryAzureBlobStorage { uploader_email: "test@email.com".to_string() }, "test@email.com".to_string())]
-    fn test_get_uploader_source(source: FileSource, expected_output: String) {
-        let actual = get_uploader_source(source);
-        assert_eq!(actual, expected_output);
     }
 }
