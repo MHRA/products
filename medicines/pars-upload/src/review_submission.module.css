@@ -1,0 +1,9 @@
+.flexRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.changeLink {
+  margin-bottom: 20px; /* Matches the header on the same row so they both line up vertically */
+}

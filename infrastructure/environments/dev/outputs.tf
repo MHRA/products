@@ -54,3 +54,11 @@ output "storage_account_name" {
 output "storage_master_key" {
   value = module.products.storage_access_key
 }
+
+output "logs_resource_group_id" {
+  value = module.logs.logs_resource_group_id
+}
+
+output "logs_primary_access_key" {
+  value = module.logs.logs_primary_access_key
+}

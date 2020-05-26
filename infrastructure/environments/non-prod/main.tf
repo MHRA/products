@@ -78,6 +78,15 @@ resource "azurerm_subnet" "load_balancer" {
   virtual_network_name = data.azurerm_virtual_network.cluster.name
 }
 
+# Logs
+module logs {
+  source = "../../modules/logs"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  resource_group_name = azurerm_resource_group.products.name
+}
+
 # AKS
 module cluster {
   source = "../../modules/cluster"
@@ -96,6 +105,8 @@ module cluster {
   cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
   lb_route_table_id                     = data.azurerm_route_table.load_balancer.id
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
+  log_cluster_diagnostics               = false
+  logs_storage_account_id               = module.logs.logs_resource_group_id
 }
 
 # CPD
@@ -108,6 +119,11 @@ module cpd {
   resource_group_name = azurerm_resource_group.products.name
 }
 
+data "azurerm_public_ip" "external" {
+  name                = split("/", module.cluster.load_balancer_public_outbound_ip_id)[8]
+  resource_group_name = split("/", module.cluster.load_balancer_public_outbound_ip_id)[4]
+}
+
 # Service Bus
 module service_bus {
   source = "../../modules/service-bus"
@@ -116,6 +132,8 @@ module service_bus {
   location            = var.REGION
   name                = local.service_bus_name
   resource_group_name = azurerm_resource_group.products.name
+  redis_use_firewall  = true
+  redis_firewall_ip   = data.azurerm_public_ip.external.ip_address
 }
 
 # Key vault

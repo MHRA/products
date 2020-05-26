@@ -13,3 +13,14 @@ variable "environment" {
 variable "name" {
   description = "name for the service bus namespace"
 }
+
+variable "redis_use_firewall" {
+  type        = bool
+  description = "Whether to apply a firewall rule for Redis"
+  default     = false
+}
+
+variable "redis_firewall_ip" {
+  description = "IP allowed to access Redis Cache"
+  default     = ""
+}
