@@ -2,6 +2,7 @@
   appearance: none;
   border: none;
   background: black;
+  padding: 0;
   width: 20px;
   height: 20px;
   border-radius: 50%;

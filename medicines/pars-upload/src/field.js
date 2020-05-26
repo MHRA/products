@@ -48,8 +48,10 @@ export const Field = ({
           <span
             style={{
               position: 'absolute',
-              top: -8,
+              display: 'flex', // so that the icon is positioned the same in Chrome & FF
+              top: -4,
               right: 10,
+              height: 20,
             }}
           >
             <DeleteIcon onClick={onClickDelete} altText="Delete substance" />
