@@ -28,7 +28,7 @@ jobs:
         with:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
           username: mhraproductsdevelopmentregistry
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          password: ${{ secrets.DEVELOPMENT_REGISTRY_PASSWORD }}
 
       - name: Set .env.build
         working-directory: ./products/medicines/doc-index-updater
