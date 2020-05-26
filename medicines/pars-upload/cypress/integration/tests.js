@@ -60,7 +60,7 @@ describe('Home page', () => {
 })
 
 describe('PARs upload form', () => {
-  it('can add multiple substances', () => {
+  it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
 
     cy.findByLabelText('Product name').type('Ibuprofen pills')
@@ -80,6 +80,18 @@ describe('PARs upload form', () => {
     cy.findAllByLabelText('Active substance').last().type('Temazepam')
 
     cy.findAllByLabelText('Active substance').should('have.length', 3)
+
+    cy.findAllByText('Delete substance').eq(1).parent('button').click()
+
+    cy.findAllByLabelText('Active substance').should('have.length', 2)
+
+    cy.findAllByLabelText('Active substance')
+      .eq(0)
+      .should('have.value', 'Ibuprofen')
+
+    cy.findAllByLabelText('Active substance')
+      .eq(1)
+      .should('have.value', 'Temazepam')
   })
 
   it('can add multiple products', () => {
