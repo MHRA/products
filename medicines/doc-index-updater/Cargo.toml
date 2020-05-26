@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.26"
+async-ssh2 = { version = "0.1", git = "https://github.com/spebern/async-ssh2.git" }
 async-trait = "0.1.24"
 azure_sdk_core = "0.40.1"
 azure_sdk_service_bus = "0.43.0"
