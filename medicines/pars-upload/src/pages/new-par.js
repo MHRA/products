@@ -92,8 +92,13 @@ const UploadPdf = ({ goBack, submit }) => {
     submit(formData)
   }
 
+  const goToPrevPage = (event) => {
+    event.preventDefault()
+    goBack()
+  }
+
   return (
-    <Layout intro={<BackLink href="/" onClick={goBack} />}>
+    <Layout intro={<BackLink href="/" onClick={goToPrevPage} />}>
       <H1>Upload your PDF</H1>
 
       <form onSubmit={onSubmit}>
