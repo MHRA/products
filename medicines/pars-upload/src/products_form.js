@@ -6,6 +6,7 @@ import { Para, H1 } from './typography'
 import { BackLink } from './back-link'
 import { Field } from './field'
 import { Button } from './button'
+import { useIncrementingIds } from './useIncrementingIds'
 
 export const Products = ({
   currentStepData,
@@ -19,9 +20,12 @@ export const Products = ({
   deletePage: delPage,
 }) => {
   const formRef = useRef()
+  const getNextId = useIncrementingIds()
 
-  const [activeSubstancesCount, setNumActiveSubstances] = useState(() =>
-    currentStepData ? currentStepData.getAll('active_substance').length : 1
+  const [activeSubstanceIds, setSubstanceIds] = useState(() =>
+    currentStepData
+      ? currentStepData.getAll('active_substance').map(() => getNextId())
+      : [getNextId()]
   )
 
   const getFormData = () => {
@@ -97,13 +101,20 @@ export const Products = ({
             formData={currentStepData}
           />
         </FormGroup>
-        {range(activeSubstancesCount).map((i) => (
-          <FormGroup key={i}>
+        {activeSubstanceIds.map((id, i) => (
+          <FormGroup key={id}>
             <Field
               name="active_substance"
               label="Active substance"
               index={i}
               formData={currentStepData}
+              onClickDelete={
+                activeSubstanceIds.length > 1
+                  ? () => {
+                      setSubstanceIds((ids) => ids.filter((i) => i != id))
+                    }
+                  : null
+              }
             />
           </FormGroup>
         ))}
@@ -111,7 +122,7 @@ export const Products = ({
           secondary
           type="button"
           onClick={() => {
-            setNumActiveSubstances((n) => n + 1)
+            setSubstanceIds((ids) => [...ids, getNextId()])
           }}
         >
           Add another active substance
