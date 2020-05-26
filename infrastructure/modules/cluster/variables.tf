@@ -66,11 +66,6 @@ variable "log_cluster_diagnostics" {
   default     = false
 }
 
-variable "diagnostic_setting_name" {
-  description = "Name of the diagnostic collection setting that saves auditable logs from the cluster"
-  default     = ""
-}
-
 variable "diagnostic_log_types" {
   description = "Set of log types to create configuration for"
   type        = list(string)
@@ -79,4 +74,9 @@ variable "diagnostic_log_types" {
     "kube-controller-manager",
     "kube-scheduler",
   "cluster-autoscaler"]
+}
+
+variable "logs_storage_account_id" {
+  description = "ID of the immutable storage account used for logs"
+  default     = ""
 }

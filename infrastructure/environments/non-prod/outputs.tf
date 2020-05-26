@@ -26,6 +26,14 @@ output "products_static_web_url" {
   value = module.products.products_static_web_url
 }
 
+output "logs_resource_group_id" {
+  value = module.logs.logs_resource_group_id
+}
+
+output "logs_primary_access_key" {
+  value = module.logs.logs_primary_access_key
+}
+
 output "search_admin_key" {
   value = module.products.search_admin_key
 }
