@@ -17,3 +17,7 @@ output "host" {
 output "resource_group_name" {
   value = azurerm_kubernetes_cluster.cluster.resource_group_name
 }
+
+output "load_balancer_public_outbound_ip_id" {
+  value = tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0]
+}

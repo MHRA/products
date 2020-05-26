@@ -42,6 +42,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
   network_profile {
     network_plugin = "kubenet"
+    outbound_type  = "loadBalancer"
   }
 
   addon_profile {
