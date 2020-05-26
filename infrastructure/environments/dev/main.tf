@@ -139,12 +139,3 @@ module keyvault {
   authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
   network_acls_default_action = "Allow"
 }
-
-# Logs
-module logs {
-  source = "../../modules/logs"
-
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  resource_group_name = data.azurerm_resource_group.keyvault.name
-}
