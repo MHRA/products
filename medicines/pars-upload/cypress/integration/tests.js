@@ -63,7 +63,7 @@ describe('PARs upload form', () => {
   it('can add multiple substances', () => {
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type('Ibuprofen pills')
+    cy.findByLabelText('Brand/Generic name').type('Ibuprofen pills')
 
     cy.findByLabelText('Strength').type('Really powerful stuff')
 
@@ -90,7 +90,7 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type(productName)
+    cy.findByLabelText('Brand/Generic name').type(productName)
 
     cy.findByLabelText('Strength').type(strength)
 
@@ -133,7 +133,7 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type(productName)
+    cy.findByLabelText('Brand/Generic name').type(productName)
 
     cy.findByLabelText('Strength').type(strength)
 
@@ -228,7 +228,7 @@ describe('PARs upload form', () => {
 
     cy.findByText('New Public Assessment Report').should('exist')
 
-    cy.findByLabelText('Product name').should('have.value', productName)
+    cy.findByLabelText('Brand/Generic name').should('have.value', productName)
   })
 
   it('can submit the form sucessfully', () => {
@@ -238,7 +238,7 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type('Ibuprofen pills')
+    cy.findByLabelText('Brand/Generic name').type('Ibuprofen pills')
 
     cy.findByLabelText('Strength').type('Really powerful stuff')
 

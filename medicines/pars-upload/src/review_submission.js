@@ -71,7 +71,7 @@ const ProductSummary = ({ data, goToFormPage }) => (
       items={[
         {
           key: 'Brand/Generic name',
-          value: data.get('product_name'),
+          value: data.get('brand_generic_name'),
         },
         {
           key: 'Strength',
