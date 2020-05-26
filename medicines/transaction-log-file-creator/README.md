@@ -7,22 +7,24 @@
 
 ## Implementation details
 
-This program creates a new log file.
+This program creates a new, empty append blob file in an Azure storage account.
+
+A ![scheduled github workflow](../../.github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml) executes this code at the start of every month to create a new log file, with the log file name based on the year and month.
+
+It only creates a blob if a file of that name does not already exist, to prevent accidental overwrite.
 
 ## Development how-to
 
-The following guides explain how to get started developing the _doc-index-updater_.
-
-### To run locally
-
-### Environment variables
+### Set up environment variables
 
 The environment variables needed are listed in `.env.example`.
 
 Use this to create a `.env` file reflecting your environment which the `make` command will read.
 
-If you are using the shared environments, grab the shared envs…
+### To run locally
+
+Once you have exported your `.env` file, run `cargo run`, or, to have your environment variables included automatically, run `make`.
 
 ## To run the tests
 
-## Releasing
+Running tests can be carried out with `cargo test`, or, to have your environment variables included automatically, run `make test`.

@@ -135,8 +135,11 @@ impl StorageClient for AzureBlobStorage {
             .finalize()
             .await
             .map_err(|e| {
-                tracing::error!("Error uploading file to blob storage: {:?}", e);
-                StorageClientError::AppendError(format!("Couldn't create blob: {:?}", e))
+                tracing::error!("Error appending data to blob file: {:?}", e);
+                StorageClientError::AppendError(format!(
+                    "Couldn't append data to blob file: {:?}",
+                    e
+                ))
             })?;
         Ok(())
     }
