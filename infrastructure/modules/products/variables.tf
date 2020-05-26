@@ -27,3 +27,7 @@ variable "add_local_pars_reply_url" {
   description = "Whether to add http://localhost:3000 to allowable redirect urls"
   default     = false
 }
+
+variable "app_registration_owners" {
+  description = "Users who can update the app registration settings"
+}
