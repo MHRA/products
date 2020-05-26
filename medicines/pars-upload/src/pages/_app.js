@@ -27,18 +27,20 @@ function App({ Component, pageProps }) {
 
       setAuthError(error)
     } else {
+      console.error('Auth error:', error)
       setAuthError('Unknown error')
     }
   }
 
   useEffect(() => {
-    setAuth(getAccount())
+    getAccount().then(setAuth)
   }, [])
 
   const signOut = () => {
     if (auth) {
       auth.signOut()
     }
+
     setAuth(null)
   }
 
@@ -53,7 +55,7 @@ function App({ Component, pageProps }) {
         signIn={triggerSignIn}
       />
       {process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true' || auth ? (
-        <Component {...pageProps} account={auth ? auth.account : null} />
+        <Component {...pageProps} auth={auth} />
       ) : (
         <SignInRequest
           signIn={triggerSignIn}

@@ -9,7 +9,7 @@ import { Field } from '../field'
 import { Products } from '../products_form'
 import { SummaryListWithoutActions } from '../summary_list'
 
-const ParUpload = ({ account }) => {
+const ParUpload = ({ auth }) => {
   const [submissionState, setSubmissionState] = useState()
   const [submittedAt, setSubmissionTime] = useState(() => new Date())
 
@@ -22,7 +22,7 @@ const ParUpload = ({ account }) => {
         steps.map(({ data }) => data).filter((data) => data)
       )
 
-      const token = 'token' // TODO
+      const token = auth ? auth.token : 'auth-token'
 
       const response = await fetch(process.env.NEXT_PUBLIC_PARS_UPLOAD_URL, {
         method: 'POST',
@@ -62,7 +62,10 @@ const ParUpload = ({ account }) => {
       )
     case 'success':
       return (
-        <Success name={account ? account.name : ''} submittedAt={submittedAt} />
+        <Success
+          name={auth ? auth.account.name : ''}
+          submittedAt={submittedAt}
+        />
       )
   }
 }
@@ -89,8 +92,13 @@ const UploadPdf = ({ goBack, submit }) => {
     submit(formData)
   }
 
+  const goToPrevPage = (event) => {
+    event.preventDefault()
+    goBack()
+  }
+
   return (
-    <Layout intro={<BackLink href="/" onClick={goBack} />}>
+    <Layout intro={<BackLink href="/" onClick={goToPrevPage} />}>
       <H1>Upload your PDF</H1>
 
       <form onSubmit={onSubmit}>
