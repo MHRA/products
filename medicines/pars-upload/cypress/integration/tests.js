@@ -69,17 +69,17 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Pharmaceutical dose form').type('some form')
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another active substance').click()
+    cy.findByText('Add another Active substance(s)').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
-    cy.findByText('Add another active substance').click()
+    cy.findByText('Add another Active substance(s)').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Temazepam')
+    cy.findAllByLabelText('Active substance(s)').last().type('Temazepam')
 
-    cy.findAllByLabelText('Active substance').should('have.length', 3)
+    cy.findAllByLabelText('Active substance(s)').should('have.length', 3)
   })
 
   it('can add multiple products', () => {
@@ -96,11 +96,11 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Pharmaceutical dose form').type(dose)
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another active substance').click()
+    cy.findByText('Add another Active substance(s)').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     cy.findByText('Licence number')
       .parent()
@@ -139,11 +139,11 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Pharmaceutical dose form').type(dose)
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another active substance').click()
+    cy.findByText('Add another Active substance(s)').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     cy.findByText('Licence number')
       .parent()
@@ -244,11 +244,11 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Pharmaceutical dose form').type('some form')
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another active substance').click()
+    cy.findByText('Add another Active substance(s)').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     const license = { type: 'THR', part_one: '12345', part_two: '6789' }
 
