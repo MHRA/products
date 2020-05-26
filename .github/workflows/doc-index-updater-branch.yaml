@@ -40,7 +40,7 @@ jobs:
         working-directory: ./products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci-master tag=$TAG
+          make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
           echo ::set-env name=TAG::$TAG
           echo ::set-env name=DIGEST::$DIGEST
