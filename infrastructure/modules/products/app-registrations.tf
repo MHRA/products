@@ -4,6 +4,7 @@ resource "azuread_application" "pars-upload" {
   group_membership_claims = "SecurityGroup"
   homepage                = "https://${azurerm_cdn_endpoint.pars.host_name}" #don't think we need this
   oauth2_allow_implicit_flow = true
+  owners = var.app_registration_owners
   app_role {
     allowed_member_types = [
       "User",

@@ -45,6 +45,7 @@ module "products" {
   pars_namespace      = local.pars_namespace
   resource_group_name = data.azurerm_resource_group.products.name
   search_sku          = "standard"
+  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
 }
 
 data "azurerm_route_table" "load_balancer" {
