@@ -42,6 +42,10 @@ const ParUpload = ({ auth }) => {
     } catch (error) {
       setSubmissionState('error')
       console.error('Error submitting form: ', error)
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
     }
   }
 
