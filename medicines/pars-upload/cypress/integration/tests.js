@@ -94,7 +94,7 @@ describe('PARs upload form', () => {
       .should('have.value', 'Temazepam')
   })
 
-  it('can add multiple products', () => {
+  it('can add and delete multiple products', () => {
     const productName = 'Ibuprofen pills'
     const strength = 'Really powerful stuff'
     const dose = 'some form'
@@ -125,11 +125,27 @@ describe('PARs upload form', () => {
 
     cy.findByText('Add another product').click()
 
-    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+    // Form should now be blank and ready for entering another product
+    cy.findByLabelText('Product name').should('have.value', '')
 
-    cy.findByText(
-      `${productName}, ${strength}, ${dose}, ${license_str}`
-    ).should('exist')
+    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+    const product_title = `${productName}, ${strength}, ${dose}, ${license_str}`
+
+    cy.findByText(product_title)
+      .parent()
+      .within(() => {
+        cy.findByText('Edit').click()
+      })
+
+    cy.findByLabelText('Product name').should('have.value', productName)
+
+    cy.findByText(product_title)
+      .parent()
+      .within(() => {
+        cy.findByText('Remove').click()
+      })
+
+    cy.findByLabelText('Product name').should('have.value', '')
   })
 
   it('review page shows the correct information', () => {
