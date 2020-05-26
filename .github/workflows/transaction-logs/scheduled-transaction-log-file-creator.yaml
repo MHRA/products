@@ -1,13 +1,9 @@
 name: scheduled-transaction-log-file-creator
 
 on:
-  # schedule:
-  #   # Midnight on the first day of every month
-  #   - cron:  '0 0 1 * *'
-  push:
-    paths:
-      - medicines/storage-logger/**
-      - .github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml
+  schedule:
+    # Midnight on the first day of every month
+    - cron: "0 0 1 * *"
 
 jobs:
   build-and-test:
