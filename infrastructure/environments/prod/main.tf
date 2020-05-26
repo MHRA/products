@@ -69,7 +69,7 @@ module logs {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = data.azurerm_resource_group.keyvault.name
+  resource_group_name = data.azurerm_resource_group.products.name
 }
 
 # AKS
@@ -92,7 +92,7 @@ module cluster {
   default_node_count                    = "3"
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
   log_cluster_diagnostics               = true
-  logs_storage_account_id               = azurerm_storage_account.logs.id
+  logs_storage_account_id               = module.logs.logs_resource_group_id
 }
 
 # Service Bus

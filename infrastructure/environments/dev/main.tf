@@ -92,7 +92,7 @@ module logs {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = data.azurerm_resource_group.keyvault.name
+  resource_group_name = data.azurerm_resource_group.products.name
 }
 
 # AKS
