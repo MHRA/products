@@ -16,6 +16,7 @@ export const Products = ({
   savePageState,
   goBack,
   goToPage: go,
+  deletePage: delPage,
 }) => {
   const formRef = useRef()
 
@@ -56,6 +57,12 @@ export const Products = ({
     go(newPageIndex)
   }
 
+  const deletePage = (pageIndex) => {
+    savePageState(getFormData())
+
+    delPage(pageIndex)
+  }
+
   return (
     <Layout intro={<BackLink href="/" onClick={goBack} />}>
       <H1>New Public Assessment Report</H1>
@@ -67,7 +74,9 @@ export const Products = ({
 
       <PreviousProductsSummary
         products={steps.filter(({ type, data }) => type === 'product' && data)}
+        currentStepIndex={currentStepIndex}
         goToPage={goToPage}
+        deletePage={deletePage}
       />
 
       <form onSubmit={onSubmit} ref={formRef}>
@@ -117,30 +126,63 @@ export const Products = ({
   )
 }
 
-const PreviousProductsSummary = ({ products, goToPage }) => {
+const PreviousProductsSummary = ({
+  products,
+  currentStepIndex,
+  goToPage,
+  deletePage,
+}) => {
   if (!products.length) {
     return null
   }
 
   return (
     <dl className="govuk-summary-list">
-      {products.map(({ data, index }) => (
-        <div key={index} className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">{product_title(data)}</dt>
-          <dd className="govuk-summary-list__actions">
-            <a
-              href="#"
-              className="govuk-link"
-              onClick={(event) => {
-                event.preventDefault()
-                goToPage(index)
+      {products.map(({ data, index }) => {
+        const showRemoveButton =
+          index === currentStepIndex && products.length > 1
+
+        return (
+          <div key={index} className="govuk-summary-list__row">
+            <dt
+              className="govuk-summary-list__key"
+              style={{
+                fontWeight: index === currentStepIndex ? 'bold' : 'normal',
               }}
             >
-              Edit<span className="govuk-visually-hidden"> product</span>
-            </a>
-          </dd>
-        </div>
-      ))}
+              {product_title(data)}
+            </dt>
+            <dd className="govuk-summary-list__actions">
+              <a
+                href="#"
+                className="govuk-link"
+                style={
+                  showRemoveButton
+                    ? {
+                        // Couldn't find anything in the design system for updating
+                        // the link colour, so just nabbed this from:
+                        // https://design-system.service.gov.uk/styles/colour/
+                        color: '#d4351c',
+                      }
+                    : {}
+                }
+                onClick={(event) => {
+                  event.preventDefault()
+
+                  if (showRemoveButton) {
+                    deletePage(index)
+                  } else {
+                    goToPage(index)
+                  }
+                }}
+              >
+                {showRemoveButton ? 'Remove' : 'Edit'}
+                <span className="govuk-visually-hidden"> product</span>
+              </a>
+            </dd>
+          </div>
+        )
+      })}
     </dl>
   )
 }
