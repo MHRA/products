@@ -13,7 +13,7 @@ export const SignInRequest = ({ signIn, error }) => (
         data-module="govuk-error-summary"
       >
         <h2 className="govuk-error-summary__title" id="error-summary-title">
-          Sign in problem
+          There is a problem
         </h2>
         <div className="govuk-error-summary__body">
           <ul className="govuk-list govuk-error-summary__list">
@@ -27,12 +27,12 @@ export const SignInRequest = ({ signIn, error }) => (
         title="Public Assessment Reports"
         style={{ textDecoration: 'none' }}
       >
-        PARs
+        Public Assessment Report
       </abbr>{' '}
       upload
     </H1>
 
-    <Para>If you are a medical writer, you can sign in to upload PARs.</Para>
+    <Para>To access this service you need to sign in with your MHRA email address and password. If you can not access it, please contact your line manager.</Para>
     <Para>
       <Button type="button" onClick={signIn}>
         Sign in

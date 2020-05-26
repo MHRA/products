@@ -73,8 +73,8 @@ export const Products = ({
       <form onSubmit={onSubmit} ref={formRef}>
         <FormGroup>
           <Field
-            name="product_name"
-            label="Product name"
+            name="brand_generic_name"
+            label="Brand/Generic name"
             formData={currentStepData}
           />
         </FormGroup>
@@ -92,7 +92,7 @@ export const Products = ({
           <FormGroup key={i}>
             <Field
               name="active_substance"
-              label="Active substance"
+              label="Active substance(s)"
               index={i}
               formData={currentStepData}
             />
@@ -192,7 +192,7 @@ const LicenseNumber = ({ formData }) => (
 
 const product_title = (formData) =>
   [
-    formData.get('product_name'),
+    formData.get('brand_generic_name'),
     formData.get('strength'),
     formData.get('pharmaceutical_dose'),
     license_number(formData),
