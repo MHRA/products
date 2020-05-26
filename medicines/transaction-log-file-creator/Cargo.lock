@@ -553,11 +553,13 @@ dependencies = [
  "azure_sdk_storage_core",
  "chrono",
  "futures",
+ "hyper",
  "lazy_static",
  "md5",
  "regex",
  "test-case",
  "tokio",
+ "tokio-test",
 ]
 
 [[package]]
@@ -1194,6 +1196,17 @@ dependencies = [
  "rustls",
  "tokio",
  "webpki",
+]
+
+[[package]]
+name = "tokio-test"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed0049c119b6d505c4447f5c64873636c7af6c75ab0d45fd9f618d82acb8016d"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "tokio",
 ]
 
 [[package]]
