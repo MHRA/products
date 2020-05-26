@@ -131,8 +131,6 @@ impl StorageClient for AzureBlobStorage {
             .put_append_block()
             .with_container_name(&self.container_name)
             .with_blob_name(&file_name)
-            // .with_content_type("application/pdf")
-            // .with_content_disposition(&append_contents)
             .with_body(body)
             .finalize()
             .await

@@ -79,6 +79,7 @@ where
 async fn delete_document_handler(
     document_content_id: String,
     state_manager: StateManager,
+    initiator_email: Option<String>,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
         let id = accept_job(&state_manager).await?.id;
@@ -88,6 +89,7 @@ async fn delete_document_handler(
         let message = DeleteMessage {
             job_id: id,
             document_content_id,
+            initiator_email,
         };
 
         queue_job(&mut queue, &state_manager, message)
@@ -105,7 +107,7 @@ async fn delete_document_xml_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = delete_document_handler(document_content_id, state_manager)
+    let r: XMLJobStatusResponse = delete_document_handler(document_content_id, state_manager, None)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
@@ -115,7 +117,7 @@ async fn delete_document_json_handler(
     document_content_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = delete_document_handler(document_content_id, state_manager).await?;
+    let r = delete_document_handler(document_content_id, state_manager, None).await?;
     Ok(warp::reply::json(&r))
 }
 

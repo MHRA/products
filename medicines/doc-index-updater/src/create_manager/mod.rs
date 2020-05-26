@@ -1,5 +1,5 @@
 use crate::{
-    audit_logger::log_file_upload,
+    audit_logger::log_transaction,
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     service_bus_client::{
@@ -89,13 +89,14 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
 
+    let message_for_log = message.clone();
+    log_transaction(&"Name".to_string(), message_for_log).await?;
     let file = retrieve::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
     )
     .await?;
 
-    let document = message.document.clone();
     let metadata: BlobMetadata = message.document.into();
     let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata.clone()).await?;
     let name = blob.name.clone();
@@ -106,7 +107,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::info!("Successfully added {} to index.", &name);
 
-    log_file_upload(&name, document).await?;
+    // log_transaction(&name, message_for_log).await?;
 
     Ok(message.job_id)
 }

@@ -1,42 +1,35 @@
-use crate::{
-    models::Document,
-    storage_client::{AzureBlobStorage, StorageClient},
-};
-// use anyhow::anyhow;
+use crate::storage_client::{AzureBlobStorage, StorageClient};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use core::fmt::Debug;
 
-pub async fn log_file_upload(blob_name: &String, document: Document) -> Result<(), anyhow::Error> {
+pub async fn log_transaction<T>(blob_name: &String, log_contents: T) -> Result<(), anyhow::Error>
+where
+    T: Debug,
+{
     let log_storage_client = AzureBlobStorage::log();
     let datetime_now = Utc::now();
     let file_name = get_log_file_name(&datetime_now);
-    let body = get_log_file_upload_body(blob_name, document, &datetime_now);
-    let _ = log_storage_client.append_to_file(file_name, &body.as_bytes());
-    Ok(())
+    let body = get_log_body(blob_name, log_contents, &datetime_now);
+    log_storage_client
+        .append_to_file(file_name, &body.as_bytes())
+        .await
+        .map_err(|e| {
+            eprintln!("Error appending to blob: {:?}", e);
+            anyhow!("Error appending to blob")
+        })
 }
 
-fn get_log_file_upload_body(
-    blob_name: &String,
-    document: Document,
-    datetime_now: &DateTime<Utc>,
-) -> String {
+fn get_log_body<T>(blob_name: &String, log_contents: T, datetime_now: &DateTime<Utc>) -> String
+where
+    T: Debug,
+{
     format!(
-        "{},{},{},{:?}",
+        "{},{},{:?}\n",
         blob_name,
         datetime_now.format("%Y-%m-%d %H:%M:%S"),
-        "CREATED",
-        document
+        log_contents
     )
-}
-
-// TODO: need to work out how to get source into delete message
-
-pub async fn log_file_delete(blob_name: &String, document: Document) -> Result<(), anyhow::Error> {
-    let log_storage_client = AzureBlobStorage::log();
-    let datetime_now = Utc::now();
-    let file_name = get_log_file_name(&datetime_now);
-    let body = get_log_file_upload_body(blob_name, document, &datetime_now);
-    let _ = log_storage_client.append_to_file(file_name, &body.as_bytes());
-    Ok(())
 }
 
 fn get_log_file_name(date: &DateTime<Utc>) -> String {
@@ -46,8 +39,9 @@ fn get_log_file_name(date: &DateTime<Utc>) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::models::FileSource;
+    use crate::models::{CreateMessage, DeleteMessage, Document, FileSource};
     use search_client::models::DocumentType;
+    use uuid::Uuid;
 
     #[test]
     fn test_get_log_file_name() {
@@ -58,9 +52,9 @@ mod test {
         assert_eq!(log_file_name, "file-change-log-1996-12".to_string());
     }
 
-    #[test]
-    fn test_get_log_line_with_temporary_file_source() {
-        let doc = Document {
+    fn get_create_message() -> CreateMessage {
+        let job_id = Uuid::parse_str(&"739b7840-a1e9-42eb-8013-0120cdf066bc").unwrap();
+        let document = Document {
             id: "CON123456".to_string(),
             name: "Paracetamol Plus PL 12345/6789".to_string(),
             document_type: DocumentType::Spc,
@@ -79,13 +73,49 @@ mod test {
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::TemporaryAzureBlobStorage,
         };
+        let initiator_email = Some("example@email.com".to_string());
+        CreateMessage {
+            document,
+            job_id,
+            initiator_email,
+        }
+    }
+
+    fn get_delete_message() -> DeleteMessage {
+        let job_id = Uuid::parse_str(&"739b7840-a1e9-42eb-8013-0120cdf066bc").unwrap();
+        let document_content_id = "CON123456789".to_string();
+        let initiator_email = Some("example@email.com".to_string());
+        DeleteMessage {
+            job_id,
+            document_content_id,
+            initiator_email,
+        }
+    }
+
+    #[test]
+    fn test_get_log_line_for_create_message() {
         let blob_name = "1kdlkjd1229ui09askjsadkl12da".to_string();
         let date = chrono::DateTime::<Utc>::from(
             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
         );
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage { uploader_email: \"example@email.com\" }, file_path: \"location/on/disk\" }".to_string();
+        let message = get_create_message();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,CreateMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document: Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage, file_path: \"location/on/disk\" }, initiator_email: Some(\"example@email.com\") }".to_string();
 
-        let actual = get_log_file_upload_body(&blob_name, doc, &date);
+        let actual = get_log_body(&blob_name, message, &date);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_get_log_line_for_delete_message() {
+        let blob_name = "1kdlkjd1229ui09askjsadkl12da".to_string();
+        let date = chrono::DateTime::<Utc>::from(
+            DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
+        );
+        let message = get_delete_message();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,DeleteMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document_content_id: \"CON123456789\", initiator_email: Some(\"example@email.com\") }".to_string();
+
+        let actual = get_log_body(&blob_name, message, &date);
 
         assert_eq!(actual, expected);
     }

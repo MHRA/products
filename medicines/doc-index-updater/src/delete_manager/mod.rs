@@ -1,4 +1,5 @@
 use crate::{
+    audit_logger::log_transaction,
     models::{DeleteMessage, JobStatus},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
@@ -116,6 +117,7 @@ async fn process_delete_message(
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
+    let message_for_log = message.clone();
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -152,6 +154,10 @@ async fn process_delete_message(
     }
 
     tracing::info!("Successfully deleted blob {}", &blob_name);
+
+    log_transaction(&blob_name, message_for_log).await?;
+
+    tracing::info!("Successfully logged transaction {}", &blob_name);
 
     Ok(message.job_id)
 }
@@ -501,6 +507,7 @@ mod test {
         let delete_message = DeleteMessage {
             document_content_id: "our_id".to_owned(),
             job_id: Uuid::new_v4(),
+            initiator_email: None,
         };
 
         TestRemovableMessage::<DeleteMessage> {

@@ -98,7 +98,7 @@ async fn queue_pars_upload(
 
         let document = document_from_form_data(storage_file, metadata);
 
-        check_in_document_handler(document, &state_manager, Some(uploader_email)).await?;
+        check_in_document_handler(document, &state_manager, Some(uploader_email.clone())).await?;
     }
 
     Ok(job_ids)
