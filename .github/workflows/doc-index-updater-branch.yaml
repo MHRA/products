@@ -46,11 +46,11 @@ jobs:
           echo ::set-env name=DIGEST::$DIGEST
 
       - name: Clone Deployments repo
-      uses: actions/checkout@v2
-      with:
-        repository: MHRA/deployments
-        path: deployments
-        token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
+        uses: actions/checkout@v2
+        with:
+          repository: MHRA/deployments
+          path: deployments
+          token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
 
       - name: Update image tag
         uses: stefanprodan/kube-tools@v1
