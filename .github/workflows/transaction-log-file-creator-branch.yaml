@@ -1,4 +1,4 @@
-name: transction-log-file-creator-branch
+name: transaction-log-file-creator-branch
 
 on:
   pull_request:
