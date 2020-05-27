@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - medicines/web/**
-      - .github/workflows/medicines-web/medicines-web-master.yaml
+      - .github/workflows/medicines-web-master.yaml
 
 env:
   AZURE_SEARCH_API_VERSION: 2017-11-11

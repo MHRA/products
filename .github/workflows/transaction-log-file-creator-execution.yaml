@@ -1,4 +1,4 @@
-name: scheduled-transaction-log-file-creator
+name: transaction-log-file-creator-execution
 
 on:
   schedule:

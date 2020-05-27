@@ -1,12 +1,12 @@
-name: learning-web-master
+name: learning-web-branch
 
 on:
-  push:
+  pull_request:
     branches:
-      - master
+      - "master"
     paths:
       - learning/web/**
-      - .github/workflows/learning-web/learning-web-master.yaml
+      - .github/workflows/learning-web-branch.yaml
 
 env:
   GATSBY_GOOGLE_ANALYTICS_TRACKING_ID: UA-6838115-14
@@ -14,7 +14,7 @@ env:
 
 jobs:
   build:
-    name: Build, test and deploy
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
@@ -62,11 +62,3 @@ jobs:
         run: yarn build
         env:
           PATH_PREFIX: "/"
-
-      - name: Deploy learning web to static site in azure storage
-        # master causes this step to fail so pointing to last working commit until fixed
-        uses: lauchacarro/Azure-Storage-Action@9225056
-        with:
-          enabled-static-website: true
-          folder: learning/web/public
-          connection-string: ${{ secrets.AZURE_STORAGE_LEARNING_WEB_CONNECTION_STRING }}

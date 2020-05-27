@@ -1,12 +1,12 @@
-name: transction-log-file-creator-branch
+name: transaction-log-file-creator-master
 
 on:
-  pull_request:
+  push:
     branches:
-      - "master"
+      - master
     paths:
       - medicines/transaction-log-file-creator/**
-      - .github/workflows/transaction-logs/transaction-log-file-creator-branch.yaml
+      - .github/workflows/transaction-log-file-creator-master.yaml
 
 jobs:
   build-and-test:
