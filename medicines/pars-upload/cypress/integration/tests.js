@@ -29,7 +29,7 @@ const mockSuccessfulSubmission = () => {
     url: parsUrl,
     status: 200,
     headers: {
-      'access-control-allow-headers': 'authorization',
+      'access-control-allow-headers': 'authorization, username',
       'access-control-allow-methods': 'POST',
       'access-control-allow-origin': baseUrl,
       'content-length': '0',
