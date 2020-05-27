@@ -71,11 +71,11 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another Active substance(s)').click()
+    cy.findByText('Add another active substance').click()
 
     cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
-    cy.findByText('Add another Active substance(s)').click()
+    cy.findByText('Add another active substance').click()
 
     cy.findAllByLabelText('Active substance(s)').last().type('Temazepam')
 
@@ -98,7 +98,7 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another Active substance(s)').click()
+    cy.findByText('Add another active substance').click()
 
     cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
@@ -141,7 +141,7 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another Active substance(s)').click()
+    cy.findByText('Add another active substance').click()
 
     cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
@@ -246,7 +246,7 @@ describe('PARs upload form', () => {
 
     cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
-    cy.findByText('Add another Active substance(s)').click()
+    cy.findByText('Add another active substance').click()
 
     cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
