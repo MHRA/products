@@ -22,4 +22,3 @@ tokio = { version = "0.2", features = ["macros", "time"] }
 [dev-dependencies]
 hyper = "0.13"
 test-case = "1.0.0"
-tokio-test = "0.2.0"

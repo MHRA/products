@@ -18,7 +18,7 @@ jobs:
 
       - name: Test
         working-directory: ./products/medicines/transaction-log-file-creator
-        run: cargo test
+        run: make test
 
       - name: Run storage log
         working-directory: ./products/medicines/transaction-log-file-creator

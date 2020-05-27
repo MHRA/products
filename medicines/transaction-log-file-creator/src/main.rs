@@ -1,6 +1,5 @@
 extern crate lazy_static;
 use anyhow::anyhow;
-use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
@@ -15,32 +14,6 @@ async fn main() {
             eprintln!("Error creating blob: {:?}", e);
             panic!("Couldn't create blob");
         }
-    }
-}
-
-#[async_trait]
-trait AppendBlob {
-    async fn get_append_blob_exists(
-        &self,
-        blob_name: &str,
-        container_name: &str,
-    ) -> Result<bool, AzureError>;
-}
-
-#[async_trait]
-impl AppendBlob for Client {
-    async fn get_append_blob_exists(
-        &self,
-        blob_name: &str,
-        container_name: &str,
-    ) -> Result<bool, AzureError> {
-        let _ = self
-            .get_blob()
-            .with_container_name(container_name)
-            .with_blob_name(blob_name)
-            .finalize()
-            .await?;
-        Ok(true)
     }
 }
 
@@ -88,19 +61,29 @@ async fn create_append_blob(client: &Client, blob_name: String) -> Result<(), an
     Ok(())
 }
 
-async fn should_create_blob(
-    client: &dyn AppendBlob,
+async fn should_create_blob(client: &Client, blob_name: &str, container_name: &str) -> bool {
+    let get_blob_exists_result = get_if_file_exists(client, blob_name, container_name).await;
+    result_is_file_does_not_exist_error(get_blob_exists_result)
+}
+
+async fn get_if_file_exists(
+    client: &Client,
     blob_name: &str,
     container_name: &str,
-) -> bool {
-    let blob_exists_result = client
-        .get_append_blob_exists(blob_name, container_name)
-        .await;
-    match blob_exists_result {
+) -> Result<bool, AzureError> {
+    client
+        .get_blob()
+        .with_container_name(container_name)
+        .with_blob_name(blob_name)
+        .finalize()
+        .await
+        .map(|_response| true)
+}
+
+fn result_is_file_does_not_exist_error(result: Result<bool, AzureError>) -> bool {
+    match result {
         Err(AzureError::UnexpectedHTTPResult(e)) => {
-            let blob_does_not_exist =
-                e.to_string() == "Unexpected HTTP result (expected: [200], received: 404)";
-            return blob_does_not_exist;
+            e.to_string() == "Unexpected HTTP result (expected: [200], received: 404)"
         }
         _ => false,
     }
@@ -111,7 +94,7 @@ mod test {
     use super::*;
     use azure_sdk_core::errors::UnexpectedHTTPResult;
     use hyper::StatusCode;
-    use tokio_test::block_on;
+    use test_case::test_case;
 
     #[test]
     fn test_get_log_file_name() {
@@ -122,64 +105,30 @@ mod test {
         assert_eq!(log_file_name, "file-change-log-1996-12".to_string());
     }
 
-    #[test]
-    fn should_create_blob_returns_true_when_it_does_not_already_exist() {
-        let client = TestClient {};
-        let should_create_blob_result = block_on(should_create_blob(
-            &client,
-            &"blob_not_found",
-            &"container_name",
-        ));
-        assert_eq!(should_create_blob_result, true);
+    fn get_file_not_found_error() -> AzureError {
+        AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(
+            StatusCode::from_u16(200).unwrap(),
+            StatusCode::from_u16(404).unwrap(),
+            &"",
+        ))
     }
 
-    #[test]
-    fn should_create_blob_returns_false_when_it_does_already_exist() {
-        let client = TestClient {};
-        let should_create_blob_result = block_on(should_create_blob(
-            &client,
-            &"blob_exists",
-            &"container_name",
-        ));
-        assert_eq!(should_create_blob_result, false);
+    fn get_other_error() -> AzureError {
+        AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(
+            StatusCode::from_u16(200).unwrap(),
+            StatusCode::from_u16(400).unwrap(),
+            &"",
+        ))
     }
 
-    #[test]
-    fn should_create_blob_returns_false_when_encountering_another_error() {
-        let client = TestClient {};
-        let should_create_blob_result = block_on(should_create_blob(
-            &client,
-            &"other_error",
-            &"container_name",
-        ));
-        assert_eq!(should_create_blob_result, false);
-    }
-
-    struct TestClient {}
-
-    #[async_trait]
-    impl AppendBlob for TestClient {
-        async fn get_append_blob_exists(
-            &self,
-            blob_name: &str,
-            _container_name: &str,
-        ) -> Result<bool, AzureError> {
-            match blob_name {
-                "blob_exists" => Ok(true),
-                "blob_not_found" => {
-                    Err(AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(
-                        StatusCode::from_u16(200).unwrap(),
-                        StatusCode::from_u16(404).unwrap(),
-                        &"",
-                    )))
-                }
-                "other_error" => Err(AzureError::UnexpectedHTTPResult(UnexpectedHTTPResult::new(
-                    StatusCode::from_u16(200).unwrap(),
-                    StatusCode::from_u16(400).unwrap(),
-                    &"",
-                ))),
-                _ => panic!("Test blob name does not match any arms"),
-            }
-        }
+    #[test_case(Err(get_file_not_found_error()), true)]
+    #[test_case(Err(get_other_error()), false)]
+    #[test_case(Ok(true), false)]
+    fn check_result_returns_true_when_file_does_not_exist(
+        input: Result<bool, AzureError>,
+        expected_output: bool,
+    ) {
+        let result = result_is_file_does_not_exist_error(input);
+        assert_eq!(result, expected_output);
     }
 }
