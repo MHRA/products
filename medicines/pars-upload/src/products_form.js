@@ -87,7 +87,7 @@ export const Products = ({
         <FormGroup>
           <Field
             name="product_name"
-            label="Product name"
+            label="Brand/Generic name"
             formData={currentStepData}
           />
         </FormGroup>
@@ -105,7 +105,7 @@ export const Products = ({
           <FormGroup key={id}>
             <Field
               name="active_substance"
-              label="Active substance"
+              label="Active substance(s)"
               index={i}
               formData={currentStepData}
               onClickDelete={

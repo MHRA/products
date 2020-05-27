@@ -50,6 +50,7 @@ module "products" {
   pars_namespace           = local.pars_namespace
   resource_group_name      = azurerm_resource_group.products.name
   add_local_pars_reply_url = true
+  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
 }
 
 # website

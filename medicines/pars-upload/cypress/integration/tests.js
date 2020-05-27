@@ -29,7 +29,7 @@ const mockSuccessfulSubmission = () => {
     url: parsUrl,
     status: 200,
     headers: {
-      'access-control-allow-headers': 'authorization',
+      'access-control-allow-headers': 'authorization, username',
       'access-control-allow-methods': 'POST',
       'access-control-allow-origin': baseUrl,
       'content-length': '0',
@@ -63,33 +63,33 @@ describe('PARs upload form', () => {
   it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type('Ibuprofen pills')
+    cy.findByLabelText('Brand/Generic name').type('Ibuprofen pills')
 
     cy.findByLabelText('Strength').type('Really powerful stuff')
 
     cy.findByLabelText('Pharmaceutical dose form').type('some form')
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
     cy.findByText('Add another active substance').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     cy.findByText('Add another active substance').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Temazepam')
+    cy.findAllByLabelText('Active substance(s)').last().type('Temazepam')
 
-    cy.findAllByLabelText('Active substance').should('have.length', 3)
+    cy.findAllByLabelText('Active substance(s)').should('have.length', 3)
 
     cy.findAllByText('Delete substance').eq(1).parent('button').click()
 
-    cy.findAllByLabelText('Active substance').should('have.length', 2)
+    cy.findAllByLabelText('Active substance(s)').should('have.length', 2)
 
-    cy.findAllByLabelText('Active substance')
+    cy.findAllByLabelText('Active substance(s)')
       .eq(0)
       .should('have.value', 'Ibuprofen')
 
-    cy.findAllByLabelText('Active substance')
+    cy.findAllByLabelText('Active substance(s)')
       .eq(1)
       .should('have.value', 'Temazepam')
   })
@@ -102,17 +102,17 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type(productName)
+    cy.findByLabelText('Brand/Generic name').type(productName)
 
     cy.findByLabelText('Strength').type(strength)
 
     cy.findByLabelText('Pharmaceutical dose form').type(dose)
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
     cy.findByText('Add another active substance').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     cy.findByText('Licence number')
       .parent()
@@ -126,7 +126,7 @@ describe('PARs upload form', () => {
     cy.findByText('Add another product').click()
 
     // Form should now be blank and ready for entering another product
-    cy.findByLabelText('Product name').should('have.value', '')
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
     const license_str = `${license.type} ${license.part_one}/${license.part_two}`
     const product_title = `${productName}, ${strength}, ${dose}, ${license_str}`
@@ -137,7 +137,7 @@ describe('PARs upload form', () => {
         cy.findByText('Edit').click()
       })
 
-    cy.findByLabelText('Product name').should('have.value', productName)
+    cy.findByLabelText('Brand/Generic name').should('have.value', productName)
 
     cy.findByText(product_title)
       .parent()
@@ -145,7 +145,7 @@ describe('PARs upload form', () => {
         cy.findByText('Remove').click()
       })
 
-    cy.findByLabelText('Product name').should('have.value', '')
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
   })
 
   it('review page shows the correct information', () => {
@@ -161,17 +161,17 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type(productName)
+    cy.findByLabelText('Brand/Generic name').type(productName)
 
     cy.findByLabelText('Strength').type(strength)
 
     cy.findByLabelText('Pharmaceutical dose form').type(dose)
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
     cy.findByText('Add another active substance').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     cy.findByText('Licence number')
       .parent()
@@ -256,7 +256,7 @@ describe('PARs upload form', () => {
 
     cy.findByText('New Public Assessment Report').should('exist')
 
-    cy.findByLabelText('Product name').should('have.value', productName)
+    cy.findByLabelText('Brand/Generic name').should('have.value', productName)
   })
 
   it('can submit the form sucessfully', () => {
@@ -266,17 +266,17 @@ describe('PARs upload form', () => {
 
     cy.visit('/new-par')
 
-    cy.findByLabelText('Product name').type('Ibuprofen pills')
+    cy.findByLabelText('Brand/Generic name').type('Ibuprofen pills')
 
     cy.findByLabelText('Strength').type('Really powerful stuff')
 
     cy.findByLabelText('Pharmaceutical dose form').type('some form')
 
-    cy.findByLabelText('Active substance').type('Ibuprofen')
+    cy.findByLabelText('Active substance(s)').type('Ibuprofen')
 
     cy.findByText('Add another active substance').click()
 
-    cy.findAllByLabelText('Active substance').last().type('Paracetamol')
+    cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
     const license = { type: 'THR', part_one: '12345', part_two: '6789' }
 
