@@ -7,7 +7,6 @@ export async function getAccount() {
 
   if (account) {
     const token = (await getToken(msalInstance)).accessToken
-    console.log({ token })
 
     return {
       account,
