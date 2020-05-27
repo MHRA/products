@@ -6,18 +6,15 @@ export async function getAccount() {
   const account = msalInstance.getAccount()
 
   if (account) {
-    // TODO:
-    //
-    // Temporary hack whilst we wait for implicit granting of ID tokens to be
-    // enabled by MHRA admins so we get an access token in the proper way:
-    // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-core#3-get-an-access-token-to-call-an-api
-
+    //const token = await getToken(msalInstance)
     const token = window.sessionStorage['msal.idtoken']
-    // const token = await getToken(msalInstance)
+    const username = account.userName
+    console.log({ token, account })
 
     return {
       account,
       token,
+      username,
       signOut: () => {
         msalInstance.logout()
       },

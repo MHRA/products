@@ -49,6 +49,7 @@ module "products" {
   namespace           = local.namespace
   pars_namespace      = local.pars_namespace
   resource_group_name = azurerm_resource_group.products.name
+  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
 }
 
 # website
