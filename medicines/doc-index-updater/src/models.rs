@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use regex::Regex;
 use search_client::models::DocumentType;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::str::FromStr;
 use uuid::Uuid;
 

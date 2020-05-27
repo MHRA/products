@@ -1,5 +1,5 @@
 use crate::{
-    audit_logger::log_transaction,
+    audit_logger::{AuditLogger, LogTransaction},
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     service_bus_client::{
@@ -107,7 +107,10 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     tracing::info!("Successfully added {} to index.", &name);
 
-    log_transaction(&name, message_for_log).await?;
+    let transaction_logger = AuditLogger {};
+    transaction_logger
+        .log_create_transaction(&name, message_for_log)
+        .await?;
 
     Ok(message.job_id)
 }

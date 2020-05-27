@@ -1,37 +1,53 @@
 use crate::{
-    models::Message,
+    models::{CreateMessage, DeleteMessage},
     storage_client::{AzureBlobStorage, StorageClient},
 };
 use anyhow::anyhow;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use core::fmt::Debug;
+use std::fmt::Debug;
+
 pub struct AuditLogger {}
 
-// pub trait RemovableMessage<T: Message>: Removable {
-//     fn get_message(&self) -> T;
-// }
-
-// impl<T> RemovableMessage<T> for RetrievedMessage<T>
-// where
-//     T: Message + Sync + Send,
-// {
-//     fn get_message(&self) -> T {
-//         self.message.clone()
-//     }
-// }
-
 #[async_trait]
-pub trait LogTransaction<'a, T: Message> {
-    async fn log_transaction(blob_name: &str, log_contents: &'a T) -> Result<(), anyhow::Error>;
+pub trait LogTransaction {
+    async fn log_create_transaction(
+        &self,
+        blob_name: &str,
+        log_contents: CreateMessage,
+    ) -> Result<(), anyhow::Error>;
+    async fn log_delete_transaction(
+        &self,
+        blob_name: &str,
+        log_contents: DeleteMessage,
+    ) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait]
-impl<'a, T> LogTransaction<'a, T> for AuditLogger
-where
-    T: Message + Sync + Send + Debug,
-{
-    async fn log_transaction(blob_name: &str, log_contents: &'a T) -> Result<(), anyhow::Error> {
+impl LogTransaction for AuditLogger {
+    async fn log_create_transaction(
+        &self,
+        blob_name: &str,
+        log_contents: CreateMessage,
+    ) -> Result<(), anyhow::Error> {
+        let log_storage_client = AzureBlobStorage::log();
+        let datetime_now = Utc::now();
+        let file_name = get_log_file_name(&datetime_now);
+        let body = get_log_body(blob_name, log_contents, &datetime_now);
+        log_storage_client
+            .append_to_file(file_name, &body.as_bytes())
+            .await
+            .map_err(|e| {
+                eprintln!("Error appending to blob: {:?}", e);
+                anyhow!("Error appending to blob")
+            })
+    }
+
+    async fn log_delete_transaction(
+        &self,
+        blob_name: &str,
+        log_contents: DeleteMessage,
+    ) -> Result<(), anyhow::Error> {
         let log_storage_client = AzureBlobStorage::log();
         let datetime_now = Utc::now();
         let file_name = get_log_file_name(&datetime_now);
@@ -46,11 +62,10 @@ where
     }
 }
 
-fn get_log_body<Message>(
-    blob_name: &str,
-    log_contents: Message,
-    datetime_now: &DateTime<Utc>,
-) -> String {
+fn get_log_body<T>(blob_name: &str, log_contents: T, datetime_now: &DateTime<Utc>) -> String
+where
+    T: Debug,
+{
     format!(
         "{},{},{:?}\n",
         blob_name,
