@@ -169,7 +169,7 @@ pub struct DeleteMessage {
 }
 
 #[async_trait]
-pub trait Message: Sized + FromStr + Clone {
+pub trait Message: Sized + FromStr + Clone + Debug {
     fn get_id(&self) -> Uuid;
     fn to_json_string(&self) -> Result<String, serde_json::Error>;
     async fn process(self) -> Result<Uuid, ProcessMessageError>;

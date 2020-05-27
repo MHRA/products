@@ -1,5 +1,5 @@
 use crate::{
-    audit_logger::log_transaction,
+    audit_logger::{AuditLogger, LogTransaction},
     models::{DeleteMessage, JobStatus},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
@@ -116,6 +116,7 @@ async fn process_delete_message(
     message: DeleteMessage,
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
+    audit_logger: impl LogTransaction<'a, DeleteMessage>,
 ) -> Result<Uuid, ProcessMessageError> {
     let message_for_log = message.clone();
     let index_record: IndexResult =
