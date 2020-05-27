@@ -1,7 +1,7 @@
 use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
-    models::{Document, FileSource, JsonWebToken},
+    models::{Document, FileSource},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use bytes::BufMut;
 use futures::future::join_all;
 use futures::TryStreamExt;
-use jsonwebtoken::{dangerous_unsafe_decode, errors::Error};
 use search_client::models::DocumentType;
 
 use std::collections::HashMap;
