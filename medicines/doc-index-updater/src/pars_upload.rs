@@ -328,24 +328,3 @@ struct Claims {
     sub: String,
     preferred_username: String,
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use pretty_assertions::assert_eq;
-
-    #[test]
-    fn decode_a_jwt_token_from_authorization_header() {
-        let token = decode_token_from_authorization_header(String::from("Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyNmY5NWIyMS02M2IyLTQ3NWYtOGEzNS1kMzljZWE0Y2ZkNjEiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2L3YyLjAiLCJpYXQiOjE1ODk4MDg3MzEsIm5iZiI6MTU4OTgwODczMSwiZXhwIjoxNTkwMDU5NjI0LCJhaW8iOiJBVlFBcS84UEFBQUFLSFNQZXNxRHdzTzAvaDhpNHloMVAzeHBZN1NiRkNpVWNmVDlJeVQxUE1zNnVhdW5TQkE4aUdmZHFYU0tzTDQ5aUpaMFkzTXRtZm8vaVN5QXJkYklkL041MUhiSzI4R2tURm9mSmY1bGpOOD0iLCJoYXNncm91cHMiOiJ0cnVlIiwibmFtZSI6IkJsb2dncywgSm9lIiwibm9uY2UiOiJiNzI2Y2M4Zi03ODBlLTRhZmUtYTE2Yy0wYTlmMzUxN2ZiNDYiLCJvaWQiOiI5NGI3ODVhYi1mNDhmLTRmNmYtYjMyZi05ZWJlMjFmNmIwZWQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJKb2UuQmxvZ2dzQE1pY3Jvc29mdC5jb20iLCJzdWIiOiJtOFFYbXdKQVpGWDZDQ1k3NU1jV3pRUkMzcmVhOGRnbDJuNHRKbnNFNVowIiwidGlkIjoiZTUyN2VhNWMtNjI1OC00Y2QyLWEyN2YtOGJkMjM3ZWM0YzI2IiwidXRpIjoiT0JJQXhoLXFRa0dBb29zTVZRMU1BQSIsInZlciI6IjIuMCIsImp0aSI6ImNlMmM5NjA1LWM5MjAtNGJkMC04NWMwLTBlOTA0MGZlMTQ5MCJ9.KWRK8mVdljCG3hpYHMSVrhIipBIq4Z_wfM9zzKAlYPw"));
-        assert_eq!(
-            token.unwrap().email,
-            String::from("Joe.Bloggs@Microsoft.com")
-        );
-    }
-
-    #[test]
-    fn decode_a_badly_formatted_jwt_token_from_authorization_header() {
-        let token = decode_token_from_authorization_header(String::from("Bearer xxxx"));
-        assert!(token.is_err());
-    }
-}
