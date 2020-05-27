@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import css from './review_submission.module.css'
 import { Layout } from './layout'
 import { H1, Para, H3 } from './typography'
-import { Button } from './button'
+import { Button, ButtonWithLinkStyles } from './button'
 import { BackLink } from './back-link'
 import { ErrorSummary } from './error_summary'
 import { SummaryListWithoutActions } from './summary_list'
@@ -120,14 +119,12 @@ const SummaryWrapper = ({ title, children, goToFormPage }) => {
       <div className={css.flexRow}>
         <H3 component="h2">{title}</H3>
 
-        <Link href="/new-par">
-          <a
-            className={`govuk-link govuk-link--no-visited-state ${css.changeLink}`}
-            onClick={onClickChange}
-          >
-            Change
-          </a>
-        </Link>
+        <ButtonWithLinkStyles
+          className={css.changeLink}
+          onClick={onClickChange}
+        >
+          Change
+        </ButtonWithLinkStyles>
       </div>
 
       {children}

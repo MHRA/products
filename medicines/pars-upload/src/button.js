@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import classes from 'classnames'
+import css from './button.module.css'
 
 export const Button = ({ children, secondary = false, ...props }) => (
   <button
@@ -15,6 +16,8 @@ export const Button = ({ children, secondary = false, ...props }) => (
 
 export const ButtonLink = ({ href, children, startButton = false }) => (
   <Link href={href}>
+    {/* The Link element above adds the href attribute */}
+    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
     <a
       role="button"
       draggable="false"
@@ -39,4 +42,16 @@ export const ButtonLink = ({ href, children, startButton = false }) => (
       ) : null}
     </a>
   </Link>
+)
+
+// For things which should be a button for accessibility reasons but
+// design-wise should look like a link
+export const ButtonWithLinkStyles = ({ children, className, onClick }) => (
+  <button
+    type="button"
+    className={classes(css.button, 'govuk-link', className)}
+    onClick={onClick}
+  >
+    {children}
+  </button>
 )
