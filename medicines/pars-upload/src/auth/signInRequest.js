@@ -32,7 +32,10 @@ export const SignInRequest = ({ signIn, error }) => (
       upload
     </H1>
 
-    <Para>To access this service you need to sign in with your MHRA email address and password. If you can not access it, please contact your line manager.</Para>
+    <Para>
+      To access this service you need to sign in with your MHRA email address
+      and password. If you can not access it, please contact your line manager.
+    </Para>
     <Para>
       <Button type="button" onClick={signIn}>
         Sign in

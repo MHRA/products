@@ -9,7 +9,6 @@ import { Button } from './button'
 
 export const Products = ({
   currentStepData,
-  currentStepIndex,
   steps,
   submit,
   repeatPage,

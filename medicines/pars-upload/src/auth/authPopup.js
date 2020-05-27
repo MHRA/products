@@ -20,22 +20,6 @@ export async function getAccount() {
   }
 }
 
-async function getToken(msalInstance) {
-  const tokenRequest = {
-    scopes: ['user.read'],
-  }
-
-  try {
-    return await msalInstance.acquireTokenSilent(tokenRequest)
-  } catch (e) {
-    if (e.name === 'InteractionRequiredAuthError') {
-      return await msalInstance.acquireTokenPopup(tokenRequest)
-    } else {
-      throw e
-    }
-  }
-}
-
 export function signIn() {
   return new UserAgentApplication(msalConfig)
     .loginPopup(loginRequest)
