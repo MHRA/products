@@ -28,6 +28,7 @@ const ParUpload = ({ auth }) => {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          Username: auth.username,
         },
         body: combined,
       })

@@ -27,7 +27,10 @@ pub fn handler(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let cors = warp::cors()
         .allow_origin(pars_origin)
-        .allow_headers(&[header::AUTHORIZATION])
+        .allow_headers(&[
+            header::AUTHORIZATION,
+            header::HeaderName::from_bytes(b"username").unwrap(),
+        ])
         .allow_methods(&[Method::POST])
         .build();
 
@@ -36,7 +39,7 @@ pub fn handler(
         // Max upload size is set to a very high limit here as the actual limit should be managed using istio
         .and(warp::multipart::form().max_length(1000 * 1024 * 1024))
         .and(with_state(state_manager))
-        .and(warp::header("Authorization"))
+        .and(warp::header("username"))
         .and_then(upload_pars_handler)
         .with(cors)
 }
@@ -106,23 +109,14 @@ async fn queue_pars_upload(
 async fn upload_pars_handler(
     form_data: FormData,
     state_manager: StateManager,
-    authorization_header: String,
+    username: String,
 ) -> Result<impl Reply, Rejection> {
     let request_id = Uuid::new_v4();
     let span = tracing::info_span!("PARS upload", request_id = request_id.to_string().as_str());
     let _enter = span.enter();
     tracing::debug!("Received PARS submission");
 
-    let json_web_token = decode_token_from_authorization_header(authorization_header);
-
-    match json_web_token {
-        Ok(token) => {
-            tracing::info!("Uploader email: {}", token.email);
-        }
-        Err(e) => {
-            tracing::error!("Error decoding token: {:?}", e);
-        }
-    }
+    tracing::info!("Uploader email: {}", username);
 
     let job_ids = queue_pars_upload(form_data, state_manager).await?;
 
@@ -322,17 +316,6 @@ impl UploadFieldValue {
     }
 }
 
-fn decode_token_from_authorization_header(
-    authorization_header: String,
-) -> Result<JsonWebToken, Error> {
-    let token = authorization_header.split("Bearer ").collect::<Vec<&str>>()[1];
-    let token_message = dangerous_unsafe_decode::<Claims>(&token)?;
-    tracing::debug!("{:?}", token_message);
-
-    Ok(JsonWebToken {
-        email: token_message.claims.preferred_username,
-    })
-}
 #[derive(Debug)]
 enum SubmissionError {
     UploadError { message: String },
