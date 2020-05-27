@@ -58,11 +58,6 @@ pub struct JobStatusResponse {
     pub status: JobStatus,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonWebToken {
-    pub email: String,
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Document {
     pub id: String,

@@ -23,11 +23,13 @@ const ParUpload = ({ auth }) => {
       )
 
       const token = auth ? auth.token : 'auth-token'
+      const username = auth ? auth.username : 'test-user@example.com'
 
       const response = await fetch(process.env.NEXT_PUBLIC_PARS_UPLOAD_URL, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          Username: username,
         },
         body: combined,
       })
