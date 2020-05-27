@@ -98,7 +98,7 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     .await?;
 
     let metadata: BlobMetadata = message.document.into();
-    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata.clone()).await?;
+    let blob = create_blob(AzureBlobStorage::permanent(), &file, metadata).await?;
     let name = blob.name.clone();
 
     tracing::debug!("Uploaded blob {}.", &name);
