@@ -73,7 +73,7 @@ export const Products = ({
       <form onSubmit={onSubmit} ref={formRef}>
         <FormGroup>
           <Field
-            name="brand_generic_name"
+            name="product_name"
             label="Brand/Generic name"
             formData={currentStepData}
           />
@@ -192,7 +192,7 @@ const LicenseNumber = ({ formData }) => (
 
 const product_title = (formData) =>
   [
-    formData.get('brand_generic_name'),
+    formData.get('product_name'),
     formData.get('strength'),
     formData.get('pharmaceutical_dose'),
     license_number(formData),
