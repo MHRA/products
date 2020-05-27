@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use core::fmt::Debug;
 
-pub async fn log_transaction<T>(blob_name: &String, log_contents: T) -> Result<(), anyhow::Error>
+pub async fn log_transaction<T>(blob_name: &str, log_contents: T) -> Result<(), anyhow::Error>
 where
     T: Debug,
 {
@@ -20,7 +20,7 @@ where
         })
 }
 
-fn get_log_body<T>(blob_name: &String, log_contents: T, datetime_now: &DateTime<Utc>) -> String
+fn get_log_body<T>(blob_name: &str, log_contents: T, datetime_now: &DateTime<Utc>) -> String
 where
     T: Debug,
 {
@@ -99,7 +99,7 @@ mod test {
             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
         );
         let message = get_create_message();
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,CreateMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document: Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage, file_path: \"location/on/disk\" }, initiator_email: Some(\"example@email.com\") }".to_string();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,CreateMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document: Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage, file_path: \"location/on/disk\" }, initiator_email: Some(\"example@email.com\") }\n".to_string();
 
         let actual = get_log_body(&blob_name, message, &date);
 
@@ -113,7 +113,7 @@ mod test {
             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
         );
         let message = get_delete_message();
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,DeleteMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document_content_id: \"CON123456789\", initiator_email: Some(\"example@email.com\") }".to_string();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,DeleteMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document_content_id: \"CON123456789\", initiator_email: Some(\"example@email.com\") }\n".to_string();
 
         let actual = get_log_body(&blob_name, message, &date);
 
