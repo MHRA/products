@@ -6,7 +6,8 @@ export async function getAccount() {
   const account = msalInstance.getAccount()
 
   if (account) {
-    const token = (await getToken(msalInstance)).accessToken
+    //const token = await getToken(msalInstance)
+    const token = window.sessionStorage['msal.idtoken']
     console.log({ token })
 
     return {
