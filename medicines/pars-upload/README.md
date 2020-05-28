@@ -44,6 +44,13 @@ Use the following command to populate `.env` from Azure Key Vault.
 make get-env
 ```
 
+NOTE: If you have those variables set in your shell, they take priority over the .env file values.
+
+To remove all NextJS public environment variables from your shell:
+
+```sh
+unset $(set | grep -o '^NEXT_PUBLIC_[^=]*')
+```
 ## Browser requirements
 
 This site is rendered client-side using _React_. Users must have JavaScript enabled.
