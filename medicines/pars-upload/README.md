@@ -46,7 +46,7 @@ make get-env
 
 NOTE: If you have those variables set in your shell, they take priority over the .env file values.
 
-To remove all the next public environment variables from your shell:
+To remove all the _next.js_ public environment variables from your shell:
 
 ```sh
 unset $(set | grep -o '^NEXT_PUBLIC_[^=]*')
