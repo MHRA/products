@@ -10,3 +10,7 @@ variable "environment" {
 variable "namespace" {
   description = "Namespace to use on cluster and storage"
 }
+variable "cdn_region" {
+  description = "Region where the CDN profile should be deployed"
+  default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
+}
