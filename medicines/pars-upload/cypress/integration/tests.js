@@ -1,3 +1,7 @@
+/* eslint-env node, mocha */
+
+/* global Cypress, cy */
+
 let polyfill
 
 // grab fetch polyfill from remote URL, could be also from a local package

@@ -5,7 +5,7 @@ import { Layout } from './layout'
 import { Para, H1 } from './typography'
 import { BackLink } from './back-link'
 import { Field } from './field'
-import { Button } from './button'
+import { Button, ButtonWithLinkStyles } from './button'
 import { useIncrementingIds } from './useIncrementingIds'
 
 export const Products = ({
@@ -177,9 +177,7 @@ const PreviousProductsSummary = ({
               {product_title(data)}
             </dt>
             <dd className="govuk-summary-list__actions">
-              <a
-                href="#"
-                className="govuk-link"
+              <ButtonWithLinkStyles
                 style={
                   showRemoveButton
                     ? {
@@ -202,7 +200,7 @@ const PreviousProductsSummary = ({
               >
                 {showRemoveButton ? 'Remove' : 'Edit'}
                 <span className="govuk-visually-hidden"> product</span>
-              </a>
+              </ButtonWithLinkStyles>
             </dd>
           </div>
         )
@@ -272,14 +270,4 @@ const license_number = (formData) => {
   const part_two = formData.get('license_part_two')
 
   return `${license_type} ${part_one}/${part_two}`
-}
-
-const range = (x) => {
-  const nums = []
-
-  for (let i = 0; i < x; i += 1) {
-    nums.push(i)
-  }
-
-  return nums
 }
