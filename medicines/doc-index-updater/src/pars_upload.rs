@@ -20,6 +20,26 @@ use warp::{
     Filter, Rejection, Reply,
 };
 
+pub fn update_handler(
+    state_manager: StateManager,
+    pars_origin: &str,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    let cors = warp::cors()
+        .allow_origin(pars_origin)
+        .allow_headers(&[header::AUTHORIZATION])
+        .allow_methods(&[Method::POST])
+        .build();
+
+    warp::path!("pars" / String)
+        .and(warp::post())
+        // Max upload size is set to a very high limit here as the actual limit should be managed using istio
+        .and(warp::multipart::form().max_length(1000 * 1024 * 1024))
+        .and(with_state(state_manager))
+        .and(warp::header("Authorization"))
+        .and_then(update_pars_handler)
+        .with(cors)
+}
+
 pub fn handler(
     state_manager: StateManager,
     pars_origin: &str,
@@ -103,6 +123,16 @@ async fn queue_pars_upload(
     }
 
     Ok(job_ids)
+}
+
+async fn update_pars_handler(
+    existing_par_identifier: String,
+    form_data: FormData,
+    state_manager: StateManager,
+    authorization_header: String,
+) -> Result<impl Reply, Rejection> {
+    let upload_handle = upload_pars_handler(form_data, state_manager, authorization_header).await?;
+    Ok(upload_handle)
 }
 
 async fn upload_pars_handler(
