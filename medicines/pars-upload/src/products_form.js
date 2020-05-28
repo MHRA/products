@@ -5,7 +5,7 @@ import { Layout } from './layout'
 import { Para, H1 } from './typography'
 import { BackLink } from './back-link'
 import { Field } from './field'
-import { Button } from './button'
+import { Button, ButtonWithLinkStyles } from './button'
 
 export const Products = ({
   currentStepData,
@@ -140,16 +140,14 @@ const PreviousProductsSummary = ({ products, goToPage }) => {
         <div key={index} className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">{product_title(data)}</dt>
           <dd className="govuk-summary-list__actions">
-            <a
-              href="#"
-              className="govuk-link"
+            <ButtonWithLinkStyles
               onClick={(event) => {
                 event.preventDefault()
                 goToPage(index)
               }}
             >
               Edit<span className="govuk-visually-hidden"> product</span>
-            </a>
+            </ButtonWithLinkStyles>
           </dd>
         </div>
       ))}

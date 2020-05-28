@@ -57,6 +57,10 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn test:ci
 
+      - name: Lint
+        working-directory: medicines/pars-upload
+        run: yarn lint
+
       - name: Build
         working-directory: medicines/pars-upload
         run: yarn build

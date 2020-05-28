@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
 export const BackLink = ({ href, onClick }) => {
+  // The Link element below adds the href attribute
+  // eslint-disable-next-line jsx-a11y/anchor-is-valid
   const anchor = <a className="govuk-back-link">Back</a>
 
   return onClick ? (
