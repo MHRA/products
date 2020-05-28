@@ -1,8 +1,8 @@
 use crate::{
     auth_manager,
     models::{
-        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message, XMLDocument,
-        XMLJobStatusResponse,
+        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message,
+        UniqueDocumentIdentifier, XMLDocument, XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
@@ -77,7 +77,7 @@ where
 }
 
 async fn delete_document_handler(
-    document_content_id: String,
+    document_content_id: UniqueDocumentIdentifier,
     state_manager: StateManager,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
@@ -87,7 +87,7 @@ async fn delete_document_handler(
 
         let message = DeleteMessage {
             job_id: id,
-            document_content_id,
+            document_id,
         };
 
         queue_job(&mut queue, &state_manager, message)

@@ -158,7 +158,12 @@ pub struct CreateMessage {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
-    pub document_content_id: String,
+    pub document_id: UniqueDocumentIdentifier,
+}
+
+pub enum UniqueDocumentIdentifier {
+    ContentId(String),
+    MetadataStorageName(String),
 }
 
 #[async_trait]

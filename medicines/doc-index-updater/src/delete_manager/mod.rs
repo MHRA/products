@@ -1,5 +1,5 @@
 use crate::{
-    models::{DeleteMessage, JobStatus},
+    models::{DeleteMessage, JobStatus, UniqueDocumentIdentifier},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
@@ -117,8 +117,7 @@ async fn process_delete_message(
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
 ) -> Result<Uuid, ProcessMessageError> {
     let index_record: IndexResult =
-        get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
-            .await?;
+        get_index_record_from_content_id(message.document_id.clone(), &search_client).await?;
     let blob_name = index_record.metadata_storage_name.clone();
 
     tracing::debug!(
@@ -157,7 +156,7 @@ async fn process_delete_message(
 }
 
 pub async fn get_index_record_from_content_id(
-    content_id: String,
+    content_id: UniqueDocumentIdentifier,
     search_client: &impl Search,
 ) -> Result<IndexResult, ProcessMessageError> {
     let search_results = search_client
@@ -166,6 +165,9 @@ pub async fn get_index_record_from_content_id(
         .map_err(anyhow::Error::from)?;
     for result in search_results.search_results {
         if result.file_name == content_id {
+            return Ok(result);
+        }
+        if result.metadata_storage_name == content_id {
             return Ok(result);
         }
     }
