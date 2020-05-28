@@ -20,7 +20,7 @@ const Index = () => {
   }
 
   return (
-    <Layout>
+    <Layout title="Public Assessment Reports (PARs) upload">
       <H1>
         <abbr
           title="Public Assessment Reports"

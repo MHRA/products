@@ -9,7 +9,6 @@ import { Button } from './button'
 
 export const Products = ({
   currentStepData,
-  currentStepIndex,
   steps,
   submit,
   repeatPage,
@@ -22,6 +21,7 @@ export const Products = ({
   const [activeSubstancesCount, setNumActiveSubstances] = useState(() =>
     currentStepData ? currentStepData.getAll('active_substance').length : 1
   )
+  const [formError, setFormError] = useState(false)
 
   const getFormData = () => {
     const formData = new FormData(formRef.current)
@@ -33,11 +33,16 @@ export const Products = ({
 
   const onSubmit = (event) => {
     event.preventDefault()
+    setFormError(false)
 
     const formData = getFormData()
 
     console.log('submitting form', formData)
     submit(formData)
+  }
+
+  const onInvalid = () => {
+    setFormError(true)
   }
 
   const onAddAnotherProduct = (event) => {
@@ -47,6 +52,8 @@ export const Products = ({
 
     if (isValid) {
       repeatPage(getFormData())
+    } else {
+      setFormError(true)
     }
   }
 
@@ -56,9 +63,14 @@ export const Products = ({
     go(newPageIndex)
   }
 
+  const title = 'New Public Assessment Report'
+
   return (
-    <Layout intro={<BackLink href="/" onClick={goBack} />}>
-      <H1>New Public Assessment Report</H1>
+    <Layout
+      title={formError ? `Error: ${title}` : title}
+      intro={<BackLink href="/" onClick={goBack} />}
+    >
+      <H1>{title}</H1>
 
       <Para>
         Your report can have one or multiple products associated with it. Please
@@ -70,7 +82,7 @@ export const Products = ({
         goToPage={goToPage}
       />
 
-      <form onSubmit={onSubmit} ref={formRef}>
+      <form onSubmit={onSubmit} onInvalid={onInvalid} ref={formRef}>
         <FormGroup>
           <Field
             name="product_name"
