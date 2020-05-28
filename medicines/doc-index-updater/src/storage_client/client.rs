@@ -16,7 +16,7 @@ pub trait StorageClient {
     ) -> Result<Vec<u8>, StorageClientError>;
     async fn append_to_file(
         &self,
-        file_name: String,
+        file_name: &String,
         append_contents: &[u8],
     ) -> Result<(), StorageClientError>;
 }

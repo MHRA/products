@@ -35,7 +35,7 @@ impl LogTransaction for AuditLogger {
         let file_name = get_log_file_name(&datetime_now);
         let body = get_log_body(blob_name, log_contents, &datetime_now);
         log_storage_client
-            .append_to_file(file_name, &body.as_bytes())
+            .append_to_file(&file_name, &body.as_bytes())
             .await
             .map_err(|e| {
                 eprintln!("Error appending to blob: {:?}", e);
@@ -53,7 +53,7 @@ impl LogTransaction for AuditLogger {
         let file_name = get_log_file_name(&datetime_now);
         let body = get_log_body(blob_name, log_contents, &datetime_now);
         log_storage_client
-            .append_to_file(file_name, &body.as_bytes())
+            .append_to_file(&file_name, &body.as_bytes())
             .await
             .map_err(|e| {
                 eprintln!("Error appending to blob: {:?}", e);

@@ -5,6 +5,7 @@ use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use azure_sdk_storage_core::prelude::Client;
 use chrono::{DateTime, Utc};
+use hyper::StatusCode;
 
 #[tokio::main]
 async fn main() {
@@ -82,8 +83,10 @@ async fn get_if_file_exists(
 
 fn result_is_file_does_not_exist_error(result: Result<bool, AzureError>) -> bool {
     match result {
-        Err(AzureError::UnexpectedHTTPResult(e)) => {
-            e.to_string() == "Unexpected HTTP result (expected: [200], received: 404)"
+        Err(AzureError::UnexpectedHTTPResult(e)) => e.status_code() == StatusCode::NOT_FOUND,
+        Err(e) => {
+            eprintln!("Error getting file: {:?}", e);
+            false
         }
         _ => false,
     }
