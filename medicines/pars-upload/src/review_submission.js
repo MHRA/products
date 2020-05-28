@@ -63,7 +63,12 @@ export const ReviewSubmission = ({
         }
       })}
 
-      <Button type="button" onClick={submit}>
+      <Button
+        type="button"
+        onClick={() => {
+          submit(null)
+        }}
+      >
         Accept and send
       </Button>
     </Layout>
