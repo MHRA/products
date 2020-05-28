@@ -20,6 +20,7 @@ locals {
   namespace        = "mhraproducts${var.ENVIRONMENT}"
   pars_namespace   = "mhrapars${var.ENVIRONMENT}"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+  logs_namespace   = "mhra${var.ENVIRONMENT}"
 }
 
 data "azurerm_resource_group" "products" {
@@ -69,7 +70,7 @@ data "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
-  namespace           = local.namespace
+  namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = data.azurerm_resource_group.products.name
