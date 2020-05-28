@@ -97,6 +97,19 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn export
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: PARs Upload form website release ${{ github.ref }}
+          body: |
+            Release of internal PARs Upload form website
+          draft: false
+          prerelease: false
+
       - name: PRODUCTION - Deploy pars upload website to static site in azure storage
         # master causes this step to fail so pointing to last working commit until fixed
         uses: lauchacarro/Azure-Storage-Action@9225056
