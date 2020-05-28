@@ -21,3 +21,8 @@ set-env: ## Takes your current .env file and replaces the keyvault value with th
 plan: ## Reads from .env and runs terraform plan with those variables
 	export $(cat .env .env.overrides 2> /dev/null | xargs) && \
 	terraform plan
+
+.PHONY: apply
+apply: ## Reads from .env and runs terraform apply with those variables - optionally supply args as args="args_here"
+	export $(cat .env .env.overrides 2> /dev/null | xargs) && \
+	terraform apply $$args
