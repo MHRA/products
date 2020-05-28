@@ -21,8 +21,13 @@ export const ReviewSubmission = ({
     goBack()
   }
 
+  const title = 'Check your answers before sending the report'
+
   return (
-    <Layout intro={<BackLink href="/" onClick={goToPrevPage} />}>
+    <Layout
+      title={submissionError ? `Error: ${title}` : title}
+      intro={<BackLink href="/" onClick={goToPrevPage} />}
+    >
       {submissionError ? (
         <ErrorSummary>
           <Para>An unexpected error occurred submitting the form.</Para>
@@ -30,7 +35,7 @@ export const ReviewSubmission = ({
         </ErrorSummary>
       ) : null}
 
-      <H1>Check your answers before sending the report</H1>
+      <H1>{title}</H1>
 
       {pageData.map(({ type, data }, i) => {
         const key = `${type}-${i}`

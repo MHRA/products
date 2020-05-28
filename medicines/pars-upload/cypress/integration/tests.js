@@ -1,3 +1,7 @@
+/* eslint-env node, mocha */
+
+/* global Cypress, cy */
+
 let polyfill
 
 // grab fetch polyfill from remote URL, could be also from a local package
@@ -29,7 +33,7 @@ const mockSuccessfulSubmission = () => {
     url: parsUrl,
     status: 200,
     headers: {
-      'access-control-allow-headers': 'authorization',
+      'access-control-allow-headers': 'authorization, username',
       'access-control-allow-methods': 'POST',
       'access-control-allow-origin': baseUrl,
       'content-length': '0',
@@ -55,7 +59,9 @@ describe('Home page', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('New Public Assessment Report').should('exist')
+    cy.findAllByText('New Public Assessment Report')
+      .not('title')
+      .should('have.length', 1)
   })
 })
 
@@ -156,7 +162,7 @@ describe('PARs upload form', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('Upload your PDF').should('exist')
+    cy.findAllByText('Upload your PDF').not('title').should('have.length', 1)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
 
@@ -171,9 +177,9 @@ describe('PARs upload form', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('Check your answers before sending the report').should(
-      'exist'
-    )
+    cy.findAllByText('Check your answers before sending the report')
+      .not('title')
+      .should('have.length', 1)
 
     cy.findByText('Brand/Generic name')
       .parent()
@@ -226,7 +232,9 @@ describe('PARs upload form', () => {
         cy.findByText('Change').click()
       })
 
-    cy.findByText('New Public Assessment Report').should('exist')
+    cy.findAllByText('New Public Assessment Report')
+      .not('title')
+      .should('have.length', 1)
 
     cy.findByLabelText('Brand/Generic name').should('have.value', productName)
   })
@@ -263,7 +271,7 @@ describe('PARs upload form', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('Upload your PDF').should('exist')
+    cy.findAllByText('Upload your PDF').not('title').should('have.length', 1)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
 
@@ -278,13 +286,15 @@ describe('PARs upload form', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findByText('Check your answers before sending the report').should(
-      'exist'
-    )
+    cy.findAllByText('Check your answers before sending the report')
+      .not('title')
+      .should('have.length', 1)
 
     cy.findByText('Accept and send').click()
 
-    cy.findByText('Submission complete').should('exist')
+    cy.findAllByText('Submission complete')
+      .not('title')
+      .should('have.length', 1)
 
     cy.findByText('Submit another report').click()
 

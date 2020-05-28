@@ -2,8 +2,10 @@ import { Button } from '../button'
 import { Para, H1 } from '../typography'
 import { Layout } from '../layout'
 
+const title = 'Public Assessment Report upload'
+
 export const SignInRequest = ({ signIn, error }) => (
-  <Layout>
+  <Layout title={error ? `Error: ${title}` : title}>
     {error ? (
       <div
         className="govuk-error-summary"
@@ -22,20 +24,14 @@ export const SignInRequest = ({ signIn, error }) => (
         </div>
       </div>
     ) : null}
-    <H1>
-      <abbr
-        title="Public Assessment Reports"
-        style={{ textDecoration: 'none' }}
-      >
-        Public Assessment Report
-      </abbr>{' '}
-      upload
-    </H1>
+
+    <H1>{title}</H1>
 
     <Para>
       To access this service you need to sign in with your MHRA email address
       and password. If you can not access it, please contact your line manager.
     </Para>
+
     <Para>
       <Button type="button" onClick={signIn}>
         Sign in

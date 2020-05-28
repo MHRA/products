@@ -23,11 +23,13 @@ const ParUpload = ({ auth }) => {
       )
 
       const token = auth ? auth.token : 'auth-token'
+      const username = auth ? auth.username : 'test-user@example.com'
 
       const response = await fetch(process.env.NEXT_PUBLIC_PARS_UPLOAD_URL, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          Username: username,
         },
         body: combined,
       })
@@ -98,7 +100,10 @@ const UploadPdf = ({ goBack, submit }) => {
   }
 
   return (
-    <Layout intro={<BackLink href="/" onClick={goToPrevPage} />}>
+    <Layout
+      title="Upload your PDF"
+      intro={<BackLink href="/" onClick={goToPrevPage} />}
+    >
       <H1>Upload your PDF</H1>
 
       <form onSubmit={onSubmit}>
@@ -111,7 +116,7 @@ const UploadPdf = ({ goBack, submit }) => {
 }
 
 const Success = ({ name, submittedAt }) => (
-  <Layout>
+  <Layout title="Submission complete">
     <div className="govuk-panel govuk-panel--confirmation">
       <h1 className="govuk-panel__title">Submission complete</h1>
     </div>
