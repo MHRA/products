@@ -18,3 +18,8 @@ variable "cdn_region" {
 variable "environment" {
   description = "The name of the environment we are deploying to"
 }
+
+variable "namespace" {
+  description = "Namespace to use for naming"
+}
+

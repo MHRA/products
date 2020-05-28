@@ -31,3 +31,7 @@ variable "add_local_pars_reply_url" {
 variable "app_registration_owners" {
   description = "Users who can update the app registration settings"
 }
+
+variable "pars_app_name" {
+  description = "Name of the PARS app"
+}

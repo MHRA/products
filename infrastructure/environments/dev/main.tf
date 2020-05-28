@@ -50,13 +50,15 @@ module "products" {
   pars_namespace           = local.pars_namespace
   resource_group_name      = azurerm_resource_group.products.name
   add_local_pars_reply_url = true
-  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  app_registration_owners  = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  pars_app_name            = "pars-upload-${var.ENVIRONMENT}"
 }
 
 # website
 module "products_web" {
   source = "../../modules/products-web"
 
+  namespace            = local.namespace
   environment          = var.ENVIRONMENT
   storage_account_name = module.products.storage_account_name
   resource_group_name  = azurerm_resource_group.products.name
@@ -91,6 +93,7 @@ resource "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
+  namespace           = local.namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name

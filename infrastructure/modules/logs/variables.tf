@@ -7,3 +7,6 @@ variable "location" {
 variable "environment" {
   description = "Environment name to use as a tag"
 }
+variable "namespace" {
+  description = "Namespace to use on cluster and storage"
+}
