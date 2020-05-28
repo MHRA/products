@@ -26,7 +26,7 @@ resource "azurerm_storage_container" "transaction_logs" {
 }
 
 resource "azurerm_storage_container" "docs_snapshot_logs" {
-  name                  = "transaction-logs"
+  name                  = "snapshot-logs"
   storage_account_name  = azurerm_storage_account.logs.name
   container_access_type = "container"
 
