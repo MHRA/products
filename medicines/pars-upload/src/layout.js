@@ -1,5 +1,11 @@
-export const Layout = ({ intro = null, children }) => (
+import Head from 'next/head'
+
+export const Layout = ({ title, intro = null, children }) => (
   <div className="govuk-width-container">
+    <Head>
+      <title>{title}</title>
+    </Head>
+
     {intro}
 
     <main className="govuk-main-wrapper" id="main-content" role="main">
