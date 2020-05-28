@@ -93,7 +93,7 @@ resource "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
-  namespace           = local.namespace
+  namespace           = var.ENVIRONMENT
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
