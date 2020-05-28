@@ -5,7 +5,6 @@ export const msalConfig = {
   auth: {
     clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
     authority: process.env.NEXT_PUBLIC_AUTHORITY_URL,
-    redirectUri: process.env.NEXT_PUBLIC_REDIRECT_URI,
   },
   cache: {
     cacheLocation: 'sessionStorage', // This configures where your cache will be stored
