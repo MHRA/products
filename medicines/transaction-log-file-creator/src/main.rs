@@ -60,7 +60,7 @@ async fn create_append_blob(
         .await
         .map_err(|e| {
             eprintln!("Error creating append blob: {:?}", e);
-            anyhow!("Couldn't create append blob: {:?}")
+            anyhow!("Couldn't create append blob")
         })?;
 
     Ok(())
