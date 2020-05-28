@@ -121,11 +121,7 @@ impl StorageClient for AzureBlobStorage {
 
         Ok(file_data)
     }
-    async fn append_to_file(
-        &self,
-        file_name: &String,
-        body: &[u8],
-    ) -> Result<(), StorageClientError> {
+    async fn append_to_file(&self, file_name: &str, body: &[u8]) -> Result<(), StorageClientError> {
         let storage_client = self.get_azure_client()?;
         storage_client
             .put_append_block()
