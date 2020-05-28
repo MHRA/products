@@ -1,5 +1,4 @@
 import 'govuk-frontend/govuk/all.scss'
-import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { SignInRequest } from '../auth/signInRequest'
 import { Header } from '../header'
@@ -46,9 +45,6 @@ function App({ Component, pageProps }) {
 
   return (
     <>
-      <Head>
-        <title>Public Assessment Reports (PARs) upload</title>
-      </Head>
       <Header
         account={auth ? auth.account : null}
         signOut={signOut}
