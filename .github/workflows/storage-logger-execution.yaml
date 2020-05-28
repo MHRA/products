@@ -1,4 +1,4 @@
-name: doc-index-updater-master
+name: storage-logger-execution
 
 on:
   schedule:
