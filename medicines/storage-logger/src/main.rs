@@ -206,7 +206,7 @@ mod test {
             access_tier_change_time: None,
             deleted_time: None,
             remaining_retention_days: None,
-            metadata: metadata,
+            metadata,
         }
     }
 
