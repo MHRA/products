@@ -10,6 +10,12 @@ resource "azurerm_storage_account" "logs" {
     environment = var.environment
   }
 
+  blob_properties {
+    delete_retention_policy {
+      days = 365
+    }
+  }
+
   lifecycle {
     prevent_destroy = true
   }

@@ -1,6 +1,6 @@
 # doc-index-updater
 
-![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater/badge.svg)
+![doc-index-updater](https://github.com/MHRA/products/workflows/doc-index-updater-master/badge.svg)
 
 - [Implementation details](#implementation-details) explain how the _doc-index-updater_ works
 - [Development how-to](#development-how-to) explains how to work on improving, fixing or extending the _doc-index-updater_

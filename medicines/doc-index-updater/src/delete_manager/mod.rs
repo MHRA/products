@@ -1,4 +1,5 @@
 use crate::{
+    audit_logger::{AuditLogger, LogTransaction},
     models::{DeleteMessage, JobStatus},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
@@ -108,14 +109,16 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
     let search_client = search_client::factory();
     let storage_client = AzureBlobStorage::permanent();
 
-    process_delete_message(message, storage_client, search_client).await
+    process_delete_message(message, storage_client, search_client, AuditLogger {}).await
 }
 
 async fn process_delete_message(
     message: DeleteMessage,
     mut storage_client: impl DeleteBlob,
     search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
+    transaction_logger: impl LogTransaction,
 ) -> Result<Uuid, ProcessMessageError> {
+    let message_for_log = message.clone();
     let index_record: IndexResult =
         get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
             .await?;
@@ -153,6 +156,12 @@ async fn process_delete_message(
 
     tracing::info!("Successfully deleted blob {}", &blob_name);
 
+    transaction_logger
+        .log_delete_transaction(&blob_name, message_for_log)
+        .await?;
+
+    tracing::info!("Successfully logged transaction {}", &blob_name);
+
     Ok(message.job_id)
 }
 
@@ -178,7 +187,8 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        models::DeleteMessage, service_bus_client::test::TestRemovableMessage,
+        models::{CreateMessage, DeleteMessage},
+        service_bus_client::test::TestRemovableMessage,
         state_manager::test::TestJobStatusClient,
     };
     use search_client::{
@@ -361,12 +371,14 @@ mod test {
         let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client();
+        let logger = given_a_transaction_logger();
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removable_message,
             storage_client,
             search_client,
+            logger,
         ));
 
         assert_eq!(result.is_err(), false);
@@ -377,12 +389,15 @@ mod test {
         let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_returns_results();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
+        let logger = given_a_transaction_logger();
+
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removable_message,
             storage_client,
             search_client,
+            logger,
         ));
 
         match result {
@@ -405,12 +420,15 @@ mod test {
         let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_restore_index();
         let storage_client = given_a_storage_client_that_cannot_delete_blob();
+        let logger = given_a_transaction_logger();
+
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removable_message,
             storage_client,
             search_client,
+            logger,
         ));
 
         match result {
@@ -433,12 +451,15 @@ mod test {
         let removable_message = given_we_have_a_delete_message().message;
         let search_client = given_a_search_client_that_cannot_delete_index();
         let storage_client = given_a_storage_client();
+        let logger = given_a_transaction_logger();
+
         given_the_necessary_env_vars_are_initialised();
 
         let result = block_on(process_delete_message(
             removable_message,
             storage_client,
             search_client,
+            logger,
         ));
 
         match result {
@@ -501,6 +522,7 @@ mod test {
         let delete_message = DeleteMessage {
             document_content_id: "our_id".to_owned(),
             job_id: Uuid::new_v4(),
+            initiator_email: None,
         };
 
         TestRemovableMessage::<DeleteMessage> {
@@ -511,6 +533,30 @@ mod test {
 
     fn given_the_delete_job_is_accepted(id: Uuid, state_manager: &TestJobStatusClient) {
         let _ = block_on(state_manager.set_status(id, JobStatus::Accepted));
+    }
+
+    struct DummyLogger {}
+
+    #[async_trait]
+    impl LogTransaction for DummyLogger {
+        async fn log_create_transaction(
+            &self,
+            _blob_name: &str,
+            _log_contents: CreateMessage,
+        ) -> Result<(), anyhow::Error> {
+            Ok(())
+        }
+        async fn log_delete_transaction(
+            &self,
+            _blob_name: &str,
+            _log_contents: DeleteMessage,
+        ) -> Result<(), anyhow::Error> {
+            Ok(())
+        }
+    }
+
+    fn given_a_transaction_logger() -> DummyLogger {
+        DummyLogger {}
     }
 
     #[test]
