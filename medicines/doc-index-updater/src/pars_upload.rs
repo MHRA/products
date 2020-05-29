@@ -2,7 +2,7 @@ use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
-    multipart_form_data::*,
+    multipart_form_data::{collect_fields, Field},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
@@ -262,6 +262,7 @@ struct Claims {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::multipart_form_data::UploadFieldValue;
     use pretty_assertions::assert_eq;
 
     fn text_field(name: &str, value: &str) -> Field {
