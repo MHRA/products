@@ -104,7 +104,7 @@ describe('PARs upload form', () => {
     const productName = 'Ibuprofen pills'
     const strength = 'Really powerful stuff'
     const dose = 'some form'
-    const license = { type: 'THR', part_one: '12345', part_two: '6789' }
+    const licence = { type: 'THR', part_one: '12345', part_two: '6789' }
 
     cy.visit('/new-par')
 
@@ -124,9 +124,9 @@ describe('PARs upload form', () => {
       .parent()
       .parent()
       .within(() => {
-        cy.findByLabelText('Type').select(license.type)
-        cy.findByLabelText('First five digits').type(license.part_one)
-        cy.findByLabelText('Last four digits').type(license.part_two)
+        cy.findByLabelText('Type').select(licence.type)
+        cy.findByLabelText('First five digits').type(licence.part_one)
+        cy.findByLabelText('Last four digits').type(licence.part_two)
       })
 
     cy.findByText('Add another product').click()
@@ -134,8 +134,8 @@ describe('PARs upload form', () => {
     // Form should now be blank and ready for entering another product
     cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
-    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
-    const product_title = `${productName}, ${strength}, ${dose}, ${license_str}`
+    const licence_str = `${licence.type} ${licence.part_one}/${licence.part_two}`
+    const product_title = `${productName}, ${strength}, ${dose}, ${licence_str}`
 
     cy.findByText(product_title)
       .parent()
@@ -159,7 +159,7 @@ describe('PARs upload form', () => {
     const strength = 'Really powerful stuff'
     const dose = 'some form'
 
-    const license = {
+    const licence = {
       type: 'THR',
       part_one: '12345',
       part_two: '6789',
@@ -183,9 +183,9 @@ describe('PARs upload form', () => {
       .parent()
       .parent()
       .within(() => {
-        cy.findByLabelText('Type').select(license.type)
-        cy.findByLabelText('First five digits').type(license.part_one)
-        cy.findByLabelText('Last four digits').type(license.part_two)
+        cy.findByLabelText('Type').select(licence.type)
+        cy.findByLabelText('First five digits').type(licence.part_one)
+        cy.findByLabelText('Last four digits').type(licence.part_two)
       })
 
     cy.findByText('Continue').click()
@@ -233,11 +233,11 @@ describe('PARs upload form', () => {
         cy.findByText('Ibuprofen, Paracetamol').should('exist')
       })
 
-    cy.findByText('License number')
+    cy.findByText('Licence number')
       .parent()
       .within(() => {
         cy.findByText(
-          `${license.type} ${license.part_one}/${license.part_two}`
+          `${licence.type} ${licence.part_one}/${licence.part_two}`
         ).should('exist')
       })
 
@@ -252,9 +252,9 @@ describe('PARs upload form', () => {
           })
       })
 
-    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+    const licence_str = `${licence.type} ${licence.part_one}/${licence.part_two}`
 
-    cy.findByText(`${productName}, ${strength}, ${dose}, ${license_str}`)
+    cy.findByText(`${productName}, ${strength}, ${dose}, ${licence_str}`)
       .parent()
       .within(() => {
         cy.findByText('Change').click()
@@ -286,15 +286,15 @@ describe('PARs upload form', () => {
 
     cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
 
-    const license = { type: 'THR', part_one: '12345', part_two: '6789' }
+    const licence = { type: 'THR', part_one: '12345', part_two: '6789' }
 
     cy.findByText('Licence number')
       .parent()
       .parent()
       .within(() => {
-        cy.findByLabelText('Type').select(license.type)
-        cy.findByLabelText('First five digits').type(license.part_one)
-        cy.findByLabelText('Last four digits').type(license.part_two)
+        cy.findByLabelText('Type').select(licence.type)
+        cy.findByLabelText('First five digits').type(licence.part_one)
+        cy.findByLabelText('Last four digits').type(licence.part_two)
       })
 
     cy.findByText('Continue').click()

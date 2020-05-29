@@ -63,13 +63,13 @@ impl StorageClient for AzureBlobStorage {
     async fn add_file(
         &self,
         file_data: &[u8],
-        license_number: &str,
+        licence_number: &str,
         metadata_ref: HashMap<&str, &str>,
     ) -> Result<StorageFile, StorageClientError> {
         let storage_client = self.get_azure_client()?;
 
         let file_digest = md5::compute(&file_data[..]);
-        let name = format!("{}{}", &self.prefix, file_name(license_number, file_data));
+        let name = format!("{}{}", &self.prefix, file_name(licence_number, file_data));
 
         storage_client
             .put_block_blob()
@@ -107,9 +107,9 @@ impl StorageClient for AzureBlobStorage {
     }
 }
 
-fn file_name(license_number: &str, file_data: &[u8]) -> String {
+fn file_name(licence_number: &str, file_data: &[u8]) -> String {
     let mut hash = sha1::Sha1::new();
-    hash.update(license_number.as_bytes());
+    hash.update(licence_number.as_bytes());
     hash.update(file_data);
     hash.digest().to_string()
 }
