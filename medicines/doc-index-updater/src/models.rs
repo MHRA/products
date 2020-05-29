@@ -484,4 +484,36 @@ pub mod test {
         let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
         assert_eq!(delete_message, deserialized);
     }
+
+    #[test]
+    fn test_deserialize_metadata_storage_name_json_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let metadata_storage_name = "ab6123ba98c8712ba8d91265da1562e";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::MetadataStorageName(
+                metadata_storage_name.to_owned(),
+            ),
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
+    }
+
+    #[test]
+    fn test_serialise_metadata_storage_name_delete_message_matches_string() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let metadata_storage_name = "ab6123ba98c8712ba8d91265da1562e";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::MetadataStorageName(
+                metadata_storage_name.to_owned(),
+            ),
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";
+        let serialized = serde_json::to_string(&delete_message).unwrap();
+        assert_eq!(to_deserialise, serialized);
+    }
 }

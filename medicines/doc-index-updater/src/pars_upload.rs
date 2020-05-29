@@ -1,7 +1,7 @@
 use crate::{
     create_manager::models::BlobMetadata,
-    document_manager::{accept_job, check_in_document_handler},
-    models::{Document, FileSource},
+    document_manager::{accept_job, check_in_document_handler, delete_document_handler},
+    models::{Document, FileSource, JobStatusResponse, UniqueDocumentIdentifier},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
@@ -126,13 +126,20 @@ async fn queue_pars_upload(
 }
 
 async fn update_pars_handler(
-    _existing_par_identifier: String,
+    existing_par_identifier: String,
     form_data: FormData,
     state_manager: StateManager,
     authorization_header: String,
 ) -> Result<impl Reply, Rejection> {
-    let upload_handle = upload_pars_handler(form_data, state_manager, authorization_header).await?;
-    Ok(upload_handle)
+    let delete = delete_document_handler(
+        UniqueDocumentIdentifier::MetadataStorageName(existing_par_identifier),
+        &state_manager,
+    )
+    .await?;
+
+    let upload = queue_upload_pars_job(form_data, state_manager, authorization_header).await?;
+
+    Ok(warp::reply::json(&UpdateResponse { delete, upload }))
 }
 
 async fn upload_pars_handler(
@@ -140,6 +147,15 @@ async fn upload_pars_handler(
     state_manager: StateManager,
     username: String,
 ) -> Result<impl Reply, Rejection> {
+    let job_ids = queue_upload_pars_job(form_data, state_manager, username).await?;
+    Ok(warp::reply::json(&UploadResponse { job_ids }))
+}
+
+async fn queue_upload_pars_job(
+    form_data: FormData,
+    state_manager: StateManager,
+    username: String,
+) -> Result<Vec<Uuid>, Rejection> {
     let request_id = Uuid::new_v4();
     let span = tracing::info_span!("PARS upload", request_id = request_id.to_string().as_str());
     let _enter = span.enter();
@@ -147,14 +163,18 @@ async fn upload_pars_handler(
 
     tracing::info!("Uploader email: {}", username);
 
-    let job_ids = queue_pars_upload(form_data, state_manager).await?;
-
-    Ok(warp::reply::json(&UploadResponse { job_ids }))
+    Ok(queue_pars_upload(form_data, state_manager).await?)
 }
 
 #[derive(Debug, Serialize)]
 struct UploadResponse {
     job_ids: Vec<Uuid>,
+}
+
+#[derive(Debug, Serialize)]
+struct UpdateResponse {
+    delete: JobStatusResponse,
+    upload: Vec<Uuid>,
 }
 
 async fn read_pars_upload(

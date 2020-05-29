@@ -76,12 +76,12 @@ where
     }
 }
 
-async fn delete_document_handler(
+pub async fn delete_document_handler(
     document_id: UniqueDocumentIdentifier,
-    state_manager: StateManager,
+    state_manager: &impl JobStatusClient,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
-        let id = accept_job(&state_manager).await?.id;
+        let id = accept_job(state_manager).await?.id;
         let correlation_id = id.to_string();
         let correlation_id = correlation_id.as_str();
 
@@ -90,7 +90,7 @@ async fn delete_document_handler(
             document_id,
         };
 
-        queue_job(&mut queue, &state_manager, message)
+        queue_job(&mut queue, state_manager, message)
             .instrument(tracing::info_span!(
                 "delete_document_handler::queue_job",
                 correlation_id
@@ -105,7 +105,7 @@ async fn delete_document_xml_handler(
     document_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), state_manager)
+    let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), &state_manager)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
@@ -115,7 +115,7 @@ async fn delete_document_json_handler(
     document_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = delete_document_handler(document_id.into(), state_manager).await?;
+    let r = delete_document_handler(document_id.into(), &state_manager).await?;
     Ok(warp::reply::json(&r))
 }
 
