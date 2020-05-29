@@ -161,9 +161,18 @@ pub struct DeleteMessage {
     pub document_id: UniqueDocumentIdentifier,
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum UniqueDocumentIdentifier {
     ContentId(String),
     MetadataStorageName(String),
+}
+
+// impl UniqueDocumentIdentifier {}
+
+impl std::fmt::Display for UniqueDocumentIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
 }
 
 #[async_trait]

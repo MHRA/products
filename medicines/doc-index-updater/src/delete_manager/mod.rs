@@ -123,7 +123,7 @@ async fn process_delete_message(
     tracing::debug!(
         "Found blob name {} for document content ID {} from index",
         &blob_name,
-        &message.document_content_id
+        &message.document_id
     );
 
     search_client
@@ -160,18 +160,20 @@ pub async fn get_index_record_from_content_id(
     search_client: &impl Search,
 ) -> Result<IndexResult, ProcessMessageError> {
     let search_results = search_client
-        .search(&content_id)
+        .search(&content_id.to_string())
         .await
         .map_err(anyhow::Error::from)?;
     for result in search_results.search_results {
-        if result.file_name == content_id {
+        if result.file_name == content_id.to_string() {
             return Ok(result);
         }
-        if result.metadata_storage_name == content_id {
+        if result.metadata_storage_name == content_id.to_string() {
             return Ok(result);
         }
     }
-    Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
+    Err(ProcessMessageError::DocumentNotFoundInIndex(
+        content_id.to_string(),
+    ))
 }
 
 #[cfg(test)]
@@ -501,7 +503,7 @@ mod test {
 
     fn given_we_have_a_delete_message() -> TestRemovableMessage<DeleteMessage> {
         let delete_message = DeleteMessage {
-            document_content_id: "our_id".to_owned(),
+            document_id: "our_id".to_owned(),
             job_id: Uuid::new_v4(),
         };
 

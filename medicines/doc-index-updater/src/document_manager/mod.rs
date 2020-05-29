@@ -77,7 +77,7 @@ where
 }
 
 async fn delete_document_handler(
-    document_content_id: UniqueDocumentIdentifier,
+    document_id: UniqueDocumentIdentifier,
     state_manager: StateManager,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
@@ -102,20 +102,20 @@ async fn delete_document_handler(
 }
 
 async fn delete_document_xml_handler(
-    document_content_id: String,
+    document_id: UniqueDocumentIdentifier,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = delete_document_handler(document_content_id, state_manager)
+    let r: XMLJobStatusResponse = delete_document_handler(document_id, state_manager)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
 }
 
 async fn delete_document_json_handler(
-    document_content_id: String,
+    document_id: UniqueDocumentIdentifier,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = delete_document_handler(document_content_id, state_manager).await?;
+    let r = delete_document_handler(document_id, state_manager).await?;
     Ok(warp::reply::json(&r))
 }
 
