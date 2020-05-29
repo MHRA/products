@@ -233,6 +233,7 @@ impl Message for DeleteMessage {
 #[cfg(test)]
 pub mod test {
     use super::*;
+    use serde_test::{assert_de_tokens, Configure, Token};
     use serde_xml_rs::from_reader;
     use test_case::test_case;
 
@@ -368,5 +369,90 @@ pub mod test {
         assert_eq!(doc.active_substances[1], "Caffeine 2");
         assert_eq!(doc.file_source, FileSource::Sentinel);
         assert_eq!(doc.file_path, "example_file.txt");
+    }
+
+    #[test]
+    fn test_deserialise_old_delete_message() {
+        let job_id = Uuid::new_v4();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+        };
+
+        assert_de_tokens(
+            &delete_message.readable(),
+            &[
+                Token::Struct {
+                    name: "DeleteMessage",
+                    len: 2,
+                },
+                Token::String("job_id"),
+                Token::String("00000000-0000-0000-0000-000000000000"),
+                Token::String("document_content_id"),
+                Token::String(content_id),
+                Token::StructEnd,
+            ],
+        )
+    }
+
+    #[test]
+    fn test_deserialise_new_delete_message_using_tokens() {
+        let job_id = Uuid::nil();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+        };
+
+        let serialized = serde_json::to_string(&delete_message).unwrap();
+        println!("serialized = {}", serialized);
+
+        assert_de_tokens(
+            &delete_message.readable(),
+            &[
+                Token::Struct {
+                    name: "DeleteMessage",
+                    len: 2,
+                },
+                Token::String("job_id"),
+                Token::String("00000000-0000-0000-0000-000000000000"),
+                Token::String("document_id"),
+                Token::Enum {
+                    name: "UniqueDocumentIdentifier",
+                },
+                Token::String("ContentId"),
+                Token::String(content_id),
+                Token::StructEnd,
+            ],
+        )
+    }
+
+    #[test]
+    fn test_serialise_new_delete_message_matches_string() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
+        let serialized = serde_json::to_string(&delete_message).unwrap();
+        assert_eq!(to_deserialise, serialized);
+    }
+
+    #[test]
+    fn test_deserialize_json_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
     }
 }
