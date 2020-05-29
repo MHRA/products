@@ -19,7 +19,7 @@ async fn main() {
 
 async fn create_log_file() -> Result<(), anyhow::Error> {
     let client = get_client()?;
-    let blob_name = get_log_file_name(Utc::now());
+    let blob_name = get_log_file_name_for_next_month(Utc::now());
     let log_container_name = get_log_container_name();
     create_append_blob(&client, &blob_name, &log_container_name).await
 }
@@ -35,8 +35,8 @@ fn get_client() -> Result<Client, anyhow::Error> {
     })
 }
 
-fn get_log_file_name(date: DateTime<Utc>) -> String {
-    (date + Duration::months(1))
+fn get_log_file_name_for_next_month(date: DateTime<Utc>) -> String {
+    (date + Duration::days(31))
         .format("file-change-log-%Y-%m")
         .to_string()
 }
@@ -71,13 +71,14 @@ async fn create_append_blob(
 #[cfg(test)]
 mod test {
     use super::*;
+    use test_case::test_case;
 
-    #[test]
-    fn test_get_log_file_name() {
-        let date = chrono::DateTime::<Utc>::from(
-            DateTime::parse_from_rfc3339("1996-12-19T16:39:57-08:00").unwrap(),
-        );
-        let log_file_name = get_log_file_name(date);
-        assert_eq!(log_file_name, "file-change-log-1996-12".to_string());
+    #[test_case("1996-12-19T16:39:57-08:00".to_string(), "file-change-log-1997-01".to_string())]
+    #[test_case("2020-01-01T00:00:00-00:00".to_string(), "file-change-log-2020-02".to_string())]
+    #[test_case("2022-02-01T00:00:00-00:00".to_string(), "file-change-log-2022-03".to_string())]
+    fn test_get_log_file_name_adds_1_month(input: String, expected: String) {
+        let date = chrono::DateTime::<Utc>::from(DateTime::parse_from_rfc3339(&input).unwrap());
+        let log_file_name = get_log_file_name_for_next_month(date);
+        assert_eq!(log_file_name, expected);
     }
 }

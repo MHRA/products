@@ -9,7 +9,7 @@
 
 This program creates a new, empty append blob file in an Azure storage account.
 
-A ![scheduled github workflow](../../.github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml) executes this code at the start of every month to create a new log file, with the log file name based on the year and month.
+A ![scheduled github workflow](../../.github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml) executes this code at the start of every month to create a new log file for the following month, with the log file name based on the target year and month.
 
 It only creates a blob if a file of that name does not already exist, to prevent accidental overwrite.
 
