@@ -135,7 +135,7 @@ describe('PARs upload form', () => {
     cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
     const licence_str = `${licence.type} ${licence.part_one}/${licence.part_two}`
-    const product_title = `${productName}, ${strength}, ${dose}, ${licence_str}`
+    const product_title = `${productName}, ${strength}, ${dose}, ${licence_str}`.toUpperCase()
 
     cy.findByText(product_title)
       .parent()
@@ -253,8 +253,9 @@ describe('PARs upload form', () => {
       })
 
     const licence_str = `${licence.type} ${licence.part_one}/${licence.part_two}`
+    const product_title = `${productName}, ${strength}, ${dose}, ${licence_str}`.toUpperCase()
 
-    cy.findByText(`${productName}, ${strength}, ${dose}, ${licence_str}`)
+    cy.findByText(product_title)
       .parent()
       .within(() => {
         cy.findByText('Change').click()
