@@ -53,7 +53,7 @@ unset $(set | grep -o '^NEXT_PUBLIC_[^=]*')
 
 ## Authorisation
 
-Authorisation is decided by [Conditional Access]: https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/overview in Azure AD and enforced by Istio in kubernetes. Each app registration has an associated `Conditional Access` entry that has DENY for all users, and has a specific ALLOW for the medical writers group associated with each environment. At Istio level in kubernetes we ensure that the token was issued by this application. Without a valid token, users will be unable to upload files.
+Authorisation is decided by [Conditional Access](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/overview) in Azure AD and enforced by Istio in kubernetes. Each app registration has an associated `Conditional Access` entry that has DENY for all users, and has a specific ALLOW for the medical writers group associated with each environment. At Istio level in kubernetes we ensure that the token was issued by this application. Without a valid token, users will be unable to upload files.
 
 ## Browser requirements
 
