@@ -165,6 +165,7 @@ pub struct DeleteMessage {
         deserialize_with = "string_or_unique_document_identifier"
     )]
     pub document_id: UniqueDocumentIdentifier,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub initiator_email: Option<String>,
 }
 
@@ -174,10 +175,9 @@ pub enum UniqueDocumentIdentifier {
     MetadataStorageName(String),
 }
 
-/// Exists for historic backwards compatibility
-/// Previously, if a DeleteMessage's document_id was set, it was a string, and identified a content_id.
-/// We convert strings to content ids to allow deserialisation of old messages to work.
-/// Also allows for document_manager endpoints to continue to accept `String` from the path, and easily convert these.
+/// Exists for historic backwards compatibility.
+/// Previously, if a `DeleteMessage`'s `document_content_id` was set, it was a string,
+/// so we deserialise strings into `UniqueDocumentIdentifier::ContentId`.
 fn string_or_unique_document_identifier<'de, D>(d: D) -> Result<UniqueDocumentIdentifier, D::Error>
 where
     D: Deserializer<'de>,
@@ -189,6 +189,8 @@ where
     serde_json::from_value(value).map_err(|e| serde::de::Error::custom(e.to_string()))
 }
 
+/// Allows for document_manager endpoints to continue to accept `String` from the path, and easily convert these.
+/// We convert strings to `UniqueDocumentIdentifier::ContentId` to allow deserialisation of old messages to work.
 impl From<String> for UniqueDocumentIdentifier {
     fn from(content_id: String) -> Self {
         UniqueDocumentIdentifier::ContentId(content_id)
@@ -397,6 +399,7 @@ pub mod test {
         let delete_message = DeleteMessage {
             job_id,
             document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
         };
 
         assert_de_tokens(
@@ -422,6 +425,7 @@ pub mod test {
         let delete_message = DeleteMessage {
             job_id,
             document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
         };
 
         let serialized = serde_json::to_string(&delete_message).unwrap();
@@ -454,6 +458,7 @@ pub mod test {
         let delete_message = DeleteMessage {
             job_id,
             document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
@@ -468,6 +473,7 @@ pub mod test {
         let delete_message = DeleteMessage {
             job_id,
             document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
@@ -482,6 +488,7 @@ pub mod test {
         let delete_message = DeleteMessage {
             job_id,
             document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_content_id\":\"CON33333333\"}";
@@ -498,6 +505,7 @@ pub mod test {
             document_id: UniqueDocumentIdentifier::MetadataStorageName(
                 metadata_storage_name.to_owned(),
             ),
+            initiator_email: None,
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";
@@ -514,6 +522,7 @@ pub mod test {
             document_id: UniqueDocumentIdentifier::MetadataStorageName(
                 metadata_storage_name.to_owned(),
             ),
+            initiator_email: None,
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";

@@ -129,7 +129,7 @@ mod test {
         let initiator_email = Some("example@email.com".to_string());
         DeleteMessage {
             job_id,
-            document_content_id,
+            document_id: document_content_id.into(),
             initiator_email,
         }
     }

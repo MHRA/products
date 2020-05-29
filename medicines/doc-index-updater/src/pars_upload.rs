@@ -130,15 +130,16 @@ async fn update_pars_handler(
     existing_par_identifier: String,
     form_data: FormData,
     state_manager: StateManager,
-    authorization_header: String,
+    username: String,
 ) -> Result<impl Reply, Rejection> {
     let delete = delete_document_handler(
         UniqueDocumentIdentifier::MetadataStorageName(existing_par_identifier),
         &state_manager,
+        Some(username.clone()),
     )
     .await?;
 
-    let upload = queue_upload_pars_job(form_data, state_manager, authorization_header).await?;
+    let upload = queue_upload_pars_job(form_data, state_manager, username).await?;
 
     Ok(warp::reply::json(&UpdateResponse { delete, upload }))
 }
