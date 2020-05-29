@@ -62,7 +62,12 @@ export const ReviewSubmission = ({
         }
       })}
 
-      <Button type="button" onClick={submit}>
+      <Button
+        type="button"
+        onClick={() => {
+          submit(null)
+        }}
+      >
         Accept and send
       </Button>
     </Layout>
@@ -92,8 +97,8 @@ const ProductSummary = ({ data, goToFormPage }) => (
           value: data.getAll('active_substance').join(', '),
         },
         {
-          key: 'License number',
-          value: data.get('license_number'),
+          key: 'Licence number',
+          value: data.get('licence_number'),
         },
       ]}
     />

@@ -1,4 +1,5 @@
 use crate::{
+    audit_logger::{AuditLogger, LogTransaction},
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     service_bus_client::{
@@ -88,6 +89,8 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
 
     let search_client = search_client::factory();
 
+    let message_for_log = message.clone();
+
     let file = retrieve::retrieve(
         message.document.file_source.clone(),
         message.document.file_path.clone(),
@@ -103,6 +106,11 @@ pub async fn process_message(message: CreateMessage) -> Result<Uuid, ProcessMess
     add_blob_to_search_index(search_client, blob).await?;
 
     tracing::info!("Successfully added {} to index.", &name);
+
+    let transaction_logger = AuditLogger {};
+    transaction_logger
+        .log_create_transaction(&name, message_for_log)
+        .await?;
 
     Ok(message.job_id)
 }

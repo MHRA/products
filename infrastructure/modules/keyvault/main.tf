@@ -68,4 +68,8 @@ resource "azurerm_key_vault" "secrets_vault" {
       storage_permissions = []
     }
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

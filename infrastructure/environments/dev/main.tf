@@ -44,13 +44,13 @@ data "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
-  environment              = var.ENVIRONMENT
-  location                 = var.REGION
-  namespace                = local.namespace
-  pars_namespace           = local.pars_namespace
-  resource_group_name      = azurerm_resource_group.products.name
-  add_local_pars_reply_url = true
-  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  environment                       = var.ENVIRONMENT
+  location                          = var.REGION
+  namespace                         = local.namespace
+  pars_namespace                    = local.pars_namespace
+  resource_group_name               = azurerm_resource_group.products.name
+  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  addtional_allowed_pars_reply_urls = ["http://localhost:3000"]
 }
 
 # website

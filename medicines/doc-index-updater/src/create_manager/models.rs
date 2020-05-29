@@ -292,7 +292,7 @@ mod test {
     }
 
     #[test]
-    fn extract_product_license_test() {
+    fn extract_product_licence_test() {
         let input = vec![
             "00 PL123451234",
             "01 pl123451234",
@@ -334,7 +334,7 @@ mod test {
         assert_eq!(extract_product_licences(input), output);
     }
     #[test]
-    fn extract_product_license_test_not_found() {
+    fn extract_product_licence_test_not_found() {
         assert_eq!(extract_product_licences("no pl number here"), "[]");
     }
     #[test]

@@ -6,27 +6,33 @@ import { Para, H1 } from './typography'
 import { BackLink } from './back-link'
 import { Field } from './field'
 import { Button, ButtonWithLinkStyles } from './button'
+import { useIncrementingIds } from './useIncrementingIds'
 
 export const Products = ({
   currentStepData,
+  currentStepIndex,
   steps,
   submit,
   repeatPage,
   savePageState,
   goBack,
   goToPage: go,
+  deletePage: delPage,
 }) => {
   const formRef = useRef()
+  const getNextId = useIncrementingIds()
 
-  const [activeSubstancesCount, setNumActiveSubstances] = useState(() =>
-    currentStepData ? currentStepData.getAll('active_substance').length : 1
+  const [activeSubstanceIds, setSubstanceIds] = useState(() =>
+    currentStepData
+      ? currentStepData.getAll('active_substance').map(() => getNextId())
+      : [getNextId()]
   )
   const [formError, setFormError] = useState(false)
 
   const getFormData = () => {
     const formData = new FormData(formRef.current)
     formData.append('title', product_title(formData))
-    formData.append('license_number', license_number(formData))
+    formData.append('licence_number', licence_number(formData))
 
     return formData
   }
@@ -63,6 +69,12 @@ export const Products = ({
     go(newPageIndex)
   }
 
+  const deletePage = (pageIndex) => {
+    savePageState(getFormData())
+
+    delPage(pageIndex)
+  }
+
   const title = 'New Public Assessment Report'
 
   return (
@@ -79,7 +91,9 @@ export const Products = ({
 
       <PreviousProductsSummary
         products={steps.filter(({ type, data }) => type === 'product' && data)}
+        currentStepIndex={currentStepIndex}
         goToPage={goToPage}
+        deletePage={deletePage}
       />
 
       <form onSubmit={onSubmit} onInvalid={onInvalid} ref={formRef}>
@@ -100,13 +114,20 @@ export const Products = ({
             formData={currentStepData}
           />
         </FormGroup>
-        {range(activeSubstancesCount).map((i) => (
-          <FormGroup key={i}>
+        {activeSubstanceIds.map((id, i) => (
+          <FormGroup key={id}>
             <Field
               name="active_substance"
               label="Active substance(s)"
               index={i}
               formData={currentStepData}
+              onClickDelete={
+                activeSubstanceIds.length > 1
+                  ? () => {
+                      setSubstanceIds((ids) => ids.filter((i) => i != id))
+                    }
+                  : null
+              }
             />
           </FormGroup>
         ))}
@@ -114,12 +135,12 @@ export const Products = ({
           secondary
           type="button"
           onClick={() => {
-            setNumActiveSubstances((n) => n + 1)
+            setSubstanceIds((ids) => [...ids, getNextId()])
           }}
         >
           Add another active substance
         </Button>
-        <LicenseNumber formData={currentStepData} />
+        <LicenceNumber formData={currentStepData} />
         <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
         </Button>{' '}
@@ -129,47 +150,80 @@ export const Products = ({
   )
 }
 
-const PreviousProductsSummary = ({ products, goToPage }) => {
+const PreviousProductsSummary = ({
+  products,
+  currentStepIndex,
+  goToPage,
+  deletePage,
+}) => {
   if (!products.length) {
     return null
   }
 
   return (
     <dl className="govuk-summary-list">
-      {products.map(({ data, index }) => (
-        <div key={index} className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">{product_title(data)}</dt>
-          <dd className="govuk-summary-list__actions">
-            <ButtonWithLinkStyles
-              onClick={(event) => {
-                event.preventDefault()
-                goToPage(index)
+      {products.map(({ data, index }) => {
+        const showRemoveButton =
+          index === currentStepIndex && products.length > 1
+
+        return (
+          <div key={index} className="govuk-summary-list__row">
+            <dt
+              className="govuk-summary-list__key"
+              style={{
+                fontWeight: index === currentStepIndex ? 'bold' : 'normal',
               }}
             >
-              Edit<span className="govuk-visually-hidden"> product</span>
-            </ButtonWithLinkStyles>
-          </dd>
-        </div>
-      ))}
+              {product_title(data)}
+            </dt>
+            <dd className="govuk-summary-list__actions">
+              <ButtonWithLinkStyles
+                style={
+                  showRemoveButton
+                    ? {
+                        // Couldn't find anything in the design system for updating
+                        // the link colour, so just nabbed this from:
+                        // https://design-system.service.gov.uk/styles/colour/
+                        color: '#d4351c',
+                      }
+                    : {}
+                }
+                onClick={(event) => {
+                  event.preventDefault()
+
+                  if (showRemoveButton) {
+                    deletePage(index)
+                  } else {
+                    goToPage(index)
+                  }
+                }}
+              >
+                {showRemoveButton ? 'Remove' : 'Edit'}
+                <span className="govuk-visually-hidden"> product</span>
+              </ButtonWithLinkStyles>
+            </dd>
+          </div>
+        )
+      })}
     </dl>
   )
 }
 
-const LicenseNumber = ({ formData }) => (
+const LicenceNumber = ({ formData }) => (
   <FormGroup>
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
         <h2 className="govuk-fieldset__heading">Licence number</h2>
       </legend>
       <ScreenReaderOnly>
-        <label htmlFor="license_number_type">Type</label>
+        <label htmlFor="licence_number_type">Type</label>
       </ScreenReaderOnly>
       <select
         className="govuk-select"
-        id="license_number_type"
-        name="license_number_type"
+        id="licence_number_type"
+        name="licence_number_type"
         defaultValue={
-          (formData && formData.get('license_number_type')) || undefined
+          (formData && formData.get('licence_number_type')) || undefined
         }
         required
       >
@@ -179,7 +233,7 @@ const LicenseNumber = ({ formData }) => (
       </select>{' '}
       <Field
         className="govuk-input--width-5"
-        name="license_part_one"
+        name="licence_part_one"
         label="First five digits"
         pattern="[0-9]{5}"
         title="5 digits"
@@ -189,7 +243,7 @@ const LicenseNumber = ({ formData }) => (
       {' / '}
       <Field
         className="govuk-input--width-5"
-        name="license_part_two"
+        name="licence_part_two"
         label="Last four digits"
         pattern="[0-9]{4}"
         title="4 digits"
@@ -205,25 +259,16 @@ const product_title = (formData) =>
     formData.get('product_name'),
     formData.get('strength'),
     formData.get('pharmaceutical_dose'),
-    license_number(formData),
+    licence_number(formData),
   ]
     .filter((x) => x)
     .join(', ')
+    .toUpperCase()
 
-const license_number = (formData) => {
-  const license_type = formData.get('license_number_type')
-  const part_one = formData.get('license_part_one')
-  const part_two = formData.get('license_part_two')
+const licence_number = (formData) => {
+  const licence_type = formData.get('licence_number_type')
+  const part_one = formData.get('licence_part_one')
+  const part_two = formData.get('licence_part_two')
 
-  return `${license_type} ${part_one}/${part_two}`
-}
-
-const range = (x) => {
-  const nums = []
-
-  for (let i = 0; i < x; i += 1) {
-    nums.push(i)
-  }
-
-  return nums
+  return `${licence_type} ${part_one}/${part_two}`
 }

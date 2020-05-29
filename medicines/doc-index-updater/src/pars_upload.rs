@@ -66,11 +66,11 @@ pub fn handler(
 async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
     file_data: &[u8],
-    license_number: &str,
+    licence_number: &str,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
-        .add_file(file_data, license_number, HashMap::new())
+        .add_file(file_data, licence_number, HashMap::new())
         .await
         .map_err(|e| SubmissionError::UploadError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
@@ -98,6 +98,7 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
 
 async fn queue_pars_upload(
     form_data: FormData,
+    uploader_email: String,
     state_manager: impl JobStatusClient,
 ) -> Result<Vec<Uuid>, Rejection> {
     let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
@@ -119,7 +120,7 @@ async fn queue_pars_upload(
 
         let document = document_from_form_data(storage_file, metadata);
 
-        check_in_document_handler(document, &state_manager).await?;
+        check_in_document_handler(document, &state_manager, Some(uploader_email.clone())).await?;
     }
 
     Ok(job_ids)
@@ -163,7 +164,7 @@ async fn queue_upload_pars_job(
 
     tracing::info!("Uploader email: {}", username);
 
-    Ok(queue_pars_upload(form_data, state_manager).await?)
+    Ok(queue_pars_upload(form_data, username, state_manager).await?)
 }
 
 #[derive(Debug, Serialize)]
@@ -271,7 +272,7 @@ fn product_form_data_to_blob_metadata(
     let product_names = vec![product_name];
 
     let title = get_field_as_string(&fields, "title")?;
-    let pl_number = get_field_as_string(&fields, "license_number")?;
+    let pl_number = get_field_as_string(&fields, "licence_number")?;
 
     let active_substances = fields
         .iter()
