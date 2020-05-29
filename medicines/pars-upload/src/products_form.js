@@ -32,7 +32,7 @@ export const Products = ({
   const getFormData = () => {
     const formData = new FormData(formRef.current)
     formData.append('title', product_title(formData))
-    formData.append('license_number', license_number(formData))
+    formData.append('licence_number', licence_number(formData))
 
     return formData
   }
@@ -140,7 +140,7 @@ export const Products = ({
         >
           Add another active substance
         </Button>
-        <LicenseNumber formData={currentStepData} />
+        <LicenceNumber formData={currentStepData} />
         <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
         </Button>{' '}
@@ -209,21 +209,21 @@ const PreviousProductsSummary = ({
   )
 }
 
-const LicenseNumber = ({ formData }) => (
+const LicenceNumber = ({ formData }) => (
   <FormGroup>
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
         <h2 className="govuk-fieldset__heading">Licence number</h2>
       </legend>
       <ScreenReaderOnly>
-        <label htmlFor="license_number_type">Type</label>
+        <label htmlFor="licence_number_type">Type</label>
       </ScreenReaderOnly>
       <select
         className="govuk-select"
-        id="license_number_type"
-        name="license_number_type"
+        id="licence_number_type"
+        name="licence_number_type"
         defaultValue={
-          (formData && formData.get('license_number_type')) || undefined
+          (formData && formData.get('licence_number_type')) || undefined
         }
         required
       >
@@ -233,7 +233,7 @@ const LicenseNumber = ({ formData }) => (
       </select>{' '}
       <Field
         className="govuk-input--width-5"
-        name="license_part_one"
+        name="licence_part_one"
         label="First five digits"
         pattern="[0-9]{5}"
         title="5 digits"
@@ -243,7 +243,7 @@ const LicenseNumber = ({ formData }) => (
       {' / '}
       <Field
         className="govuk-input--width-5"
-        name="license_part_two"
+        name="licence_part_two"
         label="Last four digits"
         pattern="[0-9]{4}"
         title="4 digits"
@@ -259,16 +259,16 @@ const product_title = (formData) =>
     formData.get('product_name'),
     formData.get('strength'),
     formData.get('pharmaceutical_dose'),
-    license_number(formData),
+    licence_number(formData),
   ]
     .filter((x) => x)
     .join(', ')
     .toUpperCase()
 
-const license_number = (formData) => {
-  const license_type = formData.get('license_number_type')
-  const part_one = formData.get('license_part_one')
-  const part_two = formData.get('license_part_two')
+const licence_number = (formData) => {
+  const licence_type = formData.get('licence_number_type')
+  const part_one = formData.get('licence_part_one')
+  const part_two = formData.get('licence_part_two')
 
-  return `${license_type} ${part_one}/${part_two}`
+  return `${licence_type} ${part_one}/${part_two}`
 }

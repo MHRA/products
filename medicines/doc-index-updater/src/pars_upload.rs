@@ -46,11 +46,11 @@ pub fn handler(
 async fn add_file_to_temporary_blob_storage(
     _job_id: Uuid,
     file_data: &[u8],
-    license_number: &str,
+    licence_number: &str,
 ) -> Result<StorageFile, SubmissionError> {
     let storage_client = AzureBlobStorage::temporary();
     let storage_file = storage_client
-        .add_file(file_data, license_number, HashMap::new())
+        .add_file(file_data, licence_number, HashMap::new())
         .await
         .map_err(|e| SubmissionError::UploadError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
@@ -221,7 +221,7 @@ fn product_form_data_to_blob_metadata(
     let product_names = vec![product_name];
 
     let title = get_field_as_string(&fields, "title")?;
-    let pl_number = get_field_as_string(&fields, "license_number")?;
+    let pl_number = get_field_as_string(&fields, "licence_number")?;
 
     let active_substances = fields
         .iter()
