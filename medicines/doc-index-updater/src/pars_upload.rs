@@ -2,21 +2,17 @@ use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler},
     models::{Document, FileSource},
+    multipart_form_data::*,
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
-use serde::{Deserialize, Serialize};
-
-use bytes::BufMut;
-use futures::future::join_all;
-use futures::TryStreamExt;
 use search_client::models::DocumentType;
-
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
-    filters::multipart::{FormData, Part},
     http::{header, Method},
+    multipart::FormData,
     Filter, Rejection, Reply,
 };
 
@@ -52,7 +48,7 @@ async fn add_file_to_temporary_blob_storage(
     let storage_file = storage_client
         .add_file(file_data, license_number, HashMap::new())
         .await
-        .map_err(|e| SubmissionError::UploadError {
+        .map_err(|e| SubmissionError::BlobStorageError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
         })?;
     Ok(storage_file)
@@ -130,18 +126,9 @@ struct UploadResponse {
 async fn read_pars_upload(
     form_data: FormData,
 ) -> Result<(Vec<BlobMetadata>, Vec<u8>), SubmissionError> {
-    let parts: Vec<Part> =
-        form_data
-            .try_collect()
-            .await
-            .map_err(|e| SubmissionError::UploadError {
-                message: format!("Error receiving data: {}", e),
-            })?;
-
-    let fields: Vec<Field> = join_all(parts.into_iter().map(read_upload_part))
+    let fields = collect_fields(form_data)
         .await
-        .into_iter()
-        .collect::<Result<_, _>>()?;
+        .map_err(|error| SubmissionError::UploadError { error })?;
 
     let GroupedFields {
         products,
@@ -155,12 +142,6 @@ async fn read_pars_upload(
         .collect::<Result<_, _>>()?;
 
     Ok((metadatas, file_data))
-}
-
-#[derive(Debug)]
-struct Field {
-    name: String,
-    value: UploadFieldValue,
 }
 
 #[derive(Debug)]
@@ -256,69 +237,18 @@ fn get_field_as_string(
         .map(|s| s.to_string())
 }
 
-async fn read_upload_part(part: Part) -> Result<Field, SubmissionError> {
-    let name = part.name().to_string();
-
-    let file_name = part.filename().map(|s| s.to_string());
-
-    let data = part
-        .stream()
-        .try_fold(Vec::new(), |mut vec, data| {
-            vec.put(data);
-            async move { Ok(vec) }
-        })
-        .await
-        .map_err(|e| SubmissionError::UploadError {
-            message: format!("Error receiving data: {}", e),
-        })?;
-
-    let value = match file_name {
-        Some(file_name) => UploadFieldValue::File { file_name, data },
-        None => UploadFieldValue::Text {
-            value: std::str::from_utf8(&data)
-                .map_err(|e| SubmissionError::UploadError {
-                    message: format!("Error decoding field to utf-8: {}", e),
-                })?
-                .to_string(),
-        },
-    };
-
-    Ok(Field { name, value })
-}
-
-#[derive(Debug)]
-enum UploadFieldValue {
-    Text { value: String },
-    File { file_name: String, data: Vec<u8> },
-}
-
-impl UploadFieldValue {
-    fn value(&self) -> Option<&str> {
-        match self {
-            UploadFieldValue::Text { value } => Some(value),
-            _ => None,
-        }
-    }
-
-    fn file_name(&self) -> Option<&str> {
-        match self {
-            UploadFieldValue::File { file_name, data: _ } => Some(file_name),
-            _ => None,
-        }
-    }
-
-    fn into_file_data(self) -> Option<Vec<u8>> {
-        match self {
-            UploadFieldValue::File { file_name: _, data } => Some(data),
-            _ => None,
-        }
-    }
-}
-
 #[derive(Debug)]
 enum SubmissionError {
-    UploadError { message: String },
-    MissingField { name: &'static str },
+    UploadError {
+        error: anyhow::Error,
+    },
+    BlobStorageError {
+        message: String, // should maybe be StorageClientError but that is not
+                         // Send + Sync so then we can't implement warp::reject::Reject
+    },
+    MissingField {
+        name: &'static str,
+    },
 }
 
 impl warp::reject::Reject for SubmissionError {}
