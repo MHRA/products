@@ -66,7 +66,7 @@ describe('Home page', () => {
 })
 
 describe('PARs upload form', () => {
-  it('can add multiple substances', () => {
+  it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
 
     cy.findByLabelText('Brand/Generic name').type('Ibuprofen pills')
@@ -86,9 +86,21 @@ describe('PARs upload form', () => {
     cy.findAllByLabelText('Active substance(s)').last().type('Temazepam')
 
     cy.findAllByLabelText('Active substance(s)').should('have.length', 3)
+
+    cy.findAllByText('Delete substance').eq(1).parent('button').click()
+
+    cy.findAllByLabelText('Active substance(s)').should('have.length', 2)
+
+    cy.findAllByLabelText('Active substance(s)')
+      .eq(0)
+      .should('have.value', 'Ibuprofen')
+
+    cy.findAllByLabelText('Active substance(s)')
+      .eq(1)
+      .should('have.value', 'Temazepam')
   })
 
-  it('can add multiple products', () => {
+  it('can add and delete multiple products', () => {
     const productName = 'Ibuprofen pills'
     const strength = 'Really powerful stuff'
     const dose = 'some form'
@@ -119,11 +131,27 @@ describe('PARs upload form', () => {
 
     cy.findByText('Add another product').click()
 
-    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+    // Form should now be blank and ready for entering another product
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
-    cy.findByText(
-      `${productName}, ${strength}, ${dose}, ${license_str}`
-    ).should('exist')
+    const license_str = `${license.type} ${license.part_one}/${license.part_two}`
+    const product_title = `${productName}, ${strength}, ${dose}, ${license_str}`
+
+    cy.findByText(product_title)
+      .parent()
+      .within(() => {
+        cy.findByText('Edit').click()
+      })
+
+    cy.findByLabelText('Brand/Generic name').should('have.value', productName)
+
+    cy.findByText(product_title)
+      .parent()
+      .within(() => {
+        cy.findByText('Remove').click()
+      })
+
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
   })
 
   it('review page shows the correct information', () => {
