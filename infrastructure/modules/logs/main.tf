@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "logs" {
-  name                     = replace("logs${var.environment}", "-", "")
+  name                     = var.namespace
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_kind             = "StorageV2"

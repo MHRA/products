@@ -20,6 +20,7 @@ locals {
   namespace        = "mhraproducts${var.ENVIRONMENT}"
   pars_namespace   = "mhrapars${var.ENVIRONMENT}"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+  logs_namespace   = "mhralogs${var.ENVIRONMENT}"
 }
 
 data "azurerm_resource_group" "products" {
@@ -39,12 +40,12 @@ resource "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  namespace           = local.namespace
-  pars_namespace      = local.pars_namespace
-  resource_group_name = data.azurerm_resource_group.products.name
-  search_sku          = "standard"
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  namespace               = local.namespace
+  pars_namespace          = local.pars_namespace
+  resource_group_name     = data.azurerm_resource_group.products.name
+  search_sku              = "standard"
   app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
 }
 
@@ -68,6 +69,7 @@ data "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
+  namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = data.azurerm_resource_group.products.name
