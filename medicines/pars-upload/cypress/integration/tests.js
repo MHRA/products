@@ -268,9 +268,13 @@ describe('PARs upload form', () => {
   })
 
   it('can submit the form sucessfully', () => {
-    cy.server()
+    if (parsUrl) {
+      cy.log('Mocking form submissions endpoint')
 
-    mockSuccessfulSubmission()
+      cy.server()
+
+      mockSuccessfulSubmission()
+    }
 
     cy.visit('/new-par')
 
