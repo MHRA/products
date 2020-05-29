@@ -46,11 +46,11 @@ export const ButtonLink = ({ href, children, startButton = false }) => (
 
 // For things which should be a button for accessibility reasons but
 // design-wise should look like a link
-export const ButtonWithLinkStyles = ({ children, className, onClick }) => (
+export const ButtonWithLinkStyles = ({ children, className, ...props }) => (
   <button
     type="button"
     className={classes(css.button, 'govuk-link', className)}
-    onClick={onClick}
+    {...props}
   >
     {children}
   </button>

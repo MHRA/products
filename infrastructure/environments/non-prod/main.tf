@@ -45,12 +45,13 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
 module "products" {
   source = "../../modules/products"
 
-  environment             = var.ENVIRONMENT
-  location                = var.REGION
-  namespace               = local.namespace
-  pars_namespace          = local.pars_namespace
-  resource_group_name     = azurerm_resource_group.products.name
-  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  environment                       = var.ENVIRONMENT
+  location                          = var.REGION
+  namespace                         = local.namespace
+  pars_namespace                    = local.pars_namespace
+  resource_group_name               = azurerm_resource_group.products.name
+  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  addtional_allowed_pars_reply_urls = []
 }
 
 # website

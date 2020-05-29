@@ -1,0 +1,30 @@
+.icon {
+  appearance: none;
+  border: none;
+  background: black;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon::before,
+.icon::after {
+  content: '';
+  display: block;
+  background: white;
+  position: absolute;
+  width: 60%;
+  left: 20%;
+  height: 2px;
+  top: calc(50% - 1px);
+}
+
+.icon::before {
+  transform: rotate(45deg);
+}
+
+.icon::after {
+  transform: rotate(-45deg);
+}
