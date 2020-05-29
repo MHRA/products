@@ -3,12 +3,6 @@ use futures::future::join_all;
 use futures::TryStreamExt;
 use warp::multipart::{FormData, Part};
 
-#[derive(Debug)]
-pub struct Field {
-    pub name: String,
-    pub value: UploadFieldValue,
-}
-
 pub async fn collect_fields(form_data: FormData) -> anyhow::Result<Vec<Field>> {
     let parts: Vec<Part> = form_data.try_collect().await?;
 
@@ -16,6 +10,12 @@ pub async fn collect_fields(form_data: FormData) -> anyhow::Result<Vec<Field>> {
         .await
         .into_iter()
         .collect::<Result<_, _>>()
+}
+
+#[derive(Debug)]
+pub struct Field {
+    pub name: String,
+    pub value: UploadFieldValue,
 }
 
 impl Field {

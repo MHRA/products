@@ -197,18 +197,18 @@ fn product_form_data_to_blob_metadata(
     file_name: String,
     fields: Vec<Field>,
 ) -> Result<BlobMetadata, SubmissionError> {
-    let product_name = get_field_as_string(&fields, "product_name")?;
+    let product_name = get_field_as_uppercase_string(&fields, "product_name")?;
 
     let product_names = vec![product_name];
 
-    let title = get_field_as_string(&fields, "title")?;
-    let pl_number = get_field_as_string(&fields, "licence_number")?;
+    let title = get_field_as_uppercase_string(&fields, "title")?;
+    let pl_number = get_field_as_uppercase_string(&fields, "licence_number")?;
 
     let active_substances = fields
         .iter()
         .filter(|field| field.name == "active_substance")
         .filter_map(|field| field.value.value())
-        .map(|s| s.to_string())
+        .map(|s| s.to_uppercase())
         .collect::<Vec<String>>();
 
     let author = "".to_string();
@@ -225,7 +225,7 @@ fn product_form_data_to_blob_metadata(
     ))
 }
 
-fn get_field_as_string(
+fn get_field_as_uppercase_string(
     fields: &[Field],
     field_name: &'static str,
 ) -> Result<String, SubmissionError> {
@@ -234,7 +234,7 @@ fn get_field_as_string(
         .find(|field| field.name == field_name)
         .and_then(|field| field.value.value())
         .ok_or(SubmissionError::MissingField { name: field_name })
-        .map(|s| s.to_string())
+        .map(|s| s.to_uppercase())
 }
 
 #[derive(Debug)]
@@ -257,4 +257,52 @@ impl warp::reject::Reject for SubmissionError {}
 struct Claims {
     sub: String,
     preferred_username: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    fn text_field(name: &str, value: &str) -> Field {
+        Field {
+            name: name.into(),
+            value: UploadFieldValue::Text {
+                value: value.into(),
+            },
+        }
+    }
+
+    #[test]
+    fn converts_form_data_to_metadata() {
+        let file_name = "file";
+        let result = product_form_data_to_blob_metadata(
+            file_name.into(),
+            vec![
+                text_field("product_name", "Feel good pills"),
+                text_field("active_substance", "Ibuprofen"),
+                text_field("active_substance", "Temazepam"),
+                text_field(
+                    "title",
+                    "Feel good pills Really Strong High Dose THR 12345/1234",
+                ),
+                text_field("licence_number", "THR 12345/1234"),
+            ],
+        )
+        .unwrap();
+
+        assert_eq!(
+            result,
+            BlobMetadata {
+                file_name: file_name.into(),
+                doc_type: DocumentType::Par,
+                title: "FEEL GOOD PILLS REALLY STRONG HIGH DOSE THR 12345/1234".into(),
+                pl_number: "THR 12345/1234".into(),
+                product_names: vec!["FEEL GOOD PILLS".into()].into(),
+                active_substances: vec!["IBUPROFEN".into(), "TEMAZEPAM".into()].into(),
+                author: "".into(),
+                keywords: None
+            }
+        )
+    }
 }
