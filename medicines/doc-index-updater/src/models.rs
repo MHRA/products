@@ -2,7 +2,7 @@ use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
 use regex::Regex;
 use search_client::models::DocumentType;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -158,6 +158,10 @@ pub struct CreateMessage {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
+    #[serde(
+        alias = "document_content_id",
+        deserialize_with = "string_or_unique_document_identifier"
+    )]
     pub document_id: UniqueDocumentIdentifier,
 }
 
@@ -171,6 +175,17 @@ pub enum UniqueDocumentIdentifier {
 /// Previously, if a DeleteMessage's document_id was set, it was a string, and identified a content_id.
 /// We convert strings to content ids to allow deserialisation of old messages to work.
 /// Also allows for document_manager endpoints to continue to accept `String` from the path, and easily convert these.
+fn string_or_unique_document_identifier<'de, D>(d: D) -> Result<UniqueDocumentIdentifier, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value: serde_json::Value = Deserialize::deserialize(d)?;
+    if let serde_json::Value::String(s) = value {
+        return Ok(s.into());
+    }
+    serde_json::from_value(value).map_err(|e| serde::de::Error::custom(e.to_string()))
+}
+
 impl From<String> for UniqueDocumentIdentifier {
     fn from(content_id: String) -> Self {
         UniqueDocumentIdentifier::ContentId(content_id)
@@ -373,7 +388,7 @@ pub mod test {
 
     #[test]
     fn test_deserialise_old_delete_message() {
-        let job_id = Uuid::new_v4();
+        let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
             job_id,
@@ -388,7 +403,7 @@ pub mod test {
                     len: 2,
                 },
                 Token::String("job_id"),
-                Token::String("00000000-0000-0000-0000-000000000000"),
+                Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
                 Token::String("document_content_id"),
                 Token::String(content_id),
                 Token::StructEnd,
@@ -398,7 +413,7 @@ pub mod test {
 
     #[test]
     fn test_deserialise_new_delete_message_using_tokens() {
-        let job_id = Uuid::nil();
+        let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
             job_id,
@@ -416,12 +431,12 @@ pub mod test {
                     len: 2,
                 },
                 Token::String("job_id"),
-                Token::String("00000000-0000-0000-0000-000000000000"),
+                Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
                 Token::String("document_id"),
                 Token::Enum {
                     name: "UniqueDocumentIdentifier",
                 },
-                Token::String("ContentId"),
+                Token::Str("ContentId"),
                 Token::String(content_id),
                 Token::StructEnd,
             ],
@@ -452,6 +467,20 @@ pub mod test {
         };
 
         let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
+    }
+
+    #[test]
+    fn test_deserialize_old_json_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_content_id\":\"CON33333333\"}";
         let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
         assert_eq!(delete_message, deserialized);
     }
