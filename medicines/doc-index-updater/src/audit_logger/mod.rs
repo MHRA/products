@@ -155,7 +155,7 @@ mod test {
             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
         );
         let message = get_delete_message();
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,DeleteMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document_content_id: \"CON123456789\", initiator_email: Some(\"example@email.com\") }\n".to_string();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,DeleteMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document_id: ContentId(\"CON123456789\"), initiator_email: Some(\"example@email.com\") }\n".to_string();
 
         let actual = get_log_body(&blob_name, message, &date);
 
