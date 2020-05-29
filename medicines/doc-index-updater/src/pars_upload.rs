@@ -126,7 +126,7 @@ async fn queue_pars_upload(
 }
 
 async fn update_pars_handler(
-    existing_par_identifier: String,
+    _existing_par_identifier: String,
     form_data: FormData,
     state_manager: StateManager,
     authorization_header: String,

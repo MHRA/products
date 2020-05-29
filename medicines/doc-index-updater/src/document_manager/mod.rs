@@ -102,20 +102,20 @@ async fn delete_document_handler(
 }
 
 async fn delete_document_xml_handler(
-    document_id: UniqueDocumentIdentifier,
+    document_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = delete_document_handler(document_id, state_manager)
+    let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), state_manager)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
 }
 
 async fn delete_document_json_handler(
-    document_id: UniqueDocumentIdentifier,
+    document_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = delete_document_handler(document_id, state_manager).await?;
+    let r = delete_document_handler(document_id.into(), state_manager).await?;
     Ok(warp::reply::json(&r))
 }
 

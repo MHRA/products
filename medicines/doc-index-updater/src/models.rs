@@ -167,11 +167,13 @@ pub enum UniqueDocumentIdentifier {
     MetadataStorageName(String),
 }
 
-// impl UniqueDocumentIdentifier {}
-
-impl std::fmt::Display for UniqueDocumentIdentifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+/// Exists for historic backwards compatibility
+/// Previously, if a DeleteMessage's document_id was set, it was a string, and identified a content_id.
+/// We convert strings to content ids to allow deserialisation of old messages to work.
+/// Also allows for document_manager endpoints to continue to accept `String` from the path, and easily convert these.
+impl From<String> for UniqueDocumentIdentifier {
+    fn from(content_id: String) -> Self {
+        UniqueDocumentIdentifier::ContentId(content_id)
     }
 }
 

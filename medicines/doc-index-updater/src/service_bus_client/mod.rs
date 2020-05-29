@@ -107,6 +107,8 @@ pub enum ProcessMessageError {
     #[error("Cannot restore index for blob with ID {0}: {1}")]
     FailedRestoringIndex(String, String),
     #[error(transparent)]
+    Reqwest(#[from] reqwest::Error),
+    #[error(transparent)]
     Generic(#[from] anyhow::Error),
 }
 
