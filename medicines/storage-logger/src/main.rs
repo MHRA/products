@@ -24,16 +24,16 @@ async fn create_blob_log() -> Result<(), Box<dyn Error>> {
 }
 
 fn get_client() -> Result<Client, AzureError> {
-    let account =
-        std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
-    let master_key =
-        std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
+    let account = std::env::var("PRODUCTS_STORAGE_ACCOUNT")
+        .expect("Set env variable PRODUCTS_STORAGE_ACCOUNT first!");
+    let master_key = std::env::var("PRODUCTS_STORAGE_MASTER_KEY")
+        .expect("Set env variable PRODUCTS_STORAGE_MASTER_KEY first!");
     Client::new(&account, &master_key)
 }
 
 async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
-    let container_name = std::env::var("STORAGE_CONTAINER_NAME")
-        .expect("Set env variable STORAGE_MASTER_KEY first!");
+    let container_name = std::env::var("PRODUCTS_STORAGE_CONTAINER_NAME")
+        .expect("Set env variable PRODUCTS_STORAGE_CONTAINER_NAME first!");
 
     let mut blob_stream = Box::pin(
         client
@@ -97,28 +97,25 @@ fn extract_blob_strings(blob: &Blob) -> Vec<String> {
 }
 
 async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(), AzureError> {
-    // let contents_log_container_name = std::env::var("STORAGE_CONTAINER_BACKUP_NAME")
-    //     .expect("Set env variable STORAGE_MASTER_KEY first!");
+    let contents_log_container_name = std::env::var("LOG_STORAGE_CONTAINER_NAME")
+        .expect("Set env variable LOG_STORAGE_CONTAINER_NAME first!");
 
-    // let blobs_as_string = blob_list.join("\n");
-    // let file_data = blobs_as_string.as_bytes();
-    // let file_digest = md5::compute(&file_data[..]);
+    let blobs_as_string = blob_list.join("\n");
+    let file_data = blobs_as_string.as_bytes();
+    let file_digest = md5::compute(&file_data[..]);
 
-    // let now: DateTime<Utc> = Utc::now();
-    // let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
+    let now: DateTime<Utc> = Utc::now();
+    let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
 
-    for line in blob_list {
-        println!("{}", line);
-    }
-    // client
-    //     .put_block_blob()
-    //     .with_container_name(&contents_log_container_name)
-    //     .with_blob_name(&blob_name)
-    //     .with_content_type("text/csv")
-    //     .with_body(&file_data[..])
-    //     .with_content_md5(&file_digest[..])
-    //     .finalize()
-    //     .await?;
+    client
+        .put_block_blob()
+        .with_container_name(&contents_log_container_name)
+        .with_blob_name(&blob_name)
+        .with_content_type("text/csv")
+        .with_body(&file_data[..])
+        .with_content_md5(&file_digest[..])
+        .finalize()
+        .await?;
 
     Ok(())
 }
