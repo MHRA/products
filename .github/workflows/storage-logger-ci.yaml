@@ -1,14 +1,20 @@
-name: doc-index-updater-master
+name: storage-logger-ci
 
 on:
-  push:
+  pull_request:
     paths:
       - medicines/storage-logger/**
-      - .github/workflows/storage-logger.yaml
+      - .github/workflows/storage-logger-ci.yaml
+  push:
+    branches:
+      - master
+    paths:
+      - medicines/storage-logger/**
+      - .github/workflows/storage-logger-ci.yaml
 
 jobs:
   build-and-test:
-    name: Build, Test and Deploy
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -19,13 +25,4 @@ jobs:
 
       - name: Test
         working-directory: ./products/medicines/storage-logger
-        run: cargo test
-
-      - name: Run storage log
-        working-directory: ./products/medicines/storage-logger
-        env:
-          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT_NONPROD }}
-          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_MASTER_KEY_NONPROD }}
-          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME_NONPROD }}
-          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NAME_NONPROD }}
-        run: cargo run
+        run: make test

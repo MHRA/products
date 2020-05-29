@@ -18,13 +18,13 @@ jobs:
 
       - name: Test
         working-directory: ./products/medicines/storage-logger
-        run: cargo test
+        run: make test
 
       - name: Run storage log
         working-directory: ./products/medicines/storage-logger
         env:
-          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
-          STORAGE_MASTER_KEY: ${{ secrets.STORAGE_MASTER_KEY }}
-          STORAGE_CONTAINER_NAME: ${{ secrets.STORAGE_CONTAINER_NAME }}
-          STORAGE_CONTAINER_BACKUP_NAME: ${{ secrets.STORAGE_CONTAINER_BACKUP_NAME }}
+          PRODUCTS_STORAGE_ACCOUNT: ${{ secrets.PRODUCTS_STORAGE_ACCOUNT_PROD }}
+          PRODUCTS_STORAGE_MASTER_KEY: ${{ secrets.PRODUCTS_STORAGE_MASTER_KEY_PROD }}
+          PRODUCTS_STORAGE_CONTAINER_NAME: ${{ secrets.PRODUCTS_STORAGE_CONTAINER_NAME_PROD }}
+          LOG_STORAGE_CONTAINER_NAME: ${{ secrets.LOG_STORAGE_CONTAINER_NAME_PROD }}
         run: cargo run
