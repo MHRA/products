@@ -263,6 +263,7 @@ const product_title = (formData) =>
   ]
     .filter((x) => x)
     .join(', ')
+    .toUpperCase()
 
 const license_number = (formData) => {
   const license_type = formData.get('license_number_type')
