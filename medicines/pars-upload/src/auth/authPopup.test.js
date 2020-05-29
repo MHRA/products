@@ -17,3 +17,9 @@ test('extracts base url from a url without path', () => {
     'http://theserver:8000'
   )
 })
+
+test('extracts base url from a url without path or port', () => {
+  expect(popup.getCurrentHost('http://theserver.com')).toBe(
+    'http://theserver.com'
+  )
+})
