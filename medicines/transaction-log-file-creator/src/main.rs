@@ -4,7 +4,7 @@ use azure_sdk_core::modify_conditions::IfMatchCondition;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use azure_sdk_storage_core::prelude::Client;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 
 #[tokio::main]
 async fn main() {
@@ -36,7 +36,9 @@ fn get_client() -> Result<Client, anyhow::Error> {
 }
 
 fn get_log_file_name(date: DateTime<Utc>) -> String {
-    date.format("file-change-log-%Y-%m").to_string()
+    (date + Duration::months(1))
+        .format("file-change-log-%Y-%m")
+        .to_string()
 }
 
 fn get_log_container_name() -> String {
