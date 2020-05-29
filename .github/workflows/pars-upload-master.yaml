@@ -94,7 +94,6 @@ jobs:
           {
             echo "NEXT_PUBLIC_CLIENT_ID=$NONPROD_PARS_APP_ID"
             echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
-            echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsnon-prod.azureedge.net"
             echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
             echo "NEXT_PUBLIC_PARS_UPLOAD_URL=\"$NEXT_PUBLIC_PARS_UPLOAD_URL\""
             echo "PARS_UPLOAD_URL=\"$PARS_UPLOAD_URL\""
