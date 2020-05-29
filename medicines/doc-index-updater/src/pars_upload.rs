@@ -74,6 +74,7 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
 
 async fn queue_pars_upload(
     form_data: FormData,
+    uploader_email: String,
     state_manager: impl JobStatusClient,
 ) -> Result<Vec<Uuid>, Rejection> {
     let (metadatas, file_data) = read_pars_upload(form_data).await.map_err(|e| {
@@ -95,7 +96,7 @@ async fn queue_pars_upload(
 
         let document = document_from_form_data(storage_file, metadata);
 
-        check_in_document_handler(document, &state_manager).await?;
+        check_in_document_handler(document, &state_manager, Some(uploader_email.clone())).await?;
     }
 
     Ok(job_ids)
@@ -111,9 +112,7 @@ async fn upload_pars_handler(
     let _enter = span.enter();
     tracing::debug!("Received PARS submission");
 
-    tracing::info!("Uploader email: {}", username);
-
-    let job_ids = queue_pars_upload(form_data, state_manager).await?;
+    let job_ids = queue_pars_upload(form_data, username, state_manager).await?;
 
     Ok(warp::reply::json(&UploadResponse { job_ids }))
 }

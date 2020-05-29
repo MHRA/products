@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use regex::Regex;
 use search_client::models::DocumentType;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -153,16 +154,18 @@ impl Into<XMLJobStatusResponse> for JobStatusResponse {
 pub struct CreateMessage {
     pub job_id: Uuid,
     pub document: Document,
+    pub initiator_email: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
     pub document_content_id: String,
+    pub initiator_email: Option<String>,
 }
 
 #[async_trait]
-pub trait Message: Sized + FromStr + Clone {
+pub trait Message: Sized + FromStr + Clone + Debug {
     fn get_id(&self) -> Uuid;
     fn to_json_string(&self) -> Result<String, serde_json::Error>;
     async fn process(self) -> Result<Uuid, ProcessMessageError>;
@@ -241,6 +244,7 @@ pub mod test {
         CreateMessage {
             job_id: id,
             document: get_test_document(),
+            initiator_email: None,
         }
     }
 

@@ -17,6 +17,8 @@ pub enum StorageClientError {
     UploadError(String),
     #[error("Could not create client: {0}")]
     ClientError(String),
+    #[error("Could not append to blob: {0}")]
+    AppendError(String),
 
     #[error(transparent)]
     DecodeError(#[from] DecodeError),

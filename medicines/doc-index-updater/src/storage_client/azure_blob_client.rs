@@ -50,6 +50,22 @@ impl AzureBlobStorage {
         }
     }
 
+    pub fn log() -> Self {
+        let container_name = std::env::var("LOG_STORAGE_CONTAINER")
+            .expect("Set env variable LOG_STORAGE_CONTAINER first!");
+        let storage_account = std::env::var("LOG_STORAGE_ACCOUNT")
+            .expect("Set env variable LOG_STORAGE_ACCOUNT first!");
+        let master_key = std::env::var("LOG_STORAGE_MASTER_KEY")
+            .expect("Set env variable LOG_STORAGE_MASTER_KEY first!");
+
+        Self {
+            container_name,
+            prefix: "".to_owned(),
+            storage_account,
+            master_key,
+        }
+    }
+
     pub fn get_azure_client(&self) -> Result<Client, StorageClientError> {
         let client = base64::decode(&self.master_key)
             .map(|_| Client::new(&self.storage_account, &self.master_key))?;
@@ -104,6 +120,24 @@ impl StorageClient for AzureBlobStorage {
             .data;
 
         Ok(file_data)
+    }
+    async fn append_to_file(&self, file_name: &str, body: &[u8]) -> Result<(), StorageClientError> {
+        let storage_client = self.get_azure_client()?;
+        storage_client
+            .put_append_block()
+            .with_container_name(&self.container_name)
+            .with_blob_name(&file_name)
+            .with_body(body)
+            .finalize()
+            .await
+            .map_err(|e| {
+                tracing::error!("Error appending data to blob file: {:?}", e);
+                StorageClientError::AppendError(format!(
+                    "Couldn't append data to blob file: {:?}",
+                    e
+                ))
+            })?;
+        Ok(())
     }
 }
 
