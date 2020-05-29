@@ -2,21 +2,17 @@ use crate::{
     create_manager::models::BlobMetadata,
     document_manager::{accept_job, check_in_document_handler, delete_document_handler},
     models::{Document, FileSource, JobStatusResponse, UniqueDocumentIdentifier},
+    multipart_form_data::{collect_fields, Field},
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
-use serde::{Deserialize, Serialize};
-
-use bytes::BufMut;
-use futures::future::join_all;
-use futures::TryStreamExt;
 use search_client::models::DocumentType;
-
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 use warp::{
-    filters::multipart::{FormData, Part},
     http::{header, Method},
+    multipart::FormData,
     Filter, Rejection, Reply,
 };
 
@@ -72,7 +68,7 @@ async fn add_file_to_temporary_blob_storage(
     let storage_file = storage_client
         .add_file(file_data, licence_number, HashMap::new())
         .await
-        .map_err(|e| SubmissionError::UploadError {
+        .map_err(|e| SubmissionError::BlobStorageError {
             message: format!("Problem talking to temporary blob storage: {:?}", e),
         })?;
     Ok(storage_file)
@@ -182,18 +178,9 @@ struct UpdateResponse {
 async fn read_pars_upload(
     form_data: FormData,
 ) -> Result<(Vec<BlobMetadata>, Vec<u8>), SubmissionError> {
-    let parts: Vec<Part> =
-        form_data
-            .try_collect()
-            .await
-            .map_err(|e| SubmissionError::UploadError {
-                message: format!("Error receiving data: {}", e),
-            })?;
-
-    let fields: Vec<Field> = join_all(parts.into_iter().map(read_upload_part))
+    let fields = collect_fields(form_data)
         .await
-        .into_iter()
-        .collect::<Result<_, _>>()?;
+        .map_err(|error| SubmissionError::UploadError { error })?;
 
     let GroupedFields {
         products,
@@ -207,12 +194,6 @@ async fn read_pars_upload(
         .collect::<Result<_, _>>()?;
 
     Ok((metadatas, file_data))
-}
-
-#[derive(Debug)]
-struct Field {
-    name: String,
-    value: UploadFieldValue,
 }
 
 #[derive(Debug)]
@@ -268,18 +249,18 @@ fn product_form_data_to_blob_metadata(
     file_name: String,
     fields: Vec<Field>,
 ) -> Result<BlobMetadata, SubmissionError> {
-    let product_name = get_field_as_string(&fields, "product_name")?;
+    let product_name = get_field_as_uppercase_string(&fields, "product_name")?;
 
     let product_names = vec![product_name];
 
-    let title = get_field_as_string(&fields, "title")?;
-    let pl_number = get_field_as_string(&fields, "licence_number")?;
+    let title = get_field_as_uppercase_string(&fields, "title")?;
+    let pl_number = get_field_as_uppercase_string(&fields, "licence_number")?;
 
     let active_substances = fields
         .iter()
         .filter(|field| field.name == "active_substance")
         .filter_map(|field| field.value.value())
-        .map(|s| s.to_string())
+        .map(|s| s.to_uppercase())
         .collect::<Vec<String>>();
 
     let author = "".to_string();
@@ -296,7 +277,7 @@ fn product_form_data_to_blob_metadata(
     ))
 }
 
-fn get_field_as_string(
+fn get_field_as_uppercase_string(
     fields: &[Field],
     field_name: &'static str,
 ) -> Result<String, SubmissionError> {
@@ -305,72 +286,21 @@ fn get_field_as_string(
         .find(|field| field.name == field_name)
         .and_then(|field| field.value.value())
         .ok_or(SubmissionError::MissingField { name: field_name })
-        .map(|s| s.to_string())
-}
-
-async fn read_upload_part(part: Part) -> Result<Field, SubmissionError> {
-    let name = part.name().to_string();
-
-    let file_name = part.filename().map(|s| s.to_string());
-
-    let data = part
-        .stream()
-        .try_fold(Vec::new(), |mut vec, data| {
-            vec.put(data);
-            async move { Ok(vec) }
-        })
-        .await
-        .map_err(|e| SubmissionError::UploadError {
-            message: format!("Error receiving data: {}", e),
-        })?;
-
-    let value = match file_name {
-        Some(file_name) => UploadFieldValue::File { file_name, data },
-        None => UploadFieldValue::Text {
-            value: std::str::from_utf8(&data)
-                .map_err(|e| SubmissionError::UploadError {
-                    message: format!("Error decoding field to utf-8: {}", e),
-                })?
-                .to_string(),
-        },
-    };
-
-    Ok(Field { name, value })
-}
-
-#[derive(Debug)]
-enum UploadFieldValue {
-    Text { value: String },
-    File { file_name: String, data: Vec<u8> },
-}
-
-impl UploadFieldValue {
-    fn value(&self) -> Option<&str> {
-        match self {
-            UploadFieldValue::Text { value } => Some(value),
-            _ => None,
-        }
-    }
-
-    fn file_name(&self) -> Option<&str> {
-        match self {
-            UploadFieldValue::File { file_name, data: _ } => Some(file_name),
-            _ => None,
-        }
-    }
-
-    fn into_file_data(self) -> Option<Vec<u8>> {
-        match self {
-            UploadFieldValue::File { file_name: _, data } => Some(data),
-            _ => None,
-        }
-    }
+        .map(|s| s.to_uppercase())
 }
 
 #[derive(Debug)]
 enum SubmissionError {
-    UploadError { message: String },
-    MissingField { name: &'static str },
+    UploadError {
+        error: anyhow::Error,
+    },
+    BlobStorageError {
+        message: String, // should maybe be StorageClientError but that is not
+                         // Send + Sync so then we can't implement warp::reject::Reject
+    },
+    MissingField {
+        name: &'static str,
+    },
 }
 
 impl warp::reject::Reject for SubmissionError {}
@@ -379,4 +309,53 @@ impl warp::reject::Reject for SubmissionError {}
 struct Claims {
     sub: String,
     preferred_username: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::multipart_form_data::UploadFieldValue;
+    use pretty_assertions::assert_eq;
+
+    fn text_field(name: &str, value: &str) -> Field {
+        Field {
+            name: name.into(),
+            value: UploadFieldValue::Text {
+                value: value.into(),
+            },
+        }
+    }
+
+    #[test]
+    fn converts_form_data_to_metadata() {
+        let file_name = "file";
+        let result = product_form_data_to_blob_metadata(
+            file_name.into(),
+            vec![
+                text_field("product_name", "Feel good pills"),
+                text_field("active_substance", "Ibuprofen"),
+                text_field("active_substance", "Temazepam"),
+                text_field(
+                    "title",
+                    "Feel good pills Really Strong High Dose THR 12345/1234",
+                ),
+                text_field("licence_number", "THR 12345/1234"),
+            ],
+        )
+        .unwrap();
+
+        assert_eq!(
+            result,
+            BlobMetadata {
+                file_name: file_name.into(),
+                doc_type: DocumentType::Par,
+                title: "FEEL GOOD PILLS REALLY STRONG HIGH DOSE THR 12345/1234".into(),
+                pl_number: "THR 12345/1234".into(),
+                product_names: vec!["FEEL GOOD PILLS".into()].into(),
+                active_substances: vec!["IBUPROFEN".into(), "TEMAZEPAM".into()].into(),
+                author: "".into(),
+                keywords: None
+            }
+        )
+    }
 }
