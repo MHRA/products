@@ -50,7 +50,7 @@ module "products" {
   pars_namespace                    = local.pars_namespace
   resource_group_name               = azurerm_resource_group.products.name
   app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
-  addtional_allowed_pars_reply_urls = ["http://localhost:3000", "https://mhraparsnon-prod.azureedge.net", "https://mhraparsnonprod.z33.web.core.windows.net"]
+  addtional_allowed_pars_reply_urls = ["http://localhost:3000"]
 }
 
 # website
