@@ -121,6 +121,18 @@ impl StorageClient for AzureBlobStorage {
 
         Ok(file_data)
     }
+    async fn get_document(&self, storage_file: StorageFile) -> Result<Vec<u8>, StorageClientError> {
+        let file_data = self
+            .get_blob(&storage_file.name)
+            .await
+            .map_err(|e| {
+                tracing::error!("Error retrieving file from blob storage: {:?}", e);
+                StorageClientError::RetrievalError(format!("Couldn't retrieve blob: {:?}", e))
+            })?
+            .map(into);
+
+        Ok(file_data)
+    }
     async fn append_to_file(&self, file_name: &str, body: &[u8]) -> Result<(), StorageClientError> {
         let storage_client = self.get_azure_client()?;
         storage_client
