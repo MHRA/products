@@ -45,6 +45,14 @@ export const ReviewSubmission = ({
         }
 
         switch (type) {
+          case 'get_par':
+            return (
+              <ParToUpdateSummary
+                key={key}
+                data={data}
+                goToFormPage={goToFormPage}
+              />
+            )
           case 'product':
             return (
               <ProductSummary
@@ -99,6 +107,19 @@ const ProductSummary = ({ data, goToFormPage }) => (
         {
           key: 'Licence number',
           value: data.get('licence_number'),
+        },
+      ]}
+    />
+  </SummaryWrapper>
+)
+
+const ParToUpdateSummary = ({ data, goToFormPage }) => (
+  <SummaryWrapper title="Par to update" goToFormPage={goToFormPage}>
+    <SummaryListWithoutActions
+      items={[
+        {
+          key: 'URL',
+          value: data.get('par_url'),
         },
       ]}
     />
