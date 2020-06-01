@@ -154,6 +154,59 @@ describe('PARs upload form', () => {
     cy.findByLabelText('Brand/Generic name').should('have.value', '')
   })
 
+  it('duplicate licence numbers are not allowed', () => {
+    const productName = 'Ibuprofen pills'
+    const strength = 'Really powerful stuff'
+    const dose = 'some form'
+    const licence = { type: 'THR', part_one: '12345', part_two: '6789' }
+
+    cy.visit('/new-par')
+
+    for (let i = 0; i < 2; i++) {
+      cy.findByLabelText('Brand/Generic name').type(productName)
+
+      cy.findByLabelText('Strength').type(strength)
+
+      cy.findByLabelText('Pharmaceutical dose form').type(dose)
+
+      cy.findByLabelText('Active substance(s)').type('Ibuprofen')
+
+      cy.findByText('Add another active substance').click()
+
+      cy.findAllByLabelText('Active substance(s)').last().type('Paracetamol')
+
+      cy.findByText('Licence number')
+        .parent()
+        .parent()
+        .within(() => {
+          cy.findByLabelText('Type').select(licence.type)
+          cy.findByLabelText('First five digits').type(licence.part_one)
+          cy.findByLabelText('Last four digits').type(licence.part_two)
+        })
+
+      cy.findByText('Add another product').click()
+    }
+
+    const validationMsg = 'Duplicate licence numbers are not allowed'
+
+    cy.findByText('Licence number')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByLabelText('Type').then(([el]) => {
+          expect(el.validationMessage).to.eq(validationMsg)
+        })
+
+        cy.findByLabelText('First five digits').then(([el]) => {
+          expect(el.validationMessage).to.eq(validationMsg)
+        })
+
+        cy.findByLabelText('Last four digits').then(([el]) => {
+          expect(el.validationMessage).to.eq(validationMsg)
+        })
+      })
+  })
+
   it('review page shows the correct information', () => {
     const productName = 'Ibuprofen pills'
     const strength = 'Really powerful stuff'
