@@ -2,6 +2,8 @@ AbilityNet
 acr
 ACR
 actix
+addon
+agentconfig
 AKS
 allowStorage
 analytics
@@ -19,8 +21,10 @@ authorisations
 authorise
 authorised
 az
+azm
 Azure
 azurecr
+azurerm
 backend
 BD
 behaviour
@@ -37,6 +41,7 @@ colour
 colours
 compliances
 config
+configmap
 crds
 CSV
 Ctrl
@@ -94,13 +99,16 @@ jetstack
 jMHESRNZIU
 jMj
 jq
+JSON
 js
 JWT
 kcnwkqgGoHssWP
+KQL
 kube
 kubectl
 kubernetes
 Kubernetes
+Kusto
 lang
 lang's
 learningweb
@@ -134,6 +142,7 @@ nodeSelector
 normalizer
 Normalizer
 noYMpubeoVBK
+observability
 ObzN
 Ok
 orchestrator
@@ -149,6 +158,8 @@ PII
 PIL
 PILs
 PLs
+Prometheus
+prometheus
 PRs
 PySpelling
 QoURBFoXXQpZp
@@ -193,12 +204,14 @@ SVGR
 tADWy
 terraform
 Terraform
+tf
 TLS
 todo
 toolchain
 TSV
 TvnNsQcPOGDojki
 TypeScript
+UI
 uk
 unix
 upgradeable
