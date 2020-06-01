@@ -2,7 +2,7 @@
 
 ## AKS
 
-Azure Kubernetes Service (AKS) provides good high-level monitoring of the cluster, such as the CPU and memory usage of each node in the cluster (to view this find the cluster in the Azure portal and then click on the "Insights" tab).
+Azure Kubernetes Service (AKS) provides good high-level monitoring of the cluster, such as the CPU and memory usage of each node in the cluster. To view this find the cluster in the Azure portal and then click on the "Insights" tab.
 
 ## Custom dashboards
 
@@ -16,14 +16,14 @@ They are set up in the following way:
 
 ### Prometheus
 
-Prometheus is already installed by istio, and our custom config for prometheus lives here: https://github.com/MHRA/deployments/blob/master/observability/prometheus-configmap.yaml
+Prometheus is already installed by istio, and our custom config for it lives here: https://github.com/MHRA/deployments/blob/master/observability/prometheus-configmap.yaml
 
 There are two parts to the config:
 
 - `prometheus.yml` specifies what pods to scrape and other general settings
-- `prometheus.rules.yml` specifies some [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/), basically each rule is a query that prometheus runs regularly and stores the results as a new metric. These are what we export to the Azure Monitor (by setting the `azure_monitor: true` label for each rule).
+- `prometheus.rules.yml` specifies some [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/), basically each rule is a query that prometheus runs regularly and stores the results as a new metric. These are what we export to the Azure Monitor (by setting the `azure_monitor: true` label for each rule, see the Azure OMS agent section below).
 
-Prometheus [stores its data locally on disk](https://prometheus.io/docs/prometheus/latest/storage/). This means that if the prometheus pod is deleted then prometheus's database is deleted as well. **This happens if you run `make` in the deployments repo** in order to force Prometheus to refresh its config. You can make [Prometheus can reload its config whilst still running](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) if you enable the `--web.enable-lifecycle` flag but I haven't figured out how to inject that into the istio profile yet.
+Prometheus [stores its data locally on disk](https://prometheus.io/docs/prometheus/latest/storage/). This means that if the prometheus pod is deleted then prometheus's database is deleted as well. **This happens if you run `make` in the deployments repo** in order to force Prometheus to refresh its config. It is possible to make [Prometheus can reload its config whilst still running](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) if you enable the `--web.enable-lifecycle` flag but I haven't figured out how to inject that into the istio profile yet.
 
 ### Azure OMS agent
 
