@@ -19,12 +19,7 @@ const ParUpload = ({ auth }) => {
 
     try {
       const par_to_delete = getIdOfParToUpdate(steps)
-      const combined = combineFormDatas(
-        steps
-          .filter(({ type }) => type != 'get_par')
-          .map(({ data }) => data)
-          .filter((data) => data)
-      )
+      const combined = combineFormDatas(steps)
 
       const token = auth ? auth.token : 'auth-token'
       const username = auth ? auth.username : 'test-user@example.com'
@@ -84,7 +79,7 @@ const ParUpload = ({ auth }) => {
   }
 }
 
-const getIdOfParToUpdate = (steps) => {
+export const getIdOfParToUpdate = (steps) => {
   let updateParStep = steps.find(({ type, data }) => type == 'get_par' && data)
   if (updateParStep) {
     let url = updateParStep.data.get('par_url')
@@ -92,7 +87,12 @@ const getIdOfParToUpdate = (steps) => {
   }
 }
 
-const combineFormDatas = (data) => {
+export const combineFormDatas = (steps) => {
+  const data = steps
+    .filter(({ type }) => type != 'get_par')
+    .map(({ data }) => data)
+    .filter((data) => data)
+
   const formData = new FormData()
 
   for (let i = 0; i < data.length; i++) {
