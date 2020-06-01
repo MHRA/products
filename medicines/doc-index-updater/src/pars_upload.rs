@@ -128,6 +128,7 @@ async fn update_pars_handler(
     state_manager: StateManager,
     username: String,
 ) -> Result<impl Reply, Rejection> {
+    println!("UPDATE PARS HANDLER: {:?}", &form_data);
     let delete = delete_document_handler(
         UniqueDocumentIdentifier::MetadataStorageName(existing_par_identifier),
         &state_manager,
@@ -145,6 +146,7 @@ async fn upload_pars_handler(
     state_manager: StateManager,
     username: String,
 ) -> Result<impl Reply, Rejection> {
+    println!("UPLOAD PARS HANDLER: {:?}", &form_data);
     let job_ids = queue_upload_pars_job(form_data, state_manager, username).await?;
     Ok(warp::reply::json(&UploadResponse { job_ids }))
 }
@@ -281,6 +283,7 @@ fn get_field_as_uppercase_string(
     fields: &[Field],
     field_name: &'static str,
 ) -> Result<String, SubmissionError> {
+    println!("FIELDS: {:?}", &fields);
     fields
         .iter()
         .find(|field| field.name == field_name)
