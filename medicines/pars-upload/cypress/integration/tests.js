@@ -27,10 +27,10 @@ Cypress.on('window:before:load', (win) => {
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
-const mockSuccessfulSubmission = () => {
+const mockSuccessfulSubmission = (url) => {
   cy.route({
     method: 'OPTIONS',
-    url: parsUrl,
+    url: url,
     status: 200,
     headers: {
       'access-control-allow-headers': 'authorization, username',
@@ -43,7 +43,7 @@ const mockSuccessfulSubmission = () => {
   })
   cy.route({
     method: 'POST',
-    url: parsUrl,
+    url: url,
     status: 200,
     response: 'fixture:mock_submission_success.json',
   })
@@ -77,6 +77,11 @@ describe('Home page', () => {
         .should('have.length', 1)
     })
 })
+
+const completeFindParToUpdateStep = (parUrl) => {
+  cy.findByLabelText('Please insert URL').type(parUrl)
+  cy.findByText('Search').click()
+}
 
 const addAndDeleteSubstances = (uploadData) => {
   cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
@@ -191,9 +196,11 @@ const completeUploadForm = (uploadData) => {
       cy.findByLabelText('First five digits').type(uploadData.licence.part_one)
       cy.findByLabelText('Last four digits').type(uploadData.licence.part_two)
     })
+
+  cy.findByText('Continue').click()
 }
 
-const uploadFile = (fileName) => {
+const completeUploadFile = (fileName) => {
   cy.findAllByText('Upload your PDF').not('title').should('have.length', 1)
 
   cy.fixture(fileName).then((fileContent) => {
@@ -204,9 +211,11 @@ const uploadFile = (fileName) => {
       mimeType: 'application/pdf',
     })
   })
+
+  cy.findByText('Continue').click()
 }
 
-describe('PARs upload form', () => {
+describe('PARs upload', () => {
   it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
     let uploadData = {
@@ -243,11 +252,9 @@ describe('PARs upload form', () => {
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
     completeUploadForm(uploadData)
-    cy.findByText('Continue').click()
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    uploadFile(fileName)
-    cy.findByText('Continue').click()
+    completeUploadFile(fileName)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')
@@ -302,7 +309,7 @@ describe('PARs upload form', () => {
     cy.findByText(product_title)
       .parent()
       .within(() => {
-        cy.findByText('Change').click()
+        cy.findAllByText('Change').last().click()
       })
 
     cy.findAllByText('New Public Assessment Report')
@@ -321,7 +328,7 @@ describe('PARs upload form', () => {
 
       cy.server()
 
-      mockSuccessfulSubmission()
+      mockSuccessfulSubmission(parsUrl)
     }
 
     cy.visit('/new-par')
@@ -334,11 +341,165 @@ describe('PARs upload form', () => {
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
     completeUploadForm(uploadData)
-    cy.findByText('Continue').click()
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    uploadFile(fileName)
-    cy.findByText('Continue').click()
+    completeUploadFile(fileName)
+
+    cy.findAllByText('Check your answers before sending the report')
+      .not('title')
+      .should('have.length', 1)
+
+    cy.findByText('Accept and send').click()
+
+    cy.findAllByText('Submission complete')
+      .not('title')
+      .should('have.length', 1)
+
+    cy.findByText('Submit another report').click()
+
+    cy.findByText('What are you doing today?').should('exist')
+  })
+})
+
+describe('PARs update', () => {
+  it('can add and delete multiple substances', () => {
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substance1: 'Ibuprofen',
+      substance2: 'Paracetamol',
+      substance3: 'Temazepam',
+    }
+    addAndDeleteSubstances(uploadData)
+  })
+
+  it('can add and delete multiple products', () => {
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substance1: 'Ibuprofen',
+      substance2: 'Paracetamol',
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    addAndDeleteProducts(uploadData)
+  })
+
+  it('review page shows the correct information', () => {
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    completeUploadForm(uploadData)
+
+    const fileName = 'rabbit-anti-human-stuff.pdf'
+    completeUploadFile(fileName)
+
+    cy.findAllByText('Check your answers before sending the report')
+      .not('title')
+      .should('have.length', 1)
+
+    cy.findByText('Brand/Generic name')
+      .parent()
+      .within(() => {
+        cy.findByText(uploadData.brand).should('exist')
+      })
+
+    cy.findByText('Strength')
+      .parent()
+      .within(() => {
+        cy.findByText(uploadData.strength).should('exist')
+      })
+
+    cy.findByText('Pharmaceutical dose form')
+      .parent()
+      .within(() => {
+        cy.findByText(uploadData.doseForm).should('exist')
+      })
+
+    cy.findByText('Active substances')
+      .parent()
+      .within(() => {
+        cy.findByText(uploadData.substances.join(', ')).should('exist')
+      })
+
+    cy.findByText('Licence number')
+      .parent()
+      .within(() => {
+        cy.findByText(
+          `${uploadData.licence.type} ${uploadData.licence.part_one}/${uploadData.licence.part_two}`
+        ).should('exist')
+      })
+
+    cy.findByText('Document')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByText('Document name')
+          .parent()
+          .within(() => {
+            cy.findByText(fileName).should('exist')
+          })
+      })
+
+    const licence_str = `${uploadData.licence.type} ${uploadData.licence.part_one}/${uploadData.licence.part_two}`
+    const product_title = `${uploadData.brand}, ${uploadData.strength}, ${uploadData.doseForm}, ${licence_str}`.toUpperCase()
+
+    cy.findByText(product_title)
+      .parent()
+      .within(() => {
+        cy.findAllByText('Change').eq(1).click()
+      })
+
+    cy.findAllByText('New Public Assessment Report')
+      .not('title')
+      .should('have.length', 1)
+
+    cy.findByLabelText('Brand/Generic name').should(
+      'have.value',
+      uploadData.brand
+    )
+  })
+
+  it('can submit the form sucessfully', () => {
+    let parToUpdateId = 'aso1901290udkldf901'
+
+    if (parsUrl) {
+      cy.log('Mocking form submissions endpoint')
+
+      cy.server()
+
+      mockSuccessfulSubmission(`${parsUrl}/${parToUpdateId}`)
+    }
+
+    cy.visit('/update-par')
+
+    completeFindParToUpdateStep(`https://blob.net/docs/${parToUpdateId}`)
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    completeUploadForm(uploadData)
+
+    const fileName = 'rabbit-anti-human-stuff.pdf'
+    completeUploadFile(fileName)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')
