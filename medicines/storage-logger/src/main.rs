@@ -1,11 +1,9 @@
-#[macro_use]
 extern crate lazy_static;
 use azure_sdk_core::{errors::AzureError, prelude::*};
 use azure_sdk_storage_blob::{blob::Blob, prelude::*};
 use azure_sdk_storage_core::prelude::Client;
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
-use regex::Regex;
 use std::error::Error;
 
 #[tokio::main]
@@ -48,52 +46,15 @@ async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
 
     while let Some(value) = blob_stream.next().await {
         for blob in value?.incomplete_vector.iter() {
-            let blob_strings = extract_blob_strings(blob);
-            blob_list.extend_from_slice(&blob_strings);
+            blob_list.push(get_blob_string(blob));
         }
     }
 
     Ok(blob_list)
 }
 
-fn extract_blob_strings(blob: &Blob) -> Vec<String> {
-    let con = match blob.metadata.get("file_name") {
-        Some(file_name) => file_name.to_owned(),
-        None => String::from(""),
-    };
-
-    let created = blob.creation_time.to_string();
-
-    let modified = match blob.last_modified {
-        Some(date) => date.to_string(),
-        None => String::from(""),
-    };
-
-    let pls = match blob.metadata.get("pl_number") {
-        Some(pls_string) => {
-            let pls_vec = get_pls_vec_from_string(pls_string);
-            match !pls_vec.is_empty() {
-                true => pls_vec,
-                false => vec![String::from("")],
-            }
-        }
-        None => vec![String::from("")],
-    };
-
-    let doc_type = match blob.metadata.get("doc_type") {
-        Some(doc_type) => doc_type.to_owned(),
-        None => String::from(""),
-    };
-
-    let mut blob_strings = vec![];
-    for pl in pls {
-        blob_strings.push(format!(
-            "{},{},{},{},{},{}",
-            blob.name, con, pl, created, modified, doc_type
-        ));
-    }
-
-    blob_strings
+fn get_blob_string(blob: &Blob) -> String {
+    format!("{:?}", blob)
 }
 
 async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(), AzureError> {
@@ -120,44 +81,12 @@ async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(
     Ok(())
 }
 
-fn get_pls_vec_from_string(pl_string: &str) -> Vec<String> {
-    lazy_static! {
-        static ref RE_PL: Regex = Regex::new(r"(PL|PLPI|THR)[0-9]+").unwrap();
-    }
-    RE_PL
-        .captures_iter(pl_string)
-        .map(|cap| cap[0].to_string())
-        .collect()
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
     use azure_sdk_core::lease::LeaseState;
     use azure_sdk_storage_blob::blob::BlobType;
     use std::collections::HashMap;
-    use test_case::test_case;
-
-    #[test_case(
-        &"[\"PL1234567\",\"PLPI987654321\", \"THR54321678\"]",
-        vec![String::from("PL1234567"), String::from("PLPI987654321"), String::from("THR54321678")]
-    )]
-    #[test_case(
-        &"[\"POL1234567\",\"12345678\", \"THR 54321678\"]",
-        vec![]
-    )]
-    #[test_case(
-        &"",
-        vec![]
-    )]
-    fn test_get_pls_vec_from_string(input: &str, expected: Vec<String>) {
-        let actual = get_pls_vec_from_string(input);
-        assert_eq!(actual.len(), expected.len());
-        println!("{:?}", &actual);
-        for i in 0..actual.len() {
-            assert_eq!(actual[i], expected[i]);
-        }
-    }
 
     fn get_test_blob(
         name: String,
@@ -221,12 +150,20 @@ mod test {
         let file_name = String::from("CON1234567");
         let doc_type = String::from("Spc");
         let blob = get_test_blob(name, container_name, date, pl, file_name, doc_type);
-        let expected = String::from(
-            "test_blog,CON1234567,PL1234567,1996-12-20 00:39:57 UTC,1996-12-20 00:39:57 UTC,Spc",
+
+        // Have to match metadata components separately as metadata hashmap randomly ordered
+        let expected_body = String::from(
+            "Blob { name: \"test_blog\", container_name: \"test_container\", snapshot_time: None, creation_time: 1996-12-20T00:39:57Z, last_modified: Some(1996-12-20T00:39:57Z), etag: None, content_length: 5, content_type: None, content_encoding: None, content_language: None, content_md5: None, cache_control: None, content_disposition: None, x_ms_blob_sequence_number: None, blob_type: BlockBlob, access_tier: None, lease_status: None, lease_state: Available, lease_duration: None, copy_id: None, copy_status: None, copy_source: None, copy_progress: None, copy_completion_time: None, copy_status_description: None, incremental_copy: None, server_encrypted: false, access_tier_inferred: None, access_tier_change_time: None, deleted_time: None, remaining_retention_days: None, metadata: {",
         );
+        let expected_file_name = String::from(r#""file_name": "CON1234567"#);
+        let expected_pl_number = String::from(r#""pl_number": "[\"PL1234567\"]"#);
+        let expected_doc_type = String::from(r#""doc_type": "Spc""#);
 
-        let actual = extract_blob_strings(&blob);
+        let actual = get_blob_string(&blob);
 
-        assert_eq!(actual[0], expected);
+        assert!(actual.contains(&expected_body));
+        assert!(actual.contains(&expected_file_name));
+        assert!(actual.contains(&expected_pl_number));
+        assert!(actual.contains(&expected_doc_type));
     }
 }
