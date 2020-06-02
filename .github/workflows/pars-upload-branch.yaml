@@ -9,7 +9,7 @@ on:
       - .github/workflows/pars-upload-branch.yaml
 
 env:
-  NEXT_PUBLIC_DISABLE_AUTH: false
+  NEXT_PUBLIC_DISABLE_AUTH: true
   PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
   # above is for cypress, below is for next.js
   NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
