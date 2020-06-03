@@ -226,7 +226,12 @@ const UpdateUrlSummary = ({ urlSteps }) => {
   return (
     <dl className="govuk-summary-list">
       <div className="govuk-summary-list__row">
-        <dt className="govuk-summary-list__key">PAR to update: {url}</dt>
+        <dt className="govuk-summary-list__key">
+          URL:{' '}
+          <a href={url} target="_blank" rel="noreferrer">
+            {url}
+          </a>
+        </dt>
       </div>
     </dl>
   )

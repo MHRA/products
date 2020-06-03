@@ -11,6 +11,7 @@ export const Field = ({
   required = true,
   index = null,
   onClickDelete,
+  helpContents = null,
   ...props
 }) => {
   const baseId = `form-field-${name}`
@@ -25,12 +26,21 @@ export const Field = ({
     </label>
   )
 
+  const helpEl = helpContents && (
+    <span className="govuk-hint">{helpContents}</span>
+  )
+
   return (
     <>
       {visuallyHideLabel ? (
         <ScreenReaderOnly>{labelEl}</ScreenReaderOnly>
       ) : (
         labelEl
+      )}
+      {visuallyHideLabel ? (
+        <ScreenReaderOnly>{helpEl}</ScreenReaderOnly>
+      ) : (
+        helpEl
       )}
       <span style={{ position: 'relative' }}>
         <input

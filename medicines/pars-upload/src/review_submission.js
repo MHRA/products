@@ -119,7 +119,11 @@ const ParToUpdateSummary = ({ data, goToFormPage }) => (
       items={[
         {
           key: 'URL',
-          value: data.get('par_url'),
+          value: (
+            <a href={data.get('par_url')} target="_blank" rel="noreferrer">
+              {data.get('par_url')}
+            </a>
+          ),
         },
       ]}
     />
