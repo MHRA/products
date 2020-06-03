@@ -17,6 +17,7 @@ export const Products = ({
   savePageState,
   goBack,
   goToPage: go,
+  goToFirstPageOfType,
   deletePage: delPage,
 }) => {
   const formRef = useRef()
@@ -43,7 +44,6 @@ export const Products = ({
 
     const formData = getFormData()
 
-    console.log('submitting form', formData)
     submit(formData)
   }
 
@@ -71,8 +71,9 @@ export const Products = ({
 
   const deletePage = (pageIndex) => {
     savePageState(getFormData())
-
+    let currentPageType = steps[pageIndex].type
     delPage(pageIndex)
+    goToFirstPageOfType(currentPageType)
   }
 
   const goToPrevPage = (event) => {
@@ -218,7 +219,6 @@ const PreviousProductsSummary = ({
 }
 
 const UpdateUrlSummary = ({ urlSteps }) => {
-  console.log(urlSteps)
   if (!urlSteps.length) {
     return null
   }

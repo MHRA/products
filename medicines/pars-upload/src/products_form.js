@@ -43,7 +43,6 @@ export const Products = ({
 
     const formData = getFormData()
 
-    console.log('submitting form', formData)
     submit(formData)
   }
 

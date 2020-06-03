@@ -83,7 +83,6 @@ const combineFormDatas = (data) => {
     const page = data[i]
 
     for (const [name, value] of page) {
-      console.log(name, value)
       formData.append(name, value)
     }
   }

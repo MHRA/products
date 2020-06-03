@@ -9,7 +9,6 @@ export async function getAccount() {
   if (account) {
     const token = window.sessionStorage['msal.idtoken']
     const username = account.userName
-    console.log({ token, account })
 
     return {
       account,
