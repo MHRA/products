@@ -141,6 +141,56 @@ export const addAndDeleteProducts = (uploadData) => {
   cy.findByLabelText('Brand/Generic name').should('have.value', '')
 }
 
+export const addDuplicateLicenceNumbers = (uploadData) => {
+  for (let i = 0; i < 2; i++) {
+    cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
+
+    cy.findByLabelText('Strength').type(uploadData.strength)
+
+    cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
+
+    cy.findByLabelText('Active substance(s)').type(uploadData.substance1)
+
+    cy.findByText('Add another active substance').click()
+
+    cy.findAllByLabelText('Active substance(s)')
+      .last()
+      .type(uploadData.substance2)
+
+    cy.findByText('Licence number')
+      .parent()
+      .parent()
+      .within(() => {
+        cy.findByLabelText('Type').select(uploadData.licence.type)
+        cy.findByLabelText('First five digits').type(
+          uploadData.licence.part_one
+        )
+        cy.findByLabelText('Last four digits').type(uploadData.licence.part_two)
+      })
+
+    cy.findByText('Add another product').click()
+  }
+
+  const validationMsg = 'Duplicate licence numbers are not allowed'
+
+  cy.findByText('Licence number')
+    .parent()
+    .parent()
+    .within(() => {
+      cy.findByLabelText('Type').then(([el]) => {
+        expect(el.validationMessage).to.eq(validationMsg)
+      })
+
+      cy.findByLabelText('First five digits').then(([el]) => {
+        expect(el.validationMessage).to.eq(validationMsg)
+      })
+
+      cy.findByLabelText('Last four digits').then(([el]) => {
+        expect(el.validationMessage).to.eq(validationMsg)
+      })
+    })
+}
+
 export const completeUploadForm = (uploadData) => {
   cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 

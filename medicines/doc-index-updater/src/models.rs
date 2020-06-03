@@ -253,7 +253,9 @@ impl Message for DeleteMessage {
 #[cfg(test)]
 pub mod test {
     use super::*;
-    use serde_test::{assert_de_tokens, Configure, Token};
+    use serde_test::{
+        assert_de_tokens as assert_that_tokens_deserialize_into_value, Configure, Token,
+    };
     use serde_xml_rs::from_reader;
     use test_case::test_case;
 
@@ -393,7 +395,7 @@ pub mod test {
     }
 
     #[test]
-    fn test_deserialise_old_delete_message() {
+    fn test_deserialise_delete_message_with_document_content_id() {
         let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
@@ -402,24 +404,24 @@ pub mod test {
             initiator_email: None,
         };
 
-        assert_de_tokens(
-            &delete_message.readable(),
-            &[
-                Token::Struct {
-                    name: "DeleteMessage",
-                    len: 2,
-                },
-                Token::String("job_id"),
-                Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
-                Token::String("document_content_id"),
-                Token::String(content_id),
-                Token::StructEnd,
-            ],
-        )
+        let value = delete_message.readable();
+        let tokens = [
+            Token::Struct {
+                name: "DeleteMessage",
+                len: 2,
+            },
+            Token::String("job_id"),
+            Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
+            Token::String("document_content_id"),
+            Token::String(content_id),
+            Token::StructEnd,
+        ];
+
+        assert_that_tokens_deserialize_into_value(&value, &tokens);
     }
 
     #[test]
-    fn test_deserialise_new_delete_message_using_tokens() {
+    fn test_deserialise_delete_message_with_unique_document_identifier() {
         let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
@@ -428,26 +430,24 @@ pub mod test {
             initiator_email: None,
         };
 
-        let serialized = serde_json::to_string(&delete_message).unwrap();
+        let value = delete_message.readable();
+        let tokens = [
+            Token::Struct {
+                name: "DeleteMessage",
+                len: 2,
+            },
+            Token::String("job_id"),
+            Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
+            Token::String("document_id"),
+            Token::Enum {
+                name: "UniqueDocumentIdentifier",
+            },
+            Token::Str("ContentId"),
+            Token::String(content_id),
+            Token::StructEnd,
+        ];
 
-        assert_de_tokens(
-            &delete_message.readable(),
-            &[
-                Token::Struct {
-                    name: "DeleteMessage",
-                    len: 2,
-                },
-                Token::String("job_id"),
-                Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
-                Token::String("document_id"),
-                Token::Enum {
-                    name: "UniqueDocumentIdentifier",
-                },
-                Token::Str("ContentId"),
-                Token::String(content_id),
-                Token::StructEnd,
-            ],
-        )
+        assert_that_tokens_deserialize_into_value(&value, &tokens);
     }
 
     #[test]

@@ -29,7 +29,7 @@ describe('Home page', () => {
 
       cy.findByText('Continue').click()
 
-      cy.findAllByText('Search for an existing report')
+      cy.findAllByText('Search for an existing Public Assessment Report')
         .not('title')
         .should('have.length', 1)
     })

@@ -1,6 +1,7 @@
 import {
   addAndDeleteSubstances,
   addAndDeleteProducts,
+  addDuplicateLicenceNumbers,
   completeFindParToUpdateStep,
   completeUploadForm,
   completeUploadFile,
@@ -46,6 +47,21 @@ describe('PARs update', () => {
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
     addAndDeleteProducts(uploadData)
+  })
+
+  it('duplicate licence numbers are not allowed', () => {
+    cy.visit('/new-par')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substance1: 'Ibuprofen',
+      substance2: 'Paracetamol',
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+
+    addDuplicateLicenceNumbers(uploadData)
   })
 
   it('review page shows the correct information', () => {
