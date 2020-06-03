@@ -27,7 +27,7 @@ export const Products = ({
       ? currentStepData.getAll('active_substance').map(() => getNextId())
       : [getNextId()]
   )
-  const [formError, setFormError] = useState(false)
+  const [formIsValid, setFormIsValid] = useState(true)
 
   const getFormData = () => {
     const formData = new FormData(formRef.current)
@@ -37,9 +37,31 @@ export const Products = ({
     return formData
   }
 
+  const checkLicenseNumberIsNotDuplicate = () => {
+    const formData = getFormData()
+
+    const licence_number_is_duplicate = steps
+      .map(({ data }) => data && data.get('licence_number'))
+      .filter((x) => x)
+      .some((licence) => licence === formData.get('licence_number'))
+
+    Array.from(
+      formRef.current.querySelectorAll(
+        '[name="licence_number_type"], [name="licence_part_one"], [name="licence_part_two"]'
+      )
+    ).map((el) => {
+      el.setCustomValidity(
+        licence_number_is_duplicate
+          ? 'Duplicate licence numbers are not allowed'
+          : ''
+      )
+    })
+  }
+
   const onSubmit = (event) => {
     event.preventDefault()
-    setFormError(false)
+
+    setFormIsValid(true)
 
     const formData = getFormData()
 
@@ -47,18 +69,17 @@ export const Products = ({
   }
 
   const onInvalid = () => {
-    setFormError(true)
+    setFormIsValid(false)
   }
 
   const onAddAnotherProduct = (event) => {
     event.preventDefault()
 
     const isValid = formRef.current.reportValidity()
+    setFormIsValid(isValid)
 
     if (isValid) {
       repeatPage(getFormData())
-    } else {
-      setFormError(true)
     }
   }
 
@@ -78,7 +99,7 @@ export const Products = ({
 
   return (
     <Layout
-      title={formError ? `Error: ${title}` : title}
+      title={formIsValid ? title : `Error: ${title}`}
       intro={<BackLink href="/" onClick={goBack} />}
     >
       <H1>{title}</H1>
@@ -139,7 +160,10 @@ export const Products = ({
         >
           Add another active substance
         </Button>
-        <LicenceNumber formData={currentStepData} />
+        <LicenceNumber
+          formData={currentStepData}
+          checkLicenseNumberIsNotDuplicate={checkLicenseNumberIsNotDuplicate}
+        />
         <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
         </Button>{' '}
@@ -208,7 +232,7 @@ const PreviousProductsSummary = ({
   )
 }
 
-const LicenceNumber = ({ formData }) => (
+const LicenceNumber = ({ formData, checkLicenseNumberIsNotDuplicate }) => (
   <FormGroup>
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -225,6 +249,7 @@ const LicenceNumber = ({ formData }) => (
           (formData && formData.get('licence_number_type')) || undefined
         }
         required
+        onInput={checkLicenseNumberIsNotDuplicate}
       >
         <option value="PL">PL</option>
         <option value="PLPI">HR</option>
@@ -238,6 +263,7 @@ const LicenceNumber = ({ formData }) => (
         title="5 digits"
         visuallyHideLabel
         formData={formData}
+        onInput={checkLicenseNumberIsNotDuplicate}
       />
       {' / '}
       <Field
@@ -248,6 +274,7 @@ const LicenceNumber = ({ formData }) => (
         title="4 digits"
         visuallyHideLabel
         formData={formData}
+        onInput={checkLicenseNumberIsNotDuplicate}
       />
     </fieldset>
   </FormGroup>
