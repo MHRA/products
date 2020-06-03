@@ -1,4 +1,4 @@
-import { getIdOfParToUpdate, combineFormDatas } from './pages/update-par'
+import { getIdOfParToUpdate, combineFormDatas } from '../pages/update-par'
 
 describe(getIdOfParToUpdate, () => {
   it('extracts ID of par to update', () => {

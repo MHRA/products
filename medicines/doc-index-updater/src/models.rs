@@ -429,7 +429,6 @@ pub mod test {
         };
 
         let serialized = serde_json::to_string(&delete_message).unwrap();
-        println!("serialized = {}", serialized);
 
         assert_de_tokens(
             &delete_message.readable(),
