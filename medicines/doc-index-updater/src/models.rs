@@ -451,7 +451,7 @@ pub mod test {
     }
 
     #[test]
-    fn test_serialise_new_delete_message_matches_string() {
+    fn test_serialise_delete_message_matches_string() {
         let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
@@ -466,7 +466,7 @@ pub mod test {
     }
 
     #[test]
-    fn test_deserialize_json_matches_delete_message() {
+    fn test_deserialize_json_with_unique_document_identifier_matches_delete_message() {
         let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
@@ -481,7 +481,7 @@ pub mod test {
     }
 
     #[test]
-    fn test_deserialize_old_json_matches_delete_message() {
+    fn test_deserialize_json_with_document_content_id_matches_delete_message() {
         let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
         let content_id = "CON33333333";
         let delete_message = DeleteMessage {
