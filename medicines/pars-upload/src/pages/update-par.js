@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { ReviewSubmission } from '../review_submission'
 import { Wizard } from '../wizard'
-import { Products } from '../products_form'
+import { Products } from '../update_products_form'
 import { UploadPdf } from '../upload_pdf'
+import { GetParToUpdate } from '../get_par_to_update'
 import { Success } from '../success'
 
 const ParUpload = ({ auth }) => {
@@ -14,21 +15,23 @@ const ParUpload = ({ auth }) => {
     setSubmissionTime(new Date())
 
     try {
-      const combined = combineFormDatas(
-        steps.map(({ data }) => data).filter((data) => data)
-      )
+      const par_to_delete = getIdOfParToUpdate(steps)
+      const combined = combineFormDatas(steps)
 
       const token = auth ? auth.token : 'auth-token'
       const username = auth ? auth.username : 'test-user@example.com'
 
-      const response = await fetch(process.env.NEXT_PUBLIC_PARS_UPLOAD_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Username: username,
-        },
-        body: combined,
-      })
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PARS_UPLOAD_URL}/${par_to_delete}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Username: username,
+          },
+          body: combined,
+        }
+      )
 
       if (!response.ok) {
         throw new Error(
@@ -52,6 +55,7 @@ const ParUpload = ({ auth }) => {
       return (
         <Wizard
           initialSteps={[
+            { type: 'get_par', component: GetParToUpdate },
             { type: 'product', component: Products },
             { type: 'file', component: UploadPdf },
             { type: 'review', component: ReviewSubmission },
@@ -72,7 +76,20 @@ const ParUpload = ({ auth }) => {
   }
 }
 
-const combineFormDatas = (data) => {
+export const getIdOfParToUpdate = (steps) => {
+  let updateParStep = steps.find(({ type, data }) => type == 'get_par' && data)
+  if (updateParStep) {
+    let url = updateParStep.data.get('par_url')
+    return url.split('/').slice(-1).pop()
+  }
+}
+
+export const combineFormDatas = (steps) => {
+  const data = steps
+    .filter(({ type }) => type != 'get_par')
+    .map(({ data }) => data)
+    .filter((data) => data)
+
   const formData = new FormData()
 
   for (let i = 0; i < data.length; i++) {

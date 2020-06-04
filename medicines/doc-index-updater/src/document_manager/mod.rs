@@ -1,8 +1,8 @@
 use crate::{
     auth_manager,
     models::{
-        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message, XMLDocument,
-        XMLJobStatusResponse,
+        CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message,
+        UniqueDocumentIdentifier, XMLDocument, XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
@@ -76,23 +76,23 @@ where
     }
 }
 
-async fn delete_document_handler(
-    document_content_id: String,
-    state_manager: StateManager,
+pub async fn delete_document_handler(
+    document_id: UniqueDocumentIdentifier,
+    state_manager: &impl JobStatusClient,
     initiator_email: Option<String>,
 ) -> Result<JobStatusResponse, Rejection> {
     if let Ok(mut queue) = delete_factory().await {
-        let id = accept_job(&state_manager).await?.id;
+        let id = accept_job(state_manager).await?.id;
         let correlation_id = id.to_string();
         let correlation_id = correlation_id.as_str();
 
         let message = DeleteMessage {
             job_id: id,
-            document_content_id,
+            document_id,
             initiator_email,
         };
 
-        queue_job(&mut queue, &state_manager, message)
+        queue_job(&mut queue, state_manager, message)
             .instrument(tracing::info_span!(
                 "delete_document_handler::queue_job",
                 correlation_id
@@ -104,20 +104,20 @@ async fn delete_document_handler(
 }
 
 async fn delete_document_xml_handler(
-    document_content_id: String,
+    document_id: String,
     state_manager: StateManager,
 ) -> Result<Xml, Rejection> {
-    let r: XMLJobStatusResponse = delete_document_handler(document_content_id, state_manager, None)
+    let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), &state_manager, None)
         .await?
         .into();
     Ok(warp::reply::xml(&r))
 }
 
 async fn delete_document_json_handler(
-    document_content_id: String,
+    document_id: String,
     state_manager: StateManager,
 ) -> Result<Json, Rejection> {
-    let r = delete_document_handler(document_content_id, state_manager, None).await?;
+    let r = delete_document_handler(document_id.into(), &state_manager, None).await?;
     Ok(warp::reply::json(&r))
 }
 

@@ -204,7 +204,7 @@ pub fn get_test_create_message(id: Uuid) -> CreateMessage {
 pub fn get_test_delete_message(job_id: Uuid, document_content_id: String) -> DeleteMessage {
     DeleteMessage {
         job_id,
-        document_content_id,
+        document_id: document_content_id.into(),
         initiator_email: None,
     }
 }

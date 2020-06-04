@@ -2,7 +2,7 @@ use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
 use regex::Regex;
 use search_client::models::DocumentType;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -160,8 +160,41 @@ pub struct CreateMessage {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DeleteMessage {
     pub job_id: Uuid,
-    pub document_content_id: String,
+    #[serde(
+        alias = "document_content_id",
+        deserialize_with = "string_or_unique_document_identifier"
+    )]
+    pub document_id: UniqueDocumentIdentifier,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub initiator_email: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub enum UniqueDocumentIdentifier {
+    ContentId(String),
+    MetadataStorageName(String),
+}
+
+/// Exists for historic backwards compatibility.
+/// Previously, if a `DeleteMessage`'s `document_content_id` was set, it was a string,
+/// so we deserialise strings into `UniqueDocumentIdentifier::ContentId`.
+fn string_or_unique_document_identifier<'de, D>(d: D) -> Result<UniqueDocumentIdentifier, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value: serde_json::Value = Deserialize::deserialize(d)?;
+    if let serde_json::Value::String(s) = value {
+        return Ok(s.into());
+    }
+    serde_json::from_value(value).map_err(|e| serde::de::Error::custom(e.to_string()))
+}
+
+/// Allows for document_manager endpoints to continue to accept `String` from the path, and easily convert these.
+/// We convert strings to `UniqueDocumentIdentifier::ContentId` to allow deserialisation of old messages to work.
+impl From<String> for UniqueDocumentIdentifier {
+    fn from(content_id: String) -> Self {
+        UniqueDocumentIdentifier::ContentId(content_id)
+    }
 }
 
 #[async_trait]
@@ -220,6 +253,9 @@ impl Message for DeleteMessage {
 #[cfg(test)]
 pub mod test {
     use super::*;
+    use serde_test::{
+        assert_de_tokens as assert_that_tokens_deserialize_into_value, Configure, Token,
+    };
     use serde_xml_rs::from_reader;
     use test_case::test_case;
 
@@ -356,5 +392,140 @@ pub mod test {
         assert_eq!(doc.active_substances[1], "Caffeine 2");
         assert_eq!(doc.file_source, FileSource::Sentinel);
         assert_eq!(doc.file_path, "example_file.txt");
+    }
+
+    #[test]
+    fn test_deserialise_delete_message_with_document_content_id() {
+        let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
+        };
+
+        let value = delete_message.readable();
+        let tokens = [
+            Token::Struct {
+                name: "DeleteMessage",
+                len: 2,
+            },
+            Token::String("job_id"),
+            Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
+            Token::String("document_content_id"),
+            Token::String(content_id),
+            Token::StructEnd,
+        ];
+
+        assert_that_tokens_deserialize_into_value(&value, &tokens);
+    }
+
+    #[test]
+    fn test_deserialise_delete_message_with_unique_document_identifier() {
+        let job_id = Uuid::parse_str("bf830819-d1e1-4bf6-bad1-7e9ddb29871b").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
+        };
+
+        let value = delete_message.readable();
+        let tokens = [
+            Token::Struct {
+                name: "DeleteMessage",
+                len: 2,
+            },
+            Token::String("job_id"),
+            Token::String("bf830819-d1e1-4bf6-bad1-7e9ddb29871b"),
+            Token::String("document_id"),
+            Token::Enum {
+                name: "UniqueDocumentIdentifier",
+            },
+            Token::Str("ContentId"),
+            Token::String(content_id),
+            Token::StructEnd,
+        ];
+
+        assert_that_tokens_deserialize_into_value(&value, &tokens);
+    }
+
+    #[test]
+    fn test_serialise_delete_message_matches_string() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
+        let serialized = serde_json::to_string(&delete_message).unwrap();
+        assert_eq!(to_deserialise, serialized);
+    }
+
+    #[test]
+    fn test_deserialize_json_with_unique_document_identifier_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"ContentId\":\"CON33333333\"}}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
+    }
+
+    #[test]
+    fn test_deserialize_json_with_document_content_id_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let content_id = "CON33333333";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::ContentId(content_id.to_owned()),
+            initiator_email: None,
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_content_id\":\"CON33333333\"}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
+    }
+
+    #[test]
+    fn test_deserialize_metadata_storage_name_json_matches_delete_message() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let metadata_storage_name = "ab6123ba98c8712ba8d91265da1562e";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::MetadataStorageName(
+                metadata_storage_name.to_owned(),
+            ),
+            initiator_email: None,
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";
+        let deserialized = serde_json::from_str::<DeleteMessage>(&to_deserialise).unwrap();
+        assert_eq!(delete_message, deserialized);
+    }
+
+    #[test]
+    fn test_serialise_metadata_storage_name_delete_message_matches_string() {
+        let job_id = Uuid::parse_str("4d378b75-64a0-49fb-94fb-1fd0d086a04a").unwrap();
+        let metadata_storage_name = "ab6123ba98c8712ba8d91265da1562e";
+        let delete_message = DeleteMessage {
+            job_id,
+            document_id: UniqueDocumentIdentifier::MetadataStorageName(
+                metadata_storage_name.to_owned(),
+            ),
+            initiator_email: None,
+        };
+
+        let to_deserialise = "{\"job_id\":\"4d378b75-64a0-49fb-94fb-1fd0d086a04a\",\"document_id\":{\"MetadataStorageName\":\"ab6123ba98c8712ba8d91265da1562e\"}}";
+        let serialized = serde_json::to_string(&delete_message).unwrap();
+        assert_eq!(to_deserialise, serialized);
     }
 }
