@@ -44,7 +44,7 @@ docker push mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 
 ## To run locally
 
-Run locally by tunnelling redis connection to Azure over TLS.
+Run locally by tunneling redis connection to Azure over TLS.
 
 - install `stunnel` with homebrew:
 
