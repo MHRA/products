@@ -3,7 +3,7 @@ name: storage-logger-execution
 on:
   schedule:
     # 12pm every Friday
-    - cron: "0 12 * * 5"
+    - cron: "0 0 * * 6"
 
 jobs:
   build-and-test:

@@ -7,17 +7,11 @@ use futures::stream::StreamExt;
 use std::error::Error;
 
 #[tokio::main]
-async fn main() {
-    match create_blob_log().await {
-        Ok(()) => println!("Finished successfully"),
-        Err(e) => println!("{:?}", e),
-    };
-}
-
-async fn create_blob_log() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     let client = get_client()?;
     let blobs_list = get_blobs_list(&client).await?;
     write_to_log_store(&client, blobs_list).await?;
+    println!("Completed successfully");
     Ok(())
 }
 
