@@ -54,12 +54,12 @@ export const Wizard = ({ initialSteps, onComplete, extraProps }) => {
 
   const deletePage = (pageIndexToDelete) => {
     setSteps((steps) => steps.filter((_, i) => i !== pageIndexToDelete))
-    setPageIndex((index) => {
-      if (index >= pageIndexToDelete) {
-        return Math.max(index - 1, 0)
-      }
-      return index
-    })
+  }
+
+  const goToFirstPageOfType = (pageType) => {
+    let matchingPageIndex = steps.findIndex((step) => step.type === pageType)
+    let goToPage = Math.max(matchingPageIndex, pageIndex - 1, 0)
+    setPageIndex(goToPage)
   }
 
   return (
@@ -73,6 +73,7 @@ export const Wizard = ({ initialSteps, onComplete, extraProps }) => {
       savePageState={setPageData}
       goBack={goBack}
       goToPage={(index) => setPageIndex(index)}
+      goToFirstPageOfType={goToFirstPageOfType}
       deletePage={deletePage}
       {...extraProps}
     />

@@ -1,6 +1,6 @@
 use crate::{
     audit_logger::{AuditLogger, LogTransaction},
-    models::{DeleteMessage, JobStatus},
+    models::{DeleteMessage, JobStatus, UniqueDocumentIdentifier},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
@@ -120,14 +120,13 @@ async fn process_delete_message(
 ) -> Result<Uuid, ProcessMessageError> {
     let message_for_log = message.clone();
     let index_record: IndexResult =
-        get_index_record_from_content_id(message.document_content_id.clone(), &search_client)
-            .await?;
+        get_index_record_from_unique_identifier(&message.document_id, &search_client).await?;
     let blob_name = index_record.metadata_storage_name.clone();
 
     tracing::debug!(
-        "Found blob name {} for document content ID {} from index",
+        "Found blob name {} for document content ID {:?} from index",
         &blob_name,
-        &message.document_content_id
+        &message.document_id
     );
 
     search_client
@@ -165,20 +164,48 @@ async fn process_delete_message(
     Ok(message.job_id)
 }
 
-pub async fn get_index_record_from_content_id(
-    content_id: String,
+pub async fn get_index_record_from_unique_identifier(
+    unique_document_identifier: &UniqueDocumentIdentifier,
     search_client: &impl Search,
 ) -> Result<IndexResult, ProcessMessageError> {
-    let search_results = search_client
-        .search(&content_id)
-        .await
-        .map_err(anyhow::Error::from)?;
+    match unique_document_identifier {
+        UniqueDocumentIdentifier::ContentId(content_id) => {
+            get_index_record_from_content_id(content_id, search_client).await
+        }
+        UniqueDocumentIdentifier::MetadataStorageName(metadata_storage_name) => {
+            get_index_record_from_metadata_storage_name(metadata_storage_name, search_client).await
+        }
+    }
+}
+
+pub async fn get_index_record_from_content_id(
+    content_id: &str,
+    search_client: &impl Search,
+) -> Result<IndexResult, ProcessMessageError> {
+    let search_results = search_client.search(content_id).await?;
     for result in search_results.search_results {
         if result.file_name == content_id {
             return Ok(result);
         }
     }
-    Err(ProcessMessageError::DocumentNotFoundInIndex(content_id))
+    Err(ProcessMessageError::DocumentNotFoundInIndex(
+        content_id.to_string(),
+    ))
+}
+
+pub async fn get_index_record_from_metadata_storage_name(
+    metadata_storage_name: &str,
+    search_client: &impl Search,
+) -> Result<IndexResult, ProcessMessageError> {
+    let search_results = search_client.search(metadata_storage_name).await?;
+    for result in search_results.search_results {
+        if result.metadata_storage_name == metadata_storage_name {
+            return Ok(result);
+        }
+    }
+    Err(ProcessMessageError::DocumentNotFoundInIndex(
+        metadata_storage_name.to_string(),
+    ))
 }
 
 #[cfg(test)]
@@ -520,7 +547,7 @@ mod test {
 
     fn given_we_have_a_delete_message() -> TestRemovableMessage<DeleteMessage> {
         let delete_message = DeleteMessage {
-            document_content_id: "our_id".to_owned(),
+            document_id: "our_id".to_string().into(),
             job_id: Uuid::new_v4(),
             initiator_email: None,
         };
@@ -623,7 +650,7 @@ mod test {
         search_client: impl Search,
     ) -> Result<IndexResult, ProcessMessageError> {
         block_on(get_index_record_from_content_id(
-            String::from("non existent content id"),
+            "non existent content id",
             &search_client,
         ))
     }

@@ -1,6 +1,7 @@
 {
   "urls": [
     "http://localhost:3000/",
-    "http://localhost:3000/new-par"
+    "http://localhost:3000/new-par",
+    "http://localhost:3000/update-par"
   ]
 }

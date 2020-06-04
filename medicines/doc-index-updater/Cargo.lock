@@ -465,6 +465,7 @@ dependencies = [
  "serde-xml-rs",
  "serde_derive",
  "serde_json",
+ "serde_test",
  "sha1",
  "smol",
  "test-case",
@@ -1871,6 +1872,15 @@ checksum = "993948e75b189211a9b31a7528f950c6adc21f9720b6438ff80a7fa2f864cea2"
 dependencies = [
  "itoa",
  "ryu",
+ "serde",
+]
+
+[[package]]
+name = "serde_test"
+version = "1.0.110"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fa199410fc9763cda6edb0d85d4c4ba7c1723024cddc7d129d14a2fc9f2a5e6"
+dependencies = [
  "serde",
 ]
 
