@@ -5,8 +5,9 @@ use super::{
 use anyhow::anyhow;
 use async_ssh2::{Session, Sftp};
 use async_trait::async_trait;
+use piper::Mutex;
+use smol::Async;
 use std::net::TcpStream;
-use tokio::io::AsyncReadExt;
 
 struct SftpConfig {
     server: String,
@@ -32,7 +33,7 @@ async fn sentinel_sftp_factory(
         )
         .as_str()
     );
-    let tcp = TcpStream::connect(format!("{}:22", server))?;
+    let tcp = Async::<TcpStream>::connect(format!("{}:22", server)).await?;
 
     tracing::debug!(message = "SFTP server connection established");
 
@@ -120,15 +121,21 @@ impl SftpClient {
 #[async_trait]
 impl GetBlob for SftpClient {
     async fn get_blob(&self, blob_name: &str) -> Result<BlobResponse, StorageClientError> {
-        let mut file =
-            retrieve_file_from_sftp(&mut self.get_sftp_connection().await?, blob_name).await?;
+        let mut sftp = self.get_sftp_connection().await?;
+        let file = retrieve_file_from_sftp(&mut sftp, blob_name).await?;
+        let reader = Mutex::new(file);
+
         let mut bytes = Vec::<u8>::new();
-        let size = file.read_to_end(&mut bytes).await.map_err(|e| anyhow!(e))?;
+        let size = futures::io::copy(reader, &mut bytes)
+            .await
+            .map_err(|e| anyhow!(e))?;
+
         tracing::debug!(
             "File retrieved from SFTP at {} ({} bytes) ",
             blob_name,
             size
         );
+
         Ok(BlobResponse {
             blob_name: blob_name.to_owned(),
             data: bytes,
