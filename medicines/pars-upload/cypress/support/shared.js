@@ -50,7 +50,7 @@ export const mockSuccessfulSubmission = (baseUrl, url) => {
 
 export const completeFindParToUpdateStep = (parUrl) => {
   cy.findByLabelText('Please insert URL').type(parUrl)
-  cy.findByText('Search').click()
+  cy.findByText('Continue').click()
 }
 
 export const addAndDeleteSubstances = (uploadData) => {

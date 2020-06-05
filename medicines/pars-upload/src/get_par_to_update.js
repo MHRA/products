@@ -42,7 +42,7 @@ export const GetParToUpdate = ({ currentStepData, goBack, submit }) => {
             }
           />
         </FormGroup>
-        <Button>Search</Button>
+        <Button>Continue</Button>
       </form>
     </Layout>
   )
