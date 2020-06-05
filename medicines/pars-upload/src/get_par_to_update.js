@@ -5,7 +5,7 @@ import { Field } from './field'
 import { Button } from './button'
 import { FormGroup } from './form'
 
-export const GetParToUpdate = ({ goBack, submit }) => {
+export const GetParToUpdate = ({ currentStepData, goBack, submit }) => {
   const onSubmit = (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -26,6 +26,7 @@ export const GetParToUpdate = ({ goBack, submit }) => {
             pattern="https:\/\/[a-zA-Z0-9.]+\/docs\/[a-zA-Z0-9]+"
             name="par_url"
             label="Please insert URL"
+            formData={currentStepData}
             helpContents={
               <span>
                 In order to find the right document, please search for the
