@@ -31,7 +31,7 @@ pub fn update_handler(
         // Max upload size is set to a very high limit here as the actual limit should be managed using istio
         .and(warp::multipart::form().max_length(1000 * 1024 * 1024))
         .and(with_state(state_manager))
-        .and(warp::header("Authorization"))
+        .and(warp::header("username"))
         .and_then(update_pars_handler)
         .with(cors)
 }
