@@ -50,7 +50,8 @@ describe('PARs update', () => {
   })
 
   it('duplicate licence numbers are not allowed', () => {
-    cy.visit('/new-par')
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -60,10 +61,31 @@ describe('PARs update', () => {
       substance2: 'Paracetamol',
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-
     addDuplicateLicenceNumbers(uploadData)
   })
+  it('upload field only accepts PDFs', () => {
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    completeUploadForm(uploadData)
+
+    const fileName = 'rabbit-anti-human-stuff.txt'
+    const expectedTitle = 'Upload a replacement PDF'
+    completeUploadFile(fileName, expectedTitle)
+
+    cy.once('fail', (err) => {
+      expect(err.message).to.include(
+        'One or more field is invalid within given file(s)'
+      )
+    })
+  })
   it('review page shows the correct information', () => {
     cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
@@ -78,7 +100,8 @@ describe('PARs update', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload a replacement PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')
@@ -146,7 +169,9 @@ describe('PARs update', () => {
     )
   })
   it('shows the uploaded file when going back to upload file page', () => {
-    cy.visit('/new-par')
+    cy.visit('/update-par')
+    completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
+
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -157,7 +182,8 @@ describe('PARs update', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload a replacement PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findByText('Document')
       .parent()
@@ -202,7 +228,8 @@ describe('PARs update', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload a replacement PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')

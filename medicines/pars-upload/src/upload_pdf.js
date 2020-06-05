@@ -5,7 +5,7 @@ import { Field } from './field'
 import { Button } from './button'
 import { SummaryListWithoutActions } from './summary_list'
 
-export const UploadPdf = ({ currentStepData, goBack, submit }) => {
+export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
   const onSubmit = (event) => {
     event.preventDefault()
 
@@ -23,12 +23,12 @@ export const UploadPdf = ({ currentStepData, goBack, submit }) => {
     goBack()
   }
 
+  const title =
+    flowName === 'update' ? 'Upload a replacement PDF' : 'Upload your PDF'
+
   return (
-    <Layout
-      title="Upload your PDF"
-      intro={<BackLink href="/" onClick={goToPrevPage} />}
-    >
-      <H1>Upload your PDF</H1>
+    <Layout title={title} intro={<BackLink href="/" onClick={goToPrevPage} />}>
+      <H1>{title}</H1>
       {currentStepData && (
         <>
           <CurrentlyUploadedFile
@@ -39,7 +39,7 @@ export const UploadPdf = ({ currentStepData, goBack, submit }) => {
         </>
       )}
       <form onSubmit={onSubmit}>
-        <Field name="file" label="File" type="file" />
+        <Field name="file" label="File" type="file" accept="application/pdf" />
 
         <Button>Continue</Button>
       </form>

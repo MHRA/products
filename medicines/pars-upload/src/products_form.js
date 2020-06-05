@@ -37,7 +37,7 @@ export const Products = ({
     return formData
   }
 
-  const checkLicenseNumberIsNotDuplicate = () => {
+  const checkLicenceNumberIsNotDuplicate = () => {
     const formData = getFormData()
 
     const licence_number_is_duplicate = steps
@@ -122,6 +122,11 @@ export const Products = ({
             name="product_name"
             label="Brand/Generic name"
             formData={currentStepData}
+            helpContents={
+              <span>
+                To add multiple brands, separate them with a forward slash (/)
+              </span>
+            }
           />
         </FormGroup>
         <FormGroup>
@@ -162,7 +167,7 @@ export const Products = ({
         </Button>
         <LicenceNumber
           formData={currentStepData}
-          checkLicenseNumberIsNotDuplicate={checkLicenseNumberIsNotDuplicate}
+          checkLicenceNumberIsNotDuplicate={checkLicenceNumberIsNotDuplicate}
         />
         <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
@@ -232,7 +237,7 @@ const PreviousProductsSummary = ({
   )
 }
 
-const LicenceNumber = ({ formData, checkLicenseNumberIsNotDuplicate }) => (
+const LicenceNumber = ({ formData, checkLicenceNumberIsNotDuplicate }) => (
   <FormGroup>
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -249,7 +254,7 @@ const LicenceNumber = ({ formData, checkLicenseNumberIsNotDuplicate }) => (
           (formData && formData.get('licence_number_type')) || undefined
         }
         required
-        onInput={checkLicenseNumberIsNotDuplicate}
+        onInput={checkLicenceNumberIsNotDuplicate}
       >
         <option value="PL">PL</option>
         <option value="PLPI">HR</option>
@@ -263,7 +268,7 @@ const LicenceNumber = ({ formData, checkLicenseNumberIsNotDuplicate }) => (
         title="5 digits"
         visuallyHideLabel
         formData={formData}
-        onInput={checkLicenseNumberIsNotDuplicate}
+        onInput={checkLicenceNumberIsNotDuplicate}
       />
       {' / '}
       <Field
@@ -274,7 +279,7 @@ const LicenceNumber = ({ formData, checkLicenseNumberIsNotDuplicate }) => (
         title="4 digits"
         visuallyHideLabel
         formData={formData}
-        onInput={checkLicenseNumberIsNotDuplicate}
+        onInput={checkLicenceNumberIsNotDuplicate}
       />
     </fieldset>
   </FormGroup>
