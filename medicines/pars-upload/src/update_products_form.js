@@ -287,11 +287,12 @@ const product_title = (formData) =>
     formData.get('product_name'),
     formData.get('strength'),
     formData.get('pharmaceutical_dose'),
-    licence_number(formData),
   ]
     .filter((x) => x)
-    .join(', ')
+    .join(' ')
     .toUpperCase()
+    .concat(' - ')
+    .concat(licence_number(formData))
 
 const licence_number = (formData) => {
   const licence_type = formData.get('licence_number_type')

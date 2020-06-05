@@ -128,7 +128,7 @@ describe('PARs update', () => {
       })
 
     const licence_str = `${uploadData.licence.type} ${uploadData.licence.part_one}/${uploadData.licence.part_two}`
-    const product_title = `${uploadData.brand}, ${uploadData.strength}, ${uploadData.doseForm}, ${licence_str}`.toUpperCase()
+    const product_title = `${uploadData.brand} ${uploadData.strength} ${uploadData.doseForm} - ${licence_str}`.toUpperCase()
 
     cy.findByText(product_title)
       .parent()
