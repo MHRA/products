@@ -136,7 +136,38 @@ describe('PARs upload', () => {
       uploadData.brand
     )
   })
+  it('shows the uploaded file when going back to upload file page', () => {
+    cy.visit('/new-par')
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    completeUploadForm(uploadData)
 
+    const fileName = 'rabbit-anti-human-stuff.pdf'
+    completeUploadFile(fileName)
+
+    cy.findByText('Document')
+      .parent()
+      .within(() => {
+        cy.findAllByText('Change').last().click()
+      })
+
+    cy.findByText(`Current file`).should('exist')
+    cy.findByText(`Upload new file instead`).should('exist')
+    cy.findByText(fileName).should('exist')
+
+    cy.findAllByText('Continue').last().click()
+    cy.findByText('Current file').should('exist')
+
+    cy.findAllByText('Continue').first().click()
+    cy.findAllByText('Check your answers before sending the report')
+      .not('title')
+      .should('have.length', 1)
+  })
   it('can submit the form sucessfully', () => {
     if (parsUrl) {
       cy.log('Mocking form submissions endpoint')

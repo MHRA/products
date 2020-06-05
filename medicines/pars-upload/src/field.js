@@ -19,7 +19,6 @@ export const Field = ({
 
   const defaultValue =
     (formData && formData.getAll(name)[index || 0]) || undefined
-
   const labelEl = (
     <label className="govuk-label" htmlFor={id}>
       {label}
