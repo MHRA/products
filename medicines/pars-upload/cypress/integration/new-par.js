@@ -57,6 +57,28 @@ describe('PARs upload', () => {
 
     addDuplicateLicenceNumbers(uploadData)
   })
+  it('upload field only accepts PDFs', () => {
+    cy.visit('/new-par')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    completeUploadForm(uploadData)
+
+    const fileName = 'rabbit-anti-human-stuff.txt'
+    const expectedTitle = 'Upload your PDF'
+    completeUploadFile(fileName, expectedTitle)
+
+    cy.once('fail', (err) => {
+      expect(err.message).to.include(
+        'One or more field is invalid within given file(s)'
+      )
+    })
+  })
   it('review page shows the correct information', () => {
     cy.visit('/new-par')
     let uploadData = {
@@ -69,7 +91,8 @@ describe('PARs upload', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload your PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')
@@ -148,7 +171,8 @@ describe('PARs upload', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload your PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findByText('Document')
       .parent()
@@ -189,7 +213,8 @@ describe('PARs upload', () => {
     completeUploadForm(uploadData)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
-    completeUploadFile(fileName)
+    const expectedTitle = 'Upload your PDF'
+    completeUploadFile(fileName, expectedTitle)
 
     cy.findAllByText('Check your answers before sending the report')
       .not('title')

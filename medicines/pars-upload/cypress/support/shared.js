@@ -220,8 +220,8 @@ export const completeUploadForm = (uploadData) => {
   cy.findByText('Continue').click()
 }
 
-export const completeUploadFile = (fileName) => {
-  cy.findAllByText('Upload your PDF').not('title').should('have.length', 1)
+export const completeUploadFile = (fileName, expectedTitle) => {
+  cy.findAllByText(expectedTitle).not('title').should('have.length', 1)
 
   cy.fixture(fileName).then((fileContent) => {
     // The `upload` method is provided by https://github.com/abramenal/cypress-file-upload/tree/v3.5.3

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useIncrementingIds } from './useIncrementingIds'
 
-export const Wizard = ({ initialSteps, onComplete, extraProps }) => {
+export const Wizard = ({ initialSteps, onComplete, extraProps, flowName }) => {
   const getNextId = useIncrementingIds()
   const [steps, setSteps] = useState(() =>
     initialSteps.map(({ type, component }) => ({
@@ -75,6 +75,7 @@ export const Wizard = ({ initialSteps, onComplete, extraProps }) => {
       goToPage={(index) => setPageIndex(index)}
       goToFirstPageOfType={goToFirstPageOfType}
       deletePage={deletePage}
+      flowName={flowName}
       {...extraProps}
     />
   )

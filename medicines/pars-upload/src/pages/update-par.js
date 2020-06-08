@@ -64,6 +64,7 @@ const ParUpload = ({ auth }) => {
           extraProps={{
             submissionError: submissionState === 'error',
           }}
+          flowName="update"
         />
       )
     case 'success':
