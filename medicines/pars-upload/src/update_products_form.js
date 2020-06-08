@@ -134,7 +134,7 @@ export const Products = ({
             formData={currentStepData}
             helpContents={
               <span>
-                To add multiple brands, separate them with a forward slash (/)
+                To add multiple names, separate them with a forward slash (/)
               </span>
             }
           />
