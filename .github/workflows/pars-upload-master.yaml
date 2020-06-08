@@ -7,6 +7,12 @@ on:
     paths:
       - medicines/pars-upload/**
       - .github/workflows/pars-upload-master.yaml
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - medicines/pars-upload/**
+      - .github/workflows/pars-upload-master.yaml
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: false

@@ -28,7 +28,8 @@ describe('PARs upload', () => {
       substance2: 'Paracetamol',
       substance3: 'Temazepam',
     }
-    addAndDeleteSubstances(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    addAndDeleteSubstances(uploadData, uploadPageTitle)
   })
 
   it('can add and delete multiple products', () => {
@@ -41,7 +42,8 @@ describe('PARs upload', () => {
       substance2: 'Paracetamol',
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-    addAndDeleteProducts(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    addAndDeleteProducts(uploadData, uploadPageTitle)
   })
   it('duplicate licence numbers are not allowed', () => {
     cy.visit('/new-par')
@@ -54,8 +56,8 @@ describe('PARs upload', () => {
       substance2: 'Paracetamol',
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-
-    addDuplicateLicenceNumbers(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
   })
   it('upload field only accepts PDFs', () => {
     cy.visit('/new-par')
@@ -67,7 +69,8 @@ describe('PARs upload', () => {
       substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-    completeUploadForm(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    completeUploadForm(uploadData, uploadPageTitle)
 
     const fileName = 'rabbit-anti-human-stuff.txt'
     const expectedTitle = 'Upload your PDF'
@@ -88,7 +91,8 @@ describe('PARs upload', () => {
       substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-    completeUploadForm(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    completeUploadForm(uploadData, uploadPageTitle)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
     const expectedTitle = 'Upload your PDF'
@@ -168,7 +172,8 @@ describe('PARs upload', () => {
       substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-    completeUploadForm(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    completeUploadForm(uploadData, uploadPageTitle)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
     const expectedTitle = 'Upload your PDF'
@@ -210,7 +215,8 @@ describe('PARs upload', () => {
       substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
-    completeUploadForm(uploadData)
+    let uploadPageTitle = 'New Public Assessment Report'
+    completeUploadForm(uploadData, uploadPageTitle)
 
     const fileName = 'rabbit-anti-human-stuff.pdf'
     const expectedTitle = 'Upload your PDF'

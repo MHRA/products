@@ -49,11 +49,16 @@ export const mockSuccessfulSubmission = (baseUrl, url) => {
 }
 
 export const completeFindParToUpdateStep = (parUrl) => {
+  cy.findAllByText('Search for an existing Public Assessment Report')
+    .not('title')
+    .should('exist')
   cy.findByLabelText('Please insert URL').type(parUrl)
   cy.findByText('Continue').click()
 }
 
-export const addAndDeleteSubstances = (uploadData) => {
+export const addAndDeleteSubstances = (uploadData, expectedTitle) => {
+  cy.findAllByText(expectedTitle).not('title').should('exist')
+
   cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
   cy.findByLabelText('Strength').type(uploadData.strength)
@@ -89,7 +94,9 @@ export const addAndDeleteSubstances = (uploadData) => {
     .should('have.value', uploadData.substance3)
 }
 
-export const addAndDeleteProducts = (uploadData) => {
+export const addAndDeleteProducts = (uploadData, expectedTitle) => {
+  cy.findAllByText(expectedTitle).not('title').should('exist')
+
   cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
   cy.findByLabelText('Strength').type(uploadData.strength)
@@ -141,7 +148,9 @@ export const addAndDeleteProducts = (uploadData) => {
   cy.findByLabelText('Brand/Generic name').should('have.value', '')
 }
 
-export const addDuplicateLicenceNumbers = (uploadData) => {
+export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
+  cy.findAllByText(expectedTitle).not('title').should('exist')
+
   for (let i = 0; i < 2; i++) {
     cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
@@ -191,7 +200,9 @@ export const addDuplicateLicenceNumbers = (uploadData) => {
     })
 }
 
-export const completeUploadForm = (uploadData) => {
+export const completeUploadForm = (uploadData, expectedTitle) => {
+  cy.findAllByText(expectedTitle).not('title').should('exist')
+
   cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
   cy.findByLabelText('Strength').type(uploadData.strength)
@@ -221,7 +232,7 @@ export const completeUploadForm = (uploadData) => {
 }
 
 export const completeUploadFile = (fileName, expectedTitle) => {
-  cy.findAllByText(expectedTitle).not('title').should('have.length', 1)
+  cy.findAllByText(expectedTitle).not('title').should('exist')
 
   cy.fixture(fileName).then((fileContent) => {
     // The `upload` method is provided by https://github.com/abramenal/cypress-file-upload/tree/v3.5.3
