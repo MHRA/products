@@ -15,10 +15,10 @@ on:
       - .github/workflows/pars-upload-master.yaml
 
 env:
-  NEXT_PUBLIC_DISABLE_AUTH: false
-  PARS_UPLOAD_URL: "https://doc-index-updater.test.mhra.gov.uk/pars"
+  NEXT_PUBLIC_DISABLE_AUTH: true
+  PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
   # above is for cypress, below is for next.js
-  NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater.test.mhra.gov.uk/pars"
+  NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
   NONPROD_PARS_APP_ID: ac2b59e9-77ca-4d39-8186-b96d305c9aae
 
 jobs:
