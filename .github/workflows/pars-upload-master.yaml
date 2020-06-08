@@ -72,7 +72,7 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn lint
 
-        - name: Accessibility check
+      - name: Accessibility check
         working-directory: medicines/pars-upload
         run: yarn a11y
 
@@ -93,7 +93,6 @@ jobs:
         with:
           name: medicines-cypress-videos
           path: medicines/pars-upload/cypress/videos
-
 
       - name: NON-PROD - Create .env file
         working-directory: medicines/pars-upload
