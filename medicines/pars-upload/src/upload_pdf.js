@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { FormGroup } from './form'
 import { Layout } from './layout'
 import { H1, H2 } from './typography'
 import { BackLink } from './back-link'
@@ -6,9 +8,12 @@ import { Button } from './button'
 import { SummaryListWithoutActions } from './summary_list'
 
 export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
+  const [formIsValid, setFormIsValid] = useState(true)
+
   const onSubmit = (event) => {
     event.preventDefault()
 
+    setFormIsValid(true)
     const formData = new FormData(event.target)
 
     submit(formData)
@@ -23,11 +28,25 @@ export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
     goBack()
   }
 
+  const onInvalid = () => {
+    console.log('Setting form invalid')
+    setFormIsValid(false)
+  }
+
+  const checkFileType = (e) => {
+    let el = e.target
+    let fileTypeValid = el.value.endsWith('.pdf')
+    el.setCustomValidity(fileTypeValid ? '' : 'Only PDF files are allowed')
+  }
+
   const title =
     flowName === 'update' ? 'Upload a replacement PDF' : 'Upload your PDF'
 
   return (
-    <Layout title={title} intro={<BackLink href="/" onClick={goToPrevPage} />}>
+    <Layout
+      title={formIsValid ? title : `Error: ${title}`}
+      intro={<BackLink href="/" onClick={goToPrevPage} />}
+    >
       <H1>{title}</H1>
       {currentStepData && (
         <>
@@ -38,9 +57,16 @@ export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
           <H2>Upload new file instead</H2>
         </>
       )}
-      <form onSubmit={onSubmit}>
-        <Field name="file" label="File" type="file" accept="application/pdf" />
-
+      <form onSubmit={onSubmit} onInvalid={onInvalid}>
+        <FormGroup>
+          <Field
+            name="file"
+            label="File"
+            type="file"
+            accept="application/pdf"
+            onInput={checkFileType}
+          />
+        </FormGroup>
         <Button>Continue</Button>
       </form>
     </Layout>
