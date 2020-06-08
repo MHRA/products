@@ -12,6 +12,8 @@ describe('Home page', () => {
 
     cy.visit('/')
 
+    cy.findAllByText('What are you doing today?').should('exist')
+
     cy.findByText('Upload a new document').click()
 
     cy.findByText('Continue').click()
@@ -24,6 +26,8 @@ describe('Home page', () => {
       cy.server()
 
       cy.visit('/')
+
+      cy.findAllByText('What are you doing today?').should('exist')
 
       cy.findByText('Update an existing document').click()
 
