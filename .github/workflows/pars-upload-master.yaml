@@ -60,7 +60,7 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn install --frozen-lockfile
 
-        - name: Build
+      - name: Build
         working-directory: medicines/pars-upload
         run: yarn build
 
