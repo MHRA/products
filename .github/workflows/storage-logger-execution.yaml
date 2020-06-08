@@ -1,0 +1,30 @@
+name: storage-logger-execution
+
+on:
+  schedule:
+    # 12pm every Friday
+    - cron: "0 0 * * 6"
+
+jobs:
+  build-and-test:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./products/medicines/storage-logger
+        run: make test
+
+      - name: Run storage log
+        working-directory: ./products/medicines/storage-logger
+        env:
+          PRODUCTS_STORAGE_ACCOUNT: ${{ secrets.PRODUCTS_STORAGE_ACCOUNT_PROD }}
+          PRODUCTS_STORAGE_MASTER_KEY: ${{ secrets.PRODUCTS_STORAGE_MASTER_KEY_PROD }}
+          PRODUCTS_STORAGE_CONTAINER_NAME: ${{ secrets.PRODUCTS_STORAGE_CONTAINER_NAME_PROD }}
+          LOG_STORAGE_CONTAINER_NAME: ${{ secrets.LOG_STORAGE_CONTAINER_NAME_PROD }}
+        run: cargo run
