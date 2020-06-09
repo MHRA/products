@@ -1,4 +1,5 @@
 import 'govuk-frontend/govuk/all.scss'
+import 'formdata-polyfill'
 import { useState, useEffect } from 'react'
 import { SignInRequest } from '../auth/signInRequest'
 import { Header } from '../header'
