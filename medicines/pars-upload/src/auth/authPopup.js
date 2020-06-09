@@ -21,6 +21,13 @@ export async function getAccount() {
   }
 }
 
+const isIE = () => {
+  const ua = window.navigator.userAgent
+  const msie = ua.indexOf('MSIE ')
+  const msie11 = ua.indexOf('Trident/')
+  return msie > 0 || msie11 > 0
+}
+
 export function getCurrentHost(currentFullUrl) {
   var uriComponents = currentFullUrl.split('/')
   return uriComponents[0] + '//' + uriComponents[2]
@@ -28,7 +35,12 @@ export function getCurrentHost(currentFullUrl) {
 
 export function signIn() {
   msalConfig.auth.redirectUri = getCurrentHost(window.location.href)
-  return new UserAgentApplication(msalConfig)
-    .loginPopup(loginRequest)
-    .then(getAccount)
+
+  if (isIE()) {
+    new UserAgentApplication(msalConfig).loginRedirect(loginRequest)
+  } else {
+    return new UserAgentApplication(msalConfig)
+      .loginPopup(loginRequest)
+      .then(getAccount)
+  }
 }
