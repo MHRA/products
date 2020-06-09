@@ -154,6 +154,8 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
   cy.findAllByText(expectedTitle).not('title').should('exist')
 
   for (let i = 0; i < 2; i++) {
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
+
     cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
     cy.findByLabelText('Strength').type(uploadData.strength)
@@ -180,7 +182,6 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
       })
 
     cy.findByText('Add another product').click()
-    cy.findByLabelText('Brand/Generic name').should('have.value', '')
   }
 
   const validationMsg = 'Duplicate licence numbers are not allowed'
