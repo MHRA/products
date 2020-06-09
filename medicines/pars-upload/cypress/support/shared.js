@@ -7,7 +7,6 @@ export const setUp = () => {
 
   // grab fetch polyfill from remote URL, could be also from a local package
   before(() => {
-    console.log('Loading polyfill')
     const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
     cy.request(polyfillUrl).then((response) => {
       polyfill = response.body
@@ -15,8 +14,6 @@ export const setUp = () => {
   })
 
   Cypress.on('window:before:load', (win) => {
-    console.log('Windows before load')
-    console.log(polyfill)
     delete win.fetch
     // since the application code does not ship with a polyfill
     // load a polyfilled "fetch" from the test
@@ -217,7 +214,6 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
 
   for (let i = 1; i < uploadData.substances.length; i++) {
     cy.findByText('Add another active substance').click()
-    console.log('SUBSTANCE!! ' + i + ' ' + uploadData.substances[i])
     cy.findAllByLabelText('Active substance(s)')
       .last()
       .type(uploadData.substances[i])
