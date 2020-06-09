@@ -29,7 +29,6 @@ export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
   }
 
   const onInvalid = () => {
-    console.log('Setting form invalid')
     setFormIsValid(false)
   }
 
