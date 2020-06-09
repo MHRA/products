@@ -7,14 +7,16 @@ export const setUp = () => {
 
   // grab fetch polyfill from remote URL, could be also from a local package
   before(() => {
+    console.log('Loading polyfill')
     const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
-
     cy.request(polyfillUrl).then((response) => {
       polyfill = response.body
     })
   })
 
   Cypress.on('window:before:load', (win) => {
+    console.log('Windows before load')
+    console.log(polyfill)
     delete win.fetch
     // since the application code does not ship with a polyfill
     // load a polyfilled "fetch" from the test
@@ -178,6 +180,7 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
       })
 
     cy.findByText('Add another product').click()
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
   }
 
   const validationMsg = 'Duplicate licence numbers are not allowed'
