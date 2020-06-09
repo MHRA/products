@@ -8,7 +8,6 @@ export const setUp = () => {
   // grab fetch polyfill from remote URL, could be also from a local package
   before(() => {
     const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
-
     cy.request(polyfillUrl).then((response) => {
       polyfill = response.body
     })
@@ -152,6 +151,8 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
   cy.findAllByText(expectedTitle).not('title').should('exist')
 
   for (let i = 0; i < 2; i++) {
+    cy.findByLabelText('Brand/Generic name').should('have.value', '')
+
     cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
     cy.findByLabelText('Strength').type(uploadData.strength)
@@ -213,7 +214,6 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
 
   for (let i = 1; i < uploadData.substances.length; i++) {
     cy.findByText('Add another active substance').click()
-    console.log('SUBSTANCE!! ' + i + ' ' + uploadData.substances[i])
     cy.findAllByLabelText('Active substance(s)')
       .last()
       .type(uploadData.substances[i])
