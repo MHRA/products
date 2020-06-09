@@ -4,6 +4,7 @@ export const Layout = ({ title, intro = null, children }) => (
   <div className="govuk-width-container">
     <Head>
       <title>{title}</title>
+      <meta httpEquiv="X-UA-Compatible" content="IE=edge"></meta>
     </Head>
 
     {intro}
