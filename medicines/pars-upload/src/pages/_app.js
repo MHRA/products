@@ -1,5 +1,5 @@
 import 'govuk-frontend/govuk/all.scss'
-import '../polyfills/setCustomValidity'
+import '../polyfills/reportValidity'
 import '../polyfills/formData'
 import { useState, useEffect } from 'react'
 import { SignInRequest } from '../auth/signInRequest'
