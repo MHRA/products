@@ -2,14 +2,13 @@ import { UserAgentApplication } from 'msal'
 import { msalConfig, loginRequest } from './authConfig'
 
 export async function getAccount() {
+  msalConfig.auth.redirectUri = getCurrentHost(window.location.href)
   const msalInstance = new UserAgentApplication(msalConfig)
   const account = msalInstance.getAccount()
 
   if (account) {
-    //const token = await getToken(msalInstance)
     const token = window.sessionStorage['msal.idtoken']
     const username = account.userName
-    console.log({ token, account })
 
     return {
       account,
@@ -22,24 +21,26 @@ export async function getAccount() {
   }
 }
 
-async function getToken(msalInstance) {
-  const tokenRequest = {
-    scopes: ['user.read'],
-  }
+const isIE = () => {
+  const ua = window.navigator.userAgent
+  const msie = ua.indexOf('MSIE ')
+  const msie11 = ua.indexOf('Trident/')
+  return msie > 0 || msie11 > 0
+}
 
-  try {
-    return await msalInstance.acquireTokenSilent(tokenRequest)
-  } catch (e) {
-    if (e.name === 'InteractionRequiredAuthError') {
-      return await msalInstance.acquireTokenPopup(tokenRequest)
-    } else {
-      throw e
-    }
-  }
+export function getCurrentHost(currentFullUrl) {
+  var uriComponents = currentFullUrl.split('/')
+  return uriComponents[0] + '//' + uriComponents[2]
 }
 
 export function signIn() {
-  return new UserAgentApplication(msalConfig)
-    .loginPopup(loginRequest)
-    .then(getAccount)
+  msalConfig.auth.redirectUri = getCurrentHost(window.location.href)
+
+  if (isIE()) {
+    new UserAgentApplication(msalConfig).loginRedirect(loginRequest)
+  } else {
+    return new UserAgentApplication(msalConfig)
+      .loginPopup(loginRequest)
+      .then(getAccount)
+  }
 }

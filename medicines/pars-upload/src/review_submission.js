@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import css from './review_submission.module.css'
 import { Layout } from './layout'
 import { H1, Para, H3 } from './typography'
-import { Button } from './button'
+import { Button, ButtonWithLinkStyles } from './button'
 import { BackLink } from './back-link'
 import { ErrorSummary } from './error_summary'
 import { SummaryListWithoutActions } from './summary_list'
@@ -46,6 +45,14 @@ export const ReviewSubmission = ({
         }
 
         switch (type) {
+          case 'get_par':
+            return (
+              <ParToUpdateSummary
+                key={key}
+                data={data}
+                goToFormPage={goToFormPage}
+              />
+            )
           case 'product':
             return (
               <ProductSummary
@@ -63,7 +70,12 @@ export const ReviewSubmission = ({
         }
       })}
 
-      <Button type="button" onClick={submit}>
+      <Button
+        type="button"
+        onClick={() => {
+          submit(null)
+        }}
+      >
         Accept and send
       </Button>
     </Layout>
@@ -93,8 +105,25 @@ const ProductSummary = ({ data, goToFormPage }) => (
           value: data.getAll('active_substance').join(', '),
         },
         {
-          key: 'License number',
-          value: data.get('license_number'),
+          key: 'Licence number',
+          value: data.get('licence_number'),
+        },
+      ]}
+    />
+  </SummaryWrapper>
+)
+
+const ParToUpdateSummary = ({ data, goToFormPage }) => (
+  <SummaryWrapper title="Par to update" goToFormPage={goToFormPage}>
+    <SummaryListWithoutActions
+      items={[
+        {
+          key: 'URL',
+          value: (
+            <a href={data.get('par_url')} target="_blank" rel="noreferrer">
+              {data.get('par_url')}
+            </a>
+          ),
         },
       ]}
     />
@@ -125,14 +154,12 @@ const SummaryWrapper = ({ title, children, goToFormPage }) => {
       <div className={css.flexRow}>
         <H3 component="h2">{title}</H3>
 
-        <Link href="/new-par">
-          <a
-            className={`govuk-link govuk-link--no-visited-state ${css.changeLink}`}
-            onClick={onClickChange}
-          >
-            Change
-          </a>
-        </Link>
+        <ButtonWithLinkStyles
+          className={css.changeLink}
+          onClick={onClickChange}
+        >
+          Change
+        </ButtonWithLinkStyles>
       </div>
 
       {children}

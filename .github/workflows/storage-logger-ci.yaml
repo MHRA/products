@@ -1,0 +1,28 @@
+name: storage-logger-ci
+
+on:
+  pull_request:
+    paths:
+      - medicines/storage-logger/**
+      - .github/workflows/storage-logger-ci.yaml
+  push:
+    branches:
+      - master
+    paths:
+      - medicines/storage-logger/**
+      - .github/workflows/storage-logger-ci.yaml
+
+jobs:
+  build-and-test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+        with:
+          path: products
+
+      - name: Test
+        working-directory: ./products/medicines/storage-logger
+        run: make test

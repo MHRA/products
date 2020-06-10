@@ -20,7 +20,7 @@ locals {
   namespace        = "mhraproducts${var.ENVIRONMENT}"
   pars_namespace   = "mhrapars${var.ENVIRONMENT}"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
-  logs_namespace   = "mhra${var.ENVIRONMENT}"
+  logs_namespace   = "mhralogs${var.ENVIRONMENT}"
 }
 
 data "azurerm_resource_group" "products" {
@@ -40,6 +40,7 @@ resource "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
+<<<<<<< HEAD
   environment             = var.ENVIRONMENT
   location                = var.REGION
   namespace               = local.namespace
@@ -48,6 +49,16 @@ module "products" {
   search_sku              = "standard"
   app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
   pars_app_name           = "pars-upload-${var.ENVIRONMENT}"
+=======
+  environment                       = var.ENVIRONMENT
+  location                          = var.REGION
+  namespace                         = local.namespace
+  pars_namespace                    = local.pars_namespace
+  resource_group_name               = data.azurerm_resource_group.products.name
+  search_sku                        = "standard"
+  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  addtional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
+>>>>>>> master
 }
 
 data "azurerm_route_table" "load_balancer" {

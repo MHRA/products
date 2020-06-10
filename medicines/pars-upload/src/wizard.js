@@ -1,15 +1,19 @@
 import { useState } from 'react'
+import { useIncrementingIds } from './useIncrementingIds'
 
-export const Wizard = ({
-  initialSteps,
-  success: Success,
-  onComplete,
-  extraProps,
-}) => {
+export const Wizard = ({ initialSteps, onComplete, extraProps, flowName }) => {
+  const getNextId = useIncrementingIds()
   const [steps, setSteps] = useState(() =>
-    initialSteps.map(({ type, component }) => ({ type, component, data: null }))
+    initialSteps.map(({ type, component }) => ({
+      id: getNextId(),
+      type,
+      component,
+      data: null,
+    }))
   )
   const [pageIndex, setPageIndex] = useState(0)
+
+  if (pageIndex >= steps.length) return null
 
   const currentPage = steps[pageIndex]
   const Component = currentPage.component
@@ -34,8 +38,9 @@ export const Wizard = ({
   const onRepeatPage = (formData) => {
     setSteps((steps) => {
       const newSteps = [...steps]
-      newSteps.splice(pageIndex, 0, {
+      newSteps.splice(pageIndex + 1, 0, {
         ...currentPage,
+        id: getNextId(),
         data: null,
       })
       return newSteps
@@ -47,13 +52,19 @@ export const Wizard = ({
     setPageIndex((i) => i - 1)
   }
 
-  if (pageIndex >= steps.length) {
-    return <Success />
+  const deletePage = (pageIndexToDelete) => {
+    setSteps((steps) => steps.filter((_, i) => i !== pageIndexToDelete))
+  }
+
+  const goToFirstPageOfType = (pageType) => {
+    let matchingPageIndex = steps.findIndex((step) => step.type === pageType)
+    let goToPage = Math.max(matchingPageIndex, pageIndex - 1, 0)
+    setPageIndex(goToPage)
   }
 
   return (
     <Component
-      key={pageIndex}
+      key={currentPage.id}
       currentStepData={currentPage.data}
       currentStepIndex={pageIndex}
       steps={steps.map((step, index) => ({ ...step, index }))}
@@ -62,6 +73,9 @@ export const Wizard = ({
       savePageState={setPageData}
       goBack={goBack}
       goToPage={(index) => setPageIndex(index)}
+      goToFirstPageOfType={goToFirstPageOfType}
+      deletePage={deletePage}
+      flowName={flowName}
       {...extraProps}
     />
   )

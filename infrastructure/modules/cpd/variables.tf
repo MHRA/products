@@ -8,7 +8,7 @@ variable "environment" {
   description = "Environment name to use as a tag"
 }
 variable "namespace" {
-  description = "Namespace to use on cluster and storage"
+  description = "Namespace to use on resources"
 }
 variable "cdn_region" {
   description = "Region where the CDN profile should be deployed"

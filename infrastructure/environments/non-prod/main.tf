@@ -20,6 +20,7 @@ locals {
   namespace        = "mhraproductsnonprod"
   pars_namespace   = "mhraparsnonprod"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+  logs_namespace   = replace("mhralogs${var.ENVIRONMENT}", "-", "")
 }
 
 resource "azurerm_resource_group" "products" {
@@ -44,13 +45,13 @@ resource "azurerm_subnet_route_table_association" "load_balancer" {
 module "products" {
   source = "../../modules/products"
 
-  environment             = var.ENVIRONMENT
-  location                = var.REGION
-  namespace               = local.namespace
-  pars_namespace          = local.pars_namespace
-  resource_group_name     = azurerm_resource_group.products.name
-  app_registration_owners = var.KEYVAULT_AUTHORISED_PERSON_IDS
-  pars_app_name           = "pars-upload-${var.ENVIRONMENT}"
+  environment                       = var.ENVIRONMENT
+  location                          = var.REGION
+  namespace                         = local.namespace
+  pars_namespace                    = local.pars_namespace
+  resource_group_name               = azurerm_resource_group.products.name
+  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  addtional_allowed_pars_reply_urls = []
 }
 
 # website
@@ -85,7 +86,11 @@ resource "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
+<<<<<<< HEAD
   namespace           = local.namespace
+=======
+  namespace           = local.logs_namespace
+>>>>>>> master
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name

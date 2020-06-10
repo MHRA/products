@@ -9,10 +9,11 @@ on:
       - .github/workflows/pars-upload-branch.yaml
 
 env:
-  NEXT_PUBLIC_DISABLE_AUTH: false
+  NEXT_PUBLIC_DISABLE_AUTH: true
   PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
   # above is for cypress, below is for next.js
   NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater-dev.test.mhra.gov.uk/pars"
+  DEV_PARS_APP_ID: 26f95b21-63b2-475f-8a35-d39cea4cfd61
 
 jobs:
   build:
@@ -61,6 +62,10 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn test:ci
 
+      - name: Lint
+        working-directory: medicines/pars-upload
+        run: yarn lint
+
       - name: Accessibility check
         working-directory: medicines/pars-upload
         run: yarn a11y
@@ -87,9 +92,8 @@ jobs:
         working-directory: medicines/pars-upload
         run: |
           {
-            echo "NEXT_PUBLIC_CLIENT_ID=26f95b21-63b2-475f-8a35-d39cea4cfd61"
+            echo "NEXT_PUBLIC_CLIENT_ID=$DEV_PARS_APP_ID"
             echo "NEXT_PUBLIC_AUTHORITY_URL=https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26"
-            echo "NEXT_PUBLIC_REDIRECT_URI=https://mhraparsdev.azureedge.net"
             echo "NEXT_PUBLIC_DISABLE_AUTH=\"$NEXT_PUBLIC_DISABLE_AUTH\""
             echo "NEXT_PUBLIC_PARS_UPLOAD_URL=\"$NEXT_PUBLIC_PARS_UPLOAD_URL\""
             echo "PARS_UPLOAD_URL=\"$PARS_UPLOAD_URL\""

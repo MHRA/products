@@ -23,15 +23,10 @@ variable "search_sku" {
   default     = "basic"
 }
 
-variable "add_local_pars_reply_url" {
-  description = "Whether to add http://localhost:3000 to allowable redirect urls"
-  default     = false
+variable "addtional_allowed_pars_reply_urls" {
+  description = "The CDN url and the primary static website URLs will be added by default, these are the addtional urls"
 }
 
 variable "app_registration_owners" {
   description = "Users who can update the app registration settings"
-}
-
-variable "pars_app_name" {
-  description = "Name of the PARS app"
 }

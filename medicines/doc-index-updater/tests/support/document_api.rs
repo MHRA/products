@@ -21,9 +21,8 @@ pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> 
             .send(),
     );
 
-    println!("{:?}", response);
     let job_status_response: JobStatusResponse = get_ok(response.json());
-    println!("{:?}", job_status_response);
+
     Ok(job_status_response)
 }
 

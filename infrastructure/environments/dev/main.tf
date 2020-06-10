@@ -20,6 +20,7 @@ locals {
   namespace        = "mhraproductsdevelopment"
   pars_namespace   = "mhraparsdevelopment"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+  logs_namespace   = "mhralogs${var.ENVIRONMENT}"
 }
 
 resource "azurerm_resource_group" "products" {
@@ -44,14 +45,13 @@ data "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
-  environment              = var.ENVIRONMENT
-  location                 = var.REGION
-  namespace                = local.namespace
-  pars_namespace           = local.pars_namespace
-  resource_group_name      = azurerm_resource_group.products.name
-  add_local_pars_reply_url = true
-  app_registration_owners  = var.KEYVAULT_AUTHORISED_PERSON_IDS
-  pars_app_name            = "pars-upload-${var.ENVIRONMENT}"
+  environment                       = var.ENVIRONMENT
+  location                          = var.REGION
+  namespace                         = local.namespace
+  pars_namespace                    = local.pars_namespace
+  resource_group_name               = azurerm_resource_group.products.name
+  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  addtional_allowed_pars_reply_urls = ["http://localhost:3000"]
 }
 
 # website
@@ -93,7 +93,7 @@ resource "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
-  namespace           = var.ENVIRONMENT
+  namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name

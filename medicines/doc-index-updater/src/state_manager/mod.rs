@@ -139,11 +139,10 @@ async fn set_status_handler(
 ) -> Result<Json, Rejection> {
     mgr.set_status(id, status)
         .await
-        .or_else(|e: MyRedisError| {
+        .map_err(|e: MyRedisError| {
             tracing::error!("{}", e);
-            Err(e)
+            e.into()
         })
-        .map_err(Into::into)
         .map(|r| warp::reply::json(&r))
 }
 

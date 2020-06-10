@@ -50,6 +50,22 @@ impl AzureBlobStorage {
         }
     }
 
+    pub fn log() -> Self {
+        let container_name = std::env::var("LOG_STORAGE_CONTAINER")
+            .expect("Set env variable LOG_STORAGE_CONTAINER first!");
+        let storage_account = std::env::var("LOG_STORAGE_ACCOUNT")
+            .expect("Set env variable LOG_STORAGE_ACCOUNT first!");
+        let master_key = std::env::var("LOG_STORAGE_MASTER_KEY")
+            .expect("Set env variable LOG_STORAGE_MASTER_KEY first!");
+
+        Self {
+            container_name,
+            prefix: "".to_owned(),
+            storage_account,
+            master_key,
+        }
+    }
+
     pub fn get_azure_client(&self) -> Result<Client, StorageClientError> {
         let client = base64::decode(&self.master_key)
             .map(|_| Client::new(&self.storage_account, &self.master_key))?;
@@ -63,13 +79,13 @@ impl StorageClient for AzureBlobStorage {
     async fn add_file(
         &self,
         file_data: &[u8],
-        license_number: &str,
+        licence_number: &str,
         metadata_ref: HashMap<&str, &str>,
     ) -> Result<StorageFile, StorageClientError> {
         let storage_client = self.get_azure_client()?;
 
         let file_digest = md5::compute(&file_data[..]);
-        let name = format!("{}{}", &self.prefix, file_name(license_number, file_data));
+        let name = format!("{}{}", &self.prefix, file_name(licence_number, file_data));
 
         storage_client
             .put_block_blob()
@@ -105,11 +121,29 @@ impl StorageClient for AzureBlobStorage {
 
         Ok(file_data)
     }
+    async fn append_to_file(&self, file_name: &str, body: &[u8]) -> Result<(), StorageClientError> {
+        let storage_client = self.get_azure_client()?;
+        storage_client
+            .put_append_block()
+            .with_container_name(&self.container_name)
+            .with_blob_name(&file_name)
+            .with_body(body)
+            .finalize()
+            .await
+            .map_err(|e| {
+                tracing::error!("Error appending data to blob file: {:?}", e);
+                StorageClientError::AppendError(format!(
+                    "Couldn't append data to blob file: {:?}",
+                    e
+                ))
+            })?;
+        Ok(())
+    }
 }
 
-fn file_name(license_number: &str, file_data: &[u8]) -> String {
+fn file_name(licence_number: &str, file_data: &[u8]) -> String {
     let mut hash = sha1::Sha1::new();
-    hash.update(license_number.as_bytes());
+    hash.update(licence_number.as_bytes());
     hash.update(file_data);
     hash.digest().to_string()
 }

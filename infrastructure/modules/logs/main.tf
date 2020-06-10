@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "logs" {
-  name                     = "logs${var.namespace}"
+  name                     = var.namespace
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_kind             = "StorageV2"
@@ -8,6 +8,12 @@ resource "azurerm_storage_account" "logs" {
 
   tags = {
     environment = var.environment
+  }
+
+  blob_properties {
+    delete_retention_policy {
+      days = 365
+    }
   }
 
   lifecycle {
