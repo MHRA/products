@@ -17,8 +17,9 @@ terraform {
 }
 
 locals {
-  namespace        = "mhraproductsdevelopment"
-  pars_namespace   = "mhraparsdevelopment"
+  namespace        = "mhraproducts${var.ENVIRONMENT}"
+  cpd_namespace    = "mhracpd${var.ENVIRONMENT}"
+  pars_namespace   = "mhrapars${var.ENVIRONMENT}"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
   logs_namespace   = "mhralogs${var.ENVIRONMENT}"
 }

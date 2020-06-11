@@ -30,3 +30,8 @@ variable "addtional_allowed_pars_reply_urls" {
 variable "app_registration_owners" {
   description = "Users who can update the app registration settings"
 }
+
+variable "include_pars_app" {
+  description = "Include PARs app registration in the managed resources for this environment"
+  default     = true
+}

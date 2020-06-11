@@ -18,9 +18,10 @@ terraform {
 
 locals {
   namespace        = "mhraproductsnonprod"
+  cpd_namespace    = "mhracpdnonprod"
   pars_namespace   = "mhraparsnonprod"
   service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
-  logs_namespace   = replace("mhralogs${var.ENVIRONMENT}", "-", "")
+  logs_namespace   = "mhralogsnonprod"
 }
 
 resource "azurerm_resource_group" "products" {
@@ -86,11 +87,7 @@ resource "azurerm_subnet" "load_balancer" {
 module logs {
   source = "../../modules/logs"
 
-<<<<<<< HEAD
-  namespace           = local.namespace
-=======
   namespace           = local.logs_namespace
->>>>>>> master
   environment         = var.ENVIRONMENT
   location            = var.REGION
   resource_group_name = azurerm_resource_group.products.name
@@ -124,7 +121,7 @@ module cpd {
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  namespace           = "mhracpdnonprod"
+  namespace           = local.cpd_namespace
   resource_group_name = azurerm_resource_group.products.name
 }
 

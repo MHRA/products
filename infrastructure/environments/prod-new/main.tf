@@ -26,7 +26,7 @@ locals {
   cpd_namespace    = "mhracpd${random_integer.deployment.result}"
   pars_namespace   = "mhrapars${random_integer.deployment.result}"
   service_bus_name = "doc-index-updater-${random_integer.deployment.result}"
-  logs_namespace   = "mhralogs${var.ENVIRONMENT}"
+  logs_namespace   = "mhralogs${random_integer.deployment.result}"
 }
 
 resource "azurerm_resource_group" "products" {
@@ -88,6 +88,7 @@ module "products" {
   search_sku                        = "standard"
   app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
   addtional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
+  include_pars_app                  = false
 }
 
 # website
