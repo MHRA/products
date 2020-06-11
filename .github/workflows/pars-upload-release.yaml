@@ -51,13 +51,21 @@ jobs:
         working-directory: medicines/pars-upload
         run: yarn install --frozen-lockfile
 
+      - name: Build
+        working-directory: medicines/pars-upload
+        run: yarn build
+
       - name: Run tests with coverage
         working-directory: medicines/pars-upload
         run: yarn test:ci
 
-      - name: Build
+      - name: Lint
         working-directory: medicines/pars-upload
-        run: yarn build
+        run: yarn lint
+
+      - name: Accessibility check
+        working-directory: medicines/pars-upload
+        run: yarn a11y
 
       - name: Run cypress end-to-end tests
         working-directory: medicines/pars-upload
@@ -76,10 +84,6 @@ jobs:
         with:
           name: medicines-cypress-videos
           path: medicines/pars-upload/cypress/videos
-
-      - name: Accessibility check
-        working-directory: medicines/pars-upload
-        run: yarn a11y
 
       - name: PRODUCTION - Create .env file
         working-directory: medicines/pars-upload
