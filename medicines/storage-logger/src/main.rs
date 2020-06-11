@@ -8,18 +8,25 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let client = get_client()?;
-    let blobs_list = get_blobs_list(&client).await?;
-    write_to_log_store(&client, blobs_list).await?;
+    let blobs_list = get_blobs_list(&get_read_client()?).await?;
+    write_to_log_store(&get_write_client()?, blobs_list).await?;
     println!("Completed successfully");
     Ok(())
 }
 
-fn get_client() -> Result<Client, AzureError> {
+fn get_read_client() -> Result<Client, AzureError> {
     let account = std::env::var("PRODUCTS_STORAGE_ACCOUNT")
         .expect("Set env variable PRODUCTS_STORAGE_ACCOUNT first!");
     let master_key = std::env::var("PRODUCTS_STORAGE_MASTER_KEY")
         .expect("Set env variable PRODUCTS_STORAGE_MASTER_KEY first!");
+    Client::new(&account, &master_key)
+}
+
+fn get_write_client() -> Result<Client, AzureError> {
+    let account =
+        std::env::var("LOG_STORAGE_ACCOUNT").expect("Set env variable LOG_STORAGE_ACCOUNT first!");
+    let master_key = std::env::var("LOG_STORAGE_MASTER_KEY")
+        .expect("Set env variable LOG_STORAGE_MASTER_KEY first!");
     Client::new(&account, &master_key)
 }
 
@@ -35,8 +42,7 @@ async fn get_blobs_list(client: &Client) -> Result<Vec<String>, AzureError> {
             .stream(),
     );
 
-    let mut blob_list: Vec<String> =
-        vec![String::from("Blob name,CON,PLs,created,modified,Doc type")];
+    let mut blob_list: Vec<String> = vec![];
 
     while let Some(value) = blob_stream.next().await {
         for blob in value?.incomplete_vector.iter() {
@@ -60,7 +66,7 @@ async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(
     let file_digest = md5::compute(&file_data[..]);
 
     let now: DateTime<Utc> = Utc::now();
-    let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
+    let blob_name = now.format("docs-content-log-%Y-%m-%d.txt").to_string();
 
     client
         .put_block_blob()
