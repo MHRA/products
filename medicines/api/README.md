@@ -1,6 +1,8 @@
 # API rust server
 
-This is where the API rust server lives.
+![medicines-api](https://github.com/MHRA/products/workflows/medicines-api-master/badge.svg)
+
+This is where the Medicines API rust server lives.
 
 ## Prerequisites
 
@@ -23,7 +25,7 @@ You should also have installed:
 
 ## Running locally 🦀
 
-1. Navigate to this directory, `/medicines/api`
+1. Navigate to this directory (`/medicines/api`)
 2. Run `make get-env` to get a copy of [environment variables](../../docs/principles/config.md)
 3. Run `make` to build and run the server
 4. Once compiled, open a browser tab and go to http://127.0.0.1:8000/healthz
@@ -33,7 +35,7 @@ To see the GraphQL explorer, go to http://127.0.0.1:8000/graphiql.
 
 ## Running in Docker container 🐳
 
-1. Navigate to this directory, `/medicines/api`
+1. Navigate to this directory (`/medicines/api`)
 2. Run `DOCKER_BUILDKIT=1 docker build . -t api`
 3. Run `docker run -p 8080:8000 --env-file .env api`
 4. Open the browser and go to `http://localhost:8080/healthz`
@@ -43,7 +45,7 @@ To see the GraphQL explorer, go to http://127.0.0.1:8080/graphiql.
 
 ## Deploy API pod in Kubernetes cluster ⎈
 
-1. Navigate to this directory, `/medicines/api`
+1. Navigate to this directory (`/medicines/api`)
 2. Source environmental variables from the corresponding environment
 
    ```sh
@@ -91,11 +93,6 @@ To see the GraphQL explorer, go to http://127.0.0.1:8080/graphiql.
 [kubernetes pod]: https://kubernetes.io/docs/concepts/workloads/pods/pod/ "Pod - Kubernetes Documentation"
 [kubernetes secret]: https://kubernetes.io/docs/concepts/configuration/secret/ "Secret - Kubernetes Documentation"
 
-## Deploy API pod in Kubernetes cluster via CI/CD pipeline
+## Releasing
 
-We are using a [secondary pipeline](./azure-pipeline.yml) instead of the [main pipeline](../../azure-pipelines.yml) because we have created a new development environment that enables us to create and test kubernetes features.
-
-This pipeline is triggered when the following conditions are true:
-
-- a new commit is made on `master` branch
-- the commit made changes in this file path `medicines/api/*`
+To create a new release and deployment to production, create and push a new tag of the form `medicinesapi.vX.X.X` (e.g. `medicinesapi.v1.3.0`) at the commit you want to release, incrementing as required from the most recent version. The `medicines-api-release` workflow will then pull the image from the `non-prod` container registry (created as part of the master branch workflow), push the image to the `production` container registry in Azure and then update the commit sha in the production overlay in deployments repo. ArgoCD will identify this change, pull the linked image from the container registry and deploy it to the cluster.
