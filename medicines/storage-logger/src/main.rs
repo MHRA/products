@@ -62,15 +62,18 @@ async fn write_to_log_store(client: &Client, blob_list: Vec<String>) -> Result<(
     let now: DateTime<Utc> = Utc::now();
     let blob_name = now.format("docs-content-log-%Y-%m-%d.csv").to_string();
 
-    client
-        .put_block_blob()
-        .with_container_name(&contents_log_container_name)
-        .with_blob_name(&blob_name)
-        .with_content_type("text/csv")
-        .with_body(&file_data[..])
-        .with_content_md5(&file_digest[..])
-        .finalize()
-        .await?;
+    for blob in blob_list {
+        println!("{:?}", &blob)
+    }
+    // client
+    //     .put_block_blob()
+    //     .with_container_name(&contents_log_container_name)
+    //     .with_blob_name(&blob_name)
+    //     .with_content_type("text/csv")
+    //     .with_body(&file_data[..])
+    //     .with_content_md5(&file_digest[..])
+    //     .finalize()
+    //     .await?;
 
     Ok(())
 }
