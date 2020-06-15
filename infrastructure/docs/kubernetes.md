@@ -45,7 +45,7 @@ kubectl get nodes
 
 ## Installing Istio, Sealed Secrets, Argo and service workloads:
 
-1. Apply manifest to the cluster - to do this, clone the [deployments](https://github.com/MHRA/deployments) repo, install the necessary pre-requisites, go to `cluster-init` dir and run
+1. Apply manifest to the cluster - to do this, clone the [deployments](https://github.com/MHRA/deployments) repo, install the necessary prerequisites, go to `cluster-init` dir and run
 
    ```sh
    make overlay=non-prod
