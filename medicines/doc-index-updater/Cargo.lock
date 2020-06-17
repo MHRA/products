@@ -40,6 +40,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85bb70cc08ec97ca5450e6eba421deeea5f172c0fc61f78b5357b2a8e8be195f"
 
 [[package]]
+name = "async-dup"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "690ccbfa536b3c383403caf52a707cbc2c2f06155b3f7390fee92c7b755300db"
+dependencies = [
+ "futures-io",
+ "simple-mutex",
+]
+
+[[package]]
 name = "async-ssh2"
 version = "0.1.1-beta"
 source = "git+https://github.com/spebern/async-ssh2.git#787e2bc0ad966c2307db0ce444c2ba77d59bc7fe"
@@ -440,6 +450,7 @@ name = "doc_index_updater"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-dup",
  "async-ssh2",
  "async-trait",
  "azure_sdk_core",
@@ -455,7 +466,6 @@ dependencies = [
  "md5",
  "net2",
  "percent-encoding",
- "piper",
  "pretty_assertions",
  "redis",
  "regex",
@@ -496,6 +506,12 @@ checksum = "e8ac63f94732332f44fe654443c46f6375d1939684c17b0afb6cb56b0456e171"
 dependencies = [
  "cfg-if",
 ]
+
+[[package]]
+name = "event-listener"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae3e266baec5d96df9ce33c5a20dba54ca460a16f577c41391203f9415ffd3ec"
 
 [[package]]
 name = "failure"
@@ -1921,6 +1937,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06d5a3f5166fb5b42a5439f2eee8b9de149e235961e3eb21c5808fc3ea17ff3e"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "simple-mutex"
+version = "1.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38aabbeafa6f6dead8cebf246fe9fae1f9215c8d29b3a69f93bd62a9e4a3dcd6"
+dependencies = [
+ "event-listener",
 ]
 
 [[package]]
