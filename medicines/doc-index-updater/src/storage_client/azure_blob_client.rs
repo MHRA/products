@@ -84,7 +84,7 @@ impl StorageClient for AzureBlobStorage {
     ) -> Result<StorageFile, StorageClientError> {
         let storage_client = self.get_azure_client()?;
 
-        let file_digest = md5::compute(&file_data[..]);
+        let file_digest = md5::compute(file_data);
         let name = format!("{}{}", &self.prefix, file_name(licence_number, file_data));
 
         storage_client
@@ -93,7 +93,7 @@ impl StorageClient for AzureBlobStorage {
             .with_blob_name(&name)
             .with_content_type("application/pdf")
             .with_metadata(&metadata_ref)
-            .with_body(&file_data[..])
+            .with_body(file_data)
             .with_content_md5(&file_digest[..])
             .finalize()
             .await
