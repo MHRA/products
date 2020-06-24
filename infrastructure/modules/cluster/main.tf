@@ -1,21 +1,38 @@
-resource "azurerm_public_ip" "products_ip" {
-  name                = "products-public-ip"
+resource "azurerm_route_table" "load_balancer" {
+  name                = "aparz-spoke-rt-products-internal-only"
   location            = var.location
   resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
 
   tags = {
     environment = var.environment
   }
 }
 
-resource "azurerm_subnet" "cluster" {
-  name                 = var.cluster_subnet_name
-  resource_group_name  = var.vnet_resource_group
-  address_prefixes     = [var.cluster_subnet_cidr]
-  virtual_network_name = var.vnet_name
+resource "azurerm_virtual_network" "cluster" {
+  name                = var.vnet_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  address_space       = [var.vnet_cidr]
 }
 
+resource "azurerm_subnet" "load_balancer" {
+  name                 = var.lb_subnet_name
+  resource_group_name  = var.resource_group_name
+  address_prefixes     = [var.lb_subnet_cidr]
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
+
+resource "azurerm_subnet_route_table_association" "load_balancer" {
+  subnet_id      = azurerm_subnet.load_balancer.id
+  route_table_id = azurerm_route_table.load_balancer.id
+}
+
+resource "azurerm_subnet" "cluster" {
+  name                 = var.cluster_subnet_name
+  resource_group_name  = var.resource_group_name
+  address_prefixes     = [var.cluster_subnet_cidr]
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment

@@ -1,5 +1,14 @@
 data "azurerm_client_config" "current" {}
 
+resource "azurerm_resource_group" "keyvault" {
+  name     = var.resource_group_name
+  location = var.location
+
+  tags = {
+    environment = var.environment
+  }
+}
+
 resource "azurerm_key_vault" "secrets_vault" {
   name                = var.name
   location            = "uksouth"

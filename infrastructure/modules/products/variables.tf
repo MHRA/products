@@ -35,3 +35,8 @@ variable "include_pars_app" {
   description = "Include PARs app registration in the managed resources for this environment"
   default     = true
 }
+
+variable "cdn_region" {
+  description = "Region where the CDN profile should be deployed"
+  default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
+}

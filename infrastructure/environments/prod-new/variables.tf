@@ -43,7 +43,7 @@ variable "KEYVAULT_ACCESS_CIDR_BLOCKS" {
   default     = []
 }
 
-variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
+variable "ADMIN_PERSON_IDS" {
   type        = list(string)
   description = "IDs of objects (people etc) to associate access policies for"
   default     = []

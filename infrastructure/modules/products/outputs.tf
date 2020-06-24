@@ -29,3 +29,7 @@ output "storage_account_name" {
 output "storage_account_primary_web_host" {
   value = azurerm_storage_account.products.primary_web_host
 }
+
+output "products_hostname_cdn" {
+  value = azurerm_cdn_endpoint.products.host_name
+}
