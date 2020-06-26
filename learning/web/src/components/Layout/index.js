@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "gatsby"
-import ReactGA from 'react-ga';
-import TagManager from 'react-gtm-module';
+import ReactGA from "react-ga"
+import TagManager from "react-gtm-module"
 
 import { rhythm } from "../../utils/typography"
 import SvgMhraLogo from "../Logos/mhra-logo"
@@ -70,6 +70,10 @@ const Content = styled.div`
 
 const LayoutStyled = styled.div`
   border-top: 4px solid rgb(15, 18, 144);
+
+  .collected-footnotes > sup + sup {
+    padding-left: 15px;
+  }
 `
 
 const Wrapper = styled.div`
@@ -132,19 +136,22 @@ class Layout extends React.Component {
   componentDidMount() {
     // If cookies are allowed and they haven't already been initialised,
     // initialise Google Analytics and Tag Manager.
-    if (window.localStorage.getItem("showCookieBanner") === "false" && !Layout.cookiesInitialized) {
+    if (
+      window.localStorage.getItem("showCookieBanner") === "false" &&
+      !Layout.cookiesInitialized
+    ) {
       if (process.env.GATSBY_GOOGLE_TAG_MANAGER_ID) {
         TagManager.initialize({
           gtmId: process.env.GATSBY_GOOGLE_TAG_MANAGER_ID,
-          dataLayerName: 'dataLayer',
-        });
+          dataLayerName: "dataLayer",
+        })
       }
 
       if (process.env.GATSBY_GOOGLE_ANALYTICS_TRACKING_ID) {
-        ReactGA.initialize(process.env.GATSBY_GOOGLE_ANALYTICS_TRACKING_ID);
+        ReactGA.initialize(process.env.GATSBY_GOOGLE_ANALYTICS_TRACKING_ID)
       }
 
-      Layout.cookiesInitialized = true;
+      Layout.cookiesInitialized = true
     }
   }
 
@@ -185,7 +192,13 @@ class Layout extends React.Component {
                 </li>
                 <li>
                   <p>
-                    <a href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                    <a
+                      href="https://www.gov.uk/government/publications/mhra-privacy-notice/mhra-privacy-notice"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Privacy Policy
+                    </a>
                   </p>
                 </li>
                 <li>
@@ -202,6 +215,6 @@ class Layout extends React.Component {
   }
 }
 
-Layout.cookiesInitialized = false;
+Layout.cookiesInitialized = false
 
 export default Layout

@@ -15,6 +15,25 @@ def html_to_markdown(html):
     return md_converter.convert(html)
 
 
+def test_table_footnotes():
+    """Test table footnotes."""
+    result = html_to_markdown(
+        '<table><tr><td>Content[^1]</td></tr></table>'
+    )
+    assert '<a class="footnote-ref" href="#fn-1">' in result
+    assert '<div class="collected-footnotes">' in result
+
+
+def test_expander_footnotes():
+    """Test table footnotes."""
+    result = html_to_markdown(
+        '<Expander title="Click for good times"><div><p>Content[^1]</p></div></Expander>'
+    )
+
+    assert '<a class="footnote-ref" href="#fn-1">' in result
+    assert '<div class="collected-footnotes">' in result
+
+
 def test_glossary_link():
     """Test glossary links."""
     result = html_to_markdown(
@@ -128,13 +147,15 @@ def test_web_layout_url_src():
         "<img src=\"[!--$ssWeblayoutUrl('ab/cd/xyz789.jpg')--]\" />"
     )
     assert '![ABC 123](/asset/abc123.jpg "Image for ABC 123")' in result
-    assert md_converter.stellent_assets_to_download == set(["abc123", "xyz789"])
+    assert md_converter.stellent_assets_to_download == set(
+        ["abc123", "xyz789"])
 
 
 @pytest.mark.parametrize("con_code", ["CON0", "CON123", "CON9999999999999"])
 def test_valid_con_code(con_code):
     """Test valid CON codes."""
-    assert con_code == learning_importer.validate_con_code(None, None, con_code)
+    assert con_code == learning_importer.validate_con_code(
+        None, None, con_code)
 
 
 @pytest.mark.parametrize("con_code", ["NOTCON123", "CON", "CON-1", "con123"])

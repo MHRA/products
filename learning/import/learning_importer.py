@@ -73,7 +73,8 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         # Strip out [!--$ssLink("…")--] directives.
         if el["href"].startswith("[!--$ssLink"):
-            el["href"] = el["href"].replace('[!--$ssLink("', "").replace('")--]', "")
+            el["href"] = el["href"].replace(
+                '[!--$ssLink("', "").replace('")--]', "")
 
         # Handle links to pages like
         # [!--$ssServerRelativeSiteRoot--]Opendocuments/OpenPDFdocuments/CON123
@@ -90,7 +91,8 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         query = parse_qs(url.query)
         if "showpage" in query:
             path = Path(url.path)
-            el["href"] = self.content_prefix + path.stem + "_" + query["showpage"][0]
+            el["href"] = self.content_prefix + \
+                path.stem + "_" + query["showpage"][0]
             if url.fragment:
                 el["href"] += "#" + url.fragment
 
@@ -119,7 +121,8 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         # Handle [!--$ssWeblayoutUrl()--] directives.
         if el["src"].startswith("[!--$ssWeblayoutUrl("):
             img_src = Path(
-                el["src"].replace("[!--$ssWeblayoutUrl('", "").replace("')--]", "")
+                el["src"].replace(
+                    "[!--$ssWeblayoutUrl('", "").replace("')--]", "")
             )
             el["src"] = self.asset_prefix + img_src.name.lower()
             self.stellent_assets_to_download.add(img_src.stem)
@@ -173,20 +176,19 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         table_tag.attrs = {}
 
         # Collect footnotes from text.
-        footnotes = []
+        footnotes = ["<div class='collected-footnotes'>"]
         for match in re.finditer(r"\[\^(\d+)\]", text):
-            footnotes.append(match[0])
+            footnotes.append(
+                self.substitute_markdown_footnotes_with_html(match[0]))
+        footnotes.append("</div>")
 
         # Replace footnotes with links.
-        text = re.sub(
-            r"\[\^(\d+)\]",
-            r"<sup><a href='#fn-\1' class='footnote-ref'>\1</a></sup>",
-            text,
-        )
+        text = self.substitute_markdown_footnotes_with_html(
+            text) + "".join(footnotes)
 
         self.markdown_to_html(table_tag, text)
 
-        return "\n\n" + table_tag.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
+        return table_tag.prettify()
 
     def convert_sub(
         self, sub_tag, text
@@ -199,20 +201,26 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
         el.name = "Expander"
 
         # Collect footnotes from text.
-        footnotes = []
+        footnotes = ["<div class='collected-footnotes'>"]
         for match in re.finditer(r"\[\^(\d+)\]", text):
-            footnotes.append(match[0])
+            footnotes.append(
+                self.substitute_markdown_footnotes_with_html(match[0]))
+        footnotes.append("</div>")
 
         # Replace footnotes with links.
-        text = re.sub(
-            r"\[\^(\d+)\]",
-            r"<sup><a href='#fn-\1' class='footnote-ref'>\1</a></sup>",
-            text,
-        )
+        text = self.substitute_markdown_footnotes_with_html(
+            text) + "".join(footnotes)
 
         self.markdown_to_html(el, text)
 
-        return el.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
+        return el.prettify()
+
+    def substitute_markdown_footnotes_with_html(self, markdown):
+        return re.sub(
+            r"\[\^(\d+)\]",
+            r"<sup><a href='#fn-\1' class='footnote-ref'>\1</a></sup>",
+            markdown,
+        )
 
 
 def inject_expanders(html):
@@ -330,7 +338,8 @@ def learning_importer(
                 row, index, md_converter, out_dir, con_code, path_to_expander_component
             )
 
-            modules.append({"name": name, "link": content_url_prefix + content_stem})
+            modules.append(
+                {"name": name, "link": content_url_prefix + content_stem})
 
     click.echo("Done!")
 
