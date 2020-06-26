@@ -25,7 +25,7 @@ jobs:
           path: products
 
       - name: Validate prod environment
-        working-directory: ./products/infrastructure/environments/prod
+        working-directory: ./products/infrastructure/environments/prod-new
         run: |
           terraform init -backend=false
           terraform validate
