@@ -15,5 +15,5 @@ output "resource_group_name" {
 }
 
 output "cluster_outbound_ip" {
-  value = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[8]
+  value = data.azurerm_public_ip.cluster_outbound.ip_address
 }

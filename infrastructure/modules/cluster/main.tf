@@ -1,7 +1,19 @@
-resource "azurerm_route_table" "load_balancer" {
-  name                = "aparz-spoke-rt-products-internal-only"
+resource "azurerm_public_ip" "products_ip" {
+  name                = "products-public-ip"
   location            = var.location
   resource_group_name = var.resource_group_name
+  allocation_method   = "Static"
+
+  tags = {
+    environment = var.environment
+  }
+}
+
+resource "azurerm_route_table" "load_balancer" {
+  name                          = "aparz-spoke-rt-products-internal-only"
+  disable_bgp_route_propagation = true
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
 
   tags = {
     environment = var.environment
@@ -144,4 +156,9 @@ resource "azurerm_log_analytics_solution" "cluster" {
     publisher = "Microsoft"
     product   = "OMSGallery/ContainerInsights"
   }
+}
+
+data "azurerm_public_ip" "cluster_outbound" {
+  name                = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[8]
+  resource_group_name = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[4]
 }
