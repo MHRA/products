@@ -186,7 +186,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         self.markdown_to_html(table_tag, text)
 
-        return "\n\n" + table_tag.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
+        return "\n\n" + table_tag.prettify() + "\n\n- " + "\n- ".join(footnotes) + "\n\n"
 
     def convert_sub(
         self, sub_tag, text
@@ -212,7 +212,7 @@ class MHRAMarkdownConverter(markdownify.MarkdownConverter):
 
         self.markdown_to_html(el, text)
 
-        return el.prettify() + "\n\n" + " ".join(footnotes) + "\n\n"
+        return el.prettify() + "\n\n- " + "\n- ".join(footnotes) + "\n\n"
 
 
 def inject_expanders(html):

@@ -13,6 +13,17 @@ import { MdClose } from "react-icons/md"
 
 const ExpanderStyled = styled.div`
   margin-bottom: ${rhythm(0.5)};
+
+  & + ul {
+    list-style: none;
+    margin: 0 0 1.45rem;
+    li {
+      display: inline;
+    }
+    li + li {
+      margin-left: 15px;
+    }
+  }
 `
 
 const Button = styled.button`
