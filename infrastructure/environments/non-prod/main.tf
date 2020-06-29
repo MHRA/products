@@ -24,64 +24,62 @@ locals {
   logs_namespace   = "mhralogsnonprod"
 }
 
-resource "azurerm_resource_group" "products" {
-  name     = var.RESOURCE_GROUP_PRODUCTS
-  location = var.REGION
+# resource "azurerm_resource_group" "products" {
+#   name     = var.RESOURCE_GROUP_PRODUCTS
+#   location = var.REGION
 
-  tags = {
-    environment = var.ENVIRONMENT
-  }
-}
+#   tags = {
+#     environment = var.ENVIRONMENT
+#   }
+# }
 
-data "azurerm_resource_group" "keyvault" {
-  name = var.KEYVAULT_RESOURCE_GROUP
-}
+# data "azurerm_resource_group" "keyvault" {
+#   name = var.KEYVAULT_RESOURCE_GROUP
+# }
 
-resource "azurerm_subnet_route_table_association" "load_balancer" {
-  subnet_id      = azurerm_subnet.load_balancer.id
-  route_table_id = data.azurerm_route_table.load_balancer.id
-}
+# resource "azurerm_subnet_route_table_association" "load_balancer" {
+#   subnet_id      = azurerm_subnet.load_balancer.id
+#   route_table_id = data.azurerm_route_table.load_balancer.id
+# }
 
 # website
 module "products" {
   source = "../../modules/products"
 
-  environment                       = var.ENVIRONMENT
-  location                          = var.REGION
-  namespace                         = local.namespace
-  pars_namespace                    = local.pars_namespace
-  resource_group_name               = azurerm_resource_group.products.name
-  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
-  addtional_allowed_pars_reply_urls = []
+  environment                        = var.ENVIRONMENT
+  location                           = var.REGION
+  namespace                          = local.namespace
+  pars_namespace                     = local.pars_namespace
+  resource_group_name                = var.RESOURCE_GROUP_PRODUCTS
+  app_registration_owners            = var.ADMIN_PERSON_IDS
+  additional_allowed_pars_reply_urls = []
 }
 
-# website
-module "products_web" {
-  source = "../../modules/products-web"
+# CPD
+module cpd {
+  source = "../../modules/cpd"
 
-  namespace            = local.namespace
-  environment          = var.ENVIRONMENT
-  storage_account_name = module.products.storage_account_name
-  resource_group_name  = azurerm_resource_group.products.name
-  origin_host_name     = module.products.storage_account_primary_web_host
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.cpd_namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
+# data "azurerm_route_table" "load_balancer" {
+#   name                = "adarz-spoke-rt-products-internal-only"
+#   resource_group_name = "asazr-rg-1001"
+# }
 
-data "azurerm_route_table" "load_balancer" {
-  name                = "adarz-spoke-rt-products-internal-only"
-  resource_group_name = "asazr-rg-1001"
-}
+# data "azurerm_virtual_network" "cluster" {
+#   name                = "aparz-spoke-np-products"
+#   resource_group_name = "adazr-rg-1001"
+# }
 
-data "azurerm_virtual_network" "cluster" {
-  name                = "aparz-spoke-np-products"
-  resource_group_name = "adazr-rg-1001"
-}
-
-resource "azurerm_subnet" "load_balancer" {
-  name                 = "adarz-spoke-products-sn-01"
-  address_prefixes     = ["10.5.65.0/26"]
-  resource_group_name  = data.azurerm_virtual_network.cluster.resource_group_name
-  virtual_network_name = data.azurerm_virtual_network.cluster.name
-}
+# resource "azurerm_subnet" "load_balancer" {
+#   name                 = "adarz-spoke-products-sn-01"
+#   address_prefixes     = ["10.5.65.0/26"]
+#   resource_group_name  = data.azurerm_virtual_network.cluster.resource_group_name
+#   virtual_network_name = data.azurerm_virtual_network.cluster.name
+# }
 
 # Logs
 module logs {
@@ -90,7 +88,7 @@ module logs {
   namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = azurerm_resource_group.products.name
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # AKS
@@ -101,7 +99,7 @@ module cluster {
   client_secret                         = var.CLIENT_SECRET
   environment                           = var.ENVIRONMENT
   location                              = var.REGION
-  resource_group_name                   = azurerm_resource_group.products.name
+  resource_group_name                   = var.RESOURCE_GROUP_PRODUCTS
   vnet_name                             = data.azurerm_virtual_network.cluster.name
   vnet_resource_group                   = data.azurerm_virtual_network.cluster.resource_group_name
   lb_subnet_id                          = azurerm_subnet.load_balancer.id
@@ -113,16 +111,6 @@ module cluster {
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
   log_cluster_diagnostics               = false
   logs_storage_account_id               = module.logs.logs_resource_group_id
-}
-
-# CPD
-module cpd {
-  source = "../../modules/cpd"
-
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  namespace           = local.cpd_namespace
-  resource_group_name = azurerm_resource_group.products.name
 }
 
 data "azurerm_public_ip" "external" {

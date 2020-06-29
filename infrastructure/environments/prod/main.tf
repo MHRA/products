@@ -41,14 +41,14 @@ resource "azurerm_resource_group" "keyvault" {
 module "products" {
   source = "../../modules/products"
 
-  environment                       = var.ENVIRONMENT
-  location                          = var.REGION
-  namespace                         = local.namespace
-  pars_namespace                    = local.pars_namespace
-  resource_group_name               = data.azurerm_resource_group.products.name
-  search_sku                        = "standard"
-  app_registration_owners           = var.KEYVAULT_AUTHORISED_PERSON_IDS
-  addtional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
+  environment                        = var.ENVIRONMENT
+  location                           = var.REGION
+  namespace                          = local.namespace
+  pars_namespace                     = local.pars_namespace
+  resource_group_name                = data.azurerm_resource_group.products.name
+  search_sku                         = "standard"
+  app_registration_owners            = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  additional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
 }
 
 data "azurerm_route_table" "load_balancer" {

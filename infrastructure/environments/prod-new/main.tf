@@ -33,15 +33,15 @@ locals {
 module products {
   source = "../../modules/products"
 
-  environment                       = var.ENVIRONMENT
-  location                          = var.REGION
-  namespace                         = local.namespace
-  pars_namespace                    = local.pars_namespace
-  resource_group_name               = var.RESOURCE_GROUP_PRODUCTS
-  search_sku                        = "standard"
-  app_registration_owners           = var.ADMIN_PERSON_IDS
-  addtional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
-  include_pars_app                  = false
+  environment                        = var.ENVIRONMENT
+  location                           = var.REGION
+  namespace                          = local.namespace
+  pars_namespace                     = local.pars_namespace
+  resource_group_name                = var.RESOURCE_GROUP_PRODUCTS
+  search_sku                         = "standard"
+  app_registration_owners            = var.ADMIN_PERSON_IDS
+  additional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
+  include_pars_app                   = false
 }
 
 # CPD

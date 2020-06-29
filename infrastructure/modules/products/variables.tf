@@ -23,7 +23,7 @@ variable "search_sku" {
   default     = "basic"
 }
 
-variable "addtional_allowed_pars_reply_urls" {
+variable "additional_allowed_pars_reply_urls" {
   description = "The CDN url and the primary static website URLs will be added by default, these are the addtional urls"
 }
 
