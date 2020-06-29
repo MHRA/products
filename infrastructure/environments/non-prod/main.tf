@@ -24,26 +24,8 @@ locals {
   logs_namespace   = "mhralogsnonprod"
 }
 
-# resource "azurerm_resource_group" "products" {
-#   name     = var.RESOURCE_GROUP_PRODUCTS
-#   location = var.REGION
-
-#   tags = {
-#     environment = var.ENVIRONMENT
-#   }
-# }
-
-# data "azurerm_resource_group" "keyvault" {
-#   name = var.KEYVAULT_RESOURCE_GROUP
-# }
-
-# resource "azurerm_subnet_route_table_association" "load_balancer" {
-#   subnet_id      = azurerm_subnet.load_balancer.id
-#   route_table_id = data.azurerm_route_table.load_balancer.id
-# }
-
-# website
-module "products" {
+# Website
+module products {
   source = "../../modules/products"
 
   environment                        = var.ENVIRONMENT
@@ -64,22 +46,6 @@ module cpd {
   namespace           = local.cpd_namespace
   resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
-# data "azurerm_route_table" "load_balancer" {
-#   name                = "adarz-spoke-rt-products-internal-only"
-#   resource_group_name = "asazr-rg-1001"
-# }
-
-# data "azurerm_virtual_network" "cluster" {
-#   name                = "aparz-spoke-np-products"
-#   resource_group_name = "adazr-rg-1001"
-# }
-
-# resource "azurerm_subnet" "load_balancer" {
-#   name                 = "adarz-spoke-products-sn-01"
-#   address_prefixes     = ["10.5.65.0/26"]
-#   resource_group_name  = data.azurerm_virtual_network.cluster.resource_group_name
-#   virtual_network_name = data.azurerm_virtual_network.cluster.name
-# }
 
 # Logs
 module logs {
@@ -100,34 +66,30 @@ module cluster {
   environment                           = var.ENVIRONMENT
   location                              = var.REGION
   resource_group_name                   = var.RESOURCE_GROUP_PRODUCTS
-  vnet_name                             = data.azurerm_virtual_network.cluster.name
-  vnet_resource_group                   = data.azurerm_virtual_network.cluster.resource_group_name
-  lb_subnet_id                          = azurerm_subnet.load_balancer.id
+  vnet_name                             = "aparz-spoke-np-products"
+  vnet_cidr                             = "10.5.65.0/24"
+  lb_subnet_name                        = "adarz-spoke-products-sn-01"
+  lb_subnet_cidr                        = "10.5.65.0/26"
   cluster_subnet_name                   = "adarz-spoke-products-sn-02"
   cluster_subnet_cidr                   = "10.5.65.64/26"
   cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS
   cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
-  lb_route_table_id                     = data.azurerm_route_table.load_balancer.id
+  default_node_count                    = "1"
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
   log_cluster_diagnostics               = false
   logs_storage_account_id               = module.logs.logs_resource_group_id
 }
 
-data "azurerm_public_ip" "external" {
-  name                = split("/", module.cluster.load_balancer_public_outbound_ip_id)[8]
-  resource_group_name = split("/", module.cluster.load_balancer_public_outbound_ip_id)[4]
-}
-
 # Service Bus
-module service_bus {
-  source = "../../modules/service-bus"
+module doc_index_updater {
+  source = "../../modules/doc-index-updater"
 
   environment         = var.ENVIRONMENT
   location            = var.REGION
   name                = local.service_bus_name
-  resource_group_name = azurerm_resource_group.products.name
-  redis_use_firewall  = true
-  redis_firewall_ip   = data.azurerm_public_ip.external.ip_address
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  redis_use_firewall  = false
+  redis_firewall_ip   = module.cluster.cluster_outbound_ip
 }
 
 # Key vault
@@ -136,9 +98,9 @@ module keyvault {
 
   environment                 = var.ENVIRONMENT
   location                    = var.REGION
-  name                        = var.KEYVAULT_NAME
-  resource_group_name         = data.azurerm_resource_group.keyvault.name
+  name                        = local.namespace
+  resource_group_name         = var.KEYVAULT_RESOURCE_GROUP
   access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
-  authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
+  authorised_person_ids       = var.ADMIN_PERSON_IDS
   network_acls_default_action = "Allow"
 }
