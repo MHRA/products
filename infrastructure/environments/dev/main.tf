@@ -44,7 +44,8 @@ module cpd {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.cpd_namespace
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = module.products.products_storage_account_name
+  cdn_name            = module.products.products_cdn_name
 }
 
 # Logs
@@ -54,7 +55,7 @@ module logs {
   namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = module.products.products_storage_account_name
 }
 
 # AKS
@@ -65,7 +66,7 @@ module cluster {
   client_secret                         = var.CLIENT_SECRET
   environment                           = var.ENVIRONMENT
   location                              = var.REGION
-  resource_group_name                   = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name                   = module.products.products_storage_account_name
   vnet_name                             = "aparz-spoke-dev-products"
   vnet_cidr                             = "10.5.65.128/25"
   lb_subnet_name                        = "adarz-spoke-products-dev-sn-01"
@@ -87,7 +88,7 @@ module doc_index_updater {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   name                = local.service_bus_name
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  resource_group_name = module.products.products_storage_account_name
   redis_use_firewall  = false
   redis_firewall_ip   = module.cluster.cluster_outbound_ip
 }

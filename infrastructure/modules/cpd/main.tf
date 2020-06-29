@@ -16,17 +16,10 @@ resource "azurerm_storage_account" "cpd" {
   }
 }
 
-resource "azurerm_cdn_profile" "cpd" {
-  name                = var.namespace
-  location            = var.cdn_region
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
 resource "azurerm_cdn_endpoint" "cpd" {
   name                = var.namespace
-  profile_name        = azurerm_cdn_profile.cpd.name
-  location            = azurerm_cdn_profile.cpd.location
+  profile_name        = var.cdn_name
+  location            = var.cdn_region
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.cpd.primary_web_host
   origin {

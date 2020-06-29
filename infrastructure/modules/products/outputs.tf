@@ -1,3 +1,7 @@
+output "products_storage_account_name" {
+  value = azurerm_resource_group.products.name
+}
+
 output "products_primary_access_key" {
   value = azurerm_storage_account.products.primary_access_key
 }
@@ -28,6 +32,10 @@ output "storage_account_name" {
 
 output "storage_account_primary_web_host" {
   value = azurerm_storage_account.products.primary_web_host
+}
+
+output "products_cdn_name" {
+  value = azurerm_cdn_profile.products.name
 }
 
 output "products_hostname_cdn" {

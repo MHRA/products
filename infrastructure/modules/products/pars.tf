@@ -16,17 +16,10 @@ resource "azurerm_storage_account" "pars" {
   }
 }
 
-resource "azurerm_cdn_profile" "pars" {
-  name                = var.pars_namespace
-  location            = "westeurope"
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
 resource "azurerm_cdn_endpoint" "pars" {
   name                = var.pars_namespace
-  profile_name        = azurerm_cdn_profile.pars.name
-  location            = azurerm_cdn_profile.pars.location
+  profile_name        = azurerm_cdn_profile.products.name
+  location            = azurerm_cdn_profile.products.location
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.pars.primary_web_host
   origin {
