@@ -124,10 +124,11 @@ module cluster {
 module service_bus {
   source = "../../modules/service-bus"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  name                = local.service_bus_name
-  resource_group_name = azurerm_resource_group.products.name
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  name                    = local.service_bus_name
+  resource_group_name     = azurerm_resource_group.products.name
+  logs_storage_account_id = module.logs.logs_resource_group_id
 }
 
 # Key vault
