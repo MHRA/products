@@ -33,15 +33,11 @@ locals {
 module products {
   source = "../../modules/products"
 
-  environment                        = var.ENVIRONMENT
-  location                           = var.REGION
-  namespace                          = local.namespace
-  pars_namespace                     = local.pars_namespace
-  resource_group_name                = var.RESOURCE_GROUP_PRODUCTS
-  search_sku                         = "standard"
-  app_registration_owners            = var.ADMIN_PERSON_IDS
-  additional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
-  include_pars_app                   = false
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  search_sku          = "standard"
 }
 
 # CPD
@@ -111,4 +107,18 @@ module keyvault {
   access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
   authorised_person_ids       = var.ADMIN_PERSON_IDS
   network_acls_default_action = "Deny"
+}
+
+# PARs
+module pars {
+  source = "../../modules/pars"
+
+  resource_group_name                = module.products.products_storage_account_name
+  location                           = var.REGION
+  environment                        = var.ENVIRONMENT
+  namespace                          = local.pars_namespace
+  cdn_name                           = module.products.products_cdn_name
+  app_registration_owners            = var.ADMIN_PERSON_IDS
+  additional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
+  include_pars_app                   = false
 }

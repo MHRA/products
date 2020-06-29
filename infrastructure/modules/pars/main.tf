@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "pars" {
-  name                     = var.pars_namespace
+  name                     = var.namespace
   resource_group_name      = var.resource_group_name
   location                 = var.location
   account_kind             = "StorageV2"
@@ -17,13 +17,13 @@ resource "azurerm_storage_account" "pars" {
 }
 
 resource "azurerm_cdn_endpoint" "pars" {
-  name                = var.pars_namespace
-  profile_name        = azurerm_cdn_profile.products.name
-  location            = azurerm_cdn_profile.products.location
+  name                = var.namespace
+  profile_name        = var.cdn_name
+  location            = var.cdn_region
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.pars.primary_web_host
   origin {
-    name      = var.pars_namespace
+    name      = var.namespace
     host_name = azurerm_storage_account.pars.primary_web_host
   }
   is_http_allowed = false
