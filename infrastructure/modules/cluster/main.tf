@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "products_ip" {
 }
 
 resource "azurerm_route_table" "load_balancer" {
-  name                          = "aparz-spoke-rt-products-internal-only"
+  name                          = var.lb_route_table_name
   disable_bgp_route_propagation = true
   location                      = var.location
   resource_group_name           = var.resource_group_name

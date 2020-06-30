@@ -68,6 +68,7 @@ module cluster {
   vnet_cidr                             = "10.5.65.128/25"
   lb_subnet_name                        = "adarz-spoke-products-dev-sn-01"
   lb_subnet_cidr                        = "10.5.65.128/26"
+  lb_route_table_name                   = "adarz-spoke-dev-products-internal-only"
   cluster_subnet_name                   = "adarz-spoke-products-dev-sn-02"
   cluster_subnet_cidr                   = "10.5.65.192/26"
   cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS

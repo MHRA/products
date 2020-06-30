@@ -84,3 +84,7 @@ variable "lb_subnet_cidr" {
   description = "CIDR IP range used for the subnet that the internal load balancer lives in"
   default     = ""
 }
+
+variable "lb_route_table_name" {
+  description = "Name to use for the load balancer route table"
+}
