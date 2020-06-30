@@ -10,7 +10,7 @@ provider "random" {
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate"
-    storage_account_name = "mhraprodtfstate"
+    storage_account_name = "tfstate10630"
     container_name       = "tfstate"
     key                  = "prod.terraform.tfstate"
   }
