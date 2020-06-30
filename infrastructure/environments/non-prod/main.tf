@@ -96,7 +96,7 @@ module keyvault {
 
   environment                 = var.ENVIRONMENT
   location                    = var.REGION
-  name                        = local.namespace
+  name                        = "mhra-non-prod-02"
   resource_group_name         = var.KEYVAULT_RESOURCE_GROUP
   access_CIDR                 = var.KEYVAULT_ACCESS_CIDR_BLOCKS
   authorised_person_ids       = var.ADMIN_PERSON_IDS

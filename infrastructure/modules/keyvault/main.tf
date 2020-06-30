@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "keyvault" {
 resource "azurerm_key_vault" "secrets_vault" {
   name                = var.name
   location            = "uksouth"
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.keyvault.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   soft_delete_enabled = true
 
@@ -76,9 +76,5 @@ resource "azurerm_key_vault" "secrets_vault" {
 
       storage_permissions = []
     }
-  }
-
-  lifecycle {
-    prevent_destroy = true
   }
 }
