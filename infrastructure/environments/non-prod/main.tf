@@ -132,12 +132,13 @@ data "azurerm_public_ip" "external" {
 module service_bus {
   source = "../../modules/service-bus"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  name                = local.service_bus_name
-  resource_group_name = azurerm_resource_group.products.name
-  redis_use_firewall  = true
-  redis_firewall_ip   = data.azurerm_public_ip.external.ip_address
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  name                    = local.service_bus_name
+  resource_group_name     = azurerm_resource_group.products.name
+  redis_use_firewall      = true
+  redis_firewall_ip       = data.azurerm_public_ip.external.ip_address
+  logs_storage_account_id = module.logs.logs_resource_group_id
 }
 
 # Key vault
