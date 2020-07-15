@@ -3,9 +3,9 @@ use super::{
     GetBlob,
 };
 use anyhow::anyhow;
+use async_dup::Mutex;
 use async_ssh2::{Session, Sftp};
 use async_trait::async_trait;
-use piper::Mutex;
 use smol::Async;
 use std::net::TcpStream;
 

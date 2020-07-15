@@ -14,6 +14,25 @@ def html_to_markdown(html):
     )
     return md_converter.convert(html)
 
+def test_table_footnotes():
+    """Test table footnotes."""
+    result = html_to_markdown(
+        '<table><tr><td>Content[^1][^2]</td></tr></table>'
+    )
+    assert '<a class="footnote-ref" href="#fn-1">' in result
+    assert '\n- [^1]' in result
+    assert '\n- [^2]' in result
+
+
+def test_expander_footnotes():
+    """Test table footnotes."""
+    result = html_to_markdown(
+        '<Expander title="Click for good times"><div><p>Content[^1][^2]</p></div></Expander>'
+    )
+
+    assert '<a class="footnote-ref" href="#fn-1">' in result
+    assert '\n- [^1]' in result
+    assert '\n- [^2]' in result
 
 def test_glossary_link():
     """Test glossary links."""

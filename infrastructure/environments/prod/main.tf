@@ -89,12 +89,13 @@ module cluster {
 module doc_index_updater {
   source = "../../modules/doc-index-updater"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  name                = local.service_bus_name
-  resource_group_name = module.products.products_storage_account_name
-  redis_use_firewall  = true
-  redis_firewall_ip   = module.cluster.cluster_outbound_ip
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  name                    = local.service_bus_name
+  resource_group_name     = module.products.products_storage_account_name
+  redis_use_firewall      = true
+  redis_firewall_ip       = module.cluster.cluster_outbound_ip
+  logs_storage_account_id = module.logs.logs_resource_group_id
 }
 
 # Key vault
