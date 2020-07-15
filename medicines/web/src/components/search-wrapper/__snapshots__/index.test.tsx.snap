@@ -13,13 +13,15 @@ exports[`SearchWrapper should render 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "sc-bxivhb",
             "isStatic": false,
-            "lastClassName": "dLSOsH",
+            "lastClassName": "hdavsY",
             "rules": Array [
               "
   width: 100%;
   padding: 1.25rem 0.625rem 0 1.25rem;
   .search {
-    background-color: rgba(10, 50, 150, 0.1);
+    background-color: ",
+              "#F1F3F9",
+              ";
     margin-bottom: 20px;
     padding: ",
               "1.25rem",
@@ -53,7 +55,7 @@ exports[`SearchWrapper should render 1`] = `
       forwardedRef={null}
     >
       <div
-        className="sc-bxivhb dLSOsH"
+        className="sc-bxivhb hdavsY"
       >
         <section
           className="search"
