@@ -7,9 +7,9 @@ on:
 
 env:
   NEXT_PUBLIC_DISABLE_AUTH: false
-  PARS_UPLOAD_URL: "https://doc-index-updater.mhra.gov.uk/pars"
+  PARS_UPLOAD_URL: "https://doc-index-updater.api.mhra.gov.uk/pars"
   # above is for cypress, below is for next.js
-  NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater.mhra.gov.uk/pars"
+  NEXT_PUBLIC_PARS_UPLOAD_URL: "https://doc-index-updater.api.mhra.gov.uk/pars"
   PROD_PARS_APP_ID: 088430d1-a1e4-444a-8769-6d0d998ba67a
 
 jobs:
