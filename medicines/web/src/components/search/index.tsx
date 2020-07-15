@@ -40,7 +40,7 @@ const StyledSearch = styled.section`
 
   input[type='search'] {
     width: 100%;
-    border: solid 1px ${mhraGray};
+    border: solid 1px ${black};
     margin-right: 0.5rem;
     min-width: 0;
   }
