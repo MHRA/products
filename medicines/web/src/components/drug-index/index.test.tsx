@@ -1,10 +1,10 @@
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
 import DrugIndex from './index';
 
 describe(DrugIndex, () => {
   it('should render', () => {
-    const component = shallow(
+    const component = mount(
       <DrugIndex
         title={'Coffee'}
         horizontal
