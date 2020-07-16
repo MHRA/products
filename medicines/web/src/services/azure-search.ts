@@ -2,10 +2,11 @@ import fetch, { Response } from 'node-fetch';
 import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
-const searchIndex = process.env.AZURE_SEARCH_INDEX;
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
-const searchService = process.env.AZURE_SEARCH_SERVICE;
+const searchIndex = process.env.AZURE_SEARCH_INDEX as string;
+const searchService = process.env.AZURE_SEARCH_SERVICE as string;
+const bmgfSearchIndex = 'bmgf-test' as string;
 
 export enum DocType {
   Par = 'Par',
@@ -31,9 +32,20 @@ export interface ISearchResult {
   title: string | null;
 }
 
+export interface IBmgfSearchResult {
+  '@search.score': number;
+  id: string;
+  metadata_storage_path: string;
+}
+
 export interface ISearchResults {
   resultCount: number;
   results: ISearchResult[];
+}
+
+export interface IBmgfSearchResults {
+  resultCount: number;
+  results: IBmgfSearchResult[];
 }
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
@@ -45,7 +57,7 @@ const buildSearchUrl = (
   pageSize: number,
   filters: ISearchFilters,
 ): string => {
-  const url = buildBaseUrl();
+  const url = buildBaseUrl(searchService, searchIndex);
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('$count', 'true');
@@ -73,7 +85,7 @@ export interface IFacetResult {
   facets: Array<{ count: number; value: string }>;
 }
 
-const buildBaseUrl = () => {
+const buildBaseUrl = (searchService: string, searchIndex: string) => {
   const url = new URL(
     `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
   );
@@ -84,13 +96,26 @@ const buildBaseUrl = () => {
 };
 
 const buildFacetUrl = (query: string): string => {
-  const url = buildBaseUrl();
+  const url = buildBaseUrl(searchService, searchIndex);
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
   url.searchParams.append('searchMode', 'all');
 
   return url.toString();
+};
+
+export const getBmgfDocs = async (
+  query: string,
+): Promise<IBmgfSearchResults> => {
+  const body = await getJson(
+    buildBaseUrl(searchService, bmgfSearchIndex).toString() +
+      `&search=${query}&queryType=full&$count=true&$top=10`,
+  );
+  return {
+    resultCount: body['@odata.count'],
+    results: body.value,
+  };
 };
 
 const getJson = async (url: string): Promise<any> => {
@@ -103,6 +128,19 @@ const getJson = async (url: string): Promise<any> => {
 
   if (resp.ok) {
     return resp.json();
+  }
+};
+
+export const getMarkdownDoc = async (url: string): Promise<any> => {
+  const resp: Response = await fetch(url, {
+    method: 'GET',
+    // headers: {
+    //   'Content-Type': 'text/markdown',
+    // },
+  });
+
+  if (resp.ok) {
+    return resp;
   }
 };
 
