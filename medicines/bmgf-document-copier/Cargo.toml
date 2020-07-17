@@ -1,0 +1,19 @@
+[package]
+name = "bmgf-doc-copier"
+version = "0.1.0"
+authors = ["Tim Lee <tim.lee@red-badger.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1.24"
+azure_sdk_core = { path = "../../../../AzureSDKForRust/azure_sdk_core" }
+azure_sdk_storage_blob = { path = "../../../../AzureSDKForRust/azure_sdk_storage_blob" }
+azure_sdk_storage_core = { path = "../../../../AzureSDKForRust/azure_sdk_storage_core" }
+futures = "0.3.4"
+lazy_static = "1.4.0"
+md5 = "0.7.0"
+tokio = { version = "0.2", features = ["macros", "time"] }
+
+[dev-dependencies]
