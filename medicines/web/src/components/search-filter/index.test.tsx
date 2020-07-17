@@ -5,10 +5,13 @@ import SearchFilter from './index';
 
 describe(SearchFilter, () => {
   it('should render search filter', () => {
+    const toggleFunction = (d: DocType) => {
+      return null;
+    };
     const component = mount(
-      <SearchFilter 
-        currentlyEnabledDocTypes={[]} 
-        toggleDocType={(d: DocType)=>{}}
+      <SearchFilter
+        currentlyEnabledDocTypes={[]}
+        toggleDocType={toggleFunction}
       />,
     );
     expect(component).toMatchSnapshot();
