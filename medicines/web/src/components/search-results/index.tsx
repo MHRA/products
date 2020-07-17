@@ -252,17 +252,17 @@ const SearchResults = (props: ISearchResultsProps) => {
 
   return props.isLoading ? (
     <StyledDrugList>
-      <h1 className="title">
+      <h2 className="title">
         {`Loading results for ${showingResultsForTerm}...`}
-      </h1>
+      </h2>
     </StyledDrugList>
   ) : (
     <>
       <StyledDrugList>
         <div>
-          <h1 className="title">
+          <h2 className="title">
             {searchResultsTitle(showingResultsForTerm, drugs.length)}
-          </h1>
+          </h2>
           {hasDrugs && (
             <p className="no-of-results">
               {searchResultsNumberingInformation({
