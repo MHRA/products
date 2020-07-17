@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DrugIndex should render 1`] = `
+exports[`DrugIndex should render horizontal items 1`] = `
 <DrugIndex
   horizontal={true}
   items={
@@ -817,6 +817,140 @@ exports[`DrugIndex should render 1`] = `
               >
                 9
                  
+              </a>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </StyledComponent>
+  </styled.nav>
+</DrugIndex>
+`;
+
+exports[`DrugIndex should render substances 1`] = `
+<DrugIndex
+  items={
+    Array [
+      Object {
+        "count": 1,
+        "name": "Ibuprofen",
+        "products": Array [
+          Object {
+            "count": 1,
+            "name": "Ibuprofen gel",
+          },
+        ],
+      },
+    ]
+  }
+  title="Coffee"
+>
+  <styled.nav>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "sc-bdVaJa",
+            "isStatic": false,
+            "lastClassName": "kOyKBG",
+            "rules": Array [
+              "
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+  }
+
+  ul {
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  ul > li {
+    padding-top: 10px;
+  }
+
+  p.horizontal {
+    margin: 0;
+  }
+
+  ul.horizontal {
+    display: flex;
+    padding-left: 0;
+  }
+
+  ul.horizontal > li {
+    line-height: 2;
+  }
+
+  a {
+    font-weight: bold;
+  }
+
+  .substance-name {
+    margin-bottom: 30px;
+  }
+
+  .substance-name a {
+    text-decoration: underline;
+    font-size: 1.1875rem;
+    font-weight: normal;
+  }
+
+  @media ",
+              "screen and (max-width: 788px)",
+              " {
+    ul.horizontal {
+      flex-wrap: wrap;
+    }
+    ul.horizontal > li {
+      flex-basis: 15%;
+    }
+  }
+",
+            ],
+          },
+          "displayName": "styled.nav",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "sc-bdVaJa",
+          "target": "nav",
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <nav
+        className="sc-bdVaJa kOyKBG"
+      >
+        <h3>
+          Coffee
+        </h3>
+        <ul
+          className=""
+        >
+          <li
+            className="substance-name"
+            key="Ibuprofen"
+          >
+            <Link
+              href="/substance?substance=Ibuprofen"
+            >
+              <a
+                href="/substance?substance=Ibuprofen"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+              >
+                Ibuprofen
+                 
+                (
+                1
+                 files)
               </a>
             </Link>
           </li>
