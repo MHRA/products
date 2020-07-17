@@ -928,9 +928,9 @@ exports[`DrugIndex should render substances 1`] = `
       <nav
         className="sc-bdVaJa kOyKBG"
       >
-        <h3>
+        <h2>
           Coffee
-        </h3>
+        </h2>
         <ul
           className=""
         >
