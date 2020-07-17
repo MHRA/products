@@ -77,7 +77,7 @@ const App: NextPage = () => {
   //   reroutePage(productName, page, docTypes);
   // };
   const getReportName = path => {
-    return path.match(/(?<=bmgf-docs\/).*(?=\/)/);
+    return decodeURIComponent(path.match(/(?<=bmgf-docs\/).*(?=\/)/));
   };
 
   return (
@@ -87,15 +87,16 @@ const App: NextPage = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        {documents.map((document, i) => (
-          <div key={i}>
-            <a href={`/bmgf/${getReportName(document.metadata_storage_path)}`}>
-              {decodeURIComponent(
-                getReportName(document.metadata_storage_path),
-              )}
-            </a>
-          </div>
-        ))}
+        {documents.map((document, i) => {
+          let reportName = getReportName(document.metadata_storage_path);
+          if (reportName && reportName != 'null') {
+            return (
+              <div key={i}>
+                <a href={`/bmgf/${reportName}`}>{reportName}</a>
+              </div>
+            );
+          }
+        })}
       </SearchWrapper>
     </Page>
   );
