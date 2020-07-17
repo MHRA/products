@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchFilter should render search filter 1`] = `
+<SearchFilter
+  currentlyEnabledDocTypes={Array []}
+  toggleDocType={[Function]}
+>
+  <styled.section>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "sc-bdVaJa",
+            "isStatic": false,
+            "lastClassName": "kwFkuw",
+            "rules": Array [
+              "
+  .checkbox-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 0.25em;
+
+    .checkbox {
+      flex: 0.1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.25em;
+
+      input {
+        flex: 1;
+      }
+    }
+
+    label {
+      flex: 1;
+    }
+  }
+",
+            ],
+          },
+          "displayName": "styled.section",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "sc-bdVaJa",
+          "target": "section",
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <section
+        className="sc-bdVaJa kwFkuw"
+      >
+        <h3>
+          Filter documents by
+        </h3>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Spc"
+          name="Summary of Product Characteristics"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <input
+                checked={false}
+                id="filter-spc"
+                name="doc"
+                onChange={[Function]}
+                type="checkbox"
+                value="Spc"
+              />
+            </div>
+            <label
+              htmlFor="filter-spc"
+            >
+              Summary of Product Characteristics
+               (
+              SPC
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Pil"
+          name="Patient Information Leaflet"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <input
+                checked={false}
+                id="filter-pil"
+                name="doc"
+                onChange={[Function]}
+                type="checkbox"
+                value="Pil"
+              />
+            </div>
+            <label
+              htmlFor="filter-pil"
+            >
+              Patient Information Leaflet
+               (
+              PIL
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Par"
+          name="Public Assessment Reports"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <input
+                checked={false}
+                id="filter-par"
+                name="doc"
+                onChange={[Function]}
+                type="checkbox"
+                value="Par"
+              />
+            </div>
+            <label
+              htmlFor="filter-par"
+            >
+              Public Assessment Reports
+               (
+              PAR
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+      </section>
+    </StyledComponent>
+  </styled.section>
+</SearchFilter>
+`;
