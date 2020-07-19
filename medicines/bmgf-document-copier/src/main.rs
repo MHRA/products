@@ -1,15 +1,14 @@
 extern crate lazy_static;
 use azure_sdk_core::{errors::AzureError, prelude::*};
-use azure_sdk_storage_blob::{blob::Blob, container::requests::ListBlobBuilder, prelude::*};
+use azure_sdk_storage_blob::prelude::*;
 use azure_sdk_storage_core::prelude::*;
-use std::error::Error;
+use futures::StreamExt;
+use std::{error::Error, sync::Arc};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let client = get_client()?;
-    let blobs_list = get_blobs_list(&client).await?;
-    copy_blobs(&client, blobs_list).await?;
-
+    let blobs_list = get_blobs_list(Arc::new(get_client()?)).await?;
+    copy_blobs(Arc::new(get_client()?), blobs_list).await?;
     println!("Completed successfully");
     Ok(())
 }
@@ -33,15 +32,16 @@ fn get_copy_source_base_url() -> String {
     )
 }
 
-async fn get_blobs_list(client: Box<dyn Client>) -> Result<Vec<String>, AzureError> {
+async fn get_blobs_list(client: Arc<dyn Client>) -> Result<Vec<String>, AzureError> {
     let container_name = std::env::var("SOURCE_CONTAINER_NAME")
         .expect("Set env variable SOURCE_CONTAINER_NAME first!");
 
-    let mut blobs = client
-        .list_blobs()
-        .with_container_name(&container_name)
-        .finalize()
-        .await;
+    let mut blob_stream = Box::pin(
+        client
+            .list_blobs()
+            .with_container_name(&container_name)
+            .stream(),
+    );
 
     let mut blob_list: Vec<String> = vec![];
 
@@ -54,106 +54,22 @@ async fn get_blobs_list(client: Box<dyn Client>) -> Result<Vec<String>, AzureErr
     Ok(blob_list)
 }
 
-async fn copy_blobs(client: Box<dyn Client>, blob_list: Vec<String>) -> Result<(), AzureError> {
+async fn copy_blobs(client: Arc<dyn Client>, blob_list: Vec<String>) -> Result<(), AzureError> {
     let destination = "$web";
+    let copy_source_base_url = get_copy_source_base_url();
 
-    let copy_source_url = get_copy_source_base_url();
-
-    client
-        .copy_blob_from_url()
-        .with_container_name(&destination)
-        .with_blob_name(&String::from("content/about.md"))
-        .with_source_url(&format!("{}/about.md", copy_source_url))
-        .with_is_synchronous(true)
-        .finalize()
-        .await?;
+    for blob in blob_list {
+        let source_url = &format!("{}/{}", copy_source_base_url, &blob);
+        let blob_name = &format!("content/A%20great%20report/{}", &blob);
+        client
+            .copy_blob_from_url()
+            .with_container_name(&destination)
+            .with_blob_name(blob_name)
+            .with_source_url(source_url)
+            .with_is_synchronous(true)
+            .finalize()
+            .await?;
+    }
 
     Ok(())
 }
-
-// #[cfg(test)]
-// mod test {
-//     use super::*;
-//     use azure_sdk_core::lease::LeaseState;
-//     use azure_sdk_storage_blob::blob::BlobType;
-//     use std::collections::HashMap;
-
-//     fn get_test_blob(
-//         name: String,
-//         container_name: String,
-//         date: DateTime<Utc>,
-//         pl: String,
-//         file_name: String,
-//         doc_type: String,
-//     ) -> Blob {
-//         let mut metadata: HashMap<String, String> = HashMap::new();
-//         metadata.insert(
-//             String::from("pl_number"),
-//             String::from(format!("[\"{}\"]", pl)),
-//         );
-//         metadata.insert(String::from("file_name"), file_name);
-//         metadata.insert(String::from("doc_type"), doc_type);
-//         Blob {
-//             name,
-//             container_name,
-//             snapshot_time: None,
-//             creation_time: date,
-//             last_modified: Some(date),
-//             etag: None,
-//             content_language: None,
-//             content_length: 5,
-//             content_type: None,
-//             content_encoding: None,
-//             content_md5: None,
-//             cache_control: None,
-//             content_disposition: None,
-//             x_ms_blob_sequence_number: None,
-//             blob_type: BlobType::BlockBlob,
-//             access_tier: None,
-//             lease_status: None,
-//             lease_state: LeaseState::Available,
-//             lease_duration: None,
-//             copy_id: None,
-//             copy_status: None,
-//             copy_source: None,
-//             copy_progress: None,
-//             copy_completion_time: None,
-//             copy_status_description: None,
-//             incremental_copy: None,
-//             server_encrypted: false,
-//             access_tier_inferred: None,
-//             access_tier_change_time: None,
-//             deleted_time: None,
-//             remaining_retention_days: None,
-//             metadata,
-//         }
-//     }
-
-//     #[test]
-//     fn test_get_blob_string() {
-//         let date = chrono::DateTime::<Utc>::from(
-//             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-08:00").unwrap(),
-//         );
-//         let name = String::from("test_blog");
-//         let container_name = String::from("test_container");
-//         let pl = String::from("PL1234567");
-//         let file_name = String::from("CON1234567");
-//         let doc_type = String::from("Spc");
-//         let blob = get_test_blob(name, container_name, date, pl, file_name, doc_type);
-
-//         // Have to match metadata components separately as metadata hashmap randomly ordered
-//         let expected_body = String::from(
-//             "Blob { name: \"test_blog\", container_name: \"test_container\", snapshot_time: None, creation_time: 1996-12-20T00:39:57Z, last_modified: Some(1996-12-20T00:39:57Z), etag: None, content_length: 5, content_type: None, content_encoding: None, content_language: None, content_md5: None, cache_control: None, content_disposition: None, x_ms_blob_sequence_number: None, blob_type: BlockBlob, access_tier: None, lease_status: None, lease_state: Available, lease_duration: None, copy_id: None, copy_status: None, copy_source: None, copy_progress: None, copy_completion_time: None, copy_status_description: None, incremental_copy: None, server_encrypted: false, access_tier_inferred: None, access_tier_change_time: None, deleted_time: None, remaining_retention_days: None, metadata: {",
-//         );
-//         let expected_file_name = String::from(r#""file_name": "CON1234567"#);
-//         let expected_pl_number = String::from(r#""pl_number": "[\"PL1234567\"]"#);
-//         let expected_doc_type = String::from(r#""doc_type": "Spc""#);
-
-//         let actual = get_blob_string(&blob);
-
-//         assert!(actual.contains(&expected_body));
-//         assert!(actual.contains(&expected_file_name));
-//         assert!(actual.contains(&expected_pl_number));
-//         assert!(actual.contains(&expected_doc_type));
-//     }
-// }

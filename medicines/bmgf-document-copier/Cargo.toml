@@ -7,11 +7,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.24"
-azure_sdk_core = { path = "../../../../AzureSDKForRust/azure_sdk_core" }
-azure_sdk_storage_blob = { path = "../../../../AzureSDKForRust/azure_sdk_storage_blob" }
-azure_sdk_storage_core = { path = "../../../../AzureSDKForRust/azure_sdk_storage_core" }
-futures = "0.3.4"
+async-trait = "0.1.36"
+# azure_sdk_core = { path = "../../../../AzureSDKForRust/azure_sdk_core" }
+# azure_sdk_storage_blob = { path = "../../../../AzureSDKForRust/azure_sdk_storage_blob" }
+# azure_sdk_storage_core = { path = "../../../../AzureSDKForRust/azure_sdk_storage_core" }
+azure_sdk_core = "0.43.6"
+azure_sdk_storage_blob = "0.45.1"
+azure_sdk_storage_core = "0.44.3"
+futures = "0.3.5"
 lazy_static = "1.4.0"
 md5 = "0.7.0"
 tokio = { version = "0.2", features = ["macros", "time"] }
