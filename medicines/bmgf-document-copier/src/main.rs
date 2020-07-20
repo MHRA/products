@@ -70,7 +70,7 @@ async fn copy_blobs(
             .with_container_name(&destination)
             .with_blob_name(blob_name)
             .with_source_url(source_url)
-            .with_is_synchronous(true)
+            .with_is_synchronous(false)
             .finalize()
             .await?;
     }

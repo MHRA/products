@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import marked from 'marked';
@@ -11,55 +12,18 @@ import {
   IBmgfSearchResult,
   getMarkdownDoc,
 } from '../../services/azure-search';
-// import { IDocument } from '../../model/substance';
-// import { getBmgfDocs } from '../../services/azure-search';
-// import { documents } from '../../services/documents-loader';
-// import Events from '../../services/events';
+
 import {
   docTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-// import { convertResults } from '../../services/results-converter';
-
-// const pageSize = 10;
-// const productPath = '/product';
-
-// interface IProductResult {
-//   name: string;
-//   count: number;
-//   documents: IDocument[];
-// }
-
-// interface IProductPageInfo {
-//   name: string;
-//   page: number;
-//   docTypes: DocType[];
-// }
 
 interface IProductResult {
   count: number;
   documents: IBmgfSearchResult[];
 }
-
-const azureDocumentsLoader = async (
-  report: string,
-): Promise<IProductResult> => {
-  const results = await getBmgfDocs(report);
-  return {
-    count: results.resultCount,
-    documents: results.results,
-  };
-};
-
-// const graphQlProductLoader = async ({
-//   name,
-//   page,
-//   docTypes,
-// }: IProductPageInfo): Promise<IProductResult> => {
-//   return documents.load({ name, page, pageSize, docTypes });
-// };
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -67,12 +31,8 @@ const App: NextPage = () => {
     false,
   );
   const [content, setContent] = React.useState();
-  // const [productName, setProductName] = React.useState('');
-  // const [count, setCount] = React.useState(0);
-  // const [pageNumber, setPageNumber] = React.useState(1);
-  // const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
-  // const [isLoading, setIsLoading] = React.useState(true);
+  let ReportElement;
 
   const router = useRouter();
   const {
@@ -84,22 +44,13 @@ const App: NextPage = () => {
     if (!report || !report.length) {
       return;
     }
+    console.log(report);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
-    (async () => {
-      const { documents, count } = await azureDocumentsLoader(
-        report.toString(),
-      );
-      let document = documents[0];
-      if (document) {
-        getMarkdownDoc(document.metadata_storage_path)
-          .then(function(response) {
-            return response.text();
-          })
-          .then(function(data) {
-            setContent(marked(data));
-          });
-      }
-    })();
+    // @ts-ignore
+    const ReportElement = dynamic(() => import(`../../content/about`), {
+      ssr: false,
+    });
+    // setContent(con);
   }, [report, disclaimerQS]);
 
   return (
@@ -108,7 +59,8 @@ const App: NextPage = () => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <article dangerouslySetInnerHTML={{ __html: content }}></article>
+      <ReportElement></ReportElement>
+      {/* <article dangerouslySetInnerHTML={{ __html: content }}></article> */}
     </Page>
   );
 };
