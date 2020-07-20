@@ -47,9 +47,12 @@ exports[`SearchResults should render 1`] = `
           toggleDocType={[Function]}
         />
       </div>
-      <div
+      <section
         className="column results"
       >
+        <styled.h3>
+          Search results
+        </styled.h3>
         <dl>
           <article
             key="0"
@@ -160,7 +163,7 @@ exports[`SearchResults should render 1`] = `
             </dd>
           </article>
         </dl>
-      </div>
+      </section>
     </div>
   </styled.div>
   <Pagination
