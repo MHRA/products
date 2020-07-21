@@ -3,23 +3,11 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 import Page from '../../components/page';
-import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
-import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
-import { IDocument } from '../../model/substance';
 import { getBmgfDocs, IBmgfSearchResult } from '../../services/azure-search';
-import { documents } from '../../services/documents-loader';
-import Events from '../../services/events';
-import {
-  docTypesFromQueryString,
-  parseDisclaimerAgree,
-  parsePage,
-  queryStringFromDocTypes,
-} from '../../services/querystring-interpreter';
 
-const pageSize = 10;
-const productPath = '/product';
+import { parseDisclaimerAgree } from '../../services/querystring-interpreter';
 
 interface IProductResult {
   count: number;
@@ -73,9 +61,6 @@ const App: NextPage = () => {
     }
   }, []);
 
-  // const handlePageChange = async (page: number) => {
-  //   reroutePage(productName, page, docTypes);
-  // };
   const getReportName = path => {
     return decodeURIComponent(path.match(/(?<=bmgf-docs\/).*(?=\/)/));
   };
@@ -88,8 +73,8 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         {documents.map((document, i) => {
-          let reportName = getReportName(document.metadata_storage_path);
-          if (reportName && reportName != 'null') {
+          const reportName = getReportName(document.metadata_storage_path);
+          if (reportName && reportName !== 'null') {
             return (
               <div key={i}>
                 <a href={`/bmgf/${reportName}`}>{reportName}</a>
