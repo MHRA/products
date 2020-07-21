@@ -69,9 +69,26 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
 };
 
 const SearchFilter: React.FC<ISearchFilterProps> = props => {
+  const [checkedFilters, setCheckedFilters] = React.useState(props.currentlyEnabledDocTypes)
   const generateCheckboxFor = (docType: DocType, name: string) => (
-    <DocTypeCheckbox {...props} docTypeForThisCheckbox={docType} name={name} />
+    <DocTypeCheckbox toggleDocType={ toggleDocType} currentlyEnabledDocTypes={checkedFilters} docTypeForThisCheckbox={docType} name={name} />
   );
+
+const toggleDocType = docTypeToToggle => {
+  const enabledDocTypes = Array.from(checkedFilters);
+  if (enabledDocTypes.includes(docTypeToToggle)) {
+    const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
+    enabledDocTypes.splice(docTypeIndex, 1);
+  } else {
+    enabledDocTypes.push(docTypeToToggle);
+  }
+  setCheckedFilters(enabledDocTypes);
+  console.log(enabledDocTypes)
+}
+
+const submit = () => {
+  console.log("submitted");
+}
 
   return (
     <StyledSearchFilter>
@@ -79,6 +96,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
+      <button onClick={submit}>Submit</button>
     </StyledSearchFilter>
   );
 };
