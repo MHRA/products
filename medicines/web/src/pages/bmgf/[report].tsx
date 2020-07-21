@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import matter from 'gray-matter';
 import glob from 'node-glob';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { uriTransformer } from 'react-markdown';
 import marked from 'marked';
 import Page from '../../components/page';
 // import SearchResults from '../../components/search-results';
@@ -24,6 +24,7 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
+import { report } from 'process';
 // import { convertResults } from '../../services/results-converter';
 
 // // const pageSize = 10;
@@ -114,36 +115,48 @@ import {
 
 // export default App;
 
-function Report({ content }) {
+const Report = ({ markdownBody }) => {
+  const allowNode = (node, index, parent) => {
+    return node.type !== 'script';
+  };
+
+  const transformUri = uri => {
+    // TODO: add processing here
+    let rewrittenUri = `/bmgf/images/${uri}`;
+    // calls through to default transformer to perform XSS filter
+    return uriTransformer(rewrittenUri);
+  };
+
   return (
     <div>
-      <article dangerouslySetInnerHTML={{ __html: content }}></article>
+      <ReactMarkdown
+        escapeHtml={false}
+        source={markdownBody}
+        allowNode={allowNode}
+        transformLinkUri={transformUri}
+      />
     </div>
   );
-}
+};
+
+export default Report;
 
 export async function getStaticProps(context) {
   const reportName = context.params;
-  console.log(reportName);
   // @ts-ignore
-  const content = await import('../../content/about.md');
-  console.log('CONTENT!');
-  console.log(content);
-  console.log('MATTERED');
-  console.log(matter(content.default));
-
-  // By returning { props: posts }, the Blog component
-  // will receive `posts` as a prop at build time
+  const reportContent = await import('../../content/about.md');
+  console.log(reportContent);
   return {
     props: {
-      content: matter(content.default).content,
+      markdownBody: reportContent.default,
     },
   };
 }
 
 export async function getStaticPaths() {
   //get all .md files in the posts dir
-  const reports = ['../../content/about.md']; // glob.sync('../../content/**/*.md');
+  // glob.sync('../../content/**/*.md');
+  const reports = ['../../content/about.md'];
 
   //remove path and extension to leave filename only
   const reportNames = reports.map(file =>
@@ -153,7 +166,7 @@ export async function getStaticPaths() {
       .slice(0, -3)
       .trim(),
   );
-  console.log(reportNames);
+
   // create paths with `slug` param
   const paths = reportNames.map(report => {
     return {
@@ -168,5 +181,3 @@ export async function getStaticPaths() {
     fallback: false,
   };
 }
-
-export default Report;
