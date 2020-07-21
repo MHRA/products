@@ -28,12 +28,14 @@ const StyledSearchFilter = styled.section`
 
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
-  toggleDocType: (d: DocType) => void;
+  updateDocTypes: (d: DocType[]) => void;
 }
 
-interface IDocTypeCheckboxProps extends ISearchFilterProps {
+interface IDocTypeCheckboxProps {
   docTypeForThisCheckbox: DocType;
   name: string;
+  toggleDocType: (d: DocType) => void;
+  currentlyEnabledDocTypes: DocType[];
 }
 
 const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
@@ -83,11 +85,10 @@ const toggleDocType = docTypeToToggle => {
     enabledDocTypes.push(docTypeToToggle);
   }
   setCheckedFilters(enabledDocTypes);
-  console.log(enabledDocTypes)
-}
+ }
 
 const submit = () => {
-  console.log("submitted");
+ props.updateDocTypes(checkedFilters) 
 }
 
   return (

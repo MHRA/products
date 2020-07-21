@@ -207,7 +207,7 @@ interface ISearchResultsProps {
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
   docTypes: DocType[];
-  handleDocTypeCheckbox: (d: DocType) => void;
+  updateDocTypes: (d: DocType[]) => void;
   handlePageChange: (num: number) => void;
   isLoading: boolean;
 }
@@ -238,7 +238,7 @@ const SearchResults = (props: ISearchResultsProps) => {
     searchTerm,
     showingResultsForTerm,
     docTypes,
-    handleDocTypeCheckbox,
+    updateDocTypes,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -305,7 +305,7 @@ const SearchResults = (props: ISearchResultsProps) => {
             <div className="column filter">
               <SearchFilter
                 currentlyEnabledDocTypes={docTypes}
-                toggleDocType={handleDocTypeCheckbox}
+                updateDocTypes={updateDocTypes}
               />
             </div>
             <div className="column results">

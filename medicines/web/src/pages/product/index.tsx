@@ -151,15 +151,8 @@ const App: NextPage = () => {
     });
   };
 
-  const handleToggleDocType = (docTypeToToggle: DocType) => {
-    const enabledDocTypes = Array.from(docTypes);
-    if (enabledDocTypes.includes(docTypeToToggle)) {
-      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
-      enabledDocTypes.splice(docTypeIndex, 1);
-    } else {
-      enabledDocTypes.push(docTypeToToggle);
-    }
-    reroutePage(productName, 1, enabledDocTypes);
+  const updateDocTypes = (updatedDocTypes: DocType[]) => {
+      reroutePage(productName, 1, updatedDocTypes);
   };
 
   const handlePageChange = async (page: number) => {
@@ -182,7 +175,7 @@ const App: NextPage = () => {
           searchTerm={productName}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          handleDocTypeCheckbox={handleToggleDocType}
+          updateDocTypes={updateDocTypes}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
         />
