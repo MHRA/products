@@ -152,7 +152,7 @@ const App: NextPage = () => {
   };
 
   const updateDocTypes = (updatedDocTypes: DocType[]) => {
-      reroutePage(productName, 1, updatedDocTypes);
+    reroutePage(productName, 1, updatedDocTypes);
   };
 
   const handlePageChange = async (page: number) => {

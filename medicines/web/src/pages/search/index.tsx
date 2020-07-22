@@ -150,7 +150,6 @@ const App: NextPage = props => {
     reroutePage(query, 1, updatedDocTypes);
   };
 
-
   const handlePageChange = async (page: number) => {
     reroutePage(query, page, docTypes);
   };

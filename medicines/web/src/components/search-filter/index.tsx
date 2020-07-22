@@ -71,25 +71,32 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
 };
 
 const SearchFilter: React.FC<ISearchFilterProps> = props => {
-  const [checkedFilters, setCheckedFilters] = React.useState(props.currentlyEnabledDocTypes)
+  const [checkedFilters, setCheckedFilters] = React.useState(
+    props.currentlyEnabledDocTypes,
+  );
   const generateCheckboxFor = (docType: DocType, name: string) => (
-    <DocTypeCheckbox toggleDocType={ toggleDocType} currentlyEnabledDocTypes={checkedFilters} docTypeForThisCheckbox={docType} name={name} />
+    <DocTypeCheckbox
+      toggleDocType={toggleDocType}
+      currentlyEnabledDocTypes={checkedFilters}
+      docTypeForThisCheckbox={docType}
+      name={name}
+    />
   );
 
-const toggleDocType = docTypeToToggle => {
-  const enabledDocTypes = Array.from(checkedFilters);
-  if (enabledDocTypes.includes(docTypeToToggle)) {
-    const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
-    enabledDocTypes.splice(docTypeIndex, 1);
-  } else {
-    enabledDocTypes.push(docTypeToToggle);
-  }
-  setCheckedFilters(enabledDocTypes);
- }
+  const toggleDocType = docTypeToToggle => {
+    const enabledDocTypes = Array.from(checkedFilters);
+    if (enabledDocTypes.includes(docTypeToToggle)) {
+      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
+      enabledDocTypes.splice(docTypeIndex, 1);
+    } else {
+      enabledDocTypes.push(docTypeToToggle);
+    }
+    setCheckedFilters(enabledDocTypes);
+  };
 
-const submit = () => {
- props.updateDocTypes(checkedFilters) 
-}
+  const submit = () => {
+    props.updateDocTypes(checkedFilters);
+  };
 
   return (
     <StyledSearchFilter>
