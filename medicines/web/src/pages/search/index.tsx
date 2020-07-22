@@ -81,6 +81,7 @@ const App: NextPage = props => {
       disclaimer: disclaimerQS,
       doc: docQS,
       useGraphQl: graphQlFeatureFlag,
+      rerouteType: rerouteTypeQS,
     },
   } = router;
 
@@ -127,10 +128,16 @@ const App: NextPage = props => {
     window.scrollTo(0, 0);
   }, [props]);
 
+  enum RerouteType  {
+    CheckboxSelected = 'checkbox',
+    Other = ''
+  }
+
   const reroutePage = (
     searchTerm: string,
     page: number,
     docTypes: DocType[],
+    rerouteType?: RerouteType,
   ) => {
     const query = {
       search: searchTerm,
@@ -140,6 +147,9 @@ const App: NextPage = props => {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
     }
+    if (rerouteType === RerouteType.CheckboxSelected){
+      query['rerouteType'] = RerouteType.CheckboxSelected;
+    }
     router.push({
       pathname: searchPath,
       query,
@@ -147,7 +157,7 @@ const App: NextPage = props => {
   };
 
   const updateDocTypes = (updatedDocTypes: DocType[]) => {
-    reroutePage(query, 1, updatedDocTypes);
+    reroutePage(query, 1, updatedDocTypes, RerouteType.CheckboxSelected);
   };
 
   const handlePageChange = async (page: number) => {
