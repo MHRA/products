@@ -1,13 +1,48 @@
 {
+  "defaults": {
+    "timeout": 10000,
+    "standard": "WCAG2AAA"
+  },
   "urls": [
-    "http://localhost:3000/",
-    "http://localhost:3000/about",
-    "http://localhost:3000/accessibility",
-    "http://localhost:3000/cookies",
-    "http://localhost:3000/search?search=eyes&page=1",
-    "http://localhost:3000/search?search=eyes&page=1&disclaimer=agree",
-    "http://localhost:3000/substance-index?letter=A",
-    "http://localhost:3000/substance?substance=IBUPROFEN",
-    "http://localhost:3000/product?product=OLBAS%20OIL&page=1&disclaimer=agree"
+    {
+      "url": "http://localhost:3000",
+      "screenCapture": "my-screen-capture.png"
+    },
+    {
+      "url": "http://localhost:3000/about",
+      "screenCapture": "about.png"
+    },
+    {
+      "url": "http://localhost:3000/accessibility",
+      "screenCapture": "pa11y-screenshots/accessibility.png"
+    },
+    {
+      "url": "http://localhost:3000/cookies",
+      "screenCapture": "pa11y-screenshots/cookies.png"
+    },
+    {
+      "url": "http://localhost:3000/about",
+      "screenCapture": "pa11y-screenshots/about.png"
+    },
+    {
+      "url": "http://localhost:3000/search?search=eyes&page=1",
+      "screenCapture": "pa11y-screenshots/search-results-disclaimer.png"
+    },
+    {
+      "url": "http://localhost:3000/search?search=eyes&page=1&disclaimer=agree",
+      "screenCapture": "pa11y-screenshots/search-results.png"
+    },
+    {
+      "url": "http://localhost:3000/substance-index?letter=A",
+      "screenCapture": "pa11y-screenshots/substance-index.png"
+    },
+    {
+      "url": "http://localhost:3000/substance?substance=IBUPROFEN",
+      "screenCapture": "pa11y-screenshots/substance-list.png"
+    },
+    {
+      "url": "http://localhost:3000/product?product=OLBAS%20OIL&page=1&disclaimer=agree",
+      "screenCapture": "pa11y-screenshots/products.png"
+    }
   ]
 }
