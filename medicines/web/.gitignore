@@ -6,3 +6,4 @@ out/
 cypress/videos/
 cypress/screenshots/
 coverage/
+pa11y-screenshots/*.png
