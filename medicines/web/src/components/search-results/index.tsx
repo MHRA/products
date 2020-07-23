@@ -1,6 +1,7 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { DocType } from '../../services/azure-search';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
@@ -210,6 +211,7 @@ interface ISearchResultsProps {
   updateDocTypes: (d: DocType[]) => void;
   handlePageChange: (num: number) => void;
   isLoading: boolean;
+  rerouteType: RerouteType;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -239,6 +241,7 @@ const SearchResults = (props: ISearchResultsProps) => {
     showingResultsForTerm,
     docTypes,
     updateDocTypes,
+    rerouteType,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -306,6 +309,7 @@ const SearchResults = (props: ISearchResultsProps) => {
               <SearchFilter
                 currentlyEnabledDocTypes={docTypes}
                 updateDocTypes={updateDocTypes}
+                rerouteType={rerouteType}
               />
             </div>
             <div className="column results">

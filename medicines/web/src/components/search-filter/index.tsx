@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
 
 const StyledSearchFilter = styled.section`
@@ -29,6 +30,7 @@ const StyledSearchFilter = styled.section`
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
   updateDocTypes: (d: DocType[]) => void;
+  rerouteType: RerouteType;
 }
 
 interface IDocTypeCheckboxProps {
@@ -74,6 +76,8 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
   const [checkedFilters, setCheckedFilters] = React.useState(
     props.currentlyEnabledDocTypes,
   );
+  const submitButton = useRef(null);
+
   const generateCheckboxFor = (docType: DocType, name: string) => (
     <DocTypeCheckbox
       toggleDocType={toggleDocType}
@@ -94,9 +98,19 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
     setCheckedFilters(enabledDocTypes);
   };
 
-  const submit = () => {
+  const submit = e => {
+    e.preventDefault();
     props.updateDocTypes(checkedFilters);
   };
+
+  useEffect(() => {
+    // https://www.javaguides.net/2019/09/typescript-number-based-enums-example.html
+    if (
+      RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
+    ) {
+      submitButton.current.focus();
+    }
+  }, [props.rerouteType]);
 
   return (
     <StyledSearchFilter>
@@ -104,7 +118,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
-      <button onClick={submit}>Submit</button>
+      <input type="submit" onClick={submit} value="submit" ref={submitButton} />
     </StyledSearchFilter>
   );
 };

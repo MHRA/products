@@ -6,6 +6,7 @@ import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
@@ -72,6 +73,7 @@ const App: NextPage = props => {
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
 
   const router = useRouter();
   const {
@@ -128,10 +130,12 @@ const App: NextPage = props => {
     window.scrollTo(0, 0);
   }, [props]);
 
-  enum RerouteType  {
-    CheckboxSelected = 'checkbox',
-    Other = ''
-  }
+  useEffect(() => {
+    if (!rerouteTypeQS) {
+      return;
+    }
+    setRerouteType(RerouteType[rerouteTypeQS.toString()]);
+  }, [rerouteTypeQS]);
 
   const reroutePage = (
     searchTerm: string,
@@ -147,8 +151,9 @@ const App: NextPage = props => {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
     }
-    if (rerouteType === RerouteType.CheckboxSelected){
-      query['rerouteType'] = RerouteType.CheckboxSelected;
+    if (rerouteType === RerouteType.CheckboxSelected) {
+      const rerouteType = 'doc';
+      query[rerouteType] = RerouteType.CheckboxSelected;
     }
     router.push({
       pathname: searchPath,
@@ -183,6 +188,7 @@ const App: NextPage = props => {
           updateDocTypes={updateDocTypes}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
+          rerouteType={rerouteType}
         />
       </SearchWrapper>
     </Page>
