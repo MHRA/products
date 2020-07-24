@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
+import {SubmitButton} from '../buttons';
 
 const StyledSearchFilter = styled.section`
   .checkbox-row {
@@ -26,6 +27,7 @@ const StyledSearchFilter = styled.section`
     }
   }
 `;
+
 
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
@@ -77,6 +79,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
     props.currentlyEnabledDocTypes,
   );
   const submitButton = useRef(null);
+  const filterHeader = useRef(null);
 
   const generateCheckboxFor = (docType: DocType, name: string) => (
     <DocTypeCheckbox
@@ -105,19 +108,20 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
 
   useEffect(() => {
     if (
-      RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
+      props.rerouteType != null && RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
     ) {
+      filterHeader.current.scrollIntoView();
       submitButton.current.focus();
     }
   }, [props.rerouteType]);
 
   return (
     <StyledSearchFilter>
-      <h2>Filter documents by</h2>
+      <h2 ref={filterHeader}>Filter documents by</h2>
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
-      <input type="submit" onClick={submit} value="submit" ref={submitButton} />
+      <SubmitButton onClick={submit} value="submit" ref={submitButton} />
     </StyledSearchFilter>
   );
 };
