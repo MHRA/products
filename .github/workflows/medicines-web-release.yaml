@@ -80,6 +80,13 @@ jobs:
         env:
           ROOT_URL_DOMAIN: localhost
 
+      - name: Upload cypress videos
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-pa11y-screenshots
+          path: medicines/web/pa11y-screenshots
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
