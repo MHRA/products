@@ -151,9 +151,9 @@ const App: NextPage = props => {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
     }
-    if (rerouteType === RerouteType.CheckboxSelected) {
-      const rerouteType = 'doc';
-      query[rerouteType] = RerouteType.CheckboxSelected;
+    if (rerouteType != null) {
+      const rerouteTypeKey = 'rerouteType';
+      query[rerouteTypeKey] = rerouteType;
     }
     router.push({
       pathname: searchPath,

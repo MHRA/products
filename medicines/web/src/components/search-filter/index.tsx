@@ -104,7 +104,6 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
   };
 
   useEffect(() => {
-    // https://www.javaguides.net/2019/09/typescript-number-based-enums-example.html
     if (
       RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
     ) {
