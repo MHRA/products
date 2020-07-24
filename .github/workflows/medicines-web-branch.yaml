@@ -83,7 +83,7 @@ jobs:
         env:
           ROOT_URL_DOMAIN: localhost
 
-      - name: Upload cypress videos
+      - name: Upload pa11y screenshots
         uses: actions/upload-artifact@v1
         if: failure()
         with:
