@@ -1,16 +1,16 @@
 {
   "defaults": {
     "timeout": 10000,
-    "standard": "WCAG2AAA"
+    "standard": "WCAG2AA"
   },
   "urls": [
     {
       "url": "http://localhost:3000",
-      "screenCapture": "my-screen-capture.png"
+      "screenCapture": "pa11y-screenshots/home.png"
     },
     {
       "url": "http://localhost:3000/about",
-      "screenCapture": "about.png"
+      "screenCapture": "pa11y-screenshots/about.png"
     },
     {
       "url": "http://localhost:3000/accessibility",
