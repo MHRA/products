@@ -110,8 +110,8 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
     if (
       props.rerouteType != null && RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
     ) {
-      filterHeader.current.scrollIntoView();
-      submitButton.current.focus();
+      filterHeader.current?.scrollIntoView();
+      submitButton.current?.focus();
     }
   }, [props.rerouteType]);
 
