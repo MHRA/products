@@ -7,10 +7,12 @@ variable "location" {
 variable "environment" {
   description = "Environment name to use as a tag"
 }
-variable "namespace" {
-  description = "Namespace to use on resources"
+variable "dns_zone_name" {
+  description = "DNS zone name"
 }
-variable "cdn_region" {
-  description = "Region where the CDN profile should be deployed"
-  default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
+variable "doc_index_updater_record_name" {
+  description = "Name of the doc index updater DNS record"
+}
+variable "cluster_public_ip_id" {
+  description = "ID of the resource of the public IP of the cluster"
 }

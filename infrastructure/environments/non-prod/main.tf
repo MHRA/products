@@ -153,3 +153,13 @@ module keyvault {
   authorised_person_ids       = var.KEYVAULT_AUTHORISED_PERSON_IDS
   network_acls_default_action = "Allow"
 }
+
+# DNS
+module dns {
+  source = "../../modules/dns"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  dns_zone_name       = var.DNS_ZONE_NAME
+  resource_group_name = var.DNS_RESOURCE_GROUP_NAME
+}
