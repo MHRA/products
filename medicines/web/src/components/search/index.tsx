@@ -10,6 +10,7 @@ import {
   white,
 } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import { Button } from '../buttons';
 
 const StyledSearch = styled.section`
   box-sizing: border-box;
@@ -43,23 +44,6 @@ const StyledSearch = styled.section`
     border: solid 1px ${mhraGray};
     margin-right: 0.5rem;
     min-width: 0;
-  }
-
-  input[type='submit'] {
-    display: block;
-    cursor: pointer;
-    color: ${mhraWhite};
-    background-color: ${primaryColor};
-    align-self: flex-end;
-    max-width: 50%;
-    border-radius: 6px;
-    text-decoration: none;
-    -webkit-appearance: none;
-    border: solid 1px ${mhra70};
-
-    &:hover {
-      background-color: ${mhra70};
-    }
   }
 
   @media ${mobileBreakpoint} {
@@ -100,7 +84,7 @@ const Search: React.FC<ISearchProps> = props => (
           onChange={props.onSearchChange}
           onBlur={props.onSearchBlur}
         />
-        <input type="submit" value="Search" />
+        <Button type="submit" value="Search" />
       </div>
     </form>
   </StyledSearch>

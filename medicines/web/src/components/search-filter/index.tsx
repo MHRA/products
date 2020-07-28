@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
-import { SubmitButton } from '../buttons';
+import { Button } from '../buttons';
 
 const StyledSearchFilter = styled.section`
   .checkbox-row {
@@ -26,6 +26,10 @@ const StyledSearchFilter = styled.section`
       flex: 1;
     }
   }
+`;
+
+const ButtonContainer = styled.div`
+  padding-top: 10px;
 `;
 
 interface ISearchFilterProps {
@@ -121,7 +125,15 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
-      <SubmitButton onClick={submit} value="Submit" ref={submitButton} />
+      <ButtonContainer>
+        <Button
+          type="submit"
+          onClick={submit}
+          value="Submit"
+          ref={submitButton}
+          padding="4px"
+        />
+      </ButtonContainer>
     </StyledSearchFilter>
   );
 };
