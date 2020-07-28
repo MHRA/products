@@ -1,6 +1,6 @@
 # MHRA Medicines Infrastructure Automation
 
-The following instructions are divided in:
+The following instructions are divided into two parts:
 
 - [Provisioning a new environment](#provisioning-a-new-environment)
 - [Provisioning infrastructure in an existing environment](#provisioning-infrastructure-in-an-existing-environment)
@@ -9,9 +9,9 @@ The following instructions are divided in:
 
 To run the following steps, first you should:
 
-1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
-3. Install [jq](https://stedolan.github.io/jq/)
+1. Install [Terraform](https://www.terraform.io/intro/getting-started/install.html) - required to deploy, delete and check the status of current cloud infrastructure from resource files from the command line
+2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) - allows you to log in to your Azure account and retrieve details about deployed instances. Accessed using `az`
+3. Install [jq](https://stedolan.github.io/jq/) - a command line JSON processor used by some of the scripts in this project
 
    ```sh
    brew install jq
@@ -23,7 +23,7 @@ To run the following steps, first you should:
    az login
    ```
 
-5. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from previous command:
+5. If the login shows that you have access to more than one subscription, run the following command changing `SUBSCRIPTION_ID` with the relevant ID found in the output from the previous command:
 
    ```sh
    az account set --subscription="SUBSCRIPTION_ID"
@@ -31,40 +31,40 @@ To run the following steps, first you should:
 
 ## Provisioning a new environment
 
-**Avoid this step if an environment is created**
+**Avoid this step if the target environment already exists**
 
-This step is limited to developers who have `owner` rights on Azure. If this is not your case, ask a colleague with the appropriate privileges, or contact **MHRA IT Desk**.
+This step is limited to developers who have `owner` rights on Azure. If you do not have sufficient privileges, ask a colleague or contact **MHRA IT Desk**.
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/prod`)
-2. Create an `.env` file following the example from `.env.example`, values to populate these fields are on step 8 and 10. (_Note: Some values are the same for different keys it, e.g. `ARM_CLIENT_ID` & `TF_VAR_CLIENT_ID`, this is because one is for Azure CLI and the other one is to inject the sensible value into a Terraform block_)
+2. Create an `.env` file, following the example from `.env.example`. (_Note: Some values are the same for different keys it, e.g. `ARM_CLIENT_ID` & `TF_VAR_CLIENT_ID`, as one is for Azure CLI and the other one is named so that it can be referenced from within Terraform_)
 
-3. Create a new storage account for the Terraform state,
+3. Create a new storage account to hold the Terraform state for this environment by running the following script
 
    ```sh
    ../../scripts/create-storage-account.sh
    ```
 
-4. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
+4. Use the output from this script to populate the corresponding values in your `.env` file
 
-5. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication) password based authentication replacing `<ServicePrincipalName>` with the name of the account you want to use
+5. [Create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest#password-based-authentication), replacing `<ServicePrincipalName>` with the name of the account you want to use
 
    ```sh
    az ad sp create-for-rbac --name <ServicePrincipalName>
    ```
 
-6. Copy and paste the final output from this script and populate with the correspondent value in `.env` file
+6. Use the output from this script to populate the corresponding values in your `.env` file
 
 ## Provisioning infrastructure in an existing environment
 
 1. Change to the relevant environment directory (e.g. `infrastructure/environments/non-prod`)
 
-2. Create an `.env` file following the example from `.env.example` and populate with the correspondent values.
+2. Create an `.env` file. You can either populate the values manually, following the example from `.env.example` or, if you have access to the Azure keyvault, you can run `make get-env` to auto-populate them from the saved values.
 
-   To get the values:
+   If populating manually, to get the `ARM_` prefixed values:
 
    1. Make sure you have logged in to the Azure CLI: `az login`. The `id` field returned by this command is your `ARM_SUBSCRIPTION_ID`.
 
-   2. Create a service principal: `az ad sp create-for-rbac --name "MakeUpSomeName"`. Use the output values from this command as your environment variables:
+   2. Create a service principal: `az ad sp create-for-rbac --name "MakeUpSomeName"`. Use the output values from this command for the following environment variables:
 
       | Environment variable | Field      |
       | -------------------- | ---------- |
@@ -78,20 +78,20 @@ This step is limited to developers who have `owner` rights on Azure. If this is 
    set -a && source .env && set +a
    ```
 
-4. Initialize terraform (ensure providers/modules are installed and backend is initialized)
+4. Initialize terraform (this ensures providers/modules are installed locally and the backend is initialized)
 
    ```sh
    terraform init
    ```
 
-5. Create a plan, or apply the infrastructure
+5. Create a plan or apply the infrastructure
 
    ```sh
    terraform plan # optional
    terraform apply
    ```
 
-6. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). The output is needed in order to upload documents and manage the search indexes...
+6. The `terraform apply` will produce some output that looks similar to the following (the keys below have since been removed). You can use these values where required in other `.env` files throughout this repo
 
    ```
    Outputs:

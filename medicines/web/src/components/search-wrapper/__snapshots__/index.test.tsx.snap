@@ -73,7 +73,7 @@ exports[`SearchWrapper should render 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "sc-htpNat",
                       "isStatic": false,
-                      "lastClassName": "eJXCyH",
+                      "lastClassName": "kRlLnl",
                       "rules": Array [
                         "
   box-sizing: border-box;
@@ -117,7 +117,7 @@ exports[`SearchWrapper should render 1`] = `
   input[type='search'] {
     width: 100%;
     border: solid 1px ",
-                        "rgb(154, 155, 156)",
+                        "#000",
                         ";
     margin-right: 0.5rem;
     min-width: 0;
@@ -154,7 +154,7 @@ exports[`SearchWrapper should render 1`] = `
                 forwardedRef={null}
               >
                 <section
-                  className="sc-htpNat eJXCyH"
+                  className="sc-htpNat kRlLnl"
                 >
                   <form
                     aria-label="Search for medicines"

@@ -1,6 +1,6 @@
 # transaction-log-file-creator
 
-![transaction-log-file-creator](https://github.com/MHRA/products/workflows/transaction-logs/transaction-log-file-creator-master/badge.svg)
+![transaction-log-file-creator](https://github.com/MHRA/products/workflows/transaction-log-file-creator-ci/badge.svg)
 
 - [Implementation details](#implementation-details) explain how the _transaction-log-file-creator_ works
 - [Development how-to](#development-how-to) explains how to work on improving, fixing or extending the _transaction-log-file-creator_
@@ -9,7 +9,7 @@
 
 This program creates a new, empty append blob file in an Azure storage account.
 
-A ![scheduled github workflow](../../.github/workflows/transaction-logs/scheduled-transaction-log-file-creator.yaml) executes this code at the start of every month to create a new log file for the following month, with the log file name based on the target year and month.
+A [scheduled github workflow](../../.github/workflows/transaction-log-file-creator-execution.yaml) executes this code at the start of every month to create a new log file for the following month, with the log file name based on the target year and month.
 
 It only creates a blob if a file of that name does not already exist, to prevent accidental overwrite.
 
