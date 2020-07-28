@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { black } from '../../styles/colors';
+import { black, mhra70, mhraWhite, primaryColor } from '../../styles/colors';
 
 const StyledCheckbox = styled.input`
   appearance: none;
@@ -22,3 +22,21 @@ const StyledCheckbox = styled.input`
 export const Checkbox = props => {
   return <StyledCheckbox type="checkbox" {...props} />;
 };
+
+export const Button = styled.input`
+  display: block;
+  cursor: pointer;
+  color: ${mhraWhite};
+  background-color: ${primaryColor};
+  align-self: flex-end;
+  max-width: 50%;
+  border-radius: 6px;
+  text-decoration: none;
+  -webkit-appearance: none;
+  border: solid 1px ${mhra70};
+  padding: 0.5rem;
+
+  &:hover {
+    background-color: ${mhra70};
+  }
+`;

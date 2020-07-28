@@ -11,9 +11,9 @@ exports[`SearchWrapper should render 1`] = `
           "$$typeof": Symbol(react.forward_ref),
           "attrs": Array [],
           "componentStyle": ComponentStyle {
-            "componentId": "sc-ifAKCX",
+            "componentId": "sc-EHOje",
             "isStatic": false,
-            "lastClassName": "gEQOvK",
+            "lastClassName": "gOXIFz",
             "rules": Array [
               "
   width: 100%;
@@ -43,7 +43,7 @@ exports[`SearchWrapper should render 1`] = `
           "displayName": "styled.div",
           "foldedComponentIds": Array [],
           "render": [Function],
-          "styledComponentId": "sc-ifAKCX",
+          "styledComponentId": "sc-EHOje",
           "target": "div",
           "toString": [Function],
           "warnTooManyClasses": [Function],
@@ -53,7 +53,7 @@ exports[`SearchWrapper should render 1`] = `
       forwardedRef={null}
     >
       <div
-        className="sc-ifAKCX gEQOvK"
+        className="sc-EHOje gOXIFz"
       >
         <section
           className="search"
@@ -71,9 +71,9 @@ exports[`SearchWrapper should render 1`] = `
                     "$$typeof": Symbol(react.forward_ref),
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "sc-htpNat",
+                      "componentId": "sc-bxivhb",
                       "isStatic": false,
-                      "lastClassName": "kRlLnl",
+                      "lastClassName": "iWZhXB",
                       "rules": Array [
                         "
   box-sizing: border-box;
@@ -144,7 +144,7 @@ exports[`SearchWrapper should render 1`] = `
                     "displayName": "styled.section",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "sc-htpNat",
+                    "styledComponentId": "sc-bxivhb",
                     "target": "section",
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -154,7 +154,7 @@ exports[`SearchWrapper should render 1`] = `
                 forwardedRef={null}
               >
                 <section
-                  className="sc-htpNat kRlLnl"
+                  className="sc-bxivhb iWZhXB"
                 >
                   <form
                     aria-label="Search for medicines"
@@ -186,9 +186,9 @@ exports[`SearchWrapper should render 1`] = `
                               "$$typeof": Symbol(react.forward_ref),
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
-                                "componentId": "sc-bwzfXH",
+                                "componentId": "sc-htpNat",
                                 "isStatic": false,
-                                "lastClassName": "bTOPsL",
+                                "lastClassName": "fDZyVT",
                                 "rules": Array [
                                   "
   display: block;
@@ -220,7 +220,7 @@ exports[`SearchWrapper should render 1`] = `
                               "displayName": "styled.input",
                               "foldedComponentIds": Array [],
                               "render": [Function],
-                              "styledComponentId": "sc-bwzfXH",
+                              "styledComponentId": "sc-htpNat",
                               "target": "input",
                               "toString": [Function],
                               "warnTooManyClasses": [Function],
@@ -232,7 +232,7 @@ exports[`SearchWrapper should render 1`] = `
                           value="Search"
                         >
                           <input
-                            className="sc-bwzfXH bTOPsL"
+                            className="sc-htpNat fDZyVT"
                             type="submit"
                             value="Search"
                           />
@@ -1077,9 +1077,9 @@ exports[`SearchWrapper should render 1`] = `
                   "$$typeof": Symbol(react.forward_ref),
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
-                    "componentId": "sc-bxivhb",
+                    "componentId": "sc-ifAKCX",
                     "isStatic": false,
-                    "lastClassName": "lkasbG",
+                    "lastClassName": "btYKIR",
                     "rules": Array [
                       "
   display: flex;
@@ -1178,7 +1178,7 @@ exports[`SearchWrapper should render 1`] = `
                   "displayName": "styled.section",
                   "foldedComponentIds": Array [],
                   "render": [Function],
-                  "styledComponentId": "sc-bxivhb",
+                  "styledComponentId": "sc-ifAKCX",
                   "target": "section",
                   "toString": [Function],
                   "warnTooManyClasses": [Function],
@@ -1188,7 +1188,7 @@ exports[`SearchWrapper should render 1`] = `
               forwardedRef={null}
             >
               <section
-                className="sc-bxivhb lkasbG"
+                className="sc-ifAKCX btYKIR"
               >
                 <div
                   className="action-bar"

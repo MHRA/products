@@ -2,8 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
-import { Button } from '../buttons';
-import { Checkbox } from '../form-elements';
+import { Button, Checkbox } from '../form-elements';
 
 const StyledSearchFilter = styled.section`
   .checkbox-row {

@@ -1,16 +1,8 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
-import {
-  black,
-  mhra70,
-  mhraBlue90,
-  mhraGray,
-  mhraWhite,
-  primaryColor,
-  white,
-} from '../../styles/colors';
+import { black, mhraBlue90, white } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-import { Button } from '../buttons';
+import { Button } from '../form-elements';
 
 const StyledSearch = styled.section`
   box-sizing: border-box;
