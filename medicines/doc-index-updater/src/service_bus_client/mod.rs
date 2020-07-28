@@ -47,6 +47,30 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
+pub async fn create_clean_up_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+    let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
+        .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
+
+    let queue_name =
+        std::env::var("CREATE_QUEUE_NAME").expect("Set env variable CREATE_QUEUE_NAME first!");
+
+    let dead_letter_queue_name = format!("{}/$DeadLetterQueue", queue_name);
+
+    let policy_name = std::env::var("CREATE_QUEUE_POLICY_NAME")
+        .expect("Set env variable CREATE_QUEUE_POLICY_NAME first!");
+
+    let policy_key = std::env::var("CREATE_QUEUE_POLICY_KEY")
+        .expect("Set env variable CREATE_QUEUE_POLICY_KEY first!");
+
+    let service_bus = Client::new(
+        service_bus_namespace,
+        dead_letter_queue_name,
+        policy_name,
+        policy_key,
+    )?;
+    Ok(DocIndexUpdaterQueue::new(service_bus))
+}
+
 #[derive(Error, Debug)]
 pub enum RetrieveFromQueueError {
     #[error(transparent)]
@@ -214,6 +238,32 @@ impl DocIndexUpdaterQueue {
         }
         Ok(())
     }
+
+    pub async fn try_process_from_dead_letter_queue<T>(
+        &mut self,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<()>
+    where
+        T: Message,
+        RetrievedMessage<T>: ProcessRetrievalError + Removable,
+    {
+        tracing::debug!("Checking for messages.");
+        let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
+            self.receive().await;
+
+        if let Ok(retrieval) = retrieved_result {
+            let correlation_id = retrieval.message.get_id().to_string();
+            let correlation_id = correlation_id.as_str();
+
+            process_dead_letter(correlation_id, state_manager)
+                .instrument(tracing::info_span!(
+                    "try_process_dead_letter_from_queue",
+                    correlation_id
+                ))
+                .await?
+        }
+        Ok(())
+    }
 }
 
 async fn process<T>(
@@ -236,6 +286,28 @@ where
             retrieval.handle_processing_error(e, state_manager).await?;
         }
     };
+    Ok(())
+}
+
+async fn process_dead_letter<T>(
+    mut retrieval: RetrievedMessage<T>,
+    state_manager: &impl JobStatusClient,
+) -> anyhow::Result<()>
+where
+    T: Message,
+    RetrievedMessage<T>: ProcessRetrievalError + Removable,
+{
+    state_manager
+        .set_status(
+            retrieval.message.job_id,
+            JobStatus::Error {
+                message: "Max number of retries exceeded - removed from dead letter queue"
+                    .to_string(),
+                code: "500".to_string(),
+            },
+        )
+        .await?;
+    let _ = removable_message.remove().await?;
     Ok(())
 }
 
