@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { DocType } from '../../services/azure-search';
+import { Checkbox } from '../form-elements';
 
 const StyledSearchFilter = styled.section`
   .checkbox-row {
@@ -13,11 +14,7 @@ const StyledSearchFilter = styled.section`
       flex: 0.1;
       display: flex;
       flex-direction: column;
-      padding: 0.25em;
-
-      input {
-        flex: 1;
-      }
+      padding: 0.25em 0;
     }
 
     label {
@@ -52,8 +49,7 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
   return (
     <div className="checkbox-row">
       <div className="checkbox">
-        <input
-          type="checkbox"
+        <Checkbox
           id={id}
           name="doc"
           value={docTypeForThisCheckbox}
