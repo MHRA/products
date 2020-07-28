@@ -131,7 +131,6 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
           onClick={submit}
           value="Submit"
           ref={submitButton}
-          padding="4px"
         />
       </ButtonContainer>
     </StyledSearchFilter>

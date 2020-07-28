@@ -22,7 +22,7 @@ exports[`Search should render 1`] = `
         type="search"
         value="drug"
       />
-      <input
+      <styled.input
         type="submit"
         value="Search"
       />

@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button should render 1`] = `
+<StyledComponent
+  forwardedComponent={
+    Object {
+      "$$typeof": Symbol(react.forward_ref),
+      "attrs": Array [],
+      "componentStyle": ComponentStyle {
+        "componentId": "sc-bdVaJa",
+        "isStatic": false,
+        "rules": Array [
+          "
+  display: block;
+  cursor: pointer;
+  color: ",
+          "#ffffff",
+          ";
+  background-color: ",
+          "rgb(15, 18, 144)",
+          ";
+  align-self: flex-end;
+  max-width: 50%;
+  border-radius: 6px;
+  text-decoration: none;
+  -webkit-appearance: none;
+  border: solid 1px ",
+          "#5759b1",
+          ";
+  padding: 0.5rem;
+
+  &:hover {
+    background-color: ",
+          "#5759b1",
+          ";
+  }
+",
+        ],
+      },
+      "displayName": "styled.input",
+      "foldedComponentIds": Array [],
+      "render": [Function],
+      "styledComponentId": "sc-bdVaJa",
+      "target": "input",
+      "toString": [Function],
+      "warnTooManyClasses": [Function],
+      "withComponent": [Function],
+    }
+  }
+  forwardedRef={null}
+  type="submit"
+  value="val"
+/>
+`;

@@ -1,5 +1,7 @@
 import { shallow } from 'enzyme';
 import React from 'react';
+import { RerouteType } from '../../model/rerouteType';
+import { DocType } from '../../services/azure-search';
 import SearchResults from './index';
 
 const drugsMock = [
@@ -26,6 +28,7 @@ const drugsMock = [
 ];
 
 const noFeedback = () => undefined;
+const updateDocType = (d: DocType[]) => undefined;
 
 describe(SearchResults, () => {
   it('should render', () => {
@@ -39,7 +42,8 @@ describe(SearchResults, () => {
         showingResultsForTerm={'Tea'}
         disclaimerAgree
         docTypes={[]}
-        handleDocTypeCheckbox={noFeedback}
+        updateDocTypes={updateDocType}
+        rerouteType={RerouteType.CheckboxSelected}
         handlePageChange={noFeedback}
         isLoading={false}
       />,
