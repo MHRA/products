@@ -10,6 +10,10 @@ output "public_ip" {
   value = azurerm_public_ip.products_ip.ip_address
 }
 
+output "public_ip_id" {
+  value = azurerm_public_ip.products_ip.id
+}
+
 output "host" {
   value = azurerm_kubernetes_cluster.cluster.kube_config.0.host
 }

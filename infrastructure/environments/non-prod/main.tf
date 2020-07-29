@@ -158,8 +158,13 @@ module keyvault {
 module dns {
   source = "../../modules/dns"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  dns_zone_name       = var.DNS_ZONE_NAME
-  resource_group_name = var.DNS_RESOURCE_GROUP_NAME
+  environment                   = var.ENVIRONMENT
+  location                      = var.REGION
+  dns_zone_name                 = var.DNS_ZONE_NAME
+  resource_group_name           = var.DNS_RESOURCE_GROUP_NAME
+  cluster_public_ip_id          = "/subscriptions/bec11470-1346-4cdd-af2e-ce1f360671a1/resourceGroups/mc_adazr-rg-1001_non-prod_uksouth/providers/Microsoft.Network/publicIPAddresses/kubernetes-a23297ad07f6449aa907eccd6b4e049d" // module.cluster.public_ip_id
+  doc_index_updater_record_name = "doc-index-updater"
+  medicines_api_record_name     = "medicines-api"
+  products_record_name          = "products"
+  products_cdn_id               = module.products_web.products_cdn_id
 }

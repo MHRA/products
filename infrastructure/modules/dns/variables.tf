@@ -13,6 +13,15 @@ variable "dns_zone_name" {
 variable "doc_index_updater_record_name" {
   description = "Name of the doc index updater DNS record"
 }
+variable "medicines_api_record_name" {
+  description = "Name of the medicines API DNS record"
+}
+variable "products_record_name" {
+  description = "Name of the medicines API DNS record"
+}
 variable "cluster_public_ip_id" {
   description = "ID of the resource of the public IP of the cluster"
+}
+variable "products_cdn_id" {
+  description = "ID of the resource of the CDN for products"
 }
