@@ -17,7 +17,7 @@ impl Substance {
     }
 }
 
-#[juniper::graphql_object]
+#[async_graphql::graphql_object]
 #[graphql(description = "An active ingredient found in medical products")]
 impl Substance {
     fn name(&self) -> &str {

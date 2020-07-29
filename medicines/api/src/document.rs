@@ -1,31 +1,36 @@
 use crate::{pagination, pagination::PageInfo};
-use juniper::GraphQLObject;
+use async_graphql::SimpleObject;
 use search_client::{
     models::{DocumentType, IndexResult},
     Search,
 };
 
-#[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
-#[graphql(description = "A document")]
+#[SimpleObject(desc = "A document")]
+#[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
+    #[field(desc = "product name")]
     product_name: Option<String>,
+    #[field(desc = "active substances")]
     active_substances: Option<Vec<String>>,
+    #[field(desc = "title")]
     title: Option<String>,
+    #[field(desc = "highlights")]
     highlights: Option<Vec<String>>,
+    #[field(desc = "created")]
     created: Option<String>,
+    #[field(desc = "doc type")]
     doc_type: Option<DocumentType>,
+    #[field(desc = "file size")]
     file_size_in_bytes: Option<i32>,
+    #[field(desc = "name")]
     name: Option<String>,
+    #[field(desc = "url")]
     url: Option<String>,
 }
 
 impl Document {
     pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
         self.doc_type == Some(doc_type)
-    }
-
-    pub fn product_name(&self) -> Option<&str> {
-        self.product_name.as_deref()
     }
 
     pub fn substances(&self) -> impl Iterator<Item = &str> {

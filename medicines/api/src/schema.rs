@@ -1,4 +1,4 @@
-use juniper::{FieldResult, RootNode};
+use async_graphql::{FieldResult, RootNode};
 
 use crate::{
     azure_context::AzureContext,
@@ -10,7 +10,7 @@ use search_client::models::DocumentType;
 
 pub struct QueryRoot;
 
-#[juniper::graphql_object(Context = AzureContext)]
+#[async_graphql::graphql_object(Context = AzureContext)]
 impl QueryRoot {
     async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
         match name {
@@ -18,14 +18,14 @@ impl QueryRoot {
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    juniper::FieldError::new(
+                    async_graphql::FieldError::new(
                         "Error fetching search results",
-                        juniper::Value::null(),
+                        async_graphql::Value::null(),
                     )
                 }),
-            None => Err(juniper::FieldError::new(
+            None => Err(async_graphql::FieldError::new(
                 "Getting a substance without providing a substance name is not supported.",
-                juniper::Value::null(),
+                async_graphql::Value::null(),
             )),
         }
     }
@@ -33,7 +33,10 @@ impl QueryRoot {
     async fn product(_context: &AzureContext, name: String) -> FieldResult<Product> {
         get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+            async_graphql::FieldError::new(
+                "Error fetching search results",
+                async_graphql::Value::null(),
+            )
         })
     }
 
@@ -45,7 +48,10 @@ impl QueryRoot {
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+                async_graphql::FieldError::new(
+                    "Error fetching search results",
+                    async_graphql::Value::null(),
+                )
             })
     }
 
@@ -70,7 +76,10 @@ impl QueryRoot {
         .await
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+            async_graphql::FieldError::new(
+                "Error fetching search results",
+                async_graphql::Value::null(),
+            )
         })?
         .into();
 
@@ -97,14 +106,14 @@ fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
 
 pub struct MutationRoot;
 
-#[juniper::graphql_object(Context = AzureContext)]
+#[async_graphql::graphql_object(Context = AzureContext)]
 impl MutationRoot {}
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot, SubscriptionRoot>;
 
 pub struct SubscriptionRoot;
 
-#[juniper::graphql_subscription(Context = AzureContext)]
+#[async_graphql::graphql_subscription(Context = AzureContext)]
 impl SubscriptionRoot {}
 
 pub fn create_schema() -> Schema {
