@@ -247,7 +247,6 @@ impl DocIndexUpdaterQueue {
         T: Message,
         RetrievedMessage<T>: ProcessRetrievalError + Removable,
     {
-        tracing::debug!("Checking for messages.");
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
             self.receive().await;
 
@@ -301,8 +300,7 @@ where
         .set_status(
             retrieval.message.get_id(),
             JobStatus::Error {
-                message: "Max number of retries exceeded - removed from dead letter queue"
-                    .to_string(),
+                message: "Max number of retries exceeded".to_string(),
                 code: "500".to_string(),
             },
         )

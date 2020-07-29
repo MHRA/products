@@ -3,8 +3,8 @@ use crate::{
     create_manager::models::BlobMetadata,
     models::{CreateMessage, JobStatus},
     service_bus_client::{
-        create_clean_up_factory, create_factory, ProcessMessageError, ProcessRetrievalError,
-        RemovableMessage, RetrievedMessage,
+        create_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
+        RetrievedMessage,
     },
     state_manager::{JobStatusClient, StateManager},
     storage_client::{
@@ -19,6 +19,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
+pub mod clean_up_worker;
 pub mod hash;
 pub mod models;
 mod retrieve;
@@ -37,27 +38,6 @@ pub async fn create_service_worker(
     loop {
         match create_client
             .try_process_from_queue::<CreateMessage>(&state_manager)
-            .await
-        {
-            Ok(()) => {}
-            Err(e) => tracing::error!("{:?}", e),
-        }
-        delay_for(time_to_wait).await;
-    }
-}
-
-pub async fn create_queue_clean_up_worker(
-    time_to_wait: Duration,
-    state_manager: StateManager,
-) -> Result<(), anyhow::Error> {
-    tracing::info!("Starting create service worker");
-    let mut create_clean_up_client = create_clean_up_factory()
-        .await
-        .map_err(|e| anyhow!("Couldn't create service bus client: {:?}", e))?;
-
-    loop {
-        match create_clean_up_client
-            .try_process_from_dead_letter_queue::<CreateMessage>(&state_manager)
             .await
         {
             Ok(()) => {}

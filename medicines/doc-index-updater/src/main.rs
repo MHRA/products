@@ -68,10 +68,12 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             time_to_wait,
             create_state
         )),
-        tokio::spawn(create_manager::create_queue_clean_up_worker(
-            time_to_wait,
-            create_clean_up_state
-        )),
+        tokio::spawn(
+            create_manager::clean_up_worker::create_queue_clean_up_worker(
+                time_to_wait,
+                create_clean_up_state
+            )
+        ),
     );
     Ok(())
 }
