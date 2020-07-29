@@ -29,7 +29,6 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
     let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
-    let clean_up_time_to_wait = time_to_wait * 10;
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
 
     let create_state = state.clone();

@@ -1,7 +1,7 @@
 use crate::{
     get_env_or_default,
-    models::{JobStatus, Message},
-    state_manager::{JobStatusClient, StateManager},
+    models::{JobStatus, JobStatusResponse, Message},
+    state_manager::{JobStatusClient, MyRedisError, StateManager},
     storage_client::models::StorageClientError,
 };
 use anyhow::anyhow;
@@ -12,6 +12,7 @@ use hyper::StatusCode;
 use thiserror::Error;
 use time::Duration;
 use tracing_futures::Instrument;
+use uuid::Uuid;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
@@ -296,17 +297,28 @@ where
     T: Message,
     RetrievedMessage<T>: ProcessRetrievalError + Removable,
 {
+    let current_job_status = state_manager.get_status(retrieval.message.get_id()).await?;
+    if current_job_status.status == JobStatus::Accepted {
+        println!("STATE OF RETRIEVED MESSAGE: {}", current_job_status.status);
+        let _ = set_job_max_tries_error_status(retrieval.message.get_id(), state_manager).await?;
+    }
+    let _ = retrieval.remove().await?;
+    Ok(())
+}
+
+async fn set_job_max_tries_error_status(
+    job_id: Uuid,
+    state_manager: &impl JobStatusClient,
+) -> Result<JobStatusResponse, MyRedisError> {
     state_manager
         .set_status(
-            retrieval.message.get_id(),
+            job_id,
             JobStatus::Error {
                 message: "Max number of retries exceeded".to_string(),
                 code: "500".to_string(),
             },
         )
-        .await?;
-    let _ = retrieval.remove().await?;
-    Ok(())
+        .await
 }
 
 #[cfg(test)]
