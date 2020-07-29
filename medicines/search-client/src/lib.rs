@@ -425,7 +425,7 @@ mod test {
 
             assert_eq!(actual, expected);
         } else {
-            assert!(false, "Provided search request is an error");
+            panic!("Provided search request is an error");
         }
     }
 
@@ -484,7 +484,7 @@ mod test {
 
             assert_eq!(actual, expected);
         } else {
-            assert!(false, "Provided search request is an error");
+            panic!("Provided search request is an error");
         }
     }
 
@@ -498,7 +498,7 @@ mod test {
 
             assert_eq!(actual, expected);
         } else {
-            assert!(false, "Provided search request is an error");
+            panic!("Provided search request is an error");
         }
     }
 

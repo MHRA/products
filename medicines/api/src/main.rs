@@ -1,4 +1,10 @@
+use crate::azure_context::create_context;
 use anyhow::anyhow;
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    QueryBuilder,
+};
+use async_graphql_warp::{BadRequest, GQLResponse};
 use core::fmt::Display;
 use std::{convert::Infallible, env, net::SocketAddr, str::FromStr};
 use tracing::Level;
@@ -17,13 +23,6 @@ mod substance;
 
 const PORT: u16 = 8000;
 
-use crate::{azure_context::create_context, schema::create_schema};
-use async_graphql::{
-    http::{playground_source, GraphQLPlaygroundConfig},
-    QueryBuilder,
-};
-use async_graphql_warp::{BadRequest, GQLResponse};
-
 pub fn healthz() -> impl Filter<Extract = impl Reply, Error = Rejection> + Copy {
     warp::path!("healthz")
         .and(warp::get())
@@ -41,8 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let log = warp::log("medicines-api");
 
-    let schema = create_schema();
-    let context = warp::any().map(create_context);
+    let schema = schema::ApiSchema::new(create_context());
 
     let cors = warp::cors()
         .allow_methods(vec![Method::GET, Method::POST])
@@ -56,10 +54,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
         .parse::<SocketAddr>()?;
 
-    let graphql_post = async_graphql_warp::graphql(schema).and_then(
+    let graphql_post = async_graphql_warp::graphql(schema.0).and_then(
         |(schema, builder): (_, QueryBuilder)| async move {
-            let resp = builder.execute(&schema).await;
-            Ok::<_, Infallible>(GQLResponse::from(resp))
+            let response = builder.execute(&schema).await;
+            Ok::<_, Infallible>(GQLResponse::from(response))
         },
     );
 

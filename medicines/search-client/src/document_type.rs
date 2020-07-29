@@ -2,8 +2,25 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
-#[cfg_attr(feature = "graphql", derive(juniper::GraphQLEnum))]
+#[cfg_attr(
+    feature = "graphql",
+    async_graphql::Enum(desc = "Document type (SPC/PIL/PAR)"),
+    derive(Serialize, Deserialize, Debug, Ord, PartialOrd)
+)]
+#[cfg_attr(
+    not(feature = "graphql"),
+    derive(
+        Serialize,
+        Deserialize,
+        Debug,
+        Copy,
+        Clone,
+        Eq,
+        PartialEq,
+        Ord,
+        PartialOrd
+    )
+)]
 pub enum DocumentType {
     #[serde(alias = "SPC")]
     Spc,

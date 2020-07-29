@@ -2,7 +2,7 @@ use crate::{
     document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };
-use async_graphql::{FieldResult, Object, SimpleObject};
+use async_graphql::{FieldResult, Object};
 use search_client::{models::DocumentType, Search};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -25,8 +25,7 @@ impl Product {
     }
 }
 
-#[Object]
-#[graphql(description = "A medical product containing active ingredients")]
+#[Object(desc = "A medical product containing active ingredients")]
 impl Product {
     #[field(desc = "name")]
     async fn name(&self) -> &str {
@@ -83,7 +82,7 @@ impl Product {
 }
 
 pub async fn handle_doc(document: &Document, products: &mut Vec<Product>) {
-    if let Some(document_product_name) = document.product_name {
+    if let Some(document_product_name) = document.product_name.as_ref() {
         // Try to find an existing product.
         let existing_product = products
             .iter_mut()
@@ -112,7 +111,7 @@ pub async fn get_substance_with_products(
     for result in azure_result.search_results {
         let document = result.into();
 
-        handle_doc(&document, &mut products);
+        handle_doc(&document, &mut products).await;
     }
 
     products.sort();

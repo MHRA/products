@@ -1,4 +1,4 @@
-use async_graphql::{FieldResult, RootNode};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
 
 use crate::{
     azure_context::AzureContext,
@@ -10,59 +10,57 @@ use search_client::models::DocumentType;
 
 pub struct QueryRoot;
 
-#[async_graphql::graphql_object(Context = AzureContext)]
+#[Object(desc = "Query root")]
 impl QueryRoot {
-    async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
+    async fn substance(
+        &self,
+        context: &Context<'_>,
+        name: Option<String>,
+    ) -> FieldResult<Substance> {
+        let context: &AzureContext = context.data()?;
         match name {
-            Some(name) => get_substance_with_products(&name, &context.client)
-                .await
-                .map_err(|e| {
-                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    async_graphql::FieldError::new(
-                        "Error fetching search results",
-                        async_graphql::Value::null(),
-                    )
-                }),
-            None => Err(async_graphql::FieldError::new(
-                "Getting a substance without providing a substance name is not supported.",
-                async_graphql::Value::null(),
-            )),
+            Some(name) => Ok(get_substance_with_products(&name, &context.client).await?),
+            None => Err(anyhow::anyhow!(
+                "Getting a substance without providing a substance name is not supported."
+            )
+            .into()),
         }
     }
 
-    async fn product(_context: &AzureContext, name: String) -> FieldResult<Product> {
-        get_product(name).await.map_err(|e| {
+    async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
+        let product = get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            async_graphql::FieldError::new(
-                "Error fetching search results",
-                async_graphql::Value::null(),
-            )
-        })
+            e
+        })?;
+        Ok(product)
     }
 
     async fn substances_by_first_letter(
-        context: &AzureContext,
+        &self,
+        context: &Context<'_>,
         letter: String,
     ) -> FieldResult<Vec<Substance>> {
-        get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
-            .await
-            .map_err(|e| {
-                tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                async_graphql::FieldError::new(
-                    "Error fetching search results",
-                    async_graphql::Value::null(),
-                )
-            })
+        let context: &AzureContext = context.data()?;
+        let ss =
+            get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
+                .await
+                .map_err(|e| {
+                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                    e
+                })?;
+        Ok(ss)
     }
 
     async fn documents(
-        context: &AzureContext,
+        &self,
+        context: &Context<'_>,
         search: Option<String>,
         first: Option<i32>,
         skip: Option<i32>,
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
+        let context: &AzureContext = context.data()?;
         let offset = get_offset_or_default(skip, after, 0);
 
         let docs = get_documents(
@@ -76,10 +74,7 @@ impl QueryRoot {
         .await
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            async_graphql::FieldError::new(
-                "Error fetching search results",
-                async_graphql::Value::null(),
-            )
+            e
         })?
         .into();
 
@@ -104,20 +99,16 @@ fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
     Ok(string.parse::<i32>()? + 1)
 }
 
-pub struct MutationRoot;
+pub struct ApiSchema(pub Schema<QueryRoot, EmptyMutation, EmptySubscription>);
 
-#[async_graphql::graphql_object(Context = AzureContext)]
-impl MutationRoot {}
-
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot, SubscriptionRoot>;
-
-pub struct SubscriptionRoot;
-
-#[async_graphql::graphql_subscription(Context = AzureContext)]
-impl SubscriptionRoot {}
-
-pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot {}, MutationRoot {}, SubscriptionRoot {})
+impl ApiSchema {
+    pub fn new(context: AzureContext) -> ApiSchema {
+        ApiSchema(
+            Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+                .data(context)
+                .finish(),
+        )
+    }
 }
 
 #[cfg(test)]

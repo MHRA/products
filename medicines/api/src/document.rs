@@ -9,23 +9,23 @@ use search_client::{
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
     #[field(desc = "product name")]
-    product_name: Option<String>,
+    pub product_name: Option<String>,
     #[field(desc = "active substances")]
-    active_substances: Option<Vec<String>>,
+    pub active_substances: Option<Vec<String>>,
     #[field(desc = "title")]
-    title: Option<String>,
+    pub title: Option<String>,
     #[field(desc = "highlights")]
-    highlights: Option<Vec<String>>,
+    pub highlights: Option<Vec<String>>,
     #[field(desc = "created")]
-    created: Option<String>,
+    pub created: Option<String>,
     #[field(desc = "doc type")]
-    doc_type: Option<DocumentType>,
+    pub doc_type: Option<DocumentType>,
     #[field(desc = "file size")]
-    file_size_in_bytes: Option<i32>,
+    pub file_size_in_bytes: Option<i32>,
     #[field(desc = "name")]
-    name: Option<String>,
+    pub name: Option<String>,
     #[field(desc = "url")]
-    url: Option<String>,
+    pub url: Option<String>,
 }
 
 impl Document {

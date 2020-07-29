@@ -1,10 +1,12 @@
 use crate::{document::Document, product::Product};
+use async_graphql::SimpleObject;
 use search_client::{
     models::{DocTypeParseError, IndexResults},
     Search,
 };
 use std::collections::BTreeMap;
 
+#[SimpleObject(desc = "An active ingredient found in medical products")]
 #[derive(Debug, PartialEq)]
 pub struct Substance {
     name: String,
@@ -14,18 +16,6 @@ pub struct Substance {
 impl Substance {
     pub fn new(name: String, products: Vec<Product>) -> Self {
         Self { name, products }
-    }
-}
-
-#[async_graphql::graphql_object]
-#[graphql(description = "An active ingredient found in medical products")]
-impl Substance {
-    fn name(&self) -> &str {
-        &self.name
-    }
-
-    fn products(&self) -> &Vec<Product> {
-        &self.products
     }
 }
 
@@ -70,7 +60,7 @@ fn format_search_results(
                 .find(|s| s.starts_with(letter))?
                 .to_string();
 
-            let product = doc.product_name()?.to_string();
+            let product = doc.product_name.to_owned().unwrap();
 
             Some((SubstanceName(substance), ProductName(product), doc))
         })
