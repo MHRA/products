@@ -31,6 +31,30 @@ pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
+pub async fn delete_clean_up_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+    let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
+        .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
+
+    let queue_name =
+        std::env::var("DELETE_QUEUE_NAME").expect("Set env variable DELETE_QUEUE_NAME first!");
+
+    let dead_letter_queue_name = format!("{}/$DeadLetterQueue", queue_name);
+
+    let policy_name = std::env::var("DELETE_QUEUE_POLICY_NAME")
+        .expect("Set env variable DELETE_QUEUE_POLICY_NAME first!");
+
+    let policy_key = std::env::var("DELETE_QUEUE_POLICY_KEY")
+        .expect("Set env variable DELETE_QUEUE_POLICY_KEY first!");
+
+    let service_bus = Client::new(
+        service_bus_namespace,
+        dead_letter_queue_name,
+        policy_name,
+        policy_key,
+    )?;
+    Ok(DocIndexUpdaterQueue::new(service_bus))
+}
+
 pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
@@ -243,7 +267,7 @@ impl DocIndexUpdaterQueue {
     pub async fn try_process_from_dead_letter_queue<T>(
         &mut self,
         state_manager: &StateManager,
-    ) -> anyhow::Result<()>
+    ) -> anyhow::Result<bool>
     where
         T: Message,
         RetrievedMessage<T>: ProcessRetrievalError + Removable,
@@ -251,6 +275,7 @@ impl DocIndexUpdaterQueue {
         let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
             self.receive().await;
 
+        let mut found_message = false;
         if let Ok(retrieval) = retrieved_result {
             let correlation_id = retrieval.message.get_id().to_string();
             let correlation_id = correlation_id.as_str();
@@ -260,9 +285,10 @@ impl DocIndexUpdaterQueue {
                     "try_process_dead_letter_from_queue",
                     correlation_id
                 ))
-                .await?
+                .await?;
+            found_message = true;
         }
-        Ok(())
+        Ok(found_message)
     }
 }
 
@@ -297,11 +323,7 @@ where
     T: Message,
     RetrievedMessage<T>: ProcessRetrievalError + Removable,
 {
-    let current_job_status = state_manager.get_status(retrieval.message.get_id()).await?;
-    if current_job_status.status == JobStatus::Accepted {
-        println!("STATE OF RETRIEVED MESSAGE: {}", current_job_status.status);
-        let _ = set_job_max_tries_error_status(retrieval.message.get_id(), state_manager).await?;
-    }
+    let _ = set_job_max_tries_error_status(retrieval.message.get_id(), state_manager).await?;
     let _ = retrieval.remove().await?;
     Ok(())
 }
