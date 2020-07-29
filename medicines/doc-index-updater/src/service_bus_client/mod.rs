@@ -255,7 +255,7 @@ impl DocIndexUpdaterQueue {
             let correlation_id = retrieval.message.get_id().to_string();
             let correlation_id = correlation_id.as_str();
 
-            process_dead_letter(correlation_id, state_manager)
+            process_dead_letter(retrieval, state_manager)
                 .instrument(tracing::info_span!(
                     "try_process_dead_letter_from_queue",
                     correlation_id
@@ -299,7 +299,7 @@ where
 {
     state_manager
         .set_status(
-            retrieval.message.job_id,
+            retrieval.message.get_id(),
             JobStatus::Error {
                 message: "Max number of retries exceeded - removed from dead letter queue"
                     .to_string(),
@@ -307,7 +307,7 @@ where
             },
         )
         .await?;
-    let _ = removable_message.remove().await?;
+    let _ = retrieval.remove().await?;
     Ok(())
 }
 
