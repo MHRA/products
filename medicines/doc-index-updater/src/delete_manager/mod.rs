@@ -19,6 +19,8 @@ use storage_client::{AzureBlobStorage, DeleteBlob};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
+pub mod clean_up_worker;
+
 pub async fn delete_service_worker(
     time_to_wait: Duration,
     state_manager: StateManager,

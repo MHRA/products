@@ -141,6 +141,12 @@ const StyledDrugList = styled.div`
   }
 `;
 
+const HiddenHeader = styled.h3`
+  visibility: hidden;
+  margin: 0;
+  height: 0;
+`;
+
 const emaWebsiteLink = () => (
   <a href="https://www.ema.europa.eu/en" target="_new">
     European Medicines Agency
@@ -255,17 +261,17 @@ const SearchResults = (props: ISearchResultsProps) => {
 
   return props.isLoading ? (
     <StyledDrugList>
-      <h1 className="title">
+      <h2 className="title">
         {`Loading results for ${showingResultsForTerm}...`}
-      </h1>
+      </h2>
     </StyledDrugList>
   ) : (
     <>
       <StyledDrugList>
         <div>
-          <h1 className="title">
+          <h2 className="title">
             {searchResultsTitle(showingResultsForTerm, drugs.length)}
-          </h1>
+          </h2>
           {hasDrugs && (
             <p className="no-of-results">
               {searchResultsNumberingInformation({
@@ -312,7 +318,8 @@ const SearchResults = (props: ISearchResultsProps) => {
                 rerouteType={rerouteType}
               />
             </div>
-            <div className="column results">
+            <section className="column results">
+              <HiddenHeader>Search results</HiddenHeader>
               <dl>
                 {hasDrugs &&
                   drugs.map((drug, i) => (
@@ -356,7 +363,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                     </article>
                   ))}
               </dl>
-            </div>
+            </section>
           </div>
         )}
       </StyledDrugList>

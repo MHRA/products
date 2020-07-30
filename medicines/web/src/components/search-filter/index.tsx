@@ -116,7 +116,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
 
   return (
     <StyledSearchFilter>
-      <h2 ref={filterHeader}>Filter documents by</h2>
+      <h3 ref={filterHeader}>Filter documents by</h3>
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
