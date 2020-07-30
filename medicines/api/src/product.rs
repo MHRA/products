@@ -74,7 +74,14 @@ impl Product {
                 document_types,
                 Some(&self.name),
             )
-            .await?
+            .await
+            .map_err(|e| {
+                tracing::error!(
+                    "Error fetching documents from Azure search service: {:?}",
+                    e
+                );
+                e
+            })?
             .into();
             Ok(docs)
         }

@@ -19,7 +19,12 @@ impl QueryRoot {
     ) -> FieldResult<Substance> {
         let context: &AzureContext = context.data()?;
         match name {
-            Some(name) => Ok(get_substance_with_products(&name, &context.client).await?),
+            Some(name) => Ok(get_substance_with_products(&name, &context.client)
+                .await
+                .map_err(|e| {
+                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                    e
+                })?),
             None => Err(anyhow::anyhow!(
                 "Getting a substance without providing a substance name is not supported."
             )
@@ -41,14 +46,14 @@ impl QueryRoot {
         letter: String,
     ) -> FieldResult<Vec<Substance>> {
         let context: &AzureContext = context.data()?;
-        let ss =
+        let substances =
             get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
                     e
                 })?;
-        Ok(ss)
+        Ok(substances)
     }
 
     async fn documents(

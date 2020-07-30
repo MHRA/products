@@ -60,9 +60,9 @@ fn format_search_results(
                 .find(|s| s.starts_with(letter))?
                 .to_string();
 
-            let product = doc.product_name.to_owned().unwrap();
-
-            Some((SubstanceName(substance), ProductName(product), doc))
+            doc.product_name
+                .to_owned()
+                .map(|product| (SubstanceName(substance), ProductName(product), doc))
         })
         .for_each(|(substance, product, doc)| {
             add_product_for_substance(&mut substances, substance, product, doc);
