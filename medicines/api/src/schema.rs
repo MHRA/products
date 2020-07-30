@@ -104,7 +104,9 @@ fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
     Ok(string.parse::<i32>()? + 1)
 }
 
-pub struct ApiSchema(pub Schema<QueryRoot, EmptyMutation, EmptySubscription>);
+type QuerySchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
+
+pub struct ApiSchema(pub QuerySchema);
 
 impl ApiSchema {
     pub fn new(context: AzureContext) -> ApiSchema {

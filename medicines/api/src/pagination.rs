@@ -42,10 +42,7 @@ macro_rules! pagination {
         impl $edgename {
             #[allow(dead_code)]
             fn new(node: $type, cursor: String) -> $edgename {
-                $edgename {
-                    node: node,
-                    cursor: cursor,
-                }
+                $edgename { node, cursor }
             }
         }
 
@@ -64,9 +61,9 @@ macro_rules! pagination {
                 total_count: i32,
             ) -> $name {
                 $name {
-                    page_info: page_info,
-                    total_count: total_count,
-                    edges: edges,
+                    page_info,
+                    total_count,
+                    edges,
                 }
             }
         }

@@ -128,7 +128,7 @@ pub async fn get_documents(
     let docs = azure_result
         .search_results
         .into_iter()
-        .map(|search_result| Document::from(search_result))
+        .map(Document::from)
         .collect();
 
     let total_count = azure_result.count.unwrap_or(0);

@@ -88,7 +88,7 @@ impl Product {
     }
 }
 
-pub async fn handle_doc(document: &Document, products: &mut Vec<Product>) {
+pub fn handle_doc(document: &Document, products: &mut Vec<Product>) {
     if let Some(document_product_name) = document.product_name.as_ref() {
         // Try to find an existing product.
         let existing_product = products
@@ -118,7 +118,7 @@ pub async fn get_substance_with_products(
     for result in azure_result.search_results {
         let document = result.into();
 
-        handle_doc(&document, &mut products).await;
+        handle_doc(&document, &mut products);
     }
 
     products.sort();
