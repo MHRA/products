@@ -108,6 +108,7 @@ describe('Search', function() {
     }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
   });
 
@@ -125,6 +126,7 @@ describe('Search', function() {
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
     cy.contains('Patient Information Leaflet (PIL)').click();
+    cy.contains('Submit').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
   });
@@ -142,6 +144,7 @@ describe('Search', function() {
     }).click();
     cy.contains('Agree').click();
     cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
     cy.get("a[href='https://example.com/an-example-par.pdf']").should(
       'not.exist',
     );
@@ -166,6 +169,7 @@ describe('Search', function() {
     cy.contains('Next').click();
     cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
     cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
     cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
   });

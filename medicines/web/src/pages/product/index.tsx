@@ -7,6 +7,7 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { docSearch, DocType } from '../../services/azure-search';
 import { documents } from '../../services/documents-loader';
@@ -76,6 +77,7 @@ const App: NextPage = () => {
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
 
   const router = useRouter();
   const {
@@ -85,6 +87,7 @@ const App: NextPage = () => {
       disclaimer: disclaimerQS,
       doc: docQS,
       useGraphQl: graphQlFeatureFlag,
+      rerouteType: rerouteTypeQS,
     },
   } = router;
 
@@ -132,6 +135,13 @@ const App: NextPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (!rerouteTypeQS) {
+      return;
+    }
+    setRerouteType(RerouteType[rerouteTypeQS.toString()]);
+  }, [rerouteTypeQS]);
+
   const reroutePage = (
     productName: string,
     page: number,
@@ -151,15 +161,8 @@ const App: NextPage = () => {
     });
   };
 
-  const handleToggleDocType = (docTypeToToggle: DocType) => {
-    const enabledDocTypes = Array.from(docTypes);
-    if (enabledDocTypes.includes(docTypeToToggle)) {
-      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
-      enabledDocTypes.splice(docTypeIndex, 1);
-    } else {
-      enabledDocTypes.push(docTypeToToggle);
-    }
-    reroutePage(productName, 1, enabledDocTypes);
+  const updateDocTypes = (updatedDocTypes: DocType[]) => {
+    reroutePage(productName, 1, updatedDocTypes);
   };
 
   const handlePageChange = async (page: number) => {
@@ -182,9 +185,10 @@ const App: NextPage = () => {
           searchTerm={productName}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          handleDocTypeCheckbox={handleToggleDocType}
+          updateDocTypes={updateDocTypes}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
+          rerouteType={rerouteType}
         />
         <DrugStructuredData drugName={productName} />
       </SearchWrapper>

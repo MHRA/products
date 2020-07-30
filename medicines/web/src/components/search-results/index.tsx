@@ -1,6 +1,7 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { DocType } from '../../services/azure-search';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
@@ -213,9 +214,10 @@ interface ISearchResultsProps {
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
   docTypes: DocType[];
-  handleDocTypeCheckbox: (d: DocType) => void;
+  updateDocTypes: (d: DocType[]) => void;
   handlePageChange: (num: number) => void;
   isLoading: boolean;
+  rerouteType: RerouteType;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -244,7 +246,8 @@ const SearchResults = (props: ISearchResultsProps) => {
     searchTerm,
     showingResultsForTerm,
     docTypes,
-    handleDocTypeCheckbox,
+    updateDocTypes,
+    rerouteType,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -311,7 +314,8 @@ const SearchResults = (props: ISearchResultsProps) => {
             <div className="column filter">
               <SearchFilter
                 currentlyEnabledDocTypes={docTypes}
-                toggleDocType={handleDocTypeCheckbox}
+                updateDocTypes={updateDocTypes}
+                rerouteType={rerouteType}
               />
             </div>
             <section className="column results">

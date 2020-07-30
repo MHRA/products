@@ -44,7 +44,8 @@ exports[`SearchResults should render 1`] = `
       >
         <SearchFilter
           currentlyEnabledDocTypes={Array []}
-          toggleDocType={[Function]}
+          rerouteType={0}
+          updateDocTypes={[Function]}
         />
       </div>
       <section
