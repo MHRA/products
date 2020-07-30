@@ -16,16 +16,9 @@ resource "azurerm_storage_account" "pars" {
   }
 }
 
-resource "azurerm_cdn_profile" "pars" {
-  name                = var.namespace
-  location            = var.cdn_region
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
 resource "azurerm_cdn_endpoint" "pars" {
   name                = var.namespace
-  profile_name        = azurerm_cdn_profile.pars.name
+  profile_name        = var.cdn_name
   location            = var.cdn_region
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.pars.primary_web_host
