@@ -61,49 +61,39 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
     );
 
+    let graphql_options = warp::options()
+        .map(warp::reply)
+        .with(cors)
+        .with(warp::log("cors-only"));
+
     let graphql_playground = warp::path::end().and(warp::get()).map(|| {
         Response::builder()
             .header("content-type", "text/html")
             .body(playground_source(GraphQLPlaygroundConfig::new("/")))
     });
 
-    let routes =
-        healthz()
-            .or(graphql_playground)
-            .or(graphql_post)
-            .recover(|err: Rejection| async move {
-                if let Some(BadRequest(err)) = err.find() {
-                    return Ok::<_, Infallible>(warp::reply::with_status(
-                        err.to_string(),
-                        StatusCode::BAD_REQUEST,
-                    ));
-                }
+    let routes = healthz()
+        .or(graphql_playground)
+        .or(graphql_options)
+        .or(graphql_post)
+        .recover(|err: Rejection| async move {
+            if let Some(BadRequest(err)) = err.find() {
+                return Ok::<_, Infallible>(warp::reply::with_status(
+                    err.to_string(),
+                    StatusCode::BAD_REQUEST,
+                ));
+            }
 
-                Ok(warp::reply::with_status(
-                    "INTERNAL_SERVER_ERROR".to_string(),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                ))
-            });
+            Ok(warp::reply::with_status(
+                "INTERNAL_SERVER_ERROR".to_string(),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            ))
+        });
 
     let _ = tokio::join!(tokio::spawn(async move {
         warp::serve(routes.with(log)).run(addr).await
     }));
-    // let _ = tokio::join!(tokio::spawn(async move {
-    //     warp::serve(
-    //         healthz()
-    //             .or(warp::path("graphiql").and(async_graphql_warp::graphiql("/graphql", None)))
-    //             .or(warp::path("graphql").and(
-    //                 warp::options()
-    //                     .map(warp::reply)
-    //                     .with(cors)
-    //                     .with(warp::log("cors-only")),
-    //             ))
-    //             .or(warp::path("graphql").and(graphql_filter))
-    //             .with(log),
-    //     )
-    //     .run(addr)
-    //     .await;
-    // }));
+
     Ok(())
 }
 
