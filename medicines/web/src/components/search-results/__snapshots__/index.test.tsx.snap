@@ -4,11 +4,11 @@ exports[`SearchResults should render 1`] = `
 <Fragment>
   <styled.div>
     <div>
-      <h1
+      <h2
         className="title"
       >
         Showing results for Tea
-      </h1>
+      </h2>
       <p
         className="no-of-results"
       >
@@ -47,9 +47,12 @@ exports[`SearchResults should render 1`] = `
           toggleDocType={[Function]}
         />
       </div>
-      <div
+      <section
         className="column results"
       >
+        <styled.h3>
+          Search results
+        </styled.h3>
         <dl>
           <article
             key="0"
@@ -160,7 +163,7 @@ exports[`SearchResults should render 1`] = `
             </dd>
           </article>
         </dl>
-      </div>
+      </section>
     </div>
   </styled.div>
   <Pagination
@@ -172,4 +175,14 @@ exports[`SearchResults should render 1`] = `
     searchTerm="Tea"
   />
 </Fragment>
+`;
+
+exports[`SearchResults should render loading page 1`] = `
+<styled.div>
+  <h2
+    className="title"
+  >
+    Loading results for Tea...
+  </h2>
+</styled.div>
 `;

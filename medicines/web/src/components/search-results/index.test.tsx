@@ -46,4 +46,23 @@ describe(SearchResults, () => {
     );
     expect(component).toMatchSnapshot();
   });
+
+  it('should render loading page', () => {
+    const component = shallow(
+      <SearchResults
+        drugs={drugsMock}
+        page={1}
+        pageSize={20}
+        resultCount={200}
+        searchTerm={'Tea'}
+        showingResultsForTerm={'Tea'}
+        disclaimerAgree
+        docTypes={[]}
+        handleDocTypeCheckbox={noFeedback}
+        handlePageChange={noFeedback}
+        isLoading
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
 });
