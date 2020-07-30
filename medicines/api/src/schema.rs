@@ -17,14 +17,14 @@ impl QueryRoot {
         context: &Context<'_>,
         name: Option<String>,
     ) -> FieldResult<Substance> {
-        let context: &AzureContext = context.data()?;
+        let context = context.data::<AzureContext>()?;
         match name {
-            Some(name) => Ok(get_substance_with_products(&name, &context.client)
+            Some(name) => get_substance_with_products(&name, &context.client)
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    e
-                })?),
+                    e.into()
+                }),
             None => Err(anyhow::anyhow!(
                 "Getting a substance without providing a substance name is not supported."
             )
@@ -33,11 +33,10 @@ impl QueryRoot {
     }
 
     async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
-        let product = get_product(name).await.map_err(|e| {
+        get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            e
-        })?;
-        Ok(product)
+            e.into()
+        })
     }
 
     async fn substances_by_first_letter(
@@ -45,15 +44,13 @@ impl QueryRoot {
         context: &Context<'_>,
         letter: String,
     ) -> FieldResult<Vec<Substance>> {
-        let context: &AzureContext = context.data()?;
-        let substances =
-            get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
-                .await
-                .map_err(|e| {
-                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    e
-                })?;
-        Ok(substances)
+        let context = context.data::<AzureContext>()?;
+        get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
+            .await
+            .map_err(|e| {
+                tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                e.into()
+            })
     }
 
     async fn documents(
@@ -65,10 +62,10 @@ impl QueryRoot {
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
-        let context: &AzureContext = context.data()?;
+        let context = context.data::<AzureContext>()?;
         let offset = get_offset_or_default(skip, after, 0);
 
-        let docs = get_documents(
+        get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
@@ -77,13 +74,11 @@ impl QueryRoot {
             None,
         )
         .await
+        .map(Into::into)
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            e
-        })?
-        .into();
-
-        Ok(docs)
+            e.into()
+        })
     }
 }
 
