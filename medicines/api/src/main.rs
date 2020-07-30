@@ -85,9 +85,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ))
             });
 
-    let _ = tokio::spawn(async move {
-        warp::serve(routes);
-    });
+    let _ = tokio::join!(tokio::spawn(async move {
+        warp::serve(routes.with(log)).run(addr).await
+    }));
     // let _ = tokio::join!(tokio::spawn(async move {
     //     warp::serve(
     //         healthz()
