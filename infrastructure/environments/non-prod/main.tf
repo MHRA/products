@@ -113,7 +113,6 @@ module pars {
   location                           = var.REGION
   environment                        = var.ENVIRONMENT
   namespace                          = local.pars_namespace
-  cdn_name                           = module.products.products_cdn_name
   app_registration_owners            = var.ADMIN_PERSON_IDS
   additional_allowed_pars_reply_urls = []
 }

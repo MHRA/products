@@ -14,11 +14,6 @@ variable "namespace" {
   description = "Namespace to use on cluster and storage"
 }
 
-variable "cdn_name" {
-  description = "Name of the CDN to associate the endpoint with"
-  default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
-}
-
 variable "cdn_region" {
   description = "Region where the CDN profile should be deployed"
   default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
