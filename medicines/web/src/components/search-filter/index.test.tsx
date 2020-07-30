@@ -1,17 +1,19 @@
 import { mount } from 'enzyme';
 import React from 'react';
+import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
 import SearchFilter from './index';
 
 describe(SearchFilter, () => {
   it('should render search filter', () => {
-    const toggleFunction = (d: DocType) => {
+    const updateDocTypesFunction = (d: DocType[]) => {
       return null;
     };
     const component = mount(
       <SearchFilter
         currentlyEnabledDocTypes={[]}
-        toggleDocType={toggleFunction}
+        updateDocTypes={updateDocTypesFunction}
+        rerouteType={RerouteType.CheckboxSelected}
       />,
     );
     expect(component).toMatchSnapshot();

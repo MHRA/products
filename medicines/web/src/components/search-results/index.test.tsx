@@ -62,7 +62,8 @@ describe(SearchResults, () => {
         showingResultsForTerm={'Tea'}
         disclaimerAgree
         docTypes={[]}
-        handleDocTypeCheckbox={noFeedback}
+        rerouteType={RerouteType.Other}
+        updateDocTypes={noFeedback}
         handlePageChange={noFeedback}
         isLoading
       />,
