@@ -66,7 +66,7 @@ impl Product {
                 total_count,
             ))
         } else {
-            let docs = get_documents(
+            get_documents(
                 &search_client::AzureSearchClient::new(),
                 "",
                 first,
@@ -75,15 +75,14 @@ impl Product {
                 Some(&self.name),
             )
             .await
+            .map(Into::into)
             .map_err(|e| {
                 tracing::error!(
                     "Error fetching documents from Azure search service: {:?}",
                     e
                 );
-                e
-            })?
-            .into();
-            Ok(docs)
+                e.into()
+            })
         }
     }
 }
