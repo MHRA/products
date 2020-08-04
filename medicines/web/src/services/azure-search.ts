@@ -110,7 +110,7 @@ export const getBmgfDocs = async (
 ): Promise<IBmgfSearchResults> => {
   const body = await getJson(
     buildBaseUrl(searchService, bmgfSearchIndex).toString() +
-      `&search=${query}&queryType=full&$count=true&$top=10`,
+      `&search=${query}&queryType=full&$count=true&$top=100`,
   );
   return {
     resultCount: body['@odata.count'],

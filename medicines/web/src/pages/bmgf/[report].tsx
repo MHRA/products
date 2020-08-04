@@ -30,8 +30,9 @@ export default Report;
 
 export async function getStaticProps(context) {
   const reportName = context.params;
+  console.log(reportName);
   // @ts-ignore
-  const reportContent = await import('../../content/about.md');
+  const reportContent = await import(`../../content/${reportName}/index.md`);
   console.log(reportContent);
   return {
     props: {
@@ -42,8 +43,8 @@ export async function getStaticProps(context) {
 
 export async function getStaticPaths() {
   //get all .md files in the posts dir
-  // glob.sync('../../content/**/*.md');
-  const reports = ['../../content/about.md'];
+  glob.sync('../../content/**/*.md');
+  // const reports = ['../../content/about.md'];
 
   //remove path and extension to leave filename only
   const reportNames = reports.map(file =>

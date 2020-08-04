@@ -62,7 +62,7 @@ const App: NextPage = () => {
   }, []);
 
   const getReportName = path => {
-    return decodeURIComponent(path.match(/(?<=bmgf-docs\/).*(?=\/)/));
+    return decodeURIComponent(path.match(/(?<=content\/).*(?=\/)/));
   };
 
   return (
@@ -73,6 +73,7 @@ const App: NextPage = () => {
     >
       <SearchWrapper initialSearchValue="">
         {documents.map((document, i) => {
+          console.log(document.metadata_storage_path);
           const reportName = getReportName(document.metadata_storage_path);
           if (reportName && reportName !== 'null') {
             return (
