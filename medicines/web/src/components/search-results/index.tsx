@@ -1,6 +1,7 @@
 import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { DocType } from '../../services/azure-search';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
@@ -140,6 +141,12 @@ const StyledDrugList = styled.div`
   }
 `;
 
+const HiddenHeader = styled.h3`
+  visibility: hidden;
+  margin: 0;
+  height: 0;
+`;
+
 const emaWebsiteLink = () => (
   <a href="https://www.ema.europa.eu/en" target="_new">
     European Medicines Agency
@@ -207,9 +214,10 @@ interface ISearchResultsProps {
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
   docTypes: DocType[];
-  handleDocTypeCheckbox: (d: DocType) => void;
+  updateDocTypes: (d: DocType[]) => void;
   handlePageChange: (num: number) => void;
   isLoading: boolean;
+  rerouteType: RerouteType;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -238,7 +246,8 @@ const SearchResults = (props: ISearchResultsProps) => {
     searchTerm,
     showingResultsForTerm,
     docTypes,
-    handleDocTypeCheckbox,
+    updateDocTypes,
+    rerouteType,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -252,17 +261,17 @@ const SearchResults = (props: ISearchResultsProps) => {
 
   return props.isLoading ? (
     <StyledDrugList>
-      <h1 className="title">
+      <h2 className="title">
         {`Loading results for ${showingResultsForTerm}...`}
-      </h1>
+      </h2>
     </StyledDrugList>
   ) : (
     <>
       <StyledDrugList>
         <div>
-          <h1 className="title">
+          <h2 className="title">
             {searchResultsTitle(showingResultsForTerm, drugs.length)}
-          </h1>
+          </h2>
           {hasDrugs && (
             <p className="no-of-results">
               {searchResultsNumberingInformation({
@@ -305,10 +314,12 @@ const SearchResults = (props: ISearchResultsProps) => {
             <div className="column filter">
               <SearchFilter
                 currentlyEnabledDocTypes={docTypes}
-                toggleDocType={handleDocTypeCheckbox}
+                updateDocTypes={updateDocTypes}
+                rerouteType={rerouteType}
               />
             </div>
-            <div className="column results">
+            <section className="column results">
+              <HiddenHeader>Search results</HiddenHeader>
               <dl>
                 {hasDrugs &&
                   drugs.map((drug, i) => (
@@ -352,7 +363,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                     </article>
                   ))}
               </dl>
-            </div>
+            </section>
           </div>
         )}
       </StyledDrugList>

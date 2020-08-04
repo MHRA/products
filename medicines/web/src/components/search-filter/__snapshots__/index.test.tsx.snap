@@ -1,0 +1,464 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchFilter should render search filter 1`] = `
+<SearchFilter
+  currentlyEnabledDocTypes={Array []}
+  rerouteType={0}
+  updateDocTypes={[Function]}
+>
+  <styled.section>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "sc-htpNat",
+            "isStatic": false,
+            "lastClassName": "hOYjHM",
+            "rules": Array [
+              "
+  .checkbox-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 0.25em;
+
+    .checkbox {
+      flex: 0.1;
+      display: flex;
+      flex-direction: column;
+      padding: 0.25em 0;
+    }
+
+    label {
+      flex: 1;
+    }
+  }
+",
+            ],
+          },
+          "displayName": "styled.section",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "sc-htpNat",
+          "target": "section",
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <section
+        className="sc-htpNat hOYjHM"
+      >
+        <h3>
+          Filter documents by
+        </h3>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Spc"
+          name="Summary of Product Characteristics"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <Component
+                checked={false}
+                id="filter-spc"
+                name="doc"
+                onChange={[Function]}
+                value="Spc"
+              >
+                <styled.input
+                  checked={false}
+                  id="filter-spc"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Spc"
+                >
+                  <StyledComponent
+                    checked={false}
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "sc-bdVaJa",
+                          "isStatic": false,
+                          "lastClassName": "hxZqvD",
+                          "rules": Array [
+                            "
+  appearance: none;
+  border: 1px solid ",
+                            "#000",
+                            ";
+  display: block;
+  height: 1.25rem;
+  margin-right: 1.25rem;
+  width: 1.25rem;
+  min-width: 1.25rem;
+
+  &:checked {
+    background-image: url('data:image/svg+xml;utf8, <svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 512 512\\"><path d=\\"M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z\\"/></svg>');
+    background-size: calc(100% - 4px) calc(100% - 4px);
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+",
+                          ],
+                        },
+                        "displayName": "styled.input",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "sc-bdVaJa",
+                        "target": "input",
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="filter-spc"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Spc"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdVaJa hxZqvD"
+                      id="filter-spc"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Spc"
+                    />
+                  </StyledComponent>
+                </styled.input>
+              </Component>
+            </div>
+            <label
+              htmlFor="filter-spc"
+            >
+              Summary of Product Characteristics
+               (
+              SPC
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Pil"
+          name="Patient Information Leaflet"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <Component
+                checked={false}
+                id="filter-pil"
+                name="doc"
+                onChange={[Function]}
+                value="Pil"
+              >
+                <styled.input
+                  checked={false}
+                  id="filter-pil"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Pil"
+                >
+                  <StyledComponent
+                    checked={false}
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "sc-bdVaJa",
+                          "isStatic": false,
+                          "lastClassName": "hxZqvD",
+                          "rules": Array [
+                            "
+  appearance: none;
+  border: 1px solid ",
+                            "#000",
+                            ";
+  display: block;
+  height: 1.25rem;
+  margin-right: 1.25rem;
+  width: 1.25rem;
+  min-width: 1.25rem;
+
+  &:checked {
+    background-image: url('data:image/svg+xml;utf8, <svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 512 512\\"><path d=\\"M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z\\"/></svg>');
+    background-size: calc(100% - 4px) calc(100% - 4px);
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+",
+                          ],
+                        },
+                        "displayName": "styled.input",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "sc-bdVaJa",
+                        "target": "input",
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="filter-pil"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Pil"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdVaJa hxZqvD"
+                      id="filter-pil"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Pil"
+                    />
+                  </StyledComponent>
+                </styled.input>
+              </Component>
+            </div>
+            <label
+              htmlFor="filter-pil"
+            >
+              Patient Information Leaflet
+               (
+              PIL
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+        <DocTypeCheckbox
+          currentlyEnabledDocTypes={Array []}
+          docTypeForThisCheckbox="Par"
+          name="Public Assessment Reports"
+          toggleDocType={[Function]}
+        >
+          <div
+            className="checkbox-row"
+          >
+            <div
+              className="checkbox"
+            >
+              <Component
+                checked={false}
+                id="filter-par"
+                name="doc"
+                onChange={[Function]}
+                value="Par"
+              >
+                <styled.input
+                  checked={false}
+                  id="filter-par"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Par"
+                >
+                  <StyledComponent
+                    checked={false}
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "sc-bdVaJa",
+                          "isStatic": false,
+                          "lastClassName": "hxZqvD",
+                          "rules": Array [
+                            "
+  appearance: none;
+  border: 1px solid ",
+                            "#000",
+                            ";
+  display: block;
+  height: 1.25rem;
+  margin-right: 1.25rem;
+  width: 1.25rem;
+  min-width: 1.25rem;
+
+  &:checked {
+    background-image: url('data:image/svg+xml;utf8, <svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 512 512\\"><path d=\\"M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z\\"/></svg>');
+    background-size: calc(100% - 4px) calc(100% - 4px);
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+",
+                          ],
+                        },
+                        "displayName": "styled.input",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "sc-bdVaJa",
+                        "target": "input",
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="filter-par"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Par"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdVaJa hxZqvD"
+                      id="filter-par"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Par"
+                    />
+                  </StyledComponent>
+                </styled.input>
+              </Component>
+            </div>
+            <label
+              htmlFor="filter-par"
+            >
+              Public Assessment Reports
+               (
+              PAR
+              )
+            </label>
+          </div>
+        </DocTypeCheckbox>
+        <styled.div>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "sc-bxivhb",
+                  "isStatic": false,
+                  "lastClassName": "gVGHTM",
+                  "rules": Array [
+                    "
+  padding-top: 10px;
+",
+                  ],
+                },
+                "displayName": "styled.div",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "sc-bxivhb",
+                "target": "div",
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+          >
+            <div
+              className="sc-bxivhb gVGHTM"
+            >
+              <styled.input
+                onClick={[Function]}
+                type="submit"
+                value="Submit"
+              >
+                <StyledComponent
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "sc-bwzfXH",
+                        "isStatic": false,
+                        "lastClassName": "bTOPsL",
+                        "rules": Array [
+                          "
+  display: block;
+  cursor: pointer;
+  color: ",
+                          "#ffffff",
+                          ";
+  background-color: ",
+                          "rgb(15, 18, 144)",
+                          ";
+  align-self: flex-end;
+  max-width: 50%;
+  border-radius: 6px;
+  text-decoration: none;
+  -webkit-appearance: none;
+  border: solid 1px ",
+                          "#5759b1",
+                          ";
+  padding: 0.5rem;
+
+  &:hover {
+    background-color: ",
+                          "#5759b1",
+                          ";
+  }
+",
+                        ],
+                      },
+                      "displayName": "styled.input",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "sc-bwzfXH",
+                      "target": "input",
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={
+                    Object {
+                      "current": <input
+                        class="sc-bwzfXH bTOPsL"
+                        type="submit"
+                        value="Submit"
+                      />,
+                    }
+                  }
+                  onClick={[Function]}
+                  type="submit"
+                  value="Submit"
+                >
+                  <input
+                    className="sc-bwzfXH bTOPsL"
+                    onClick={[Function]}
+                    type="submit"
+                    value="Submit"
+                  />
+                </StyledComponent>
+              </styled.input>
+            </div>
+          </StyledComponent>
+        </styled.div>
+      </section>
+    </StyledComponent>
+  </styled.section>
+</SearchFilter>
+`;

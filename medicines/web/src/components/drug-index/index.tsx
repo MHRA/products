@@ -127,7 +127,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   return (
     <StyledDrugIndex>
-      {level === 0 ? <p className="horizontal">{title}</p> : <h3>{title}</h3>}
+      {level === 0 ? <p className="horizontal">{title}</p> : <h2>{title}</h2>}
       <ul className={horizontal ? 'horizontal' : ''}>
         {items.map(item => {
           return (

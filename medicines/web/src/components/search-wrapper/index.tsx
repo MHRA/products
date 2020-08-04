@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
+import { accessibleBackgroundBlue } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
 import DrugIndex, { index } from '../drug-index';
@@ -11,7 +12,7 @@ const StyledSearchWrapper = styled.div`
   width: 100%;
   padding: 1.25rem 0.625rem 0 1.25rem;
   .search {
-    background-color: rgba(10, 50, 150, 0.1);
+    background-color: ${accessibleBackgroundBlue};
     margin-bottom: 20px;
     padding: ${baseSpace} calc(${baseSpace} / 2);
   }
