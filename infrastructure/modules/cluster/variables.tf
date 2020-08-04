@@ -80,3 +80,7 @@ variable "logs_storage_account_id" {
   description = "ID of the immutable storage account used for logs"
   default     = ""
 }
+
+variable "cluster_public_ip" {
+  description = "IP address of the public endpoint of the cluster"
+}
