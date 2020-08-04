@@ -118,711 +118,631 @@ exports[`DrugIndex should render horizontal items 1`] = `
   title="Coffee"
 >
   <styled.nav>
-    <StyledComponent
-      forwardedComponent={
-        Object {
-          "$$typeof": Symbol(react.forward_ref),
-          "attrs": Array [],
-          "componentStyle": ComponentStyle {
-            "componentId": "sc-bdVaJa",
-            "isStatic": false,
-            "lastClassName": "kOyKBG",
-            "rules": Array [
-              "
-  h2 {
-    font-size: 1.5rem;
-    margin-top: 0;
-  }
-
-  ul {
-    justify-content: space-between;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  ul > li {
-    padding-top: 10px;
-  }
-
-  p.horizontal {
-    margin: 0;
-  }
-
-  ul.horizontal {
-    display: flex;
-    padding-left: 0;
-  }
-
-  ul.horizontal > li {
-    line-height: 2;
-  }
-
-  a {
-    font-weight: bold;
-  }
-
-  .substance-name {
-    margin-bottom: 30px;
-  }
-
-  .substance-name a {
-    text-decoration: underline;
-    font-size: 1.1875rem;
-    font-weight: normal;
-  }
-
-  @media ",
-              "screen and (max-width: 788px)",
-              " {
-    ul.horizontal {
-      flex-wrap: wrap;
-    }
-    ul.horizontal > li {
-      flex-basis: 15%;
-    }
-  }
-",
-            ],
-          },
-          "displayName": "styled.nav",
-          "foldedComponentIds": Array [],
-          "render": [Function],
-          "styledComponentId": "sc-bdVaJa",
-          "target": "nav",
-          "toString": [Function],
-          "warnTooManyClasses": [Function],
-          "withComponent": [Function],
-        }
-      }
-      forwardedRef={null}
+    <nav
+      className="sc-AxjAm jJjbyf"
     >
-      <nav
-        className="sc-bdVaJa kOyKBG"
+      <p
+        className="horizontal"
       >
-        <p
-          className="horizontal"
+        Coffee
+      </p>
+      <ul
+        className="horizontal"
+      >
+        <li
+          className=""
+          key="A"
         >
-          Coffee
-        </p>
-        <ul
-          className="horizontal"
-        >
-          <li
-            className=""
-            key="A"
+          <Link
+            href="/substance-index?letter=A"
           >
-            <Link
+            <a
               href="/substance-index?letter=A"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=A"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                A
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="B"
+              A
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="B"
+        >
+          <Link
+            href="/substance-index?letter=B"
           >
-            <Link
+            <a
               href="/substance-index?letter=B"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=B"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                B
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="C"
+              B
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="C"
+        >
+          <Link
+            href="/substance-index?letter=C"
           >
-            <Link
+            <a
               href="/substance-index?letter=C"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=C"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                C
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="D"
+              C
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="D"
+        >
+          <Link
+            href="/substance-index?letter=D"
           >
-            <Link
+            <a
               href="/substance-index?letter=D"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=D"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                D
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="E"
+              D
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="E"
+        >
+          <Link
+            href="/substance-index?letter=E"
           >
-            <Link
+            <a
               href="/substance-index?letter=E"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=E"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                E
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="F"
+              E
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="F"
+        >
+          <Link
+            href="/substance-index?letter=F"
           >
-            <Link
+            <a
               href="/substance-index?letter=F"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=F"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                F
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="G"
+              F
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="G"
+        >
+          <Link
+            href="/substance-index?letter=G"
           >
-            <Link
+            <a
               href="/substance-index?letter=G"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=G"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                G
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="H"
+              G
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="H"
+        >
+          <Link
+            href="/substance-index?letter=H"
           >
-            <Link
+            <a
               href="/substance-index?letter=H"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=H"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                H
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="I"
+              H
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="I"
+        >
+          <Link
+            href="/substance-index?letter=I"
           >
-            <Link
+            <a
               href="/substance-index?letter=I"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=I"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                I
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="J"
+              I
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="J"
+        >
+          <Link
+            href="/substance-index?letter=J"
           >
-            <Link
+            <a
               href="/substance-index?letter=J"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=J"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                J
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="K"
+              J
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="K"
+        >
+          <Link
+            href="/substance-index?letter=K"
           >
-            <Link
+            <a
               href="/substance-index?letter=K"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=K"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                K
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="L"
+              K
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="L"
+        >
+          <Link
+            href="/substance-index?letter=L"
           >
-            <Link
+            <a
               href="/substance-index?letter=L"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=L"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                L
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="M"
+              L
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="M"
+        >
+          <Link
+            href="/substance-index?letter=M"
           >
-            <Link
+            <a
               href="/substance-index?letter=M"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=M"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                M
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="N"
+              M
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="N"
+        >
+          <Link
+            href="/substance-index?letter=N"
           >
-            <Link
+            <a
               href="/substance-index?letter=N"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=N"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                N
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="O"
+              N
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="O"
+        >
+          <Link
+            href="/substance-index?letter=O"
           >
-            <Link
+            <a
               href="/substance-index?letter=O"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=O"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                O
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="P"
+              O
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="P"
+        >
+          <Link
+            href="/substance-index?letter=P"
           >
-            <Link
+            <a
               href="/substance-index?letter=P"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=P"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                P
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="Q"
+              P
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="Q"
+        >
+          <Link
+            href="/substance-index?letter=Q"
           >
-            <Link
+            <a
               href="/substance-index?letter=Q"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=Q"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                Q
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="R"
+              Q
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="R"
+        >
+          <Link
+            href="/substance-index?letter=R"
           >
-            <Link
+            <a
               href="/substance-index?letter=R"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=R"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                R
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="S"
+              R
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="S"
+        >
+          <Link
+            href="/substance-index?letter=S"
           >
-            <Link
+            <a
               href="/substance-index?letter=S"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=S"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                S
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="T"
+              S
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="T"
+        >
+          <Link
+            href="/substance-index?letter=T"
           >
-            <Link
+            <a
               href="/substance-index?letter=T"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=T"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                T
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="U"
+              T
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="U"
+        >
+          <Link
+            href="/substance-index?letter=U"
           >
-            <Link
+            <a
               href="/substance-index?letter=U"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=U"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                U
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="V"
+              U
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="V"
+        >
+          <Link
+            href="/substance-index?letter=V"
           >
-            <Link
+            <a
               href="/substance-index?letter=V"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=V"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                V
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="W"
+              V
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="W"
+        >
+          <Link
+            href="/substance-index?letter=W"
           >
-            <Link
+            <a
               href="/substance-index?letter=W"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=W"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                W
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="X"
+              W
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="X"
+        >
+          <Link
+            href="/substance-index?letter=X"
           >
-            <Link
+            <a
               href="/substance-index?letter=X"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=X"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                X
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="Y"
+              X
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="Y"
+        >
+          <Link
+            href="/substance-index?letter=Y"
           >
-            <Link
+            <a
               href="/substance-index?letter=Y"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=Y"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                Y
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="Z"
+              Y
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="Z"
+        >
+          <Link
+            href="/substance-index?letter=Z"
           >
-            <Link
+            <a
               href="/substance-index?letter=Z"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=Z"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                Z
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="0"
+              Z
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="0"
+        >
+          <Link
+            href="/substance-index?letter=0"
           >
-            <Link
+            <a
               href="/substance-index?letter=0"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=0"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                0
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="1"
+              0
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="1"
+        >
+          <Link
+            href="/substance-index?letter=1"
           >
-            <Link
+            <a
               href="/substance-index?letter=1"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=1"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                1
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="2"
+              1
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="2"
+        >
+          <Link
+            href="/substance-index?letter=2"
           >
-            <Link
+            <a
               href="/substance-index?letter=2"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=2"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                2
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="3"
+              2
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="3"
+        >
+          <Link
+            href="/substance-index?letter=3"
           >
-            <Link
+            <a
               href="/substance-index?letter=3"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=3"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                3
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="4"
+              3
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="4"
+        >
+          <Link
+            href="/substance-index?letter=4"
           >
-            <Link
+            <a
               href="/substance-index?letter=4"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=4"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                4
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="5"
+              4
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="5"
+        >
+          <Link
+            href="/substance-index?letter=5"
           >
-            <Link
+            <a
               href="/substance-index?letter=5"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=5"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                5
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="6"
+              5
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="6"
+        >
+          <Link
+            href="/substance-index?letter=6"
           >
-            <Link
+            <a
               href="/substance-index?letter=6"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=6"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                6
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="7"
+              6
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="7"
+        >
+          <Link
+            href="/substance-index?letter=7"
           >
-            <Link
+            <a
               href="/substance-index?letter=7"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=7"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                7
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="8"
+              7
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="8"
+        >
+          <Link
+            href="/substance-index?letter=8"
           >
-            <Link
+            <a
               href="/substance-index?letter=8"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=8"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                8
-                 
-              </a>
-            </Link>
-          </li>
-          <li
-            className=""
-            key="9"
+              8
+               
+            </a>
+          </Link>
+        </li>
+        <li
+          className=""
+          key="9"
+        >
+          <Link
+            href="/substance-index?letter=9"
           >
-            <Link
+            <a
               href="/substance-index?letter=9"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance-index?letter=9"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                9
-                 
-              </a>
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </StyledComponent>
+              9
+               
+            </a>
+          </Link>
+        </li>
+      </ul>
+    </nav>
   </styled.nav>
 </DrugIndex>
 `;
@@ -846,117 +766,37 @@ exports[`DrugIndex should render substances 1`] = `
   title="Coffee"
 >
   <styled.nav>
-    <StyledComponent
-      forwardedComponent={
-        Object {
-          "$$typeof": Symbol(react.forward_ref),
-          "attrs": Array [],
-          "componentStyle": ComponentStyle {
-            "componentId": "sc-bdVaJa",
-            "isStatic": false,
-            "lastClassName": "kOyKBG",
-            "rules": Array [
-              "
-  h2 {
-    font-size: 1.5rem;
-    margin-top: 0;
-  }
-
-  ul {
-    justify-content: space-between;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  ul > li {
-    padding-top: 10px;
-  }
-
-  p.horizontal {
-    margin: 0;
-  }
-
-  ul.horizontal {
-    display: flex;
-    padding-left: 0;
-  }
-
-  ul.horizontal > li {
-    line-height: 2;
-  }
-
-  a {
-    font-weight: bold;
-  }
-
-  .substance-name {
-    margin-bottom: 30px;
-  }
-
-  .substance-name a {
-    text-decoration: underline;
-    font-size: 1.1875rem;
-    font-weight: normal;
-  }
-
-  @media ",
-              "screen and (max-width: 788px)",
-              " {
-    ul.horizontal {
-      flex-wrap: wrap;
-    }
-    ul.horizontal > li {
-      flex-basis: 15%;
-    }
-  }
-",
-            ],
-          },
-          "displayName": "styled.nav",
-          "foldedComponentIds": Array [],
-          "render": [Function],
-          "styledComponentId": "sc-bdVaJa",
-          "target": "nav",
-          "toString": [Function],
-          "warnTooManyClasses": [Function],
-          "withComponent": [Function],
-        }
-      }
-      forwardedRef={null}
+    <nav
+      className="sc-AxjAm jJjbyf"
     >
-      <nav
-        className="sc-bdVaJa kOyKBG"
+      <h2>
+        Coffee
+      </h2>
+      <ul
+        className=""
       >
-        <h2>
-          Coffee
-        </h2>
-        <ul
-          className=""
+        <li
+          className="substance-name"
+          key="Ibuprofen"
         >
-          <li
-            className="substance-name"
-            key="Ibuprofen"
+          <Link
+            href="/substance?substance=Ibuprofen"
           >
-            <Link
+            <a
               href="/substance?substance=Ibuprofen"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
             >
-              <a
-                href="/substance?substance=Ibuprofen"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                Ibuprofen
-                 
-                (
-                1
-                 files)
-              </a>
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </StyledComponent>
+              Ibuprofen
+               
+              (
+              1
+               files)
+            </a>
+          </Link>
+        </li>
+      </ul>
+    </nav>
   </styled.nav>
 </DrugIndex>
 `;
