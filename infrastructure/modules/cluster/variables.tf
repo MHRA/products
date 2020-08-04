@@ -18,6 +18,10 @@ variable "lb_subnet_id" {
   description = "Load Balancer Subnet id"
 }
 
+variable "lb_subnet_name" {
+  description = "Load balancer subnet name"
+}
+
 variable "cluster_subnet_name" {
   description = "Cluster Subnet name"
 }
