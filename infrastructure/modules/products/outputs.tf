@@ -1,4 +1,4 @@
-output "products_storage_account_name" {
+output "products_resource_group_name" {
   value = azurerm_resource_group.products.name
 }
 

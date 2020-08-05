@@ -41,7 +41,7 @@ module cpd {
   environment         = var.ENVIRONMENT
   location            = var.REGION
   namespace           = local.cpd_namespace
-  resource_group_name = module.products.products_storage_account_name
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
   cdn_name            = module.products.products_cdn_name
 }
 
@@ -52,7 +52,7 @@ module logs {
   namespace           = local.logs_namespace
   environment         = var.ENVIRONMENT
   location            = var.REGION
-  resource_group_name = module.products.products_storage_account_name
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
 }
 
 # AKS
@@ -63,7 +63,7 @@ module cluster {
   client_secret                         = var.CLIENT_SECRET
   environment                           = var.ENVIRONMENT
   location                              = var.REGION
-  resource_group_name                   = module.products.products_storage_account_name
+  resource_group_name                   = var.RESOURCE_GROUP_PRODUCTS
   vnet_name                             = "aparz-spoke-np-products"
   vnet_cidr                             = "10.5.65.0/24"
   lb_subnet_name                        = "adarz-spoke-products-sn-01"
@@ -86,7 +86,7 @@ module doc_index_updater {
   environment             = var.ENVIRONMENT
   location                = var.REGION
   name                    = local.service_bus_name
-  resource_group_name     = module.products.products_storage_account_name
+  resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
   redis_use_firewall      = false
   redis_firewall_ip       = module.cluster.cluster_outbound_ip
   logs_storage_account_id = module.logs.logs_resource_group_id
@@ -109,7 +109,7 @@ module keyvault {
 module pars {
   source = "../../modules/pars"
 
-  resource_group_name                = module.products.products_storage_account_name
+  resource_group_name                = var.RESOURCE_GROUP_PRODUCTS
   location                           = var.REGION
   environment                        = var.ENVIRONMENT
   namespace                          = local.pars_namespace
