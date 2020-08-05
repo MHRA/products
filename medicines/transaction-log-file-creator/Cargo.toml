@@ -9,9 +9,9 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.26"
 async-trait = "0.1.24"
-azure_sdk_core = { git = "https://github.com/MindFlavor/AzureSDKForRust", branch = "master" }
-azure_sdk_storage_blob = { git = "https://github.com/MindFlavor/AzureSDKForRust", branch = "master" }
-azure_sdk_storage_core = { git = "https://github.com/MindFlavor/AzureSDKForRust", branch = "master" }
+azure_sdk_core = "0.43.6"
+azure_sdk_storage_blob = "0.45.2"
+azure_sdk_storage_core = "0.44.3"
 chrono = "0.4.11"
 futures = "0.3.4"
 lazy_static = "1.4.0"

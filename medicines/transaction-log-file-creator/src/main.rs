@@ -3,8 +3,9 @@ use anyhow::anyhow;
 use azure_sdk_core::modify_conditions::IfMatchCondition;
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::prelude::Client;
+use azure_sdk_storage_core::prelude::*;
 use chrono::{DateTime, Duration, Utc};
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
@@ -18,28 +19,24 @@ async fn main() {
 }
 
 async fn create_log_file() -> Result<(), anyhow::Error> {
-    let client = get_client()?;
+    let client = Arc::new(get_client()?);
     let blob_name = get_log_file_name_for_next_month(Utc::now());
     let log_container_name = get_log_container_name();
     create_append_blob(&client, &blob_name, &log_container_name).await
 }
 
-fn get_client() -> Result<dyn Client, anyhow::Error> {
+fn get_client() -> Result<Box<dyn Client>, anyhow::Error> {
     let account =
         std::env::var("LOG_STORAGE_ACCOUNT").expect("Set env variable LOG_STORAGE_ACCOUNT first!");
     let master_key = std::env::var("LOG_STORAGE_MASTER_KEY")
         .expect("Set env variable LOG_STORAGE_MASTER_KEY first!");
-    Client::new(&account, &master_key).map_err(|e| {
-        eprint!("Error creating storage client: {:?}", e);
-        anyhow!("Error creating storage client")
-    })
+    Ok(Box::new(client::with_access_key(&account, &master_key)))
 }
 
 fn get_log_file_name_for_next_month(date: DateTime<Utc>) -> String {
-    "file-change-log-2020-09".to_string()
-    // (date + Duration::days(31))
-    //     .format("file-change-log-2020-09")
-    //     .to_string()
+    (date + Duration::days(31))
+        .format("file-change-log-2020-09")
+        .to_string()
 }
 
 fn get_log_container_name() -> String {
@@ -47,7 +44,7 @@ fn get_log_container_name() -> String {
 }
 
 async fn create_append_blob(
-    client: &Client,
+    client: &Arc<Box<dyn Client>>,
     blob_name: &str,
     container_name: &str,
 ) -> Result<(), anyhow::Error> {
