@@ -24,7 +24,7 @@ async fn create_log_file() -> Result<(), anyhow::Error> {
     create_append_blob(&client, &blob_name, &log_container_name).await
 }
 
-fn get_client() -> Result<Client, anyhow::Error> {
+fn get_client() -> Result<dyn Client, anyhow::Error> {
     let account =
         std::env::var("LOG_STORAGE_ACCOUNT").expect("Set env variable LOG_STORAGE_ACCOUNT first!");
     let master_key = std::env::var("LOG_STORAGE_MASTER_KEY")
@@ -36,9 +36,10 @@ fn get_client() -> Result<Client, anyhow::Error> {
 }
 
 fn get_log_file_name_for_next_month(date: DateTime<Utc>) -> String {
-    (date + Duration::days(31))
-        .format("file-change-log-%Y-%m")
-        .to_string()
+    "file-change-log-2020-09".to_string()
+    // (date + Duration::days(31))
+    //     .format("file-change-log-2020-09")
+    //     .to_string()
 }
 
 fn get_log_container_name() -> String {
