@@ -69,4 +69,22 @@ resource "azurerm_cdn_endpoint" "products" {
     name      = var.namespace
     host_name = azurerm_storage_account.products.primary_web_host
   }
+
+  delivery_rule {
+    name  = "httpredirect"
+    order = 1
+
+    request_scheme_condition {
+      match_values = [
+        "HTTP",
+      ]
+      negate_condition = false
+      operator         = "Equal"
+    }
+
+    url_redirect_action {
+      protocol      = "Https"
+      redirect_type = "Moved"
+    }
+  }
 }
