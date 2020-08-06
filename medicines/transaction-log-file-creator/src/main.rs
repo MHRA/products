@@ -35,7 +35,7 @@ fn get_client() -> Result<Box<dyn Client>, anyhow::Error> {
 
 fn get_log_file_name_for_next_month(date: DateTime<Utc>) -> String {
     (date + Duration::days(31))
-        .format("file-change-log-2020-09")
+        .format("file-change-log-%Y-%m")
         .to_string()
 }
 
