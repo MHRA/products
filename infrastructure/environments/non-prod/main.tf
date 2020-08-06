@@ -73,7 +73,7 @@ module cluster {
   cluster_subnet_cidr                   = "10.5.65.64/26"
   cluster_route_destination_cidr_blocks = var.CLUSTER_ROUTE_DESTINATION_CIDR_BLOCKS
   cluster_route_next_hop                = var.CLUSTER_ROUTE_NEXT_HOP
-  default_node_count                    = "1"
+  default_node_count                    = "2"
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
   log_cluster_diagnostics               = false
   logs_storage_account_id               = module.logs.logs_resource_group_id
