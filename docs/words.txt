@@ -103,6 +103,7 @@ JSON
 js
 JWT
 kcnwkqgGoHssWP
+keyvault
 KQL
 kube
 kubectl
@@ -185,6 +186,7 @@ ServiceEntry
 ServicePrincipalName
 sexualized
 SFTP
+SHA
 Sharepoint
 SLA
 sp

@@ -1,7 +1,7 @@
 use crate::{
     get_env_or_default,
-    models::{JobStatus, Message},
-    state_manager::{JobStatusClient, StateManager},
+    models::{JobStatus, JobStatusResponse, Message},
+    state_manager::{JobStatusClient, MyRedisError, StateManager},
     storage_client::models::StorageClientError,
 };
 use anyhow::anyhow;
@@ -12,6 +12,7 @@ use hyper::StatusCode;
 use thiserror::Error;
 use time::Duration;
 use tracing_futures::Instrument;
+use uuid::Uuid;
 
 pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
@@ -30,6 +31,30 @@ pub async fn delete_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
+pub async fn delete_clean_up_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+    let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
+        .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
+
+    let queue_name =
+        std::env::var("DELETE_QUEUE_NAME").expect("Set env variable DELETE_QUEUE_NAME first!");
+
+    let dead_letter_queue_name = format!("{}/$DeadLetterQueue", queue_name);
+
+    let policy_name = std::env::var("DELETE_QUEUE_POLICY_NAME")
+        .expect("Set env variable DELETE_QUEUE_POLICY_NAME first!");
+
+    let policy_key = std::env::var("DELETE_QUEUE_POLICY_KEY")
+        .expect("Set env variable DELETE_QUEUE_POLICY_KEY first!");
+
+    let service_bus = Client::new(
+        service_bus_namespace,
+        dead_letter_queue_name,
+        policy_name,
+        policy_key,
+    )?;
+    Ok(DocIndexUpdaterQueue::new(service_bus))
+}
+
 pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
     let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
         .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
@@ -44,6 +69,30 @@ pub async fn create_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
         .expect("Set env variable CREATE_QUEUE_POLICY_KEY first!");
 
     let service_bus = Client::new(service_bus_namespace, queue_name, policy_name, policy_key)?;
+    Ok(DocIndexUpdaterQueue::new(service_bus))
+}
+
+pub async fn create_clean_up_factory() -> Result<DocIndexUpdaterQueue, AzureError> {
+    let service_bus_namespace = std::env::var("SERVICE_BUS_NAMESPACE")
+        .expect("Set env variable SERVICE_BUS_NAMESPACE first!");
+
+    let queue_name =
+        std::env::var("CREATE_QUEUE_NAME").expect("Set env variable CREATE_QUEUE_NAME first!");
+
+    let dead_letter_queue_name = format!("{}/$DeadLetterQueue", queue_name);
+
+    let policy_name = std::env::var("CREATE_QUEUE_POLICY_NAME")
+        .expect("Set env variable CREATE_QUEUE_POLICY_NAME first!");
+
+    let policy_key = std::env::var("CREATE_QUEUE_POLICY_KEY")
+        .expect("Set env variable CREATE_QUEUE_POLICY_KEY first!");
+
+    let service_bus = Client::new(
+        service_bus_namespace,
+        dead_letter_queue_name,
+        policy_name,
+        policy_key,
+    )?;
     Ok(DocIndexUpdaterQueue::new(service_bus))
 }
 
@@ -214,6 +263,33 @@ impl DocIndexUpdaterQueue {
         }
         Ok(())
     }
+
+    pub async fn try_process_from_dead_letter_queue<T>(
+        &mut self,
+        state_manager: &StateManager,
+    ) -> anyhow::Result<bool>
+    where
+        T: Message,
+        RetrievedMessage<T>: ProcessRetrievalError + Removable,
+    {
+        let retrieved_result: Result<RetrievedMessage<T>, RetrieveFromQueueError> =
+            self.receive().await;
+
+        let mut found_message = false;
+        if let Ok(retrieval) = retrieved_result {
+            let correlation_id = retrieval.message.get_id().to_string();
+            let correlation_id = correlation_id.as_str();
+
+            process_dead_letter(retrieval, state_manager)
+                .instrument(tracing::info_span!(
+                    "try_process_dead_letter_from_queue",
+                    correlation_id
+                ))
+                .await?;
+            found_message = true;
+        }
+        Ok(found_message)
+    }
 }
 
 async fn process<T>(
@@ -237,6 +313,34 @@ where
         }
     };
     Ok(())
+}
+
+async fn process_dead_letter<T>(
+    mut retrieval: RetrievedMessage<T>,
+    state_manager: &impl JobStatusClient,
+) -> anyhow::Result<()>
+where
+    T: Message,
+    RetrievedMessage<T>: ProcessRetrievalError + Removable,
+{
+    let _ = set_job_max_tries_error_status(retrieval.message.get_id(), state_manager).await?;
+    let _ = retrieval.remove().await?;
+    Ok(())
+}
+
+async fn set_job_max_tries_error_status(
+    job_id: Uuid,
+    state_manager: &impl JobStatusClient,
+) -> Result<JobStatusResponse, MyRedisError> {
+    state_manager
+        .set_status(
+            job_id,
+            JobStatus::Error {
+                message: "Max number of retries exceeded".to_string(),
+                code: "500".to_string(),
+            },
+        )
+        .await
 }
 
 #[cfg(test)]
