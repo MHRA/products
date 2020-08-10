@@ -162,7 +162,7 @@ const App: NextPage = props => {
   };
 
   const updateDocTypes = (updatedDocTypes: DocType[]) => {
-    if (docTypes === updatedDocTypes) return;
+    if(docTypes == updatedDocTypes) return;
     reroutePage(query, 1, updatedDocTypes, RerouteType.CheckboxSelected);
   };
 
