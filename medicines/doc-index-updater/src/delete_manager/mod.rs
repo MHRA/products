@@ -61,6 +61,8 @@ async fn handle_processing_error_for_delete_message<T>(
 where
     T: RemovableMessage<DeleteMessage>,
 {
+    tracing::info!("Handling processing error. Setting error state in state manager");
+
     let error_message = error.to_string();
 
     match error {
@@ -69,7 +71,7 @@ where
                 "Document {} wasn't found during delete, removing message",
                 id
             );
-            tracing::info!("Updating job to error state");
+
             state_manager
                 .set_status(
                     removable_message.get_message().job_id,
@@ -83,7 +85,6 @@ where
         }
         ProcessMessageError::FailedRestoringIndex(_, _) => {
             tracing::error!("{}", error_message);
-            tracing::info!("Updating job to error state");
             state_manager
                 .set_status(
                     removable_message.get_message().job_id,
