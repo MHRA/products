@@ -20,6 +20,7 @@ Authorisation
 authorisations
 authorise
 authorised
+authorises
 az
 azm
 Azure
