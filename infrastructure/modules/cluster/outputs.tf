@@ -6,12 +6,12 @@ output "kube_config" {
   value = azurerm_kubernetes_cluster.cluster.kube_config_raw
 }
 
-output "public_ip" {
-  value = azurerm_public_ip.products_ip.ip_address
+output "cluster_public_inbound_ip" {
+  value = azurerm_public_ip.cluster_inbound.ip_address
 }
 
-output "public_ip_id" {
-  value = azurerm_public_ip.products_ip.id
+output "cluster_public_inbound_ip_id" {
+  value = azurerm_public_ip.cluster_inbound.id
 }
 
 output "host" {

@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version = "=2.8.0"
+  version = "=2.20.0"
   features {}
 }
 
@@ -123,4 +123,19 @@ module pars {
   app_registration_owners            = var.ADMIN_PERSON_IDS
   additional_allowed_pars_reply_urls = ["https://pars.mhra.gov.uk"]
   include_pars_app                   = false
+}
+
+# DNS
+module dns {
+  source = "../../modules/dns"
+
+  environment                   = var.ENVIRONMENT
+  location                      = var.REGION
+  dns_zone_name                 = var.DNS_ZONE_NAME
+  resource_group_name           = var.DNS_RESOURCE_GROUP_NAME
+  cluster_public_ip_id          = module.cluster.cluster_public_inbound_ip_id
+  doc_index_updater_record_name = "doc-index-updater"
+  medicines_api_record_name     = "medicines-api"
+  products_record_name          = "products"
+  products_cdn_id               = module.products.products_cdn_id
 }

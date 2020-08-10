@@ -1,14 +1,3 @@
-resource "azurerm_public_ip" "products_ip" {
-  name                = "products-public-ip"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-
-  tags = {
-    environment = var.environment
-  }
-}
-
 resource "azurerm_route_table" "load_balancer" {
   name                          = var.lb_route_table_name
   disable_bgp_route_propagation = true
@@ -161,4 +150,16 @@ resource "azurerm_log_analytics_solution" "cluster" {
 data "azurerm_public_ip" "cluster_outbound" {
   name                = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[8]
   resource_group_name = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[4]
+}
+
+resource "azurerm_public_ip" "cluster_inbound" {
+  name                = "products-public-ip"
+  location            = var.location
+  resource_group_name = azurerm_kubernetes_cluster.cluster.node_resource_group
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    environment = var.environment
+  }
 }
