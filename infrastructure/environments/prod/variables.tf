@@ -53,3 +53,13 @@ variable "KEYVAULT_RESOURCE_GROUP" {
   description = "Name of resource group where keyvault is deployed"
   default     = "secrets"
 }
+
+variable "DNS_ZONE_NAME" {
+  description = "Name of DNS zone"
+  default     = "api.mhra.gov.uk"
+}
+
+variable "DNS_RESOURCE_GROUP_NAME" {
+  description = "Name of resource group where DNS zone is deployed"
+  default     = "dns"
+}
