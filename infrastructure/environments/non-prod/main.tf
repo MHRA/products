@@ -126,7 +126,7 @@ module dns {
   location                      = var.REGION
   dns_zone_name                 = var.DNS_ZONE_NAME
   resource_group_name           = var.DNS_RESOURCE_GROUP_NAME
-  cluster_public_ip_id          = module.cluster.cluster_public_inbound_ip_id
+  cluster_public_inbound_ip_id  = module.cluster.cluster_public_inbound_ip_id
   doc_index_updater_record_name = "doc-index-updater"
   medicines_api_record_name     = "medicines-api"
   products_record_name          = "products"
