@@ -20,7 +20,7 @@ locals {
   namespace        = "mhraproducts${var.ENVIRONMENT}"
   cpd_namespace    = "mhracpd${var.ENVIRONMENT}"
   pars_namespace   = "mhrapars${var.ENVIRONMENT}"
-  service_bus_name = "doc-index-updater-${var.ENVIRONMENT}"
+  doc_index_updater_namespace = "doc-index-updater-${var.ENVIRONMENT}"
   logs_namespace   = "mhralogs${var.ENVIRONMENT}"
 }
 
@@ -80,16 +80,26 @@ module cluster {
 }
 
 # Service Bus
-module doc_index_updater {
-  source = "../../modules/doc-index-updater"
+module service_bus {
+  source = "../../modules/service-bus"
 
   environment             = var.ENVIRONMENT
   location                = var.REGION
-  name                    = local.service_bus_name
+  name                    = local.doc_index_updater_namespace
+  resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
+  logs_storage_account_id = module.logs.logs_resource_group_id
+}
+
+# Redis
+module redis {
+  source = "../../modules/redis"
+
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  name                    = local.doc_index_updater_namespace
   resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
   redis_use_firewall      = false
   redis_firewall_ip       = module.cluster.cluster_outbound_ip
-  logs_storage_account_id = module.logs.logs_resource_group_id
 }
 
 # Key vault

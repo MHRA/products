@@ -1,4 +1,4 @@
-resource "azurerm_redis_cache" "doc_index_updater_redis" {
+resource "azurerm_redis_cache" "redis" {
   name = var.name
 
   capacity            = 0
@@ -13,7 +13,7 @@ resource "azurerm_redis_cache" "doc_index_updater_redis" {
 resource "azurerm_redis_firewall_rule" "cluster" {
   count               = var.redis_use_firewall ? 1 : 0
   name                = "cluster_ip_range"
-  redis_cache_name    = azurerm_redis_cache.doc_index_updater_redis.name
+  redis_cache_name    = azurerm_redis_cache.redis.name
   resource_group_name = var.resource_group_name
   start_ip            = var.redis_firewall_ip
   end_ip              = var.redis_firewall_ip

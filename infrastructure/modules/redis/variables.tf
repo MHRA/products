@@ -11,7 +11,7 @@ variable "environment" {
 }
 
 variable "name" {
-  description = "name for the service bus namespace"
+  description = "Name for redis resource"
 }
 
 variable "redis_use_firewall" {
@@ -23,14 +23,4 @@ variable "redis_use_firewall" {
 variable "redis_firewall_ip" {
   description = "IP allowed to access Redis Cache"
   default     = ""
-}
-
-variable "logs_storage_account_id" {
-  description = "ID of the storage account to send service bus logs to"
-}
-
-variable "diagnostic_log_types" {
-  description = "Set of log types to create configuration for"
-  type        = list(string)
-  default     = ["OperationalLogs"]
 }
