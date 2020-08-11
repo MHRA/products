@@ -87,6 +87,7 @@ module cluster {
   resource_group_name                   = data.azurerm_resource_group.products.name
   vnet_name                             = data.azurerm_virtual_network.cluster.name
   vnet_resource_group                   = data.azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_name                        = "aparz-spoke-products-sn-01"
   lb_subnet_id                          = data.azurerm_subnet.load_balancer.id
   cluster_subnet_name                   = "aparz-spoke-products-sn-02"
   cluster_subnet_cidr                   = "10.5.66.64/26"

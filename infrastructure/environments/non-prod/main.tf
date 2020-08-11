@@ -112,7 +112,6 @@ module cluster {
   support_email_addresses               = var.SUPPORT_EMAIL_ADDRESSES
   log_cluster_diagnostics               = false
   logs_storage_account_id               = module.logs.logs_resource_group_id
-  cluster_public_ip                     = "52.151.120.140"
 }
 
 # CPD

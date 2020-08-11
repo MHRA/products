@@ -109,6 +109,7 @@ module cluster {
   resource_group_name                   = azurerm_resource_group.products.name
   vnet_name                             = azurerm_virtual_network.cluster.name
   vnet_resource_group                   = azurerm_virtual_network.cluster.resource_group_name
+  lb_subnet_name                        = "adarz-spoke-products-dev-sn-01"
   lb_subnet_id                          = azurerm_subnet.load_balancer.id
   cluster_subnet_name                   = "adarz-spoke-products-dev-sn-02"
   cluster_subnet_cidr                   = "10.5.65.192/26"
