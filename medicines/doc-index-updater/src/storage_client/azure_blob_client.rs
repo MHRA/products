@@ -8,7 +8,7 @@ use azure_sdk_core::{
     MetadataSupport,
 };
 use azure_sdk_storage_blob::Blob;
-use azure_sdk_storage_core::client::Client;
+use azure_sdk_storage_core::prelude::*;
 use std::collections::HashMap;
 
 pub struct AzureBlobStorage {
@@ -66,11 +66,11 @@ impl AzureBlobStorage {
         }
     }
 
-    pub fn get_azure_client(&self) -> Result<Client, StorageClientError> {
+    pub fn get_azure_client(&self) -> Result<Box<dyn Client>, StorageClientError> {
         let client = base64::decode(&self.master_key)
-            .map(|_| Client::new(&self.storage_account, &self.master_key))?;
+            .map(|_| client::with_access_key(&self.storage_account, &self.master_key))?;
 
-        Ok(client?)
+        Ok(Box::new(client))
     }
 }
 
