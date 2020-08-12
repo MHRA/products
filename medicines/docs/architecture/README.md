@@ -34,6 +34,8 @@ There is also the option within the website to update an existing PAR, which del
 
 ## Update for BMGF
 
+![](./architecture_bmgf.svg)
+
 In order for the Products site to host reports associated with the Bill and Melinda Gates Foundation, the following updates will be made.
 
 A new Azure storage container will be created to hold the reports and associated images. Files can be managed either directly through the Azure browser portal or by using the Microsoft desktop tool "Azure Storage Explorer" to upload and delete documents via the Azure API over HTTPS.
