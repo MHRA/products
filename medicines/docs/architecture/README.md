@@ -18,9 +18,9 @@ Metadata for the medicines (including lists of associated documents) is attached
 
 The API pod contains a lightweight custom HTTP server, written in Rust. It is stateless so it can scale out easily. It allows SPC, PIL and PAR to be searched via a self-documented, read-only, [GraphQL-based API](https://medicines.api.mhra.gov.uk/graphiql) that conforms to the [Open API 3.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md).
 
-## Doc Index Updater
+## SPC/PIL/PAR document management
 
-The `doc-index-updater` pod is an API for the Sentinel Batch export process for SPCs and PILs, and the PARs portal for PARs. It is written in Rust and provides an API that validates and processes documents before storing data and PDFs in Azure Blob Storage and Azure Search.
+The `doc-index-updater` pod is an API for the Sentinel Batch export process for SPCs and PILs, and for the PARs portal for PARs. It is written in Rust and provides an API that validates and processes documents before storing data and PDFs in Azure Blob Storage and Azure Search.
 
 The PARs portal allows medical writers to make changes to the PARS on the site. It is a simple, static site, hosted in Azure Blob Storage (as with the current Products and Learning sites). The site has a form to enter information about the PAR (title, associated PLs, active substances, and so on), and an upload field to upload the PAR in PDF form.
 
@@ -31,3 +31,15 @@ Login requests are validated by Azure AD and an ID JWT token returned. Once comp
 The Document Index Updater then uploads the new document to blob storage and the Azure search index being used by the site, after which, the document is instantly accessible on the products website.
 
 There is also the option within the website to update an existing PAR, which deletes the original PAR at the same time as creating a new, replacement document.
+
+## Update for BMGF
+
+In order for the Products site to host reports associated with the Bill and Melinda Gates Foundation, the following updates will be made.
+
+A new Azure storage container will be created to hold the reports and associated images. Files can be managed either directly through the Azure browser portal or by using the Microsoft desktop tool "Azure Storage Explorer" to upload and delete documents via the Azure API over HTTPS.
+
+The reports will be stored in markdown format, as markdown is straightforward to produce without requiring technical knowledge of HTML, yet allows document structure to be easily parsed and converted into accessible HTML pages.
+
+The website build process will be updated to query the storage container and convert each markdown file into a static HTML page on the site.
+
+An additional "index" page will be created and linked to from the homepage that will list all available reports related to BMGF, making use of the Azure search service to provide search functionality. Clicking on a link from this page will take users to the statically generated report page.
