@@ -16,7 +16,7 @@ Metadata for the medicines (including lists of associated documents) is attached
 
 ## Medicines API
 
-The API pod contains a lightweight custom HTTP server, written in Rust. It is stateless so it can scale out easily. It allows SPC, PIL and PAR to be searched via a self-documented, read-only, [GraphQL-based API](https://medicines.api.mhra.gov.uk/graphiql) that conforms to the [Open API 3.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md).
+The API pod contains a lightweight custom HTTP server, written in Rust. It is stateless so it can scale out easily. It allows SPC, PIL and PAR to be searched via a self-documented, read-only, [GraphQL-based API](https://medicines.api.mhra.gov.uk/graphiql).
 
 ## SPC/PIL/PAR document management
 
@@ -26,7 +26,7 @@ The PARs portal allows medical writers to make changes to the PARS on the site. 
 
 Authentication and authorization is provided by Azure's Active Directory (AD) service. The email addresses of approved medical writers are managed by a group within Azure AD that authorises them to edit PARS.
 
-Login requests are validated by Azure AD and an ID JWT token returned. Once completed, the PAR form is submitted, along with the JWT token, to a PARs endpoint on the Document Index Updater. An authorization policy in Istio ensures that any requests to this endpoint are accompanied by a valid, Azure-signed JWT token that contains the necessary claim to make changes to PARS (granted by membership of the group, defined within AD).
+Login requests are validated by Azure AD and an ID JWT token returned. Once completed, the PAR form is submitted, along with the JWT token, to a PARs endpoint on the Document Index Updater. An authorization policy in Istio ensures that any requests to this endpoint are accompanied by a valid, Azure-signed JWT token that is associated with the PARs application (granted only to members of the group, defined within AD).
 
 The Document Index Updater then uploads the new document to blob storage and the Azure search index being used by the site, after which, the document is instantly accessible on the products website.
 
