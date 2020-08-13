@@ -159,13 +159,14 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
 
     cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
 
-    cy.findByLabelText('Active substance(s)').type(uploadData.substance1)
+    cy.findByLabelText('Active substance(s)').type(uploadData.substances[0])
 
-    cy.findByText('Add another active substance').click()
-
-    cy.findAllByLabelText('Active substance(s)')
-      .last()
-      .type(uploadData.substance2)
+    for (let j = 1; j < uploadData.substances.length; j++) {
+      cy.findByText('Add another active substance').click()
+      cy.findAllByLabelText('Active substance(s)')
+        .last()
+        .type(uploadData.substances[j])
+    }
 
     cy.findByText('Licence number')
       .parent()

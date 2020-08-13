@@ -59,8 +59,7 @@ describe('Update PARs', () => {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
       doseForm: 'some form',
-      substance1: 'Ibuprofen',
-      substance2: 'Paracetamol',
+      substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
     let uploadPageTitle = 'Updated Public Assessment Report'
