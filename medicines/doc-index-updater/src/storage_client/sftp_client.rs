@@ -7,7 +7,7 @@ use async_dup::Mutex;
 use async_ssh2::{Session, Sftp};
 use async_trait::async_trait;
 use smol::Async;
-use std::net::{TcpStream, ToSocketAddrs};
+use std::net::TcpStream;
 
 struct SftpConfig {
     server: String,
