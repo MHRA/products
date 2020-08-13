@@ -7,7 +7,7 @@ import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md"
 import { sizes, media } from "../../utils/theme"
 import { rhythm } from "../../utils/typography"
 import { mhraBlue, anchorColour, white, mhraGray10 } from "../../utils/colors"
-import uuid from "uuid/v4"
+import { v4 as uuid } from "uuid"
 
 const Aside = styled.aside`
   flex: 0 0 ${rhythm(14)};
@@ -110,7 +110,7 @@ class Sidebar extends Component {
     }
   }
 
-  toggleOpen = e => {
+  toggleOpen = (e) => {
     e.preventDefault()
     this.setState({ open: !this.state.open })
   }
@@ -146,11 +146,11 @@ class Sidebar extends Component {
             }
           }
         `}
-        render={data => {
+        render={(data) => {
           const modules = data.allModulesJson.nodes
 
-          const renderEntries = entries => {
-            return entries.map(entry => {
+          const renderEntries = (entries) => {
+            return entries.map((entry) => {
               const { link, module, name, id } = entry
               const current = location.pathname === `${link}`
               return (
@@ -168,8 +168,8 @@ class Sidebar extends Component {
             })
           }
 
-          const getCurrentModuleItems = modules => {
-            const currentModule = modules.filter(entry => {
+          const getCurrentModuleItems = (modules) => {
+            const currentModule = modules.filter((entry) => {
               return location.pathname.split("/").includes(entry.module)
             })[0]
             if (currentModule.items && currentModule.items.length) {
