@@ -33,11 +33,8 @@ async fn sentinel_sftp_factory(
         )
         .as_str()
     );
-    let addr = format!("{}:22", server)
-        .to_socket_addrs()?
-        .next()
-        .ok_or_else(|| anyhow!("no socket address"))?;
-    let tcp = Async::<TcpStream>::connect(addr).await?;
+
+    let tcp = Async::<TcpStream>::connect(format!("{}:22", server)).await?;
 
     tracing::debug!(message = "SFTP server connection established");
 
