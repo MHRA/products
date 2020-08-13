@@ -231,15 +231,21 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
   cy.findByText('Continue').click()
 }
 
-export const completeUploadFile = (fileName, expectedTitle) => {
+export const completeUploadFile = (
+  fileName,
+  expectedTitle,
+  mimeType = 'application/pdf',
+  encoding = ''
+) => {
   cy.findAllByText(expectedTitle).not('title').should('exist')
 
   cy.fixture(fileName).then((fileContent) => {
     // The `upload` method is provided by https://github.com/abramenal/cypress-file-upload/tree/v3.5.3
-    cy.get('input[type=file]').upload({
+    cy.get('input[type=file]').attachFile({
       fileContent,
       fileName,
-      mimeType: 'application/pdf',
+      mimeType,
+      encoding,
     })
   })
 

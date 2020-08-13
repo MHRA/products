@@ -18,7 +18,7 @@ setUp()
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
-describe('PARs update', () => {
+describe('Update PARs', () => {
   it('can add and delete multiple substances', () => {
     cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
@@ -82,7 +82,7 @@ describe('PARs update', () => {
 
     const fileName = 'rabbit-anti-human-stuff.txt'
     const expectedTitle = 'Upload a replacement PDF'
-    completeUploadFile(fileName, expectedTitle)
+    completeUploadFile(fileName, expectedTitle, 'text/plain', 'ascii')
 
     cy.once('fail', (err) => {
       expect(err.message).to.include(

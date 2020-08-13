@@ -17,7 +17,7 @@ setUp()
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
-describe('PARs upload', () => {
+describe('New PARs upload', () => {
   it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
     let uploadData = {
@@ -74,7 +74,7 @@ describe('PARs upload', () => {
 
     const fileName = 'rabbit-anti-human-stuff.txt'
     const expectedTitle = 'Upload your PDF'
-    completeUploadFile(fileName, expectedTitle)
+    completeUploadFile(fileName, expectedTitle, 'text/plain', 'ascii')
 
     cy.once('fail', (err) => {
       expect(err.message).to.include(
