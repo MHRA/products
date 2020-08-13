@@ -9,6 +9,17 @@ resource "azurerm_route_table" "load_balancer" {
   }
 }
 
+resource "azurerm_route" "load_balancer" {
+  for_each = toset(var.cluster_route_destination_cidr_blocks)
+
+  name                   = replace(replace(each.value, ".", "_"), "/", "__")
+  resource_group_name    = var.resource_group_name
+  route_table_name       = var.lb_route_table_name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.cluster_route_next_hop
+}
+
 resource "azurerm_virtual_network" "cluster" {
   name                = var.vnet_name
   location            = var.location
