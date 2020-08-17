@@ -8,8 +8,6 @@ on:
       - nibsc/web/**
       - .github/workflows/nibsc-web-branch.yaml
 
-env:
-
 jobs:
   build:
     name: Build and test
