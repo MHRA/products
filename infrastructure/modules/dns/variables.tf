@@ -19,7 +19,7 @@ variable "medicines_api_record_name" {
 variable "products_record_name" {
   description = "Name of the medicines API DNS record"
 }
-variable "cluster_public_ip_id" {
+variable "cluster_public_inbound_ip_id" {
   description = "ID of the resource of the public IP of the cluster"
 }
 variable "products_cdn_id" {

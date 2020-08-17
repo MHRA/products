@@ -16,27 +16,32 @@ resource "azurerm_storage_account" "cpd" {
   }
 }
 
-resource "azurerm_storage_container" "cpd_website" {
-  name                  = "$web"
-  storage_account_name  = azurerm_storage_account.cpd.name
-  container_access_type = "container"
-}
-
-resource "azurerm_cdn_profile" "cpd" {
-  name                = "mhracpd${var.environment}"
-  location            = var.cdn_region
-  resource_group_name = var.resource_group_name
-  sku                 = "Standard_Microsoft"
-}
-
 resource "azurerm_cdn_endpoint" "cpd" {
-  name                = "mhracpd${var.environment}"
-  profile_name        = azurerm_cdn_profile.cpd.name
-  location            = azurerm_cdn_profile.cpd.location
+  name                = var.namespace
+  profile_name        = var.cdn_name
+  location            = var.cdn_region
   resource_group_name = var.resource_group_name
   origin_host_header  = azurerm_storage_account.cpd.primary_web_host
   origin {
-    name      = "mhracpd${var.environment}"
+    name      = var.namespace
     host_name = azurerm_storage_account.cpd.primary_web_host
+  }
+
+  delivery_rule {
+    name  = "httpredirect"
+    order = 1
+
+    request_scheme_condition {
+      match_values = [
+        "HTTP",
+      ]
+      negate_condition = false
+      operator         = "Equal"
+    }
+
+    url_redirect_action {
+      protocol      = "Https"
+      redirect_type = "Moved"
+    }
   }
 }

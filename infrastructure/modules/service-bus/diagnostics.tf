@@ -1,6 +1,6 @@
 resource "azurerm_monitor_diagnostic_setting" "service_bus" {
   name               = "service-bus-diagnostics-${var.environment}"
-  target_resource_id = azurerm_servicebus_namespace.doc_index_updater_service_bus.id
+  target_resource_id = azurerm_servicebus_namespace.service_bus.id
   storage_account_id = var.logs_storage_account_id
 
   dynamic "log" {
