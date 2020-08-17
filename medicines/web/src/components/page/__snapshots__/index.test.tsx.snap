@@ -13,7 +13,7 @@ exports[`App should render 1`] = `
     />
   </Head>
   <styled.div>
-    <GlobalStyleComponent />
+    <Memo(GlobalStyleComponent) />
     <CookieBanner
       setStorageAllowed={[Function]}
       storageAllowed={true}
