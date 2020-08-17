@@ -17,11 +17,12 @@ terraform {
 }
 
 locals {
-  namespace        = "mhraproductsnonprod"
-  cpd_namespace    = "mhracpdnonprod"
-  pars_namespace   = "mhraparsnonprod"
+  namespace                   = "mhraproductsnonprod"
+  cpd_namespace               = "mhracpdnonprod"
+  pars_namespace              = "mhraparsnonprod"
   doc_index_updater_namespace = "doc-index-updater-${var.ENVIRONMENT}"
-  logs_namespace   = "mhralogsnonprod"
+  logs_namespace              = "mhralogsnonprod"
+  nibsc_namespace             = "mhranibscnonprod"
 }
 
 # Website
@@ -94,12 +95,12 @@ module service_bus {
 module redis {
   source = "../../modules/redis"
 
-  environment             = var.ENVIRONMENT
-  location                = var.REGION
-  name                    = local.doc_index_updater_namespace
-  resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
-  redis_use_firewall      = false
-  redis_firewall_ip       = module.cluster.cluster_outbound_ip
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  name                = local.doc_index_updater_namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  redis_use_firewall  = false
+  redis_firewall_ip   = module.cluster.cluster_outbound_ip
 }
 
 # Key vault
@@ -141,4 +142,15 @@ module dns {
   medicines_api_record_name     = "medicines-api"
   products_record_name          = "products"
   products_cdn_id               = module.products.products_cdn_id
+}
+
+# NIBSC
+module nibsc {
+  source = "../../modules/nibsc"
+
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  namespace           = local.nibsc_namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  cdn_name            = module.products.products_cdn_name
 }
