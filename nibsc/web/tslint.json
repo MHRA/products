@@ -1,0 +1,47 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:latest",
+    "tslint-eslint-rules",
+    "tslint-config-prettier",
+    "tslint-react"
+  ],
+  "linterOptions": {
+    "exclude": ["node_modules"]
+  },
+  "jsRules": {
+    "quotemark": [true, "single"]
+  },
+  "rules": {
+    "arrow-parens": false,
+    "curly": [true, "ignore-same-line"],
+    "import-name": false,
+    "jsx-boolean-value": [true, "never"],
+    "jsx-no-multiline-js": false,
+    "jsx-use-translation-function": [
+      false,
+      "allow-punctuation",
+      "allow-htmlentities"
+    ],
+    "jsx-wrap-multiline": false,
+    "no-implicit-dependencies": false,
+    "no-shadowed-variable": false,
+    "no-submodule-imports": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "object-literal-sort-keys": false,
+    "prettier": [true, "./.prettierrc.json"],
+    "variable-name": {
+      "options": ["allow-pascal-case"]
+    },
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never",
+        "esSpecCompliant": true
+      }
+    ]
+  },
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "lint": {}
+}
