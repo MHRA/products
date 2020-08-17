@@ -6,12 +6,12 @@ output "kube_config" {
   value = azurerm_kubernetes_cluster.cluster.kube_config_raw
 }
 
-output "public_ip" {
-  value = azurerm_public_ip.products_ip.ip_address
+output "cluster_public_inbound_ip" {
+  value = azurerm_public_ip.cluster_inbound.ip_address
 }
 
-output "public_ip_id" {
-  value = azurerm_public_ip.products_ip.id
+output "cluster_public_inbound_ip_id" {
+  value = azurerm_public_ip.cluster_inbound.id
 }
 
 output "host" {
@@ -22,6 +22,6 @@ output "resource_group_name" {
   value = azurerm_kubernetes_cluster.cluster.resource_group_name
 }
 
-output "load_balancer_public_outbound_ip_id" {
-  value = tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0]
+output "cluster_outbound_ip" {
+  value = data.azurerm_public_ip.cluster_outbound.ip_address
 }

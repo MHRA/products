@@ -20,6 +20,7 @@ Authorisation
 authorisations
 authorise
 authorised
+authorises
 az
 azm
 Azure
@@ -31,6 +32,7 @@ behaviour
 BESILATE
 Bing
 Bitnami
+BMGF
 BUILDKIT
 CADIX
 cancelled

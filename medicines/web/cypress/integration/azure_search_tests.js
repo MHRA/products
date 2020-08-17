@@ -5,6 +5,9 @@
 
 // Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
 
+// UPDATE 27/07/20: we will no longer need to polyfill once full cypress mocking for fetch implemented when this PR is merged and released: https://github.com/cypress-io/cypress/pull/4176",
+// Once this has been completed, it should be possible to upgrade next from 9.2 -> 9.4 - currently interaction causes fetch polyfill to break
+
 let polyfill;
 
 // grab fetch polyfill from remote URL, could be also from a local package

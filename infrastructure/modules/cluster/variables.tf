@@ -6,18 +6,6 @@ variable "location" {
   description = "Resource group location"
 }
 
-variable "vnet_name" {
-  description = "Virtual Network name"
-}
-
-variable "vnet_resource_group" {
-  description = "Virtual Network resource group name"
-}
-
-variable "lb_subnet_id" {
-  description = "Load Balancer Subnet id"
-}
-
 variable "cluster_subnet_name" {
   description = "Cluster Subnet name"
 }
@@ -33,10 +21,6 @@ variable "cluster_route_destination_cidr_blocks" {
 
 variable "cluster_route_next_hop" {
   description = "Next hop for default route"
-}
-
-variable "lb_route_table_id" {
-  description = "Route Table ID"
 }
 
 variable "environment" {
@@ -79,4 +63,28 @@ variable "diagnostic_log_types" {
 variable "logs_storage_account_id" {
   description = "ID of the immutable storage account used for logs"
   default     = ""
+}
+
+variable "vnet_name" {
+  description = "Name of the VNET that the cluster lives in"
+  default     = ""
+}
+
+variable "vnet_cidr" {
+  description = "CIDR IP range used for the cluster VNET"
+  default     = ""
+}
+
+variable "lb_subnet_name" {
+  description = "Name of the subnet that the internal load balancer lives in"
+  default     = ""
+}
+
+variable "lb_subnet_cidr" {
+  description = "CIDR IP range used for the subnet that the internal load balancer lives in"
+  default     = ""
+}
+
+variable "lb_route_table_name" {
+  description = "Name to use for the load balancer route table"
 }

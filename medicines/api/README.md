@@ -2,7 +2,7 @@
 
 ![medicines-api](https://github.com/MHRA/products/workflows/medicines-api-master/badge.svg)
 
-This is where the Medicines API rust server lives.
+This is where the code for the [Medicines API](https://medicines.api.mhra.gov.uk/graphiql) lives.
 
 ## Prerequisites
 

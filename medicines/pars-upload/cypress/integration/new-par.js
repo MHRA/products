@@ -17,7 +17,7 @@ setUp()
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
-describe('PARs upload', () => {
+describe('New PARs upload', () => {
   it('can add and delete multiple substances', () => {
     cy.visit('/new-par')
     let uploadData = {
@@ -52,8 +52,7 @@ describe('PARs upload', () => {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
       doseForm: 'some form',
-      substance1: 'Ibuprofen',
-      substance2: 'Paracetamol',
+      substances: ['Ibuprofen', 'Paracetamol'],
       licence: { type: 'THR', part_one: '12345', part_two: '6789' },
     }
     let uploadPageTitle = 'New Public Assessment Report'
@@ -74,7 +73,7 @@ describe('PARs upload', () => {
 
     const fileName = 'rabbit-anti-human-stuff.txt'
     const expectedTitle = 'Upload your PDF'
-    completeUploadFile(fileName, expectedTitle)
+    completeUploadFile(fileName, expectedTitle, 'text/plain', 'ascii')
 
     cy.once('fail', (err) => {
       expect(err.message).to.include(

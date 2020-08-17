@@ -1,4 +1,4 @@
-use juniper::{FieldResult, RootNode};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
 
 use crate::{
     azure_context::AzureContext,
@@ -10,56 +10,62 @@ use search_client::models::DocumentType;
 
 pub struct QueryRoot;
 
-#[juniper::graphql_object(Context = AzureContext)]
+#[Object(desc = "Query root")]
 impl QueryRoot {
-    async fn substance(context: &AzureContext, name: Option<String>) -> FieldResult<Substance> {
+    async fn substance(
+        &self,
+        context: &Context<'_>,
+        name: Option<String>,
+    ) -> FieldResult<Substance> {
+        let context = context.data::<AzureContext>()?;
         match name {
             Some(name) => get_substance_with_products(&name, &context.client)
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    juniper::FieldError::new(
-                        "Error fetching search results",
-                        juniper::Value::null(),
-                    )
+                    e.into()
                 }),
-            None => Err(juniper::FieldError::new(
-                "Getting a substance without providing a substance name is not supported.",
-                juniper::Value::null(),
-            )),
+            None => Err(anyhow::anyhow!(
+                "Getting a substance without providing a substance name is not supported."
+            )
+            .into()),
         }
     }
 
-    async fn product(_context: &AzureContext, name: String) -> FieldResult<Product> {
+    async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
         get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+            e.into()
         })
     }
 
     async fn substances_by_first_letter(
-        context: &AzureContext,
+        &self,
+        context: &Context<'_>,
         letter: String,
     ) -> FieldResult<Vec<Substance>> {
+        let context = context.data::<AzureContext>()?;
         get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                juniper::FieldError::new("Error fetching search results", juniper::Value::null())
+                e.into()
             })
     }
 
     async fn documents(
-        context: &AzureContext,
+        &self,
+        context: &Context<'_>,
         search: Option<String>,
         first: Option<i32>,
         skip: Option<i32>,
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<Documents> {
+        let context = context.data::<AzureContext>()?;
         let offset = get_offset_or_default(skip, after, 0);
 
-        let docs = get_documents(
+        get_documents(
             &context.client,
             search.as_deref().unwrap_or(" "),
             first,
@@ -68,13 +74,11 @@ impl QueryRoot {
             None,
         )
         .await
+        .map(Into::into)
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            juniper::FieldError::new("Error fetching search results", juniper::Value::null())
-        })?
-        .into();
-
-        Ok(docs)
+            e.into()
+        })
     }
 }
 
@@ -95,20 +99,18 @@ fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
     Ok(string.parse::<i32>()? + 1)
 }
 
-pub struct MutationRoot;
+type QuerySchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
 
-#[juniper::graphql_object(Context = AzureContext)]
-impl MutationRoot {}
+pub struct ApiSchema(pub QuerySchema);
 
-pub type Schema = RootNode<'static, QueryRoot, MutationRoot, SubscriptionRoot>;
-
-pub struct SubscriptionRoot;
-
-#[juniper::graphql_subscription(Context = AzureContext)]
-impl SubscriptionRoot {}
-
-pub fn create_schema() -> Schema {
-    Schema::new(QueryRoot {}, MutationRoot {}, SubscriptionRoot {})
+impl ApiSchema {
+    pub fn new(context: AzureContext) -> ApiSchema {
+        ApiSchema(
+            Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+                .data(context)
+                .finish(),
+        )
+    }
 }
 
 #[cfg(test)]

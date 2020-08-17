@@ -2,7 +2,7 @@
 
 ![pars-upload](https://github.com/MHRA/products/workflows/pars-upload-master/badge.svg)
 
-This is the PARS upload form.
+This is where the code for the [PARS upload](https://pars.mhra.gov.uk) site lives.
 
 - See an [example use of the form][example doc].
 

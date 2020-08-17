@@ -5,7 +5,7 @@ help: ## Display this help screen
 .PHONY: get-env
 get-env: ## Gets the environment variables from azure keyvault into .env file
 	az keyvault secret show \
-	  --vault-name mhra-prod \
+	  --vault-name mhraproducts4853 \
 	  --name infrastructure-prod-env \
 	  --query value \
 	  --output tsv | sort | sed '/^$$/d' > .env
@@ -13,16 +13,11 @@ get-env: ## Gets the environment variables from azure keyvault into .env file
 .PHONY: set-env
 set-env: ## Takes your current .env file and replaces the keyvault value with the contents of the file
 	az keyvault secret set \
-	--vault-name mhra-prod \
+	--vault-name mhraproducts4853 \
 	--name infrastructure-prod-env \
 	--file .env
 
 .PHONY: plan
-plan: ## Reads from .env and runs terraform plan with those variables - optionally supply args as args="args_here"
+plan: ## Reads from .env and runs terraform plan with those variables
 	export $(cat .env .env.overrides 2> /dev/null | xargs) && \
-	terraform plan $$args
-
-.PHONY: apply
-apply: ## Reads from .env and runs terraform apply with those variables - optionally supply args as args="args_here"
-	export $(cat .env .env.overrides 2> /dev/null | xargs) && \
-	terraform apply $$args
+	terraform plan

@@ -1,21 +1,50 @@
-resource "azurerm_public_ip" "products_ip" {
-  name                = "products-public-ip"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
+resource "azurerm_route_table" "load_balancer" {
+  name                          = var.lb_route_table_name
+  disable_bgp_route_propagation = true
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
 
   tags = {
     environment = var.environment
   }
 }
 
-resource "azurerm_subnet" "cluster" {
-  name                 = var.cluster_subnet_name
-  resource_group_name  = var.vnet_resource_group
-  address_prefixes     = [var.cluster_subnet_cidr]
-  virtual_network_name = var.vnet_name
+resource "azurerm_route" "load_balancer" {
+  for_each = toset(var.cluster_route_destination_cidr_blocks)
+
+  name                   = replace(replace(each.value, ".", "_"), "/", "__")
+  resource_group_name    = var.resource_group_name
+  route_table_name       = var.lb_route_table_name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.cluster_route_next_hop
 }
 
+resource "azurerm_virtual_network" "cluster" {
+  name                = var.vnet_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  address_space       = [var.vnet_cidr]
+}
+
+resource "azurerm_subnet" "load_balancer" {
+  name                 = var.lb_subnet_name
+  resource_group_name  = var.resource_group_name
+  address_prefixes     = [var.lb_subnet_cidr]
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
+
+resource "azurerm_subnet_route_table_association" "load_balancer" {
+  subnet_id      = azurerm_subnet.load_balancer.id
+  route_table_id = azurerm_route_table.load_balancer.id
+}
+
+resource "azurerm_subnet" "cluster" {
+  name                 = var.cluster_subnet_name
+  resource_group_name  = var.resource_group_name
+  address_prefixes     = [var.cluster_subnet_cidr]
+  virtual_network_name = azurerm_virtual_network.cluster.name
+}
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.environment
@@ -126,5 +155,22 @@ resource "azurerm_log_analytics_solution" "cluster" {
   plan {
     publisher = "Microsoft"
     product   = "OMSGallery/ContainerInsights"
+  }
+}
+
+data "azurerm_public_ip" "cluster_outbound" {
+  name                = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[8]
+  resource_group_name = split("/", tolist(azurerm_kubernetes_cluster.cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips)[0])[4]
+}
+
+resource "azurerm_public_ip" "cluster_inbound" {
+  name                = "products-public-ip"
+  location            = var.location
+  resource_group_name = azurerm_kubernetes_cluster.cluster.node_resource_group
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    environment = var.environment
   }
 }
