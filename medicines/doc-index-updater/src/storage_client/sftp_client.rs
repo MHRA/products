@@ -33,6 +33,7 @@ async fn sentinel_sftp_factory(
         )
         .as_str()
     );
+
     let tcp = Async::<TcpStream>::connect(format!("{}:22", server)).await?;
 
     tracing::debug!(message = "SFTP server connection established");
