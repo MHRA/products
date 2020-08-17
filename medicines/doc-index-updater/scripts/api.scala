@@ -35,9 +35,9 @@ class ProductsApi extends Simulation {
   }
 
   val httpProtocol = http
-    //.baseUrl("https://medicines-api.non-prod.mhra.gov.uk/graphql") // non prod
-    .baseUrl("https://medicines-api-dev.test.mhra.gov.uk/graphql") //dev
-    //.baseUrl("http://localhost:8000/graphql") // local
+    //.baseUrl("https://medicines-api.non-prod.mhra.gov.uk") // non prod
+    .baseUrl("https://medicines-api-dev.test.mhra.gov.uk") //dev
+    //.baseUrl("http://localhost:8000") // local
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
     .doNotTrackHeader("1")

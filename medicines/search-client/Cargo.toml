@@ -1,30 +1,27 @@
 [package]
 name = "search_client"
 version = "0.0.1"
-authors = ["Matt Doughty <matt.doughty@mhra.gov.uk>", "Craig Anderson <craig.anderson@red-badger.com>"]
+authors = ["Tim Lee <tim.lee@mhra.gov.uk>", "Stuart Harris <stuart.harris@red-badger.com>"]
 edition = "2018"
 license = "MIT"
 description = "MHRA Products Search Client"
 
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [features]
 default = []
 
-graphql = ["juniper", "futures"]
+graphql = ["async-graphql", "futures"]
 
 [dependencies]
-anyhow = "1.0.28"
-async-trait = "0.1.30"
-chrono = "0.4.11"
-reqwest = { version = "0.10.4", features = ["json"] }
-serde = { version = "1.0.106", features = ["derive"] }
-serde_derive = "1.0.106"
-serde_json = "1.0.52"
-tracing = { version = "0.1.13", features = ["attributes"] }
-juniper = { git = "https://github.com/graphql-rust/juniper", branch = "master", optional = true }
-futures = { version = "0.3.4", optional = true }
+anyhow = "1.0.32"
+async-graphql = { version = "1.16.14", optional = true }
+async-trait = "0.1.36"
+chrono = "0.4.13"
+futures = { version = "0.3.5", optional = true }
+reqwest = { version = "0.10.7", features = ["json"] }
+serde = { version = "1.0.114", features = ["derive"] }
+serde_derive = "1.0.114"
+serde_json = "1.0.57"
+tracing = { version = "0.1.17", features = ["attributes"] }
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"

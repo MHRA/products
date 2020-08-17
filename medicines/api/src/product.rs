@@ -2,7 +2,7 @@ use crate::{
     document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };
-use juniper::FieldResult;
+use async_graphql::{FieldResult, Object};
 use search_client::{models::DocumentType, Search};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -25,13 +25,14 @@ impl Product {
     }
 }
 
-#[juniper::graphql_object]
-#[graphql(description = "A medical product containing active ingredients")]
+#[Object(desc = "A medical product containing active ingredients")]
 impl Product {
-    fn name(&self) -> &str {
+    #[field(desc = "name")]
+    async fn name(&self) -> &str {
         &self.name
     }
 
+    #[field(desc = "documents")]
     async fn documents(
         &self,
         first: Option<i32>,
@@ -65,7 +66,7 @@ impl Product {
                 total_count,
             ))
         } else {
-            let docs = get_documents(
+            get_documents(
                 &search_client::AzureSearchClient::new(),
                 "",
                 first,
@@ -74,21 +75,20 @@ impl Product {
                 Some(&self.name),
             )
             .await
+            .map(Into::into)
             .map_err(|e| {
                 tracing::error!(
                     "Error fetching documents from Azure search service: {:?}",
                     e
                 );
-                juniper::FieldError::new("Error fetching documents", juniper::Value::null())
-            })?
-            .into();
-            Ok(docs)
+                e.into()
+            })
         }
     }
 }
 
 pub fn handle_doc(document: &Document, products: &mut Vec<Product>) {
-    if let Some(document_product_name) = document.product_name() {
+    if let Some(document_product_name) = document.product_name.as_ref() {
         // Try to find an existing product.
         let existing_product = products
             .iter_mut()

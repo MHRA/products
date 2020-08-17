@@ -1,31 +1,36 @@
 use crate::{pagination, pagination::PageInfo};
-use juniper::GraphQLObject;
+use async_graphql::SimpleObject;
 use search_client::{
     models::{DocumentType, IndexResult},
     Search,
 };
 
-#[derive(GraphQLObject, Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
-#[graphql(description = "A document")]
+#[SimpleObject(desc = "A document")]
+#[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
-    product_name: Option<String>,
-    active_substances: Option<Vec<String>>,
-    title: Option<String>,
-    highlights: Option<Vec<String>>,
-    created: Option<String>,
-    doc_type: Option<DocumentType>,
-    file_size_in_bytes: Option<i32>,
-    name: Option<String>,
-    url: Option<String>,
+    #[field(desc = "product name")]
+    pub product_name: Option<String>,
+    #[field(desc = "active substances")]
+    pub active_substances: Option<Vec<String>>,
+    #[field(desc = "title")]
+    pub title: Option<String>,
+    #[field(desc = "highlights")]
+    pub highlights: Option<Vec<String>>,
+    #[field(desc = "created")]
+    pub created: Option<String>,
+    #[field(desc = "doc type")]
+    pub doc_type: Option<DocumentType>,
+    #[field(desc = "file size")]
+    pub file_size_in_bytes: Option<i32>,
+    #[field(desc = "name")]
+    pub name: Option<String>,
+    #[field(desc = "url")]
+    pub url: Option<String>,
 }
 
 impl Document {
     pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
         self.doc_type == Some(doc_type)
-    }
-
-    pub fn product_name(&self) -> Option<&str> {
-        self.product_name.as_deref()
     }
 
     pub fn substances(&self) -> impl Iterator<Item = &str> {
@@ -123,7 +128,7 @@ pub async fn get_documents(
     let docs = azure_result
         .search_results
         .into_iter()
-        .map(|search_result| Document::from(search_result))
+        .map(Document::from)
         .collect();
 
     let total_count = azure_result.count.unwrap_or(0);
