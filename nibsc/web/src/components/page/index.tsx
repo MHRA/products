@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 
-import { nibscMainGreen } from '../../styles/colors';
+import { nibscMainGreen,anchorColour } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
 // import Footer from '../footer';
 // import Header from '../header';
@@ -36,7 +36,7 @@ const WithStyles = styled.div`
     color: ${anchorColour};
     text-decoration: underline;
     &:hover {
-      color: ${mhra};
+      color: ${nibscMainGreen};
     }
   }
 `;
@@ -51,21 +51,14 @@ const Wrapper = styled.main`
 interface IPageProps {
   children: React.ReactNode;
   title: string;
-  storageAllowed: boolean;
-  setStorageAllowed: any;
 }
 
 const App: React.FC<IPageProps> = (props) => {
-  useEffect(() => {
-    if (props.storageAllowed) {
-      Events.initializeTrackingScripts();
-    }
-  }, [props.storageAllowed]);
-
+  
   return (
     <>
       <Head>
-        <title>MHRA {props.title}</title>
+        <title>NIBSC - {props.title}</title>
         <meta
           httpEquiv="Content-Security-Policy-Report-Only"
           content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
@@ -73,13 +66,9 @@ const App: React.FC<IPageProps> = (props) => {
       </Head>
       <WithStyles>
         <Normalize />
-        <CookieBanner
-          storageAllowed={props.storageAllowed}
-          setStorageAllowed={props.setStorageAllowed}
-        />
-        <Header title={props.title} />
+        {/* <Header title={props.title} /> */}
         <Wrapper>{props.children}</Wrapper>
-        <Footer />
+        {/* <Footer /> */}
       </WithStyles>
     </>
   );

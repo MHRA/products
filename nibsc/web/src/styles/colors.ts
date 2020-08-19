@@ -8,3 +8,5 @@ export const nibscPurple = '#93509E';
 export const nibscOrange = '#E98300';
 export const nibscPink = '#D71F85';
 export const nibscBlue = '#031F73';
+
+export const anchorColour = '#1d70b8';
