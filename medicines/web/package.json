@@ -79,7 +79,7 @@
     "lint": "yarn tslint",
     "sitemap": "ts-node --project src/tools/tsconfig.json src/tools/sitemap-generator.ts",
     "start": "next start",
-    "test-e2e": "yarn run test-e2e-graphql; yarn run test-e2e-azure-search",
+    "test-e2e": "yarn run test-e2e-graphql && yarn run test-e2e-azure-search",
     "test-e2e-azure-search": "./scripts/test-e2e-azure-search.sh",
     "test-e2e-graphql": "./scripts/test-e2e-graphql.sh",
     "test": "yarn jest",
