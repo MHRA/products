@@ -1,5 +1,5 @@
 #!/bin/bash
-env USE_GRAPHQL=false yarn dev &
+cross-env USE_GRAPHQL=false yarn dev &
 wait-on http://localhost:3000
 server_pid=$!
 ENV_VARS=$(cat .env | sed '/^$/d' | tr "\n" "," | sed 's/,$/ /g')
