@@ -6,11 +6,57 @@
     "dev": "next dev",
     "build": "next build",
     "export": "next export -o dist",
+    "lint": "yarn tslint",
     "start": "next start"
   },
   "dependencies": {
     "next": "9.5.2",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "styled-components": "^5.1.1",
+    "styled-normalize": "^8.0.7"
+  },
+  "devDependencies": {
+    "@types/enzyme": "^3.10.4",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "^26.0.10",
+    "@types/node": "^14.6.0",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "@types/styled-components": "^5.1.2",
+    "babel-jest": "^26.3.0",
+    "babel-plugin-styled-components": "^1.10.6",
+    "cypress": "^4.12.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-to-json": "^3.4.4",
+    "husky": "^4.2.5",
+    "jest": "^26.4.0",
+    "lint-staged": "^10.2.11",
+    "pa11y-ci": "^2.3.0",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.1.0",
+    "ts-node": "^8.5.0",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "tslint-react": "^5.0.0",
+    "typescript": "^3.7.5",
+    "wait-on": "^5.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,yml,md}": [
+      "yarn prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "yarn lint"
+    ],
+    "*.tf": "bash -c 'terraform fmt -check'"
   }
 }
