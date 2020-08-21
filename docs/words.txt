@@ -10,6 +10,7 @@ analytics
 Analytics
 api
 APIs
+Appian
 appId
 APtr
 ArgoCD
@@ -27,6 +28,7 @@ Azure
 azurecr
 azurerm
 backend
+balancer
 BD
 behaviour
 BESILATE
@@ -101,8 +103,8 @@ jetstack
 jMHESRNZIU
 jMj
 jq
-JSON
 js
+JSON
 JWT
 kcnwkqgGoHssWP
 keyvault
@@ -141,11 +143,11 @@ mQo
 mTLS
 nginx
 nmmGKnHes
-npm
 nodeSelector
 normalizer
 Normalizer
 noYMpubeoVBK
+npm
 observability
 ObzN
 Ok
@@ -154,8 +156,8 @@ organisation
 organisations
 os
 OtfjQ
-parameterise
 PAR
+parameterise
 PARs
 pdf
 PDFs
@@ -163,8 +165,8 @@ PII
 PIL
 PILs
 PLs
-Prometheus
 prometheus
+Prometheus
 PRs
 PySpelling
 QoURBFoXXQpZp
