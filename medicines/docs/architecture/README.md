@@ -4,19 +4,27 @@
 
 ## The cluster
 
-The diagram above shows how we use Azure’s Kubernetes Service (AKS) to host an API pod for the medicines microservice and a document index updater API pod, which Sentinel’s batch export process calls to update documents for the portal. Although each pod is only shown once, there may be multiple instances of each, for reliability (across zones) and scalability (new instances can be created and destroyed automatically and in just a few seconds).
+The diagram above shows how we use Azure’s Kubernetes Service (AKS) to host microservices. There is:
 
-The shaded blue area is a virtual network consisting of 2 subnets, one for the Kubernetes (K8s) cluster and one for an internal loadbalancer, which is accessible from Sentinel. The cluster hosts an Istio ingress gateway. This is the entrypoint for all incoming requests from the Internet. It terminates SSL using certificates automatically renewed (from [Let’s Encrypt](https://letsencrypt.org/)) by the certificate manager pod. The gateway allows us to do host- and path-based routing to services within the cluster, and we can apply Istio policies, e.g. rate limiting, here.
+- an API pod (`products-api`)for the products microservice
+- a `doc-index-updater` API pod, which Sentinel’s batch export process calls to update documents for the portal
+- a `devices-updater` pod, which will call the Appian API for Devices and Manufacturer data and store it in Cosmos DB
+
+Although each pod is only shown once, there may be multiple instances of each, for reliability (across zones) and scalability (new instances can be created and destroyed automatically and in just a few seconds).
+
+The inner shaded blue area is a virtual network consisting of 2 subnets, one for the Kubernetes (K8s) cluster and one for an internal load balancer, which is accessible from Sentinel. The cluster hosts an Istio ingress gateway. This is the entry-point for all incoming requests from the Internet. It terminates SSL using certificates automatically renewed (from [Let’s Encrypt](https://letsencrypt.org/)) by the certificate manager pod. The gateway allows us to do host- and path-based routing to services within the cluster, and we can apply Istio policies here e.g. authentication, authorization and rate limiting.
 
 ## Storage
 
-Documents are stored in Azure Blob Storage, named after a digest of their contents. This is called content-based addressing and means that two identical documents resolve to the same name giving us deduplication for free. An updated document resolves to a new name, giving us version history for free. We can keep historical documents for ever as storage is very cheap and effectively infinite.
+Documents are stored in Azure Blob Storage, named after a digest of their contents. This is called content-based addressing and means that two identical documents resolve to the same name giving us de-duplication for free. An updated document resolves to a new name, giving us version history for free. We can keep historical documents for ever as storage is very cheap and effectively infinite.
 
 Metadata for the medicines (including lists of associated documents) is attached to each file. Azure Search indexes the documents (pdf and Blob Storage are both supported). Azure search also has AI plugins for features such as phrase detection. This has the potential to give us a rich, relevant search experience similar to that provided by commercially available search engines such as Google or Bing).
 
 ## Medicines API
 
-The API pod contains a lightweight custom HTTP server, written in Rust. It is stateless so it can scale out easily. It allows SPC, PIL and PAR to be searched via a self-documented, read-only, [GraphQL-based API](https://medicines.api.mhra.gov.uk/graphiql).
+The API pod contains a lightweight custom HTTP server, written in Rust. It is stateless so it can scale out easily. It allows SPC, PIL and PAR to be searched via a self-documenting, read-only, [GraphQL-based API](https://medicines.api.mhra.gov.uk/graphiql).
+
+Note: this API will soon be renamed to `products-api` in order to reflect the upcoming addition of publicly accessible information about medical devices and manufacturers.
 
 ## SPC/PIL/PAR document management
 
@@ -31,6 +39,10 @@ Login requests are validated by Azure AD and an ID JWT token returned. Once comp
 The Document Index Updater then uploads the new document to blob storage and the Azure search index being used by the site, after which, the document is instantly accessible on the products website.
 
 There is also the option within the website to update an existing PAR, which deletes the original PAR at the same time as creating a new, replacement document.
+
+## Devices and Manufacturers updates
+
+The `devices-updater` pod will be built shortly to periodically get devices and manufacturer data from an API in Appian and store it in Cosmos DB for the `products-api` to consume.
 
 ## Update for BMGF
 
