@@ -1,16 +1,9 @@
-import Head from 'next/head';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { Normalize } from 'styled-normalize';
 
-import {
-  nibscMainGreen,
-  anchorColour,
-  white,
-  menuHover,
-} from '../../styles/colors';
-import { desktopMaxWidth, mobileBreakpoint } from '../../styles/dimensions';
+import { nibscMainGreen, menuHover, white } from '../../styles/colors';
+import { mobileBreakpoint } from '../../styles/dimensions';
 
 const MenuContainer = styled.ul`
   min-height: 30px;
@@ -82,7 +75,7 @@ const HeaderMenu: React.FC = () => {
         <MenuItem linkUrl="/">Control testing</MenuItem>
         <MenuItem linkUrl="/">Science and research</MenuItem>
         <MenuItem linkUrl="/">Expert services</MenuItem>
-        <MenuItem linkUrl="/">About us</MenuItem>
+        <MenuItem linkUrl="/about_us">About us</MenuItem>
       </MenuContainer>
     </nav>
   );

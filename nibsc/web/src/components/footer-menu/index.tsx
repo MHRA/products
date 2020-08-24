@@ -2,12 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 
-import {
-  nibscMainGreen,
-  anchorColour,
-  white,
-  menuHover,
-} from '../../styles/colors';
+import { nibscMainGreen } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const MenuContainer = styled.ul`

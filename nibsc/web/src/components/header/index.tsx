@@ -13,7 +13,7 @@ const FullWidthHeader = styled.div`
 `;
 
 const ConstrainedHeader = styled.div`
-  padding: ${baseSpace};
+  padding: ${baseSpace} 0;
   margin: 0 auto;
   max-width: ${desktopMaxWidth};
 `;
