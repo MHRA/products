@@ -72,7 +72,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
   );
 };
 
-const Menu: React.FC = () => {
+const HeaderMenu: React.FC = () => {
   return (
     <nav>
       <MenuContainer>
@@ -88,4 +88,4 @@ const Menu: React.FC = () => {
   );
 };
 
-export default Menu;
+export default HeaderMenu;

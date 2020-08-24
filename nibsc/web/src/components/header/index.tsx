@@ -6,7 +6,7 @@ import {
   baseSpace,
   desktopMaxWidth,
 } from '../../styles/dimensions';
-import Menu from '../menu';
+import HeaderMenu from '../header-menu';
 
 const FullWidthHeader = styled.div`
   margin-top: 35px;
@@ -32,7 +32,7 @@ const Header: React.FC = () => {
     <FullWidthHeader>
       <ConstrainedHeader>
         <LogoImage src="/images/NIBSC_logo.png" />
-        <Menu />
+        <HeaderMenu />
       </ConstrainedHeader>
     </FullWidthHeader>
   );

@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
@@ -7,13 +6,14 @@ import { nibscMainGreen, anchorColour } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
 
 import Footer from '../footer';
+import Head from '../head';
 import Header from '../header';
 
 const WithStyles = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: Arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 16px;
 
   * {
@@ -54,13 +54,7 @@ interface IPageProps {
 const App: React.FC<IPageProps> = (props) => {
   return (
     <>
-      <Head>
-        <title>NIBSC - {props.title}</title>
-        <meta
-          httpEquiv="Content-Security-Policy-Report-Only"
-          content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
-        />
-      </Head>
+      <Head title={props.title} />
       <WithStyles>
         <Normalize />
         <Header />
