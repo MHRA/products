@@ -6,14 +6,11 @@ import { nibscMainGreen } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const MenuContainer = styled.ul`
-  min-height: 30px;
   list-style: none;
-  display: flex;
   padding: 0;
   font-weight: bold;
-  font-size: 12px;
-  align-items: stretch;
-  justify-items: center;
+  font-size: 1em;
+  margin-top: 0;
   margin-bottom: 38px;
   flex-wrap: wrap;
 
@@ -22,14 +19,20 @@ const MenuContainer = styled.ul`
     text-decoration: none;
     color: ${nibscMainGreen};
   }
+
+  @media ${mobileBreakpoint} {
+    text-align: center;
+  }
 `;
 
 const StyledMenuItem = styled.li`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  padding-right: 15px;
-  margin-bottom: 10px;
+  display: inline-block;
+  padding-right: 35px;
+
+  @media ${mobileBreakpoint} {
+    padding-right: 15px;
+    margin-bottom: 10px;
+  }
 `;
 
 interface MenuItemProps {

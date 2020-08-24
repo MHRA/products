@@ -26,10 +26,10 @@ const WithStyles = styled.div`
 
   img,
   svg {
-    display: block;
     height: auto;
     max-width: 100%;
   }
+
   a {
     color: ${anchorColour};
     text-decoration: underline;

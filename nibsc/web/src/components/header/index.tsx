@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 import {
@@ -8,7 +9,7 @@ import {
 } from '../../styles/dimensions';
 import HeaderMenu from '../header-menu';
 
-const FullWidthHeader = styled.div`
+const FullWidthHeader = styled.header`
   margin-top: 35px;
 `;
 
@@ -18,8 +19,12 @@ const ConstrainedHeader = styled.div`
   max-width: ${desktopMaxWidth};
 `;
 
+const LogoContainer = styled.div`
+  margin-bottom: 35px;
+`;
+
 const LogoImage = styled.img`
-  margin-bottom: 30px;
+  display: inline-block;
 
   @media ${mobileBreakpoint} {
     margin-left: auto;
@@ -31,7 +36,13 @@ const Header: React.FC = () => {
   return (
     <FullWidthHeader>
       <ConstrainedHeader>
-        <LogoImage src="/images/NIBSC_logo.png" />
+        <LogoContainer>
+          <Link href="/">
+            <a>
+              <LogoImage src="/images/NIBSC_logo.png" />
+            </a>
+          </Link>
+        </LogoContainer>
         <HeaderMenu />
       </ConstrainedHeader>
     </FullWidthHeader>
