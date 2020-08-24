@@ -1,12 +1,13 @@
 import Head from 'next/head';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 
-import { nibscMainGreen,anchorColour } from '../../styles/colors';
+import { nibscMainGreen, anchorColour } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
-// import Footer from '../footer';
-// import Header from '../header';
+
+import Footer from '../footer';
+import Header from '../header';
 
 const WithStyles = styled.div`
   display: flex;
@@ -17,9 +18,6 @@ const WithStyles = styled.div`
 
   * {
     box-sizing: border-box;
-  }
-
-  body {
   }
 
   picture {
@@ -41,7 +39,7 @@ const WithStyles = styled.div`
   }
 `;
 
-const Wrapper = styled.main`
+const PageWrapper = styled.main`
   flex-grow: 1;
   margin: 0 auto 4rem;
   max-width: ${desktopMaxWidth};
@@ -54,7 +52,6 @@ interface IPageProps {
 }
 
 const App: React.FC<IPageProps> = (props) => {
-  
   return (
     <>
       <Head>
@@ -66,9 +63,9 @@ const App: React.FC<IPageProps> = (props) => {
       </Head>
       <WithStyles>
         <Normalize />
-        {/* <Header title={props.title} /> */}
-        <Wrapper>{props.children}</Wrapper>
-        {/* <Footer /> */}
+        <Header />
+        <PageWrapper>{props.children}</PageWrapper>
+        <Footer />
       </WithStyles>
     </>
   );

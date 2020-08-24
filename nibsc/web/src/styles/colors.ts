@@ -10,3 +10,4 @@ export const nibscPink = '#D71F85';
 export const nibscBlue = '#031F73';
 
 export const anchorColour = '#1d70b8';
+export const menuHover = '#ef8200;';

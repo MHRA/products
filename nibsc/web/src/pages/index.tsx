@@ -7,17 +7,12 @@ const H1 = Styled.h1`
   color: ${nibscMainGreen};
 `;
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <Page title="Homepage">
-
-        <H1>Welcome to NIBSC!</H1>
-        <img src="/images/NIBSC_logo.png" />
-
-
-      <footer>
-      
-      </footer>
+      <footer></footer>
     </Page>
   );
-}
+};
+
+export default Home;
