@@ -2,22 +2,19 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 
-import { nibscMainGreen } from '../../styles/colors';
+import { nibscAccessibleGreen, white } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const MenuContainer = styled.ul`
   list-style: none;
   padding: 0;
-  font-weight: bold;
-  font-size: 1em;
-  margin-top: 0;
-  margin-bottom: 38px;
+  font-size: 12px;
+  margin: 0 0 38px 5px;
   flex-wrap: wrap;
 
   li a,
   li a:hover {
-    text-decoration: none;
-    color: ${nibscMainGreen};
+    color: ${white};
   }
 
   @media ${mobileBreakpoint} {
@@ -27,10 +24,9 @@ const MenuContainer = styled.ul`
 
 const StyledMenuItem = styled.li`
   display: inline-block;
-  padding-right: 35px;
+  margin-right: 26px;
 
   @media ${mobileBreakpoint} {
-    padding-right: 15px;
     margin-bottom: 10px;
   }
 `;

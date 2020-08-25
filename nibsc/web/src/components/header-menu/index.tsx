@@ -2,14 +2,14 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 
-import { nibscMainGreen, menuHover, white } from '../../styles/colors';
+import { nibscAccessibleGreen, menuHover, white } from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const MenuContainer = styled.ul`
   min-height: 30px;
   list-style: none;
   display: flex;
-  background-color: ${nibscMainGreen};
+  background-color: ${nibscAccessibleGreen};
   padding: 0;
   font-weight: bold;
   font-size: 1em;

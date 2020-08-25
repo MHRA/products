@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Normalize } from 'styled-normalize';
 
-import { nibscMainGreen, anchorColour } from '../../styles/colors';
+import { nibscAccessibleGreen, anchorColour } from '../../styles/colors';
 import { desktopMaxWidth } from '../../styles/dimensions';
 
 import Footer from '../footer';
@@ -34,7 +34,7 @@ const WithStyles = styled.div`
     color: ${anchorColour};
     text-decoration: underline;
     &:hover {
-      color: ${nibscMainGreen};
+      color: ${nibscAccessibleGreen};
     }
   }
 `;
