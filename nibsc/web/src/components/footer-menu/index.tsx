@@ -10,7 +10,7 @@ const MenuContainer = styled.ul`
   padding: 0;
   font-size: 12px;
   margin: 0 0 38px 5px;
-  flex-wrap: wrap;
+  display: inline-block;
 
   li a,
   li a:hover {

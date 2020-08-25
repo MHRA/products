@@ -25,6 +25,7 @@ const Picture = styled.picture`
   max-width: 302px;
   border-left: 1px solid ${nibscAccessibleGreen};
   margin: 36px;
+  display: inline-block;
 `;
 
 const Footer: React.FC = () => {
@@ -38,7 +39,6 @@ const Footer: React.FC = () => {
           <FooterMenu />
         </div>
       </ConstrainedFooter>
-    </FullWidthFooter>
   );
 };
 
