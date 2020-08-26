@@ -36,7 +36,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               },
               {
                 "name": "Query",
-                "value": "InsightsMetrics\n| where Namespace == \"prometheus\"\n| where Name == \"job:cpu_usage_seconds_per_pod:mean\" \n| where parse_json(Tags).namespace == \"doc-index-updater\"\n| summarize avg(Val) by tostring(parse_json(Tags).pod_name), bin(TimeGenerated, 15s)\n| render timechart\n"
+                "value": "InsightsMetrics\n| where Namespace == \"prometheus\"\n| where Name == \"job:cpu_usage_seconds_per_pod:mean\" \n| where parse_json(Tags).namespace == \"doc-index-updater\"\n| summarize avg(Val) by tostring(parse_json(Tags).pod), bin(TimeGenerated, 15s)\n| render timechart\n"
               },
               {
                 "name": "TimeRange",
@@ -130,7 +130,7 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               },
               {
                 "name": "Query",
-                "value": "InsightsMetrics\n| where Namespace == \"prometheus\"\n| where Name == \"job:memory_usage_percent_per_pod:mean\"\n| where parse_json(Tags).namespace == \"doc-index-updater\"\n| summarize avg(Val * 100) by tostring(parse_json(Tags).pod_name), bin(TimeGenerated, 1m)\n| render timechart\n"
+                "value": "InsightsMetrics\n| where Namespace == \"prometheus\"\n| where Name == \"job:memory_usage_percent_per_pod:mean\"\n| where parse_json(Tags).namespace == \"doc-index-updater\"\n| summarize avg(Val * 100) by tostring(parse_json(Tags).pod), bin(TimeGenerated, 1m)\n| render timechart\n"
               },
               {
                 "name": "TimeRange",
@@ -579,7 +579,101 @@ resource "azurerm_dashboard" "doc-index-updater-dashboard" {
               "type": "ApplicationInsights"
             }
           }
-        }
+        },
+
+
+        "6": {
+          "position": {
+            "x": 0,
+            "y": 12,
+            "colSpan": 6,
+            "rowSpan": 4
+          },
+          "metadata": {
+            "inputs": [
+              {
+                "name": "ComponentId",
+                "value": {
+                  "SubscriptionId": "${data.azurerm_subscription.current.subscription_id}",
+                  "ResourceGroup": "${var.resource_group_name}",
+                  "Name": "${azurerm_log_analytics_workspace.cluster.name}",
+                  "ResourceId": "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourcegroups/${var.resource_group_name}/providers/microsoft.operationalinsights/workspaces/${azurerm_log_analytics_workspace.cluster.name}"
+                }
+              },
+              {
+                "name": "Query",
+                "value": "InsightsMetrics\n| where Namespace == \"prometheus\"\n| where Name == \"job:error_response_latency_milliseconds_per_pod:mean\" \n| where parse_json(Tags).namespace == \"doc-index-updater\"\n| summarize avg(Val) by tostring(parse_json(Tags).pod_name), bin(TimeGenerated, 15s)\n| render timechart\n"
+              },
+              {
+                "name": "TimeRange",
+                "value": "PT30M"
+              },
+              {
+                "name": "Dimensions",
+                "value": {
+                  "xAxis": {
+                    "name": "TimeGenerated",
+                    "type": "datetime"
+                  },
+                  "yAxis": [
+                    {
+                      "name": "count_",
+                      "type": "long"
+                    }
+                  ],
+                  "splitBy": [],
+                  "aggregation": "Sum"
+                }
+              },
+              {
+                "name": "Version",
+                "value": "1.0"
+              },
+              {
+                "name": "PartId",
+                "value": "14fbaca6-515b-42e1-9e14-7392ad21d3f2"
+              },
+              {
+                "name": "PartTitle",
+                "value": "Analytics"
+              },
+              {
+                "name": "PartSubTitle",
+                "value": "${azurerm_log_analytics_workspace.cluster.name}"
+              },
+              {
+                "name": "resourceTypeMode",
+                "value": "workspace"
+              },
+              {
+                "name": "ControlType",
+                "value": "AnalyticsChart"
+              },
+              {
+                "name": "SpecificChart",
+                "value": "Line"
+              },
+              {
+                "name": "DashboardId",
+                "isOptional": true
+              }
+            ],
+            "type": "Extension/AppInsightsExtension/PartType/AnalyticsPart",
+            "settings": {
+              "content": {
+                "PartTitle": "Error request latency (ms)",
+                "PartSubTitle": "${azurerm_log_analytics_workspace.cluster.name}"
+              }
+            },
+            "asset": {
+              "idInputName": "ComponentId",
+              "type": "ApplicationInsights"
+            }
+          }
+        },
+
+        
+
       }
     }
   },
