@@ -74,6 +74,7 @@ const App: NextPage = props => {
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
   const {
@@ -82,7 +83,6 @@ const App: NextPage = props => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
-      useGraphQl: graphQlFeatureFlag,
       rerouteType: rerouteTypeQS,
     },
   } = router;
@@ -90,7 +90,7 @@ const App: NextPage = props => {
   const getSearchResults = async (
     searchPageInfo: ISearchPageInfo,
   ): Promise<ISearchResult> => {
-    if (graphQlFeatureFlag) {
+    if (useGraphQl) {
       return graphQlSearchPageLoader(searchPageInfo);
     } else {
       return azureSearchPageLoader(searchPageInfo);

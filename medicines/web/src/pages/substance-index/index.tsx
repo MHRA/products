@@ -20,10 +20,11 @@ const App: NextPage = () => {
   );
   const [results, setResults] = React.useState<ISubstance[]>([]);
   const [substanceIndex, setSubstanceIndex] = React.useState('');
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
   const {
-    query: { letter: queryQS, useGraphQl: graphQlFeatureFlag },
+    query: { letter: queryQS },
   } = router;
 
   useEffect(() => {
@@ -33,9 +34,7 @@ const App: NextPage = () => {
     (async () => {
       const index = queryQS.toString();
 
-      const loader = graphQlFeatureFlag
-        ? graphqlSubstanceLoader
-        : substanceLoader;
+      const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
 
       setResults(await loader.load(index));
       setSubstanceIndex(index);

@@ -38,7 +38,7 @@ describe('Search using GraphQl', function() {
   it('can search for Paracetamol', function() {
     cy.server();
     mockParacetamolResultsForGraphQl();
-    cy.visit('/search?search=paracetamol&page=1&useGraphQl=true');
+    cy.visit('/search?search=paracetamol&page=1');
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -54,7 +54,7 @@ describe('A-Z Index', function() {
     // Mock out GraphQL response.
     cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
 
-    cy.visit('/substance?substance=PARACETAMOL&useGraphQl=true');
+    cy.visit('/substance?substance=PARACETAMOL');
     cy.contains('PARACETAMOL TABLETS FROM GRAPHQL');
     cy.contains('WRONG THING', { timeout: 0 }).should('not.exist');
   });

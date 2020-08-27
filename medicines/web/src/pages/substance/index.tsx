@@ -35,10 +35,10 @@ const App: NextPage = () => {
   );
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
-
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
   const router = useRouter();
   const {
-    query: { substance: queryQS, useGraphQl: graphQlFeatureFlag },
+    query: { substance: queryQS },
   } = router;
 
   useEffect(() => {
@@ -47,9 +47,7 @@ const App: NextPage = () => {
     }
     (async () => {
       const substanceName = queryQS.toString();
-      const loader: (
-        substance: string,
-      ) => Promise<IProduct[]> = graphQlFeatureFlag
+      const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
         ? graphQlProductsLoader
         : azureProductsLoader;
 
