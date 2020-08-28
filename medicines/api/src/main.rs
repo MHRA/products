@@ -54,12 +54,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("0.0.0.0:{}", get_env_or_default("PORT", PORT.to_string()))
         .parse::<SocketAddr>()?;
 
-    let graphql_post = async_graphql_warp::graphql(schema.0).and_then(
-        |(schema, builder): (_, QueryBuilder)| async move {
+    let graphql_post = async_graphql_warp::graphql(schema.0)
+        .and_then(|(schema, builder): (_, QueryBuilder)| async move {
             let response = builder.execute(&schema).await;
             Ok::<_, Infallible>(GQLResponse::from(response))
-        },
-    );
+        })
+        .with(cors.clone());
 
     let graphql_options = warp::options()
         .map(warp::reply)
