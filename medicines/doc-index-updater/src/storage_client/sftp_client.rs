@@ -4,10 +4,10 @@ use super::{
 };
 use anyhow::anyhow;
 use async_dup::Mutex;
+use async_io::Async;
 use async_ssh2::{Session, Sftp};
 use async_trait::async_trait;
-use smol::Async;
-use std::net::TcpStream;
+use std::net::{TcpStream, ToSocketAddrs};
 
 struct SftpConfig {
     server: String,
@@ -34,7 +34,11 @@ async fn sentinel_sftp_factory(
         .as_str()
     );
 
-    let tcp = Async::<TcpStream>::connect(format!("{}:22", server)).await?;
+    let addr = format!("{}:22", server)
+        .to_socket_addrs()?
+        .next()
+        .ok_or_else(|| anyhow!("no socket address"))?;
+    let tcp = Async::<TcpStream>::connect(addr).await?;
 
     tracing::debug!(message = "SFTP server connection established");
 
