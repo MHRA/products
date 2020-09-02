@@ -45,19 +45,6 @@ describe('New PARs upload', () => {
     let uploadPageTitle = 'New Public Assessment Report'
     addAndDeleteProducts(uploadData, uploadPageTitle)
   })
-  it('duplicate licence numbers are not allowed', () => {
-    cy.visit('/new-par')
-
-    let uploadData = {
-      brand: 'Ibuprofen pills',
-      strength: 'Really powerful stuff',
-      doseForm: 'some form',
-      substance: 'Ibuprofen',
-      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
-    }
-    let uploadPageTitle = 'New Public Assessment Report'
-    addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
-  })
   it('upload field only accepts PDFs', () => {
     cy.visit('/new-par')
 
@@ -80,6 +67,19 @@ describe('New PARs upload', () => {
         'One or more field is invalid within given file(s)'
       )
     })
+  })
+  it('duplicate licence numbers are not allowed', () => {
+    cy.visit('/new-par')
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: ['Ibuprofen', 'Paracetamol'],
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    let uploadPageTitle = 'New Public Assessment Report'
+    addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
   })
   it('review page shows the correct information', () => {
     cy.visit('/new-par')
