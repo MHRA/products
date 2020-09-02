@@ -17,9 +17,20 @@ setUp()
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
+const startNewParForm = () => {
+  cy.visit('/')
+
+  cy.findAllByText('What are you doing today?').should('exist')
+
+  cy.findByText('Upload a new document').click()
+
+  cy.findByText('Continue').click()
+}
+
 describe('New PARs upload', () => {
   it('can add and delete multiple substances', () => {
-    cy.visit('/new-par')
+    startNewParForm()
+
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -33,7 +44,8 @@ describe('New PARs upload', () => {
   })
 
   it('can add and delete multiple products', () => {
-    cy.visit('/new-par')
+    startNewParForm()
+
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -45,8 +57,21 @@ describe('New PARs upload', () => {
     let uploadPageTitle = 'New Public Assessment Report'
     addAndDeleteProducts(uploadData, uploadPageTitle)
   })
+  it('duplicate licence numbers are not allowed', () => {
+    startNewParForm()
+
+    let uploadData = {
+      brand: 'Ibuprofen pills',
+      strength: 'Really powerful stuff',
+      doseForm: 'some form',
+      substances: 'Ibuprofen',
+      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
+    }
+    let uploadPageTitle = 'New Public Assessment Report'
+    addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
+  })
   it('upload field only accepts PDFs', () => {
-    cy.visit('/new-par')
+    startNewParForm()
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -68,21 +93,8 @@ describe('New PARs upload', () => {
       )
     })
   })
-  it('duplicate licence numbers are not allowed', () => {
-    cy.visit('/new-par')
-
-    let uploadData = {
-      brand: 'Ibuprofen pills',
-      strength: 'Really powerful stuff',
-      doseForm: 'some form',
-      substances: 'Ibuprofen',
-      licence: { type: 'THR', part_one: '12345', part_two: '6789' },
-    }
-    let uploadPageTitle = 'New Public Assessment Report'
-    addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
-  })
   it('review page shows the correct information', () => {
-    cy.visit('/new-par')
+    startNewParForm()
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -163,7 +175,7 @@ describe('New PARs upload', () => {
     )
   })
   it('shows the uploaded file when going back to upload file page', () => {
-    cy.visit('/new-par')
+    startNewParForm()
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -205,7 +217,7 @@ describe('New PARs upload', () => {
       mockSuccessfulSubmission(baseUrl, parsUrl)
     }
 
-    cy.visit('/new-par')
+    startNewParForm()
 
     let uploadData = {
       brand: 'Ibuprofen pills',
