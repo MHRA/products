@@ -150,37 +150,44 @@ export const addAndDeleteProducts = (uploadData, expectedTitle) => {
 export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
   cy.findAllByText(expectedTitle).not('title').should('exist')
 
-  for (let i = 0; i < 2; i++) {
-    cy.findByLabelText('Brand/Generic name').should('have.value', '')
+  cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
-    cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
+  cy.findByLabelText('Strength').type(uploadData.strength)
 
-    cy.findByLabelText('Strength').type(uploadData.strength)
+  cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
 
-    cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
+  cy.findByLabelText('Active substance(s)').type(uploadData.substance)
 
-    cy.findByLabelText('Active substance(s)').type(uploadData.substances[0])
+  cy.findByText('Licence number')
+    .parent()
+    .parent()
+    .within(() => {
+      cy.findByLabelText('Type').select(uploadData.licence.type)
+      cy.findByLabelText('First five digits').type(uploadData.licence.part_one)
+      cy.findByLabelText('Last four digits').type(uploadData.licence.part_two)
+    })
+  cy.findByText('Add another product').click()
 
-    for (let j = 1; j < uploadData.substances.length; j++) {
-      cy.findByText('Add another active substance').click()
-      cy.findAllByLabelText('Active substance(s)')
-        .last()
-        .type(uploadData.substances[j])
-    }
+  cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
-    cy.findByText('Licence number')
-      .parent()
-      .parent()
-      .within(() => {
-        cy.findByLabelText('Type').select(uploadData.licence.type)
-        cy.findByLabelText('First five digits').type(
-          uploadData.licence.part_one
-        )
-        cy.findByLabelText('Last four digits').type(uploadData.licence.part_two)
-      })
+  cy.findByLabelText('Brand/Generic name').type(uploadData.brand)
 
-    cy.findByText('Add another product').click()
-  }
+  cy.findByLabelText('Strength').type(uploadData.strength)
+
+  cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
+
+  cy.findByLabelText('Active substance(s)').type(uploadData.substance)
+
+  cy.findByText('Licence number')
+    .parent()
+    .parent()
+    .within(() => {
+      cy.findByLabelText('Type').select(uploadData.licence.type)
+      cy.findByLabelText('First five digits').type(uploadData.licence.part_one)
+      cy.findByLabelText('Last four digits').type(uploadData.licence.part_two)
+    })
+
+  cy.findByText('Add another product').click()
 
   const validationMsg = 'Duplicate licence numbers are not allowed'
 
