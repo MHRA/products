@@ -7,7 +7,7 @@ on:
 
 env:
   NONPROD_IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
-  PROD_IMAGE: mhraproductsproductionregistry.azurecr.io/products/medicines-api
+  PROD_IMAGE: mhraproducts4853registry.azurecr.io/products/medicines-api
 
 jobs:
   build-and-test:
@@ -75,7 +75,7 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            cd deployments/medicines-api/overlays/prod
+            cd deployments/medicines-api/overlays/prod-new
 
             kustomize edit set image $DIGEST
 
