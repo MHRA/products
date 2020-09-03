@@ -1,7 +1,12 @@
 mod document_type;
 pub mod models;
+mod query_normalizer;
+
+#[macro_use]
+extern crate lazy_static;
 
 use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
+use crate::query_normalizer::extract_normalized_product_licences;
 use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
