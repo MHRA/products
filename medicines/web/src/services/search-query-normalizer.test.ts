@@ -1,4 +1,7 @@
-import { buildFuzzyQuery } from './search-query-normalizer';
+import {
+  buildFuzzyQuery,
+  extractNormalizedProductLicenses,
+} from './search-query-normalizer';
 
 describe(buildFuzzyQuery, () => {
   beforeAll(() => {
@@ -32,5 +35,26 @@ describe(buildFuzzyQuery, () => {
     expect(fuzzyQuery).toBe(
       '(amlodipine~1 || amlodipine^4) (PL304640140~1 || PL304640140^4)',
     );
+  });
+});
+
+describe(extractNormalizedProductLicenses, () => {
+  it.each`
+    input                                           | expectedResult
+    ${'pl 30464/0140'}                              | ${'PL304640140'}
+    ${'pl30464/0140'}                               | ${'PL304640140'}
+    ${'30464/0140'}                                 | ${'PL304640140'}
+    ${'pl/30464/0140'}                              | ${'PL304640140'}
+    ${'pl-30464-0140'}                              | ${'PL304640140'}
+    ${'pl_30464_0140'}                              | ${'PL304640140'}
+    ${'hr 30464/0140'}                              | ${'hr PL304640140'}
+    ${'thr 30464/0140'}                             | ${'thr PL304640140'}
+    ${'something 30464/0140'}                       | ${'something PL304640140'}
+    ${'something 30464-0140'}                       | ${'something PL304640140'}
+    ${'something 30464_0140 other text'}            | ${'something other text PL304640140'}
+    ${'something 30464_0140 other 12345_1234 text'} | ${'something other text PL304640140 PL123451234'}
+  `('converts $input to $expectedResult', ({ input, expectedResult }) => {
+    const result = extractNormalizedProductLicenses(input);
+    expect(result).toBe(expectedResult);
   });
 });

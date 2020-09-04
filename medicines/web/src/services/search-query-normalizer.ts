@@ -12,17 +12,21 @@ const escapeSpecialWords = (word: string): string =>
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `(${word}~${searchWordFuzziness} || ${word}^${searchExactnessBoost})`;
 
-const extractNormalizedProductLicenses = (q: string): string => {
+export const extractNormalizedProductLicenses = (q: string): string => {
   const normalizedProductLicences = q
     .match(extractProductLicenseRegExp)
-    ?.map(match => match.replace(extractProductLicenseRegExp, 'PL$3$5'));
+    ?.map((match) =>
+      match.replace(extractProductLicenseRegExp, 'PL$3$5').trim(),
+    );
 
   if (normalizedProductLicences && normalizedProductLicences.length) {
     const normalizedProductLicencesString: string = normalizedProductLicences.join(
       ' ',
     );
     const qWithoutProductLicences = q.replace(extractProductLicenseRegExp, '');
-    return `${qWithoutProductLicences} ${normalizedProductLicencesString}`;
+    return `${
+      qWithoutProductLicences ? `${qWithoutProductLicences} ` : ''
+    }${normalizedProductLicencesString}`;
   }
 
   return `${q}`;
@@ -33,8 +37,8 @@ const splitByNonSearchableCharacters = (query: string) =>
 
 export const buildFuzzyQuery = (query: string): string => {
   return splitByNonSearchableCharacters(extractNormalizedProductLicenses(query))
-    .filter(x => x.length > 0)
-    .map(word => escapeSpecialWords(word))
-    .map(word => preferExactMatchButSupportFuzzyMatch(word))
+    .filter((x) => x.length > 0)
+    .map((word) => escapeSpecialWords(word))
+    .map((word) => preferExactMatchButSupportFuzzyMatch(word))
     .join(' ');
 };
