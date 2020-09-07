@@ -53,7 +53,7 @@ describe(extractNormalizedProductLicenses, () => {
     ${'pretext 30464/0140'}                             | ${'pretext PL304640140'}
     ${'pretext 30464-0140'}                             | ${'pretext PL304640140'}
     ${'pretext 30464_0140 posttext'}                    | ${'pretext posttext PL304640140'}
-    ${'pretext 30464_0140 midtext 12345_1234 posttext'} | ${'something midtext posttext PL304640140 PL123451234'}
+    ${'pretext 30464_0140 midtext 12345_1234 posttext'} | ${'pretext midtext posttext PL304640140 PL123451234'}
   `('converts $input to $expectedResult', ({ input, expectedResult }) => {
     const result = extractNormalizedProductLicenses(input);
     expect(result).toBe(expectedResult);
@@ -68,7 +68,6 @@ describe(escapeSpecialWords, () => {
     ${'this OR that'}  | ${'this \\OR that'}
     ${'this || that'}  | ${'this \\|| that'}
     ${'this NOT that'} | ${'this \\NOT that'}
-    ${'this !that'}    | ${'this \\!that'}
   `('converts $input to $expectedResult', ({ input, expectedResult }) => {
     const result = escapeSpecialWords(input);
     expect(result).toBe(expectedResult);

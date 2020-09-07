@@ -224,6 +224,7 @@ fn add_fuzzy_search(search_term: &str, search_fuzziness: &str, search_exactness:
         .join(" ")
 }
 
+#[allow(clippy::too_many_arguments)]
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -369,6 +370,7 @@ impl CreateIndexEntry for AzureSearchClient {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
