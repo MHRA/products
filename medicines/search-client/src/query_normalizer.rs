@@ -1,5 +1,4 @@
 use regex::Captures;
-use urlencoding::encode;
 
 use regex::Regex;
 
@@ -61,10 +60,6 @@ pub fn escape_special_words(word: &str) -> String {
         .to_string()
 }
 
-pub fn encode_qs_param(qs_param: &str) -> String {
-    encode(qs_param)
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -105,14 +100,6 @@ mod test {
         let input = "this AND that OR something else NOT the other";
         let expected = "this and that or something else not the other";
         let result = escape_special_words(&input);
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn test_encode_qs_param() {
-        let input = "(0.3%~1 || 0.3^1)";
-        let expected = "this and that or something else not the other";
-        let result = encode_qs_param(&input);
         assert_eq!(result, expected);
     }
 }
