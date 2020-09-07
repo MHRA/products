@@ -6,7 +6,7 @@ const extractProductLicenseRegExp: RegExp = new RegExp(
   'ig',
 );
 
-const escapeSpecialWords = (word: string): string =>
+export const escapeSpecialWords = (word: string): string =>
   word.replace(/(\|\||&&|\bAND\b|\bOR\b|\bNOT\b)/gi, `\\$1`);
 
 const preferExactMatchButSupportFuzzyMatch = (word: string): string =>

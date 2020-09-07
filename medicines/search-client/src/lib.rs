@@ -6,7 +6,10 @@ mod query_normalizer;
 extern crate lazy_static;
 
 use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
-use crate::query_normalizer::extract_normalized_product_licences;
+use crate::query_normalizer::{
+    encode_qs_param, escape_special_characters, escape_special_words,
+    extract_normalized_product_licences, prefer_exact_match_but_support_fuzzy_match,
+};
 use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
@@ -23,6 +26,8 @@ struct AzureConfig {
 pub struct AzureSearchClient {
     client: reqwest::Client,
     config: AzureConfig,
+    search_fuzziness: String,
+    search_exactness: String,
 }
 
 pub struct AzurePagination {
@@ -47,6 +52,9 @@ impl AzureSearchClient {
         let search_service = get_env("SEARCH_SERVICE");
         let api_version = get_env("AZURE_SEARCH_API_VERSION");
 
+        let search_word_fuzziness = get_env("AZURE_SEARCH_WORD_FUZZINESS");
+        let search_exactness_boost = get_env("AZURE_SEARCH_EXACTNESS_BOOST");
+
         AzureSearchClient {
             client: reqwest::Client::new(),
             config: AzureConfig {
@@ -55,6 +63,8 @@ impl AzureSearchClient {
                 search_service,
                 api_version,
             },
+            search_exactness: search_exactness_boost,
+            search_fuzziness: search_word_fuzziness,
         }
     }
 }
@@ -184,6 +194,25 @@ impl Search for AzureSearchClient {
     }
 }
 
+fn clean_up_search_term(search_term: &str) -> String {
+    let mut search_term = extract_normalized_product_licences(&search_term);
+    search_term = escape_special_characters(&search_term);
+    search_term = escape_special_words(&search_term);
+    search_term = encode_qs_param(&search_term);
+
+    search_term
+        .split(" ")
+        .map(|word| {
+            prefer_exact_match_but_support_fuzzy_match(
+                word,
+                &self.search_word_fuzziness,
+                &self.search_exactness_boost,
+            )
+        })
+        .collect::<Vec<String>>()
+        .join(" ")
+}
+
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -206,8 +235,9 @@ fn build_search(
             ("api-version", config.api_version.as_str()),
             ("highlight", "content"),
             ("queryType", "full"),
-            ("search", search_term),
+            ("search", &clean_up_search_term(search_term)),
             ("scoringProfile", "preferKeywords"),
+            ("searchMode", "all"),
             ("$count", &include_count),
         ])
         .header("api-key", &config.api_key);
@@ -330,6 +360,8 @@ async fn search(
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
+    search_fuzziness,
+    
 ) -> Result<IndexResults, reqwest::Error> {
     let req = build_search(
         search_term,
@@ -338,6 +370,8 @@ async fn search(
         filter,
         &client,
         &config,
+        search_fuzziness,
+        search_exactness
     )?;
 
     tracing::debug!("Requesting from URL: {}", &req.url());

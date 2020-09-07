@@ -1,36 +1,42 @@
-use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
-use async_trait::async_trait;
-use core::fmt::Debug;
 use regex::Captures;
-use serde::ser::Serialize;
-use std::collections::HashMap;
 use urlencoding::encode;
 
 use regex::Regex;
 
 pub fn extract_normalized_product_licences(search_term: &str) -> String {
     lazy_static! {
-        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?P<prefix>^|\s+|PL|HR|THR)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
+        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?P<prefix>PL|HR|THR|\s|^)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
     }
 
     RE_PRODUCT_LICENCE
         .replace_all(&search_term, |caps: &Captures| {
-            let prefix = if caps[1].trim().chars().count() > 0 {
-                caps[1].to_string()
-            } else {
+            let prefix = if caps[1].is_empty() {
                 String::from("PL")
+            } else if caps[1].trim().is_empty() {
+                String::from(" PL")
+            } else {
+                caps[1].to_string()
             };
-            format!("{}{}{}", prefix, &caps[3], &caps[5])
+            format!(
+                "{prefix}{five_numbers}{four_numbers}",
+                prefix = prefix,
+                five_numbers = &caps[3],
+                four_numbers = &caps[5]
+            )
         })
         .to_string()
 }
 
-pub fn prefer_exact_match_but_support_fuzzy_match(word: &str) -> String {
+pub fn prefer_exact_match_but_support_fuzzy_match(
+    word: &str,
+    search_word_fuzziness: &str,
+    search_exactness_boost: &str,
+) -> String {
     format!(
-        "{word}~{search_word_fuzziness} || {word}^{search_exactness_boost}",
+        "({word}~{search_word_fuzziness} || {word}^{search_exactness_boost})",
         word = word,
-        search_word_fuzziness = 1,
-        search_exactness_boost = 4
+        search_word_fuzziness = search_word_fuzziness,
+        search_exactness_boost = search_exactness_boost
     )
 }
 
@@ -43,6 +49,20 @@ pub fn escape_special_characters(word: &str) -> String {
     RE_SPECIAL_CHARACTERS
         .replace_all(word, r"\${special_character}")
         .to_string()
+}
+
+pub fn escape_special_words(word: &str) -> String {
+    lazy_static! {
+        static ref RE_SPECIAL_WORDS: Regex =
+            Regex::new(r#"(?P<special_words>[AND|OR|NOT])"#).unwrap();
+    }
+    RE_SPECIAL_WORDS
+        .replace_all(word, |caps: &Captures| caps[1].to_lowercase())
+        .to_string()
+}
+
+pub fn encode_qs_param(qs_param: &str) -> String {
+    encode(qs_param)
 }
 
 #[cfg(test)]
@@ -64,9 +84,9 @@ mod test {
         assert_eq!(result, expected);
     }
 
-    #[test_case("ibuprofen", "ibuprofen~1 || ibuprofen^4")]
+    #[test_case("ibuprofen", "(ibuprofen~1 || ibuprofen^4)")]
     fn test_prefer_exact_match_but_support_fuzzy_match(input: &str, expected: &str) {
-        let result = prefer_exact_match_but_support_fuzzy_match(&input);
+        let result = prefer_exact_match_but_support_fuzzy_match(&input, "1", "4");
         assert_eq!(result, expected);
     }
 
@@ -77,6 +97,22 @@ mod test {
         let expected =
             "\\+ \\& \\- \\| \\! \\( \\) \\{ \\} \\[ \\] \\^ \\\" \\~ \\* \\? \\: \\\\ \\/";
         let result = escape_special_characters(&input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_escape_special_words() {
+        let input = "this AND that OR something else NOT the other";
+        let expected = "this and that or something else not the other";
+        let result = escape_special_words(&input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_encode_qs_param() {
+        let input = "(0.3%~1 || 0.3^1)";
+        let expected = "this and that or something else not the other";
+        let result = encode_qs_param(&input);
         assert_eq!(result, expected);
     }
 }
