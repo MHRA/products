@@ -42,8 +42,7 @@ pub fn prefer_exact_match_but_support_fuzzy_match(
 pub fn escape_special_characters(search_term: &str) -> String {
     lazy_static! {
         static ref RE_SPECIAL_CHARACTERS: Regex =
-            Regex::new(r#"(?P<special_character>[+\-&\|!!\(\)\{\}\[\]\^""\~\*\?\\:\\\\/])"#)
-                .unwrap();
+            Regex::new(r#"(?P<special_character>[\+\-\\/\\\^\|\?\*\\(\)\{\}\[\]&!"~:])"#).unwrap();
     }
     RE_SPECIAL_CHARACTERS
         .replace_all(search_term, r"\${special_character}")
@@ -88,9 +87,8 @@ mod test {
     //todo: encode for special characters ; / ? : @ = + &
     #[test]
     fn test_escape_special_characters() {
-        let input = "+ & - | ! ( ) { } [ ] ^ \" ~ * ? : \\ /";
-        let expected =
-            "\\+ \\& \\- \\| \\! \\( \\) \\{ \\} \\[ \\] \\^ \\\" \\~ \\* \\? \\: \\\\ \\/";
+        let input = r#"+ & - | ! ( ) { } [ ] ^ " ~ * ? : \ /"#;
+        let expected = r#"\+ \& \- \| \! \( \) \{ \} \[ \] \^ \" \~ \* \? \: \\ \/"#;
         let result = escape_special_characters(&input);
         assert_eq!(result, expected);
     }
