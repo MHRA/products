@@ -208,14 +208,13 @@ impl Search for AzureSearchClient {
     }
 }
 
-fn clean_up_search_term(
-    search_term: &str,
-    search_fuzziness: &str,
-    search_exactness: &str,
-) -> String {
+fn clean_up_search_term(search_term: &str) -> String {
     let mut search_term = extract_normalized_product_licences(&search_term);
     search_term = escape_special_characters(&search_term);
-    search_term = escape_special_words(&search_term);
+    escape_special_words(&search_term)
+}
+
+fn add_fuzzy_search(search_term: &str, search_fuzziness: &str, search_exactness: &str) -> String {
     search_term
         .split(' ')
         .map(|word| {
@@ -243,16 +242,16 @@ fn build_search(
 
     let include_count = include_count.unwrap_or(false).to_string();
 
+    let search_term = clean_up_search_term(search_term);
+    let search_term = add_fuzzy_search(&search_term, search_fuzziness, search_exactness);
+
     let mut request_builder = client
         .get(&base_url)
         .query(&[
             ("api-version", config.api_version.as_str()),
             ("highlight", "content"),
             ("queryType", "full"),
-            (
-                "search",
-                &clean_up_search_term(search_term, search_fuzziness, search_exactness),
-            ),
+            ("search", &search_term),
             ("scoringProfile", "preferKeywords"),
             ("searchMode", "all"),
             ("$count", &include_count),
@@ -495,6 +494,7 @@ mod test {
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
+            // Decoded search term: (Something~1+||+Something^4)+(challenging~1+||+challenging^4)+(and~1+||+and^4)+(with~1+||+with^4)+(forbidden~1+||+forbidden^4)+(symbols~1+||+symbols^4)+(\\*\\!~1+||+\\*\\!^4)+(\\(\\)~1+||+\\(\\)^4)+(or~1+||+or^4)+(%~1+||+%^4)+(keywords~1+||+keywords^4)+(not~1+||+not^4)+(PL123451234~1+||+PL123451234^4)
             let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=%28Something%7E1+%7C%7C+Something%5E4%29+%28challenging%7E1+%7C%7C+challenging%5E4%29+%28and%7E1+%7C%7C+and%5E4%29+%28with%7E1+%7C%7C+with%5E4%29+%28forbidden%7E1+%7C%7C+forbidden%5E4%29+%28symbols%7E1+%7C%7C+symbols%5E4%29+%28%5C*%5C%21%7E1+%7C%7C+%5C*%5C%21%5E4%29+%28%5C%28%5C%29%7E1+%7C%7C+%5C%28%5C%29%5E4%29+%28or%7E1+%7C%7C+or%5E4%29+%28%25%7E1+%7C%7C+%25%5E4%29+%28keywords%7E1+%7C%7C+keywords%5E4%29+%28not%7E1+%7C%7C+not%5E4%29+%28PL123451234%7E1+%7C%7C+PL123451234%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24count=false"
                 .to_string();
 

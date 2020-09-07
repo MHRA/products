@@ -39,24 +39,24 @@ pub fn prefer_exact_match_but_support_fuzzy_match(
     )
 }
 
-pub fn escape_special_characters(word: &str) -> String {
+pub fn escape_special_characters(search_term: &str) -> String {
     lazy_static! {
         static ref RE_SPECIAL_CHARACTERS: Regex =
             Regex::new(r#"(?P<special_character>[+\-&\|!!\(\)\{\}\[\]\^""\~\*\?\\:\\\\/])"#)
                 .unwrap();
     }
     RE_SPECIAL_CHARACTERS
-        .replace_all(word, r"\${special_character}")
+        .replace_all(search_term, r"\${special_character}")
         .to_string()
 }
 
-pub fn escape_special_words(word: &str) -> String {
+pub fn escape_special_words(search_term: &str) -> String {
     lazy_static! {
         static ref RE_SPECIAL_WORDS: Regex =
             Regex::new(r#"(?P<special_words>[AND|OR|NOT])"#).unwrap();
     }
     RE_SPECIAL_WORDS
-        .replace_all(word, |caps: &Captures| caps[1].to_lowercase())
+        .replace_all(search_term, |caps: &Captures| caps[1].to_lowercase())
         .to_string()
 }
 
