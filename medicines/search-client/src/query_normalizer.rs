@@ -54,9 +54,11 @@ pub fn escape_special_words(search_term: &str) -> String {
         static ref RE_SPECIAL_WORDS: Regex =
             Regex::new(r#"([^a-zA-Z])(?P<special_words>AND|OR|NOT)([^a-zA-Z])"#).unwrap();
     }
-    RE_SPECIAL_WORDS.replace_all(search_term, |caps: &Captures| {
-        format!("{}{}{}", caps[1], caps[2].to_lowercase(), caps[3]).to_string()
-    })
+    RE_SPECIAL_WORDS
+        .replace_all(search_term, |caps: &Captures| {
+            format!("{}{}{}", &caps[1], &caps[2].to_lowercase(), &caps[3])
+        })
+        .to_string()
 }
 
 #[cfg(test)]
