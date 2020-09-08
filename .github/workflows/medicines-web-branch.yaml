@@ -82,3 +82,18 @@ jobs:
         run: yarn a11y
         env:
           ROOT_URL_DOMAIN: localhost
+
+      - name: Upload pa11y screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-pa11y-screenshots
+          path: medicines/web/pa11y-screenshots
+
+      - name: Deploy products web to static site in azure storage
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
+        with:
+          enabled-static-website: true
+          folder: medicines/web/dist
+          connection-string: ${{ secrets.AZURE_STORAGE_DEV_PRODUCTS_WEB_CONNECTION_STRING }}
