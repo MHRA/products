@@ -1,7 +1,8 @@
-use juniper::GraphQLObject;
+use async_graphql::SimpleObject;
 
 // Based upon: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-#[derive(GraphQLObject, Debug, PartialEq)]
+#[SimpleObject]
+#[derive(Debug, PartialEq)]
 pub struct PageInfo {
     pub has_previous_page: bool,
     pub has_next_page: bool,
@@ -32,7 +33,7 @@ macro_rules! pagination {
         pagination!($name, $edgename, $type, ());
     };
     ($name:ident, $edgename:ident, $type:ty, $context:ty) => {
-        #[derive(juniper::GraphQLObject)]
+        #[SimpleObject]
         pub struct $edgename {
             node: $type,
             cursor: String,
@@ -41,14 +42,11 @@ macro_rules! pagination {
         impl $edgename {
             #[allow(dead_code)]
             fn new(node: $type, cursor: String) -> $edgename {
-                $edgename {
-                    node: node,
-                    cursor: cursor,
-                }
+                $edgename { node, cursor }
             }
         }
 
-        #[derive(juniper::GraphQLObject)]
+        #[SimpleObject]
         pub struct $name {
             page_info: $crate::pagination::PageInfo,
             total_count: i32,
@@ -63,9 +61,9 @@ macro_rules! pagination {
                 total_count: i32,
             ) -> $name {
                 $name {
-                    page_info: page_info,
-                    total_count: total_count,
-                    edges: edges,
+                    page_info,
+                    total_count,
+                    edges,
                 }
             }
         }

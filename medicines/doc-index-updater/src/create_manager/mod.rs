@@ -19,6 +19,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::time::delay_for;
 use uuid::Uuid;
 
+pub mod clean_up_worker;
 pub mod hash;
 pub mod models;
 mod retrieve;

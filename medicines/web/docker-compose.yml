@@ -16,6 +16,7 @@ services:
         - GOOGLE_TRACKING_ID
         - GOOGLE_USE_DEBUG
         - ROOT_URL_DOMAIN
+        - USE_GRAPHQL
     image: web:latest
     ports:
       - '3000:3000'

@@ -14,8 +14,9 @@ module.exports = {
     GOOGLE_USE_DEBUG: process.env.GOOGLE_USE_DEBUG,
     ROOT_URL_DOMAIN: process.env.ROOT_URL_DOMAIN,
     GRAPHQL_URL: process.env.GRAPHQL_URL,
+    USE_GRAPHQL: process.env.USE_GRAPHQL,
   },
-  webpack: config => {
+  webpack: (config) => {
     config.module.rules.push({
       test: /\.(md)$/,
       use: [

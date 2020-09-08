@@ -43,12 +43,7 @@ variable "KEYVAULT_ACCESS_CIDR_BLOCKS" {
   default     = []
 }
 
-variable "KEYVAULT_NAME" {
-  description = "Name of keyvault where secrets stored"
-  default     = "mhra-prod"
-}
-
-variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
+variable "ADMIN_PERSON_IDS" {
   type        = list(string)
   description = "IDs of objects (people etc) to associate access policies for"
   default     = []
@@ -56,5 +51,15 @@ variable "KEYVAULT_AUTHORISED_PERSON_IDS" {
 
 variable "KEYVAULT_RESOURCE_GROUP" {
   description = "Name of resource group where keyvault is deployed"
-  default     = "prod-secrets"
+  default     = "secrets"
+}
+
+variable "DNS_ZONE_NAME" {
+  description = "Name of DNS zone"
+  default     = "api.mhra.gov.uk"
+}
+
+variable "DNS_RESOURCE_GROUP_NAME" {
+  description = "Name of resource group where DNS zone is deployed"
+  default     = "dns"
 }

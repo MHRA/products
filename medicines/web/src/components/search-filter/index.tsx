@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { RerouteType } from '../../model/rerouteType';
 import { DocType } from '../../services/azure-search';
+import { Button, Checkbox } from '../form-elements';
 
 const StyledSearchFilter = styled.section`
   .checkbox-row {
@@ -13,11 +15,7 @@ const StyledSearchFilter = styled.section`
       flex: 0.1;
       display: flex;
       flex-direction: column;
-      padding: 0.25em;
-
-      input {
-        flex: 1;
-      }
+      padding: 0.25em 0;
     }
 
     label {
@@ -26,17 +24,24 @@ const StyledSearchFilter = styled.section`
   }
 `;
 
+const ButtonContainer = styled.div`
+  padding-top: 10px;
+`;
+
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
-  toggleDocType: (d: DocType) => void;
+  updateDocTypes: (d: DocType[]) => void;
+  rerouteType: RerouteType;
 }
 
-interface IDocTypeCheckboxProps extends ISearchFilterProps {
+interface IDocTypeCheckboxProps {
   docTypeForThisCheckbox: DocType;
   name: string;
+  toggleDocType: (d: DocType) => void;
+  currentlyEnabledDocTypes: DocType[];
 }
 
-const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
+const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = (props) => {
   const {
     docTypeForThisCheckbox,
     name,
@@ -52,8 +57,7 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
   return (
     <div className="checkbox-row">
       <div className="checkbox">
-        <input
-          type="checkbox"
+        <Checkbox
           id={id}
           name="doc"
           value={docTypeForThisCheckbox}
@@ -68,17 +72,62 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
   );
 };
 
-const SearchFilter: React.FC<ISearchFilterProps> = props => {
-  const generateCheckboxFor = (docType: DocType, name: string) => (
-    <DocTypeCheckbox {...props} docTypeForThisCheckbox={docType} name={name} />
+const SearchFilter: React.FC<ISearchFilterProps> = (props) => {
+  const [checkedFilters, setCheckedFilters] = React.useState(
+    props.currentlyEnabledDocTypes,
   );
+  const submitButton = useRef(null);
+  const filterHeader = useRef(null);
+
+  const generateCheckboxFor = (docType: DocType, name: string) => (
+    <DocTypeCheckbox
+      toggleDocType={toggleDocType}
+      currentlyEnabledDocTypes={checkedFilters}
+      docTypeForThisCheckbox={docType}
+      name={name}
+    />
+  );
+
+  const toggleDocType = (docTypeToToggle) => {
+    const enabledDocTypes = Array.from(checkedFilters);
+    if (enabledDocTypes.includes(docTypeToToggle)) {
+      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
+      enabledDocTypes.splice(docTypeIndex, 1);
+    } else {
+      enabledDocTypes.push(docTypeToToggle);
+    }
+    setCheckedFilters(enabledDocTypes);
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    props.updateDocTypes(checkedFilters);
+  };
+
+  useEffect(() => {
+    if (
+      props.rerouteType != null &&
+      RerouteType[props.rerouteType.toString()] === RerouteType.CheckboxSelected
+    ) {
+      filterHeader.current?.scrollIntoView();
+      submitButton.current?.focus();
+    }
+  }, [props.rerouteType]);
 
   return (
     <StyledSearchFilter>
-      <h2>Filter documents by</h2>
+      <h3 ref={filterHeader}>Filter documents by</h3>
       {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
       {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
       {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
+      <ButtonContainer>
+        <Button
+          type="submit"
+          onClick={submit}
+          value="Submit"
+          ref={submitButton}
+        />
+      </ButtonContainer>
     </StyledSearchFilter>
   );
 };

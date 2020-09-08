@@ -21,6 +21,7 @@ env:
   GOOGLE_USE_DEBUG: true
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines-api.non-prod.mhra.gov.uk/graphql
+  USE_GRAPHQL: true
 
 jobs:
   build:
@@ -82,6 +83,13 @@ jobs:
         run: yarn a11y
         env:
           ROOT_URL_DOMAIN: localhost
+
+      - name: Upload pa11y screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-pa11y-screenshots
+          path: medicines/web/pa11y-screenshots
 
       - name: Deploy products web to static site in azure storage
         # master causes this step to fail so pointing to last working commit until fixed

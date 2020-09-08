@@ -17,7 +17,7 @@ import substanceLoader from '../../services/substance-loader';
 const azureProductsLoader = async (substance: string) => {
   const firstLetter = substance.charAt(0);
   const substanceIndex = await substanceLoader.load(firstLetter);
-  const substanceMatch = substanceIndex.find(s => s.name === substance);
+  const substanceMatch = substanceIndex.find((s) => s.name === substance);
   if (substanceMatch) {
     return substanceMatch.products;
   }
@@ -35,10 +35,10 @@ const App: NextPage = () => {
   );
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
-
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
   const router = useRouter();
   const {
-    query: { substance: queryQS, useGraphQl: graphQlFeatureFlag },
+    query: { substance: queryQS },
   } = router;
 
   useEffect(() => {
@@ -47,13 +47,11 @@ const App: NextPage = () => {
     }
     (async () => {
       const substanceName = queryQS.toString();
-      const loader: (
-        substance: string,
-      ) => Promise<IProduct[]> = graphQlFeatureFlag
+      const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
         ? graphQlProductsLoader
         : azureProductsLoader;
 
-      loader(substanceName).then(products => {
+      loader(substanceName).then((products) => {
         setProducts(products);
         setSubstanceName(substanceName);
         Events.viewProductsForSubstance(substanceName);
@@ -77,7 +75,7 @@ const App: NextPage = () => {
         <ProductList title={substanceName} products={products} />
         <SubstanceStructuredData substanceName={substanceName} />
         <DrugListStructuredData
-          drugNames={products.map(product => product.name)}
+          drugNames={products.map((product) => product.name)}
         />
       </SearchWrapper>
     </Page>

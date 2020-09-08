@@ -159,13 +159,14 @@ export const addDuplicateLicenceNumbers = (uploadData, expectedTitle) => {
 
     cy.findByLabelText('Pharmaceutical dose form').type(uploadData.doseForm)
 
-    cy.findByLabelText('Active substance(s)').type(uploadData.substance1)
+    cy.findByLabelText('Active substance(s)').type(uploadData.substances[0])
 
-    cy.findByText('Add another active substance').click()
-
-    cy.findAllByLabelText('Active substance(s)')
-      .last()
-      .type(uploadData.substance2)
+    for (let j = 1; j < uploadData.substances.length; j++) {
+      cy.findByText('Add another active substance').click()
+      cy.findAllByLabelText('Active substance(s)')
+        .last()
+        .type(uploadData.substances[j])
+    }
 
     cy.findByText('Licence number')
       .parent()
@@ -231,15 +232,21 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
   cy.findByText('Continue').click()
 }
 
-export const completeUploadFile = (fileName, expectedTitle) => {
+export const completeUploadFile = (
+  fileName,
+  expectedTitle,
+  mimeType = 'application/pdf',
+  encoding = ''
+) => {
   cy.findAllByText(expectedTitle).not('title').should('exist')
 
   cy.fixture(fileName).then((fileContent) => {
     // The `upload` method is provided by https://github.com/abramenal/cypress-file-upload/tree/v3.5.3
-    cy.get('input[type=file]').upload({
+    cy.get('input[type=file]').attachFile({
       fileContent,
       fileName,
-      mimeType: 'application/pdf',
+      mimeType,
+      encoding,
     })
   })
 

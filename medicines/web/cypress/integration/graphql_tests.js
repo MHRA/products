@@ -11,12 +11,12 @@ let polyfill;
 before(() => {
   const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js';
 
-  cy.request(polyfillUrl).then(response => {
+  cy.request(polyfillUrl).then((response) => {
     polyfill = response.body;
   });
 });
 
-Cypress.on('window:before:load', win => {
+Cypress.on('window:before:load', (win) => {
   delete win.fetch;
   // since the application code does not ship with a polyfill
   // load a polyfilled "fetch" from the test
@@ -34,11 +34,11 @@ const mockParacetamolResultsForGraphQl = () =>
 
 const longerTimeout = 20000;
 
-describe('Search using GraphQl', function() {
-  it('can search for Paracetamol', function() {
+describe('Search using GraphQl', function () {
+  it('can search for Paracetamol', function () {
     cy.server();
     mockParacetamolResultsForGraphQl();
-    cy.visit('/search?search=paracetamol&page=1&useGraphQl=true');
+    cy.visit('/search?search=paracetamol&page=1');
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -47,14 +47,14 @@ describe('Search using GraphQl', function() {
   });
 });
 
-describe('A-Z Index', function() {
-  it('can navigate to Paracetamol Tablets with GraphQL feature on', function() {
+describe('A-Z Index', function () {
+  it('can navigate to Paracetamol Tablets with GraphQL feature on', function () {
     cy.server();
 
     // Mock out GraphQL response.
     cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
 
-    cy.visit('/substance?substance=PARACETAMOL&useGraphQl=true');
+    cy.visit('/substance?substance=PARACETAMOL');
     cy.contains('PARACETAMOL TABLETS FROM GRAPHQL');
     cy.contains('WRONG THING', { timeout: 0 }).should('not.exist');
   });

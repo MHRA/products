@@ -6,6 +6,7 @@ import Page from '../../components/page';
 import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
+import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
@@ -60,7 +61,7 @@ const graphQlSearchPageLoader = async ({
   return searchResults.load({ searchTerm, page, pageSize, docTypes });
 };
 
-const App: NextPage = props => {
+const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
@@ -72,6 +73,8 @@ const App: NextPage = props => {
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
   const {
@@ -80,14 +83,14 @@ const App: NextPage = props => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
-      useGraphQl: graphQlFeatureFlag,
+      rerouteType: rerouteTypeQS,
     },
   } = router;
 
   const getSearchResults = async (
     searchPageInfo: ISearchPageInfo,
   ): Promise<ISearchResult> => {
-    if (graphQlFeatureFlag) {
+    if (useGraphQl) {
       return graphQlSearchPageLoader(searchPageInfo);
     } else {
       return azureSearchPageLoader(searchPageInfo);
@@ -127,10 +130,18 @@ const App: NextPage = props => {
     window.scrollTo(0, 0);
   }, [props]);
 
+  useEffect(() => {
+    if (!rerouteTypeQS) {
+      return;
+    }
+    setRerouteType(RerouteType[rerouteTypeQS.toString()]);
+  }, [rerouteTypeQS]);
+
   const reroutePage = (
     searchTerm: string,
     page: number,
     docTypes: DocType[],
+    rerouteType?: RerouteType,
   ) => {
     const query = {
       search: searchTerm,
@@ -140,21 +151,19 @@ const App: NextPage = props => {
       const docKey = 'doc';
       query[docKey] = queryStringFromDocTypes(docTypes);
     }
+    if (rerouteType != null) {
+      const rerouteTypeKey = 'rerouteType';
+      query[rerouteTypeKey] = rerouteType;
+    }
     router.push({
       pathname: searchPath,
       query,
     });
   };
 
-  const handleToggleDocType = async (docTypeToToggle: DocType) => {
-    const enabledDocTypes = Array.from(docTypes);
-    if (enabledDocTypes.includes(docTypeToToggle)) {
-      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
-      enabledDocTypes.splice(docTypeIndex, 1);
-    } else {
-      enabledDocTypes.push(docTypeToToggle);
-    }
-    reroutePage(query, 1, enabledDocTypes);
+  const updateDocTypes = (updatedDocTypes: DocType[]) => {
+    if (docTypes === updatedDocTypes) return;
+    reroutePage(query, 1, updatedDocTypes, RerouteType.CheckboxSelected);
   };
 
   const handlePageChange = async (page: number) => {
@@ -177,9 +186,10 @@ const App: NextPage = props => {
           searchTerm={query}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          handleDocTypeCheckbox={handleToggleDocType}
+          updateDocTypes={updateDocTypes}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
+          rerouteType={rerouteType}
         />
       </SearchWrapper>
     </Page>

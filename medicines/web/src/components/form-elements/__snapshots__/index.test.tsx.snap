@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button should render 1`] = `
+<input
+  className="sc-AxirZ fdlzyX"
+  type="submit"
+  value="val"
+/>
+`;
+
+exports[`Checkbox should render 1`] = `
+<styled.input
+  id="agree-checkbox"
+  name="agree"
+  onChange={[Function]}
+  type="checkbox"
+  value="val"
+/>
+`;

@@ -9,15 +9,16 @@ env:
   AZURE_SEARCH_API_VERSION: 2017-11-11
   AZURE_SEARCH_EXACTNESS_BOOST: 4
   AZURE_SEARCH_INDEX: products-index
-  AZURE_SEARCH_KEY: 650538997E243D9CE334050D9119BA90
+  AZURE_SEARCH_KEY: 17CCFC430C1A78A169B392A35A99C49D
   AZURE_SEARCH_SCORING_PROFILE: preferKeywords
-  AZURE_SEARCH_SERVICE: mhraproductsproduction
+  AZURE_SEARCH_SERVICE: mhraproducts4853
   AZURE_SEARCH_WORD_FUZZINESS: 1
   GOOGLE_GTM_CONTAINER_ID: GTM-WJ5TW34
   GOOGLE_TRACKING_ID: UA-6838115-13
   GOOGLE_USE_DEBUG: false
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines.api.mhra.gov.uk/graphql
+  USE_GRAPHQL: true
 
 jobs:
   build:
@@ -79,6 +80,13 @@ jobs:
         run: yarn a11y
         env:
           ROOT_URL_DOMAIN: localhost
+
+      - name: Upload pa11y screenshots
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: medicines-pa11y-screenshots
+          path: medicines/web/pa11y-screenshots
 
       - name: Create Release
         id: create_release

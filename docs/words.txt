@@ -20,6 +20,7 @@ Authorisation
 authorisations
 authorise
 authorised
+authorises
 az
 azm
 Azure
@@ -31,6 +32,7 @@ behaviour
 BESILATE
 Bing
 Bitnami
+BMGF
 BUILDKIT
 CADIX
 cancelled
@@ -103,6 +105,7 @@ JSON
 js
 JWT
 kcnwkqgGoHssWP
+keyvault
 KQL
 kube
 kubectl
@@ -138,6 +141,7 @@ mQo
 mTLS
 nginx
 nmmGKnHes
+npm
 nodeSelector
 normalizer
 Normalizer
@@ -185,6 +189,7 @@ ServiceEntry
 ServicePrincipalName
 sexualized
 SFTP
+SHA
 Sharepoint
 SLA
 sp

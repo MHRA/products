@@ -2,10 +2,6 @@ output "kube_config" {
   value = module.cluster.kube_config
 }
 
-output "public_ip" {
-  value = module.cluster.public_ip
-}
-
 output "host" {
   value = module.cluster.host
 }
@@ -47,7 +43,7 @@ output "cpd_static_web_url" {
 }
 
 output "products_hostname_cdn" {
-  value = module.products_web.products_hostname_cdn
+  value = module.products.products_hostname_cdn
 }
 
 output "cpd_hostname_cdn" {
@@ -63,11 +59,11 @@ output "service_bus_queue_keys" {
 }
 
 output "redis_access_key" {
-  value = module.service_bus.redis_access_key
+  value = module.redis.redis_access_key
 }
 
 output "service_bus_name" {
-  value = local.service_bus_name
+  value = local.doc_index_updater_namespace
 }
 
 output "storage_account_name" {

@@ -1,15 +1,8 @@
 import React, { FormEvent } from 'react';
 import styled from 'styled-components';
-import {
-  black,
-  mhra70,
-  mhraBlue90,
-  mhraGray,
-  mhraWhite,
-  primaryColor,
-  white,
-} from '../../styles/colors';
+import { black, mhraBlue90, white } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
+import { Button } from '../form-elements';
 
 const StyledSearch = styled.section`
   box-sizing: border-box;
@@ -40,26 +33,9 @@ const StyledSearch = styled.section`
 
   input[type='search'] {
     width: 100%;
-    border: solid 1px ${mhraGray};
+    border: solid 1px ${black};
     margin-right: 0.5rem;
     min-width: 0;
-  }
-
-  input[type='submit'] {
-    display: block;
-    cursor: pointer;
-    color: ${mhraWhite};
-    background-color: ${primaryColor};
-    align-self: flex-end;
-    max-width: 50%;
-    border-radius: 6px;
-    text-decoration: none;
-    -webkit-appearance: none;
-    border: solid 1px ${mhra70};
-
-    &:hover {
-      background-color: ${mhra70};
-    }
   }
 
   @media ${mobileBreakpoint} {
@@ -84,7 +60,7 @@ interface ISearchProps {
   search: string;
 }
 
-const Search: React.FC<ISearchProps> = props => (
+const Search: React.FC<ISearchProps> = (props) => (
   <StyledSearch>
     <form
       onSubmit={props.onSearchSubmit}
@@ -100,7 +76,7 @@ const Search: React.FC<ISearchProps> = props => (
           onChange={props.onSearchChange}
           onBlur={props.onSearchBlur}
         />
-        <input type="submit" value="Search" />
+        <Button type="submit" value="Search" />
       </div>
     </form>
   </StyledSearch>
