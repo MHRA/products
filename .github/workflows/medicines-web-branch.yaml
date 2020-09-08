@@ -38,7 +38,7 @@ jobs:
             -f=docx
             -t=html
             -o=medicines/web/public/test.md
-            --extract-media medicines/web/public/test
+            --extract-media=medicines/web/public/test
             medicines/web/public/example_report_references.docx
 
       - name: Setup node.js
