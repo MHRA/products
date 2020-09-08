@@ -4,7 +4,7 @@ use regex::Regex;
 
 pub fn extract_normalized_product_licences(search_term: &str) -> String {
     lazy_static! {
-        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?P<prefix>PL|HR|THR|\s|^)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
+        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?i)(?P<prefix>PL|HR|THR|\s|^)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
     }
 
     RE_PRODUCT_LICENCE
@@ -14,7 +14,7 @@ pub fn extract_normalized_product_licences(search_term: &str) -> String {
             } else if caps[1].trim().is_empty() {
                 String::from(" PL")
             } else {
-                caps[1].to_string()
+                caps[1].to_uppercase()
             };
             format!(
                 "{prefix}{five_numbers}{four_numbers}",
@@ -70,6 +70,7 @@ mod test {
     #[test_case("12345/1234", "PL123451234")]
     #[test_case("PRETEXT PL 12345/1234 POSTTEXT", "PRETEXT PL123451234 POSTTEXT")]
     #[test_case("PRETEXT 12345/1234 POSTTEXT", "PRETEXT PL123451234 POSTTEXT")]
+    #[test_case("PRETEXT pl 12345/1234", "PRETEXT PL123451234")]
     #[test_case("PL/23456/1234", "PL234561234")]
     #[test_case("PL-34567-1234", "PL345671234")]
     #[test_case("PL_45678_1234", "PL456781234")]
