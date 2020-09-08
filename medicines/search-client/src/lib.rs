@@ -217,6 +217,7 @@ fn clean_up_search_term(search_term: &str) -> String {
 fn add_fuzzy_search(search_term: &str, search_fuzziness: &str, search_exactness: &str) -> String {
     search_term
         .split(' ')
+        .filter(|word| !word.is_empty())
         .map(|word| {
             prefer_exact_match_but_support_fuzzy_match(word, search_fuzziness, search_exactness)
         })
@@ -455,6 +456,10 @@ mod test {
         "cool beans".to_string()
     }
 
+    fn given_we_have_an_empty_search_term() -> String {
+        "".to_string()
+    }
+
     fn given_we_have_a_challenging_search_term() -> String {
         "Something challenging AND with forbidden symbols *! () OR % keywords NOT PL 12345/1234"
             .to_string()
@@ -578,6 +583,20 @@ mod test {
         }
     }
 
+    fn then_empty_search_url_with_pagination_and_filter_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=&scoringProfile=preferKeywords&searchMode=all&%24count=true&%24filter=%28my_cool_field+eq+%27my+cool+value%27+xor+my_cool_field+ne+%27my+uncool+value%27%29&%24top=10&%24skip=50"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            panic!("Provided search request is an error");
+        }
+    }
+
     fn then_search_url_with_pagination_and_filter_is_as_expected(
         actual_result: Result<reqwest::Request, reqwest::Error>,
     ) {
@@ -599,6 +618,16 @@ mod test {
         let config = given_we_have_a_config();
         let actual = when_we_build_a_search_request_with_pagination(client, search_term, config);
         then_search_url_with_pagination_is_as_expected(actual);
+    }
+
+    #[test]
+    fn test_build_empty_search_with_pagination_and_filter() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_an_empty_search_term();
+        let config = given_we_have_a_config();
+        let actual =
+            when_we_build_a_search_request_with_pagination_and_filter(client, search_term, config);
+        then_empty_search_url_with_pagination_and_filter_is_as_expected(actual);
     }
 
     #[test]
