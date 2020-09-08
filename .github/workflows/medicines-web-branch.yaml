@@ -31,6 +31,11 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v2
 
+      - name: Convert file using pandoc
+        uses: docker://pandoc/core:2.10
+        with:
+          args: -f docx -t html -o medicines/web/public/test.md --extract-media medicines/web/public/test medicines/web/public/example_report_references.docx
+
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:
@@ -57,7 +62,6 @@ jobs:
             echo "AZURE_SEARCH_KEY=\"$AZURE_SEARCH_KEY\""
             echo "GRAPHQL_URL=\"$GRAPHQL_URL\""
           } > .env
-
       - name: Run cypress end-to-end tests
         working-directory: medicines/web
         run: mkdir -p cypress/screenshots && yarn test-e2e
@@ -90,3 +94,11 @@ jobs:
         with:
           name: medicines-pa11y-screenshots
           path: medicines/web/pa11y-screenshots
+
+      - name: Deploy products web to static site in azure storage
+        # master causes this step to fail so pointing to last working commit until fixed
+        uses: lauchacarro/Azure-Storage-Action@9225056
+        with:
+          enabled-static-website: true
+          folder: medicines/web/dist
+          connection-string: ${{ secrets.AZURE_STORAGE_DEV_PRODUCTS_WEB_CONNECTION_STRING }}
