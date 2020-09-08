@@ -455,7 +455,7 @@ mod test {
         "cool beans".to_string()
     }
 
-    fn given_we_have_a_difficult_search_term() -> String {
+    fn given_we_have_a_challenging_search_term() -> String {
         "Something challenging AND with forbidden symbols *! () OR % keywords NOT PL 12345/1234"
             .to_string()
     }
@@ -518,7 +518,7 @@ mod test {
     #[test]
     fn test_build_search_using_challenging_term() {
         let client = given_we_have_a_search_client();
-        let search_term = given_we_have_a_difficult_search_term();
+        let search_term = given_we_have_a_challenging_search_term();
         let config = given_we_have_a_config();
         let actual = when_we_build_a_search_request_without_pagination(client, search_term, config);
         then_search_url_with_challenging_term_is_as_expected(actual);

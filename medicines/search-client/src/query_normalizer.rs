@@ -52,11 +52,11 @@ pub fn escape_special_characters(search_term: &str) -> String {
 pub fn escape_special_words(search_term: &str) -> String {
     lazy_static! {
         static ref RE_SPECIAL_WORDS: Regex =
-            Regex::new(r#"(?P<special_words>[AND|OR|NOT])"#).unwrap();
+            Regex::new(r#"([^a-zA-Z])(?P<special_words>AND|OR|NOT)([^a-zA-Z])"#).unwrap();
     }
-    RE_SPECIAL_WORDS
-        .replace_all(search_term, |caps: &Captures| caps[1].to_lowercase())
-        .to_string()
+    RE_SPECIAL_WORDS.replace_all(search_term, |caps: &Captures| {
+        format!("{}{}{}", caps[1], caps[2].to_lowercase(), caps[3]).to_string()
+    })
 }
 
 #[cfg(test)]
@@ -96,8 +96,8 @@ mod test {
 
     #[test]
     fn test_escape_special_words() {
-        let input = "this AND that OR something else NOT the other";
-        let expected = "this and that or something else not the other";
+        let input = "this AND that OR something else NOT the other for grand cannot";
+        let expected = "this and that or something else not the other for grand cannot";
         let result = escape_special_words(&input);
         assert_eq!(result, expected);
     }
