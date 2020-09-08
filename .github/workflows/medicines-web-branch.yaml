@@ -34,12 +34,7 @@ jobs:
       - name: Convert file using pandoc
         uses: docker://pandoc/core:2.9
         with:
-          args: |>  # allows you to break string into multiple lines
-            -f=docx
-            -t=html
-            -o=medicines/web/public/test.md
-            --extract-media=medicines/web/public/test
-            medicines/web/public/example_report_references.docx
+          args: -f=docx -t=html -o=medicines/web/public/test.md --extract-media=medicines/web/public/test medicines/web/public/example_report_references.docx
 
       - name: Setup node.js
         uses: actions/setup-node@v1
