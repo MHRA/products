@@ -1,25 +1,24 @@
 import { UserAgentApplication } from 'msal'
-import { msalConfig, loginRequest, tokenRequest } from './authConfig'
+import { msalConfig, loginRequest } from './authConfig'
 
 export async function getAccount() {
   msalConfig.auth.redirectUri = getCurrentHost(window.location.href)
   const msalInstance = new UserAgentApplication(msalConfig)
   const account = msalInstance.getAccount()
 
-  if (msalInstance && account) {
-    let auth = await msalInstance
-      .acquireTokenSilent(tokenRequest)
-      .then((response) => {
-        return {
-          account,
-          token: response.accessToken,
-          username: account.userName,
-          signOut: () => {
-            msalInstance.logout()
-          },
-        }
-      })
-    return auth
+  if (account) {
+    const tokenSessionStorageKey = `msal.${msalConfig.auth.clientId}.idtoken`
+    const token = window.sessionStorage[tokenSessionStorageKey]
+    const username = account.userName
+
+    return {
+      account,
+      token,
+      username,
+      signOut: () => {
+        msalInstance.logout()
+      },
+    }
   }
 }
 
