@@ -209,8 +209,8 @@ impl Search for AzureSearchClient {
 }
 
 fn clean_up_search_term(search_term: &str) -> String {
-    let mut search_term = extract_normalized_product_licences(&search_term);
-    search_term = escape_special_characters(&search_term);
+    let search_term = extract_normalized_product_licences(&search_term);
+    let search_term = escape_special_characters(&search_term);
     escape_special_words(&search_term)
 }
 
