@@ -1,7 +1,15 @@
 mod document_type;
 pub mod models;
+mod query_normalizer;
+
+#[macro_use]
+extern crate lazy_static;
 
 use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
+use crate::query_normalizer::{
+    escape_special_characters, escape_special_words, extract_normalized_product_licences,
+    prefer_exact_match_but_support_fuzzy_match,
+};
 use async_trait::async_trait;
 use core::fmt::Debug;
 use serde::ser::Serialize;
@@ -18,6 +26,8 @@ struct AzureConfig {
 pub struct AzureSearchClient {
     client: reqwest::Client,
     config: AzureConfig,
+    search_fuzziness: String,
+    search_exactness: String,
 }
 
 pub struct AzurePagination {
@@ -42,6 +52,9 @@ impl AzureSearchClient {
         let search_service = get_env("SEARCH_SERVICE");
         let api_version = get_env("AZURE_SEARCH_API_VERSION");
 
+        let search_word_fuzziness = get_env("AZURE_SEARCH_WORD_FUZZINESS");
+        let search_exactness_boost = get_env("AZURE_SEARCH_EXACTNESS_BOOST");
+
         AzureSearchClient {
             client: reqwest::Client::new(),
             config: AzureConfig {
@@ -50,6 +63,8 @@ impl AzureSearchClient {
                 search_service,
                 api_version,
             },
+            search_exactness: search_exactness_boost,
+            search_fuzziness: search_word_fuzziness,
         }
     }
 }
@@ -97,7 +112,17 @@ pub trait Search {
 #[async_trait]
 impl Search for AzureSearchClient {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, None, None, None, &self.client, &self.config).await
+        search(
+            search_term,
+            None,
+            None,
+            None,
+            &self.client,
+            &self.config,
+            &self.search_fuzziness,
+            &self.search_exactness,
+        )
+        .await
     }
 
     async fn search_with_pagination(
@@ -113,6 +138,8 @@ impl Search for AzureSearchClient {
             None,
             &self.client,
             &self.config,
+            &self.search_fuzziness,
+            &self.search_exactness,
         )
         .await
     }
@@ -131,6 +158,8 @@ impl Search for AzureSearchClient {
             filter,
             &self.client,
             &self.config,
+            &self.search_fuzziness,
+            &self.search_exactness,
         )
         .await
     }
@@ -179,6 +208,24 @@ impl Search for AzureSearchClient {
     }
 }
 
+fn clean_up_search_term(search_term: &str) -> String {
+    let search_term = extract_normalized_product_licences(&search_term);
+    let search_term = escape_special_characters(&search_term);
+    escape_special_words(&search_term)
+}
+
+fn add_fuzzy_search(search_term: &str, search_fuzziness: &str, search_exactness: &str) -> String {
+    search_term
+        .split(' ')
+        .filter(|word| !word.is_empty())
+        .map(|word| {
+            prefer_exact_match_but_support_fuzzy_match(word, search_fuzziness, search_exactness)
+        })
+        .collect::<Vec<String>>()
+        .join(" ")
+}
+
+#[allow(clippy::too_many_arguments)]
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -186,6 +233,8 @@ fn build_search(
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
+    search_fuzziness: &str,
+    search_exactness: &str,
 ) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
@@ -195,14 +244,18 @@ fn build_search(
 
     let include_count = include_count.unwrap_or(false).to_string();
 
+    let search_term = clean_up_search_term(search_term);
+    let search_term = add_fuzzy_search(&search_term, search_fuzziness, search_exactness);
+
     let mut request_builder = client
         .get(&base_url)
         .query(&[
             ("api-version", config.api_version.as_str()),
             ("highlight", "content"),
             ("queryType", "full"),
-            ("search", search_term),
+            ("search", &search_term),
             ("scoringProfile", "preferKeywords"),
+            ("searchMode", "all"),
             ("$count", &include_count),
         ])
         .header("api-key", &config.api_key);
@@ -318,6 +371,7 @@ impl CreateIndexEntry for AzureSearchClient {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -325,6 +379,8 @@ async fn search(
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
+    search_fuzziness: &str,
+    search_exactness: &str,
 ) -> Result<IndexResults, reqwest::Error> {
     let req = build_search(
         search_term,
@@ -333,6 +389,8 @@ async fn search(
         filter,
         &client,
         &config,
+        search_fuzziness,
+        search_exactness,
     )?;
 
     tracing::debug!("Requesting from URL: {}", &req.url());
@@ -398,6 +456,15 @@ mod test {
         "cool beans".to_string()
     }
 
+    fn given_we_have_an_empty_search_term() -> String {
+        "".to_string()
+    }
+
+    fn given_we_have_a_challenging_search_term() -> String {
+        "Something challenging AND with forbidden symbols *! () OR % keywords NOT PL 12345/1234"
+            .to_string()
+    }
+
     fn given_we_have_a_config() -> AzureConfig {
         AzureConfig {
             api_key: "api_key".to_string(),
@@ -412,7 +479,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(&search_term, None, None, None, &client, &config)
+        build_search(&search_term, None, None, None, &client, &config, "1", "4")
     }
 
     fn then_search_url_without_pagination_is_as_expected(
@@ -420,7 +487,22 @@ mod test {
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
-            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=false"
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=%28cool%7E1+%7C%7C+cool%5E4%29+%28beans%7E1+%7C%7C+beans%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24count=false"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            panic!("Provided search request is an error");
+        }
+    }
+
+    fn then_search_url_with_challenging_term_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            // Decoded search term: (Something~1+||+Something^4)+(challenging~1+||+challenging^4)+(and~1+||+and^4)+(with~1+||+with^4)+(forbidden~1+||+forbidden^4)+(symbols~1+||+symbols^4)+(\\*\\!~1+||+\\*\\!^4)+(\\(\\)~1+||+\\(\\)^4)+(or~1+||+or^4)+(%~1+||+%^4)+(keywords~1+||+keywords^4)+(not~1+||+not^4)+(PL123451234~1+||+PL123451234^4)
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=%28Something%7E1+%7C%7C+Something%5E4%29+%28challenging%7E1+%7C%7C+challenging%5E4%29+%28and%7E1+%7C%7C+and%5E4%29+%28with%7E1+%7C%7C+with%5E4%29+%28forbidden%7E1+%7C%7C+forbidden%5E4%29+%28symbols%7E1+%7C%7C+symbols%5E4%29+%28%5C*%5C%21%7E1+%7C%7C+%5C*%5C%21%5E4%29+%28%5C%28%5C%29%7E1+%7C%7C+%5C%28%5C%29%5E4%29+%28or%7E1+%7C%7C+or%5E4%29+%28%25%7E1+%7C%7C+%25%5E4%29+%28keywords%7E1+%7C%7C+keywords%5E4%29+%28not%7E1+%7C%7C+not%5E4%29+%28PL123451234%7E1+%7C%7C+PL123451234%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24count=false"
                 .to_string();
 
             assert_eq!(actual, expected);
@@ -438,6 +520,15 @@ mod test {
         then_search_url_without_pagination_is_as_expected(actual);
     }
 
+    #[test]
+    fn test_build_search_using_challenging_term() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_a_challenging_search_term();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_request_without_pagination(client, search_term, config);
+        then_search_url_with_challenging_term_is_as_expected(actual);
+    }
+
     fn when_we_build_a_search_request_with_pagination(
         client: reqwest::Client,
         search_term: String,
@@ -453,6 +544,8 @@ mod test {
             None,
             &client,
             &config,
+            "1",
+            "4",
         )
     }
 
@@ -471,6 +564,8 @@ mod test {
             Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')"),
             &client,
             &config,
+            "1",
+            "4",
         )
     }
 
@@ -479,7 +574,21 @@ mod test {
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
-            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=true&%24top=10&%24skip=50"
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=%28cool%7E1+%7C%7C+cool%5E4%29+%28beans%7E1+%7C%7C+beans%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24count=true&%24top=10&%24skip=50"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            panic!("Provided search request is an error");
+        }
+    }
+
+    fn then_empty_search_url_with_pagination_and_filter_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=&scoringProfile=preferKeywords&searchMode=all&%24count=true&%24filter=%28my_cool_field+eq+%27my+cool+value%27+xor+my_cool_field+ne+%27my+uncool+value%27%29&%24top=10&%24skip=50"
                 .to_string();
 
             assert_eq!(actual, expected);
@@ -493,7 +602,7 @@ mod test {
     ) {
         if let Ok(actual) = actual_result {
             let actual = actual.url().to_string();
-            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=cool+beans&scoringProfile=preferKeywords&%24count=true&%24filter=%28my_cool_field+eq+%27my+cool+value%27+xor+my_cool_field+ne+%27my+uncool+value%27%29&%24top=10&%24skip=50"
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&highlight=content&queryType=full&search=%28cool%7E1+%7C%7C+cool%5E4%29+%28beans%7E1+%7C%7C+beans%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24count=true&%24filter=%28my_cool_field+eq+%27my+cool+value%27+xor+my_cool_field+ne+%27my+uncool+value%27%29&%24top=10&%24skip=50"
                 .to_string();
 
             assert_eq!(actual, expected);
@@ -509,6 +618,16 @@ mod test {
         let config = given_we_have_a_config();
         let actual = when_we_build_a_search_request_with_pagination(client, search_term, config);
         then_search_url_with_pagination_is_as_expected(actual);
+    }
+
+    #[test]
+    fn test_build_empty_search_with_pagination_and_filter() {
+        let client = given_we_have_a_search_client();
+        let search_term = given_we_have_an_empty_search_term();
+        let config = given_we_have_a_config();
+        let actual =
+            when_we_build_a_search_request_with_pagination_and_filter(client, search_term, config);
+        then_empty_search_url_with_pagination_and_filter_is_as_expected(actual);
     }
 
     #[test]
