@@ -17,19 +17,9 @@ setUp()
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
-const startNewParForm = () => {
-  cy.visit('/')
-
-  cy.findAllByText('What are you doing today?').should('exist')
-
-  cy.findByText('Upload a new document').click()
-
-  cy.findByText('Continue').click()
-}
-
 describe('New PARs upload', () => {
   it('can add and delete multiple substances', () => {
-    startNewParForm()
+    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -44,7 +34,7 @@ describe('New PARs upload', () => {
   })
 
   it('can add and delete multiple products', () => {
-    startNewParForm()
+    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -58,7 +48,7 @@ describe('New PARs upload', () => {
     addAndDeleteProducts(uploadData, uploadPageTitle)
   })
   it('upload field only accepts PDFs', () => {
-    startNewParForm()
+    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -81,7 +71,7 @@ describe('New PARs upload', () => {
     })
   })
   it('duplicate licence numbers are not allowed', () => {
-    startNewParForm()
+    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',
@@ -94,7 +84,7 @@ describe('New PARs upload', () => {
     addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
   })
   it('review page shows the correct information', () => {
-    startNewParForm()
+    cy.visit('/new-par')
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -175,7 +165,7 @@ describe('New PARs upload', () => {
     )
   })
   it('shows the uploaded file when going back to upload file page', () => {
-    startNewParForm()
+    cy.visit('/new-par')
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -217,7 +207,7 @@ describe('New PARs upload', () => {
       mockSuccessfulSubmission(baseUrl, parsUrl)
     }
 
-    startNewParForm()
+    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',

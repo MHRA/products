@@ -19,5 +19,5 @@ export const loginRequest = {
 
 // Add here scopes for access token to be used at MS Graph API endpoints.
 export const tokenRequest = {
-  scopes: ['user.read'],
+  scopes: [],
 }
