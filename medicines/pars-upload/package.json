@@ -44,7 +44,6 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.6",
-    "imagemin-optipng": "^8.0.0",
     "jest": "^26.4.0",
     "pa11y-ci": "^2.3.0",
     "prettier": "^2.0.5",
