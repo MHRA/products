@@ -2,8 +2,24 @@ use crate::{
     document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };
-use async_graphql::{FieldResult, Object};
-use search_client::{models::DocumentType, Search};
+use async_graphql::{FieldResult, Object, SimpleObject};
+use search_client::{
+    models::{DocumentType, FacetResults},
+    Search,
+};
+
+#[SimpleObject(desc = "A medical product containing active ingredients")]
+#[derive(Debug, PartialEq)]
+pub struct ProductIndex {
+    name: String,
+    count: i32,
+}
+
+impl ProductIndex {
+    pub fn new(name: String, count: i32) -> Self {
+        Self { name, count }
+    }
+}
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
@@ -127,6 +143,37 @@ pub async fn get_substance_with_products(
 
 pub async fn get_product(product_name: String) -> Result<Product, reqwest::Error> {
     Ok(Product::new(product_name, None))
+}
+
+pub async fn get_products_index(
+    client: &impl Search,
+    substance: &str,
+) -> anyhow::Result<Vec<ProductIndex>> {
+    let substance = substance.to_ascii_uppercase();
+    let letter = substance.chars().next().unwrap().to_string();
+
+    let azure_result = client
+        .search_by_facet_field("facets", &format!("{}, {}", &letter, &substance))
+        .await?;
+
+    Ok(format_index_search_results(azure_result))
+}
+
+fn format_index_search_results(results: FacetResults) -> Vec<ProductIndex> {
+    print!("{:#?}", &results);
+    results
+        .facet_results
+        .facets
+        .into_iter()
+        .filter_map(|result| {
+            let facets = result.value.split(',').collect::<Vec<&str>>();
+            if facets.len() != 3 {
+                return None;
+            }
+            let product = facets[2];
+            Some(ProductIndex::new(product.trim().to_string(), result.count))
+        })
+        .collect()
 }
 
 #[cfg(test)]

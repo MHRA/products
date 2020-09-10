@@ -3,8 +3,10 @@ use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Obje
 use crate::{
     azure_context::AzureContext,
     document::{get_documents, Documents},
-    product::{get_product, get_substance_with_products, Product},
-    substance::{get_substances_starting_with_letter, Substance, SubstanceIndex},
+    product::{
+        get_product, get_products_index, get_substance_with_products, Product, ProductIndex,
+    },
+    substance::{get_substances_index, Substance, SubstanceIndex},
 };
 use search_client::models::DocumentType;
 
@@ -39,13 +41,27 @@ impl QueryRoot {
         })
     }
 
-    async fn substances_by_first_letter(
+    async fn substances_index(
         &self,
         context: &Context<'_>,
         letter: String,
     ) -> FieldResult<Vec<SubstanceIndex>> {
         let context = context.data::<AzureContext>()?;
-        get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
+        get_substances_index(&context.client, letter.chars().next().unwrap())
+            .await
+            .map_err(|e| {
+                tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                e.into()
+            })
+    }
+
+    async fn products_index(
+        &self,
+        context: &Context<'_>,
+        substance: String,
+    ) -> FieldResult<Vec<ProductIndex>> {
+        let context = context.data::<AzureContext>()?;
+        get_products_index(&context.client, &substance)
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);

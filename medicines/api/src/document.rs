@@ -32,13 +32,6 @@ impl Document {
     pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
         self.doc_type == Some(doc_type)
     }
-
-    pub fn substances(&self) -> impl Iterator<Item = &str> {
-        self.active_substances
-            .iter()
-            .flat_map(|s| s.iter())
-            .map(|s| s.as_str())
-    }
 }
 
 impl From<IndexResult> for Document {

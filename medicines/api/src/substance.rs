@@ -1,10 +1,6 @@
-use crate::{document::Document, product::Product};
+use crate::product::Product;
 use async_graphql::SimpleObject;
-use search_client::{
-    models::{DocTypeParseError, FacetResults, IndexResults},
-    Search,
-};
-use std::collections::BTreeMap;
+use search_client::{models::FacetResults, Search};
 
 #[SimpleObject(desc = "An active ingredient found in medical products")]
 #[derive(Debug, PartialEq)]
@@ -32,7 +28,7 @@ impl Substance {
     }
 }
 
-pub async fn get_substances_starting_with_letter(
+pub async fn get_substances_index(
     client: &impl Search,
     letter: char,
 ) -> anyhow::Result<Vec<SubstanceIndex>> {
@@ -65,103 +61,12 @@ fn format_index_search_results(results: FacetResults) -> Vec<SubstanceIndex> {
                 return None;
             }
             let substance = facets[1];
-            Some(SubstanceIndex::new(substance.to_string(), result.count))
+            Some(SubstanceIndex::new(
+                substance.trim().to_string(),
+                result.count,
+            ))
         })
         .collect()
-}
-
-fn format_search_results(
-    results: IndexResults,
-    letter: char,
-) -> Result<Vec<Substance>, DocTypeParseError> {
-    // Using a BTreeMap (instead of HashMap) so that the keys are sorted alphabetically.
-    let mut substances: BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>> =
-        BTreeMap::new();
-
-    let letter_string = letter.to_string();
-
-    results
-        .search_results
-        .into_iter()
-        .filter(|result| result.facets.iter().any(|s| s == &letter_string))
-        .filter_map(|result| {
-            let doc: Document = result.into();
-
-            let substance = doc
-                .substances()
-                .find(|s| s.starts_with(letter))?
-                .to_string();
-
-            doc.product_name
-                .to_owned()
-                .map(|product| (SubstanceName(substance), ProductName(product), doc))
-        })
-        .for_each(|(substance, product, doc)| {
-            add_product_for_substance(&mut substances, substance, product, doc);
-        });
-
-    let substances_vec = substances
-        .into_iter()
-        .map(|(SubstanceName(substance), products)| {
-            let products_vec = products
-                .into_iter()
-                .map(|(ProductName(name), docs)| Product::new(name, Some(docs)))
-                .collect();
-
-            Substance::new(substance, products_vec)
-        })
-        .collect();
-
-    Ok(substances_vec)
-}
-
-fn add_product_for_substance_index(
-    substances: &mut BTreeMap<SubstanceName, BTreeMap<ProductName, DocumentCount>>,
-    substance: SubstanceName,
-    product: ProductName,
-    document_count: DocumentCount,
-) {
-    match substances.get_mut(&substance) {
-        None => {
-            let mut products = BTreeMap::new();
-            products.insert(product, document_count);
-            substances.insert(substance, products);
-        }
-        Some(mut products) => {
-            products.insert(product, document_count);
-        }
-    }
-}
-
-fn add_product_for_substance(
-    substances: &mut BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>>,
-    substance: SubstanceName,
-    product: ProductName,
-    doc: Document,
-) {
-    match substances.get_mut(&substance) {
-        None => {
-            let mut products = BTreeMap::new();
-            products.insert(product, vec![doc]);
-            substances.insert(substance, products);
-        }
-        Some(mut products) => add_document_for_product(&mut products, product, doc),
-    }
-}
-
-fn add_document_for_product(
-    products: &mut BTreeMap<ProductName, Vec<Document>>,
-    name: ProductName,
-    document: Document,
-) {
-    match products.get_mut(&name) {
-        Some(docs) => {
-            docs.push(document);
-        }
-        None => {
-            products.insert(name, vec![document]);
-        }
-    };
 }
 
 #[cfg(test)]
