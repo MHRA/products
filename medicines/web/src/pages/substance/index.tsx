@@ -74,9 +74,13 @@ const App: NextPage = () => {
       <SearchWrapper initialSearchValue="">
         <ProductList title={substanceName} products={products} />
         <SubstanceStructuredData substanceName={substanceName} />
-        <DrugListStructuredData
-          drugNames={products.map((product) => product.name)}
-        />
+        {products && products.length ? (
+          <DrugListStructuredData
+            drugNames={products.map((product) => product.name)}
+          />
+        ) : (
+          <></>
+        )}
       </SearchWrapper>
     </Page>
   );

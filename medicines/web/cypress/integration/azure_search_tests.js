@@ -14,12 +14,12 @@ let polyfill;
 before(() => {
   const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js';
 
-  cy.request(polyfillUrl).then(response => {
+  cy.request(polyfillUrl).then((response) => {
     polyfill = response.body;
   });
 });
 
-Cypress.on('window:before:load', win => {
+Cypress.on('window:before:load', (win) => {
   delete win.fetch;
   // since the application code does not ship with a polyfill
   // load a polyfilled "fetch" from the test
@@ -82,8 +82,8 @@ const mockIbuprofenSpcPilResults = () =>
 
 const longerTimeout = 20000;
 
-describe('Search', function() {
-  it('can search for Paracetamol', function() {
+describe('Search', function () {
+  it('can search for Paracetamol', function () {
     cy.server();
     mockParacetamolResults();
     mockParacetamolResultsPage2();
@@ -98,7 +98,7 @@ describe('Search', function() {
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
   });
 
-  it('can filter for SPCs', function() {
+  it('can filter for SPCs', function () {
     cy.server();
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
@@ -114,7 +114,7 @@ describe('Search', function() {
     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
   });
 
-  it('can filter for SPCs and PILs together', function() {
+  it('can filter for SPCs and PILs together', function () {
     cy.server();
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
@@ -133,7 +133,7 @@ describe('Search', function() {
     cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
   });
 
-  it('can filter SPCs then go to next page to see 2nd page filtered documents', function() {
+  it('can filter SPCs then go to next page to see 2nd page filtered documents', function () {
     cy.server();
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
@@ -155,7 +155,7 @@ describe('Search', function() {
     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
   });
 
-  it('can go to next page then filter SPCs to see 1st page filtered documents', function() {
+  it('can go to next page then filter SPCs to see 1st page filtered documents', function () {
     cy.server();
     mockIbuprofenResults();
     mockIbuprofenResults();
@@ -177,8 +177,8 @@ describe('Search', function() {
   });
 });
 
-describe('A-Z Index', function() {
-  it('can navigate to Paracetamol via A-Z index', function() {
+describe('A-Z Index', function () {
+  it('can navigate to Paracetamol via A-Z index', function () {
     cy.server();
     // Mock out list of substances.
     cy.route(
@@ -198,9 +198,7 @@ describe('A-Z Index', function() {
     );
 
     cy.visit('/');
-    cy.get('nav')
-      .contains('P')
-      .click();
+    cy.get('nav').contains('P').click();
     cy.contains('PARACETAMOL').click();
     cy.contains('PARACETAMOL TABLETS').click();
     cy.contains('I have read and understand the disclaimer').click();
@@ -210,30 +208,26 @@ describe('A-Z Index', function() {
   });
 });
 
-describe('Cookies', function() {
+describe('Cookies', function () {
   const cookie_banner_text =
     'MHRA does not collect any data that would identify you directly. ' +
     'We would like to use Google Analytics to help us improve our services.';
 
-  it("Cookies aren't accepted by default", function() {
+  it("Cookies aren't accepted by default", function () {
     cy.visit('/');
     cy.contains(cookie_banner_text);
     cy.contains('Cookie Policy').click();
-    cy.contains('label', 'Off')
-      .find('input')
-      .should('be.checked');
-    cy.contains('label', 'On')
-      .find('input')
-      .should('not.be.checked');
+    cy.contains('label', 'Off').find('input').should('be.checked');
+    cy.contains('label', 'On').find('input').should('not.be.checked');
   });
 
-  it('Accept cookies via the banner', function() {
+  it('Accept cookies via the banner', function () {
     cy.visit('/');
     cy.contains('Accept all cookies').click();
     cy.contains(cookie_banner_text).should('not.exist');
   });
 
-  it('Accept cookies via the cookie policy form', function() {
+  it('Accept cookies via the cookie policy form', function () {
     cy.visit('/');
     cy.contains('Cookie Policy').click();
     cy.contains('label', 'On').click();
@@ -241,19 +235,15 @@ describe('Cookies', function() {
     cy.contains(cookie_banner_text).should('not.exist');
   });
 
-  it('Accepting cookies is reflected in cookie policy form', function() {
+  it('Accepting cookies is reflected in cookie policy form', function () {
     cy.visit('/');
     cy.contains('Accept all cookies').click();
     cy.contains('Cookie Policy').click();
-    cy.contains('label', 'On')
-      .find('input')
-      .should('be.checked');
-    cy.contains('label', 'Off')
-      .find('input')
-      .should('not.be.checked');
+    cy.contains('label', 'On').find('input').should('be.checked');
+    cy.contains('label', 'Off').find('input').should('not.be.checked');
   });
 
-  it('Decline cookies via the cookie policy form', function() {
+  it('Decline cookies via the cookie policy form', function () {
     cy.visit('/');
     cy.contains('Accept all cookies').click();
     cy.contains('Cookie Policy').click();
