@@ -23,7 +23,6 @@ struct AzureConfig {
     api_version: String,
     search_fuzziness: String,
     search_exactness_boost: String,
-    max_count_for_filter_search: String,
 }
 
 pub struct AzureSearchClient {
@@ -55,8 +54,6 @@ impl AzureSearchClient {
 
         let search_fuzziness = get_env_or_default("AZURE_SEARCH_WORD_FUZZINESS", "1");
         let search_exactness_boost = get_env_or_default("AZURE_SEARCH_EXACTNESS_BOOST", "4");
-        let max_count_for_filter_search =
-            get_env_or_default("MAX_COUNT_FOR_FILTER_SEARCH", "50000");
 
         AzureSearchClient {
             client: reqwest::Client::new(),
@@ -67,7 +64,6 @@ impl AzureSearchClient {
                 api_version,
                 search_fuzziness,
                 search_exactness_boost,
-                max_count_for_filter_search,
             },
         }
     }
@@ -326,14 +322,7 @@ fn build_filter_by_collection_request(
 
     client
         .get(&base_url)
-        .query(&[
-            ("api-version", &config.api_version),
-            ("$filter", &filter),
-            ("facet", &String::from("facets,count:50000,sort:value")),
-            ("searchMode", &String::from("all")),
-            ("$count", &String::from("true")),
-            ("$top", &String::from("1000")),
-        ])
+        .query(&[("api-version", &config.api_version), ("$filter", &filter)])
         .header("api-key", &config.api_key)
         .build()
 }
@@ -364,8 +353,6 @@ fn build_facet_search(
             ("api-version", &config.api_version),
             ("$filter", &filter),
             ("facet", &String::from("facets,count:50000,sort:value")),
-            ("searchMode", &String::from("all")),
-            ("$count", &String::from("true")),
             ("$top", &String::from("0")),
         ])
         .header("api-key", &config.api_key)
@@ -536,6 +523,8 @@ mod test {
             search_index: "search_index".to_string(),
             search_service: "search_service".to_string(),
             api_version: "api_version".to_string(),
+            search_exactness_boost: "4".to_string(),
+            search_fuzziness: "1".to_string(),
         }
     }
 
@@ -544,7 +533,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(&search_term, None, None, None, &client, &config, "1", "4")
+        build_search(&search_term, None, None, None, &client, &config)
     }
 
     fn then_search_url_without_pagination_is_as_expected(
@@ -609,8 +598,6 @@ mod test {
             None,
             &client,
             &config,
-            "1",
-            "4",
         )
     }
 
@@ -629,8 +616,6 @@ mod test {
             Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')"),
             &client,
             &config,
-            "1",
-            "4",
         )
     }
 
@@ -713,6 +698,8 @@ mod test {
             search_index: "my_cool_search_index".to_string(),
             api_key: "my_cool_api_key".to_string(),
             api_version: "2017-11-11".to_string(),
+            search_fuzziness: "1".to_string(),
+            search_exactness_boost: "4".to_string(),
         };
 
         let req = build_filter_by_collection_request(
@@ -745,7 +732,7 @@ mod test {
                 .find(|query_pair| query_pair.0 == "$filter")
                 .unwrap()
                 .1,
-            "my_cool_field/any(value: value cooler_than 'my cool value')"
+            "my_cool_field/any(f: f cooler_than 'my cool value')"
         );
     }
 }

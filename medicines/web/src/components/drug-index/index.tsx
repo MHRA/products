@@ -102,24 +102,28 @@ export interface IFacet {
   value: string;
 }
 
-interface IIndex {
-  title: string;
-  horizontal?: boolean;
-  items: IProduct[];
+export enum IndexType {
+  Horizontal,
+  SubstancesIndex,
+  ProductsIndex,
 }
 
-const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
+interface IIndex {
+  title: string;
+  items: IProduct[];
+  indexType: IndexType;
+}
+
+const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
   if (items === undefined || items.length === 0) {
     return <></>;
   }
 
-  const level = isIndex(items[0]) ? 0 : isSubstance(items[0]) ? 1 : 2;
-
   const searchLink = (itemName: string) => {
-    if (level === 0) {
+    if (indexType === IndexType.Horizontal) {
       return `/substance-index?letter=${itemName}`;
     }
-    if (level === 1) {
+    if (indexType === IndexType.SubstancesIndex) {
       return `/substance?substance=${encodeURIComponent(itemName)}`;
     }
     return `/product?product=${encodeURIComponent(itemName)}`;
@@ -127,11 +131,20 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, horizontal }) => {
 
   return (
     <StyledDrugIndex>
-      {level === 0 ? <p className="horizontal">{title}</p> : <h2>{title}</h2>}
-      <ul className={horizontal ? 'horizontal' : ''}>
-        {items.map(item => {
+      {indexType === IndexType.Horizontal ? (
+        <p className="horizontal">{title}</p>
+      ) : (
+        <h2>{title}</h2>
+      )}
+      <ul className={indexType === IndexType.Horizontal ? 'horizontal' : ''}>
+        {items.map((item) => {
           return (
-            <li key={item.name} className={level > 0 ? 'substance-name' : ''}>
+            <li
+              key={item.name}
+              className={
+                indexType !== IndexType.Horizontal ? 'substance-name' : ''
+              }
+            >
               <Link href={searchLink(item.name)}>
                 <a>
                   {item.name} {item.count && <>({item.count} files)</>}

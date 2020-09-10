@@ -707,6 +707,8 @@ mod test {
         ) -> Result<IndexResults, reqwest::Error> {
             unimplemented!()
         }
+        async fn search_by_facet_field()
+
         async fn filter_by_collection_field(
             &self,
             _field_name: &str,

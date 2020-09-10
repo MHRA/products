@@ -28,28 +28,20 @@ const substanceLoader = new DataLoader<string, ISubstance[]>(async (keys) => {
   );
 });
 
-interface IResponse {
-  substancesByFirstLetter: Array<{
-    name: string;
-    products: IProductResponse[];
-  }>;
+interface ISubstanceIndexItem {
+  name: string;
+  count: number;
 }
 
-interface IProductResponse {
-  name: string;
-  documents: { count: number };
+interface IResponse {
+  substancesIndex: ISubstanceIndexItem[];
 }
 
 const query = `
 query ($letter: String!) {
-  substancesByFirstLetter(letter: $letter) {
+  substancesIndex(letter: $letter) {
     name
-    products {
-      name
-      documents {
-        count: totalCount
-      }
-    }
+    count
   }
 }`;
 
@@ -65,29 +57,11 @@ export const graphqlSubstanceLoader = new DataLoader<string, ISubstance[]>(
           query,
           variables,
         });
-        console.log('RESPONSE DATA');
-        console.log(data);
-        return data.substancesByFirstLetter.map(({ name, products }) => {
-          return {
-            name,
-            count: documentsCount(products),
-            products: products.map(({ name, documents: { count } }) => {
-              return { name, count };
-            }),
-          };
-        });
+
+        return data.substancesIndex;
       }),
     );
   },
 );
-
-const documentsCount = (products: IProductResponse[]) => {
-  console.log('PRODUCTS!!!');
-  console.log(products);
-  return products.reduce(
-    (total: number, { documents: { count } }) => total + count,
-    0,
-  );
-};
 
 export default substanceLoader;

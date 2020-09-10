@@ -57,7 +57,7 @@ exports[`SearchWrapper should render 1`] = `
           </styled.section>
         </Search>
         <DrugIndex
-          horizontal={true}
+          indexType={0}
           items={
             Array [
               Object {

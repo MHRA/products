@@ -1,14 +1,14 @@
 import { mount } from 'enzyme';
 import React from 'react';
 import { IProduct, ISubstance } from '../../model/substance';
-import DrugIndex from './index';
+import DrugIndex, { IndexType } from './index';
 
 describe(DrugIndex, () => {
   it('should render horizontal items', () => {
     const component = mount(
       <DrugIndex
         title={'Coffee'}
-        horizontal
+        indexType={IndexType.Horizontal}
         items={[
           { name: 'A' },
           { name: 'B' },

@@ -172,7 +172,7 @@ fn build_product_name_filter(product_name: &str) -> String {
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use search_client::models::IndexResults;
+    use search_client::models::{FacetResults, IndexResults};
     use test_case::test_case;
     use tokio_test::block_on;
 
@@ -211,6 +211,13 @@ mod test {
                 context: String::from(""),
                 count: Some(1234),
             })
+        }
+        async fn search_by_facet_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<FacetResults, reqwest::Error> {
+            unimplemented!()
         }
         async fn filter_by_collection_field(
             &self,
