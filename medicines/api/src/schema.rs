@@ -4,7 +4,7 @@ use crate::{
     azure_context::AzureContext,
     document::{get_documents, Documents},
     product::{get_product, get_substance_with_products, Product},
-    substance::{get_substances_starting_with_letter, Substance},
+    substance::{get_substances_starting_with_letter, Substance, SubstanceIndex},
 };
 use search_client::models::DocumentType;
 
@@ -43,7 +43,7 @@ impl QueryRoot {
         &self,
         context: &Context<'_>,
         letter: String,
-    ) -> FieldResult<Vec<Substance>> {
+    ) -> FieldResult<Vec<SubstanceIndex>> {
         let context = context.data::<AzureContext>()?;
         get_substances_starting_with_letter(&context.client, letter.chars().next().unwrap())
             .await

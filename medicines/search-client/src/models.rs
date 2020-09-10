@@ -41,6 +41,27 @@ pub struct IndexResults {
     pub count: Option<i32>,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+pub struct Facet {
+    pub count: i32,
+    pub value: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct FacetResult {
+    pub facets: Vec<Facet>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FacetResults {
+    #[serde(rename = "value")]
+    pub search_results: Vec<IndexResult>,
+    #[serde(rename = "@search.facets")]
+    pub facet_results: FacetResult,
+    #[serde(rename = "@odata.context")]
+    pub context: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct AzureIndexChangedResults {
     pub value: Vec<AzureIndexChangedResult>,

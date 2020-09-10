@@ -1,7 +1,7 @@
 use crate::{document::Document, product::Product};
 use async_graphql::SimpleObject;
 use search_client::{
-    models::{DocTypeParseError, IndexResults},
+    models::{DocTypeParseError, FacetResults, IndexResults},
     Search,
 };
 use std::collections::BTreeMap;
@@ -13,6 +13,32 @@ pub struct Substance {
     products: Vec<Product>,
 }
 
+#[SimpleObject(desc = "An active ingredient found in medical products")]
+#[derive(Debug, PartialEq)]
+pub struct SubstanceIndex {
+    name: String,
+    products: Vec<ProductFacet>,
+}
+
+impl SubstanceIndex {
+    pub fn new(name: String, products: Vec<ProductFacet>) -> Self {
+        Self { name, products }
+    }
+}
+
+#[SimpleObject(desc = "A medical product containing active ingredients")]
+#[derive(Debug, PartialEq)]
+pub struct ProductFacet {
+    name: String,
+    count: i32,
+}
+
+impl ProductFacet {
+    pub fn new(name: String, count: i32) -> Self {
+        Self { name, count }
+    }
+}
+
 impl Substance {
     pub fn new(name: String, products: Vec<Product>) -> Self {
         Self { name, products }
@@ -22,14 +48,14 @@ impl Substance {
 pub async fn get_substances_starting_with_letter(
     client: &impl Search,
     letter: char,
-) -> anyhow::Result<Vec<Substance>> {
+) -> anyhow::Result<Vec<SubstanceIndex>> {
     let upper_letter = letter.to_ascii_uppercase();
 
     let azure_result = client
-        .filter_by_collection_field("facets", &upper_letter.to_string())
+        .search_by_facet_field("facets", &upper_letter.to_string())
         .await?;
 
-    Ok(format_search_results(azure_result, upper_letter)?)
+    Ok(format_index_search_results(azure_result)?)
 }
 
 #[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
@@ -38,6 +64,53 @@ struct SubstanceName(String);
 #[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
 struct ProductName(String);
 
+#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
+struct DocumentCount(i32);
+
+fn format_index_search_results(
+    results: FacetResults,
+) -> Result<Vec<SubstanceIndex>, DocTypeParseError> {
+    let mut substances: BTreeMap<SubstanceName, BTreeMap<ProductName, DocumentCount>> =
+        BTreeMap::new();
+
+    print!("{:#?}", &results);
+
+    results
+        .facet_results
+        .facets
+        .into_iter()
+        .filter_map(|result| {
+            let facets = result.value.split(',').collect::<Vec<&str>>();
+            if facets.len() < 3 {
+                return None;
+            }
+            let substance = facets[1];
+            let product = facets[2];
+            Some((
+                SubstanceName(substance.to_string()),
+                ProductName(product.to_string()),
+                DocumentCount(result.count),
+            ))
+        })
+        .for_each(|(substance, product, count)| {
+            add_product_for_substance_index(&mut substances, substance, product, count);
+        });
+
+    let substances_vec = substances
+        .into_iter()
+        .map(|(SubstanceName(substance), products)| {
+            let products_vec = products
+                .into_iter()
+                .map(|(ProductName(name), DocumentCount(count))| ProductFacet::new(name, count))
+                .collect();
+
+            SubstanceIndex::new(substance, products_vec)
+        })
+        .collect();
+
+    Ok(substances_vec)
+}
+
 fn format_search_results(
     results: IndexResults,
     letter: char,
@@ -45,6 +118,8 @@ fn format_search_results(
     // Using a BTreeMap (instead of HashMap) so that the keys are sorted alphabetically.
     let mut substances: BTreeMap<SubstanceName, BTreeMap<ProductName, Vec<Document>>> =
         BTreeMap::new();
+
+    print!("{:#?}", &results);
 
     let letter_string = letter.to_string();
 
@@ -81,6 +156,24 @@ fn format_search_results(
         .collect();
 
     Ok(substances_vec)
+}
+
+fn add_product_for_substance_index(
+    substances: &mut BTreeMap<SubstanceName, BTreeMap<ProductName, DocumentCount>>,
+    substance: SubstanceName,
+    product: ProductName,
+    document_count: DocumentCount,
+) {
+    match substances.get_mut(&substance) {
+        None => {
+            let mut products = BTreeMap::new();
+            products.insert(product, document_count);
+            substances.insert(substance, products);
+        }
+        Some(mut products) => {
+            products.insert(product, document_count);
+        }
+    }
 }
 
 fn add_product_for_substance(

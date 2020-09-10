@@ -36,7 +36,7 @@ const convertResponseToProduct = ({
 };
 
 export const products = new DataLoader<string, IProduct[]>(
-  async substanceNames => {
+  async (substanceNames) => {
     return Promise.all(
       substanceNames.map(async (substanceName: string) => {
         const variables = { substanceName };
@@ -45,7 +45,8 @@ export const products = new DataLoader<string, IProduct[]>(
           query,
           variables,
         });
-
+        console.log('PRODUCTS DATA');
+        console.log(data);
         return data.substance.products.map(convertResponseToProduct);
       }),
     );
