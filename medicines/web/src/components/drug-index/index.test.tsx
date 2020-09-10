@@ -59,7 +59,13 @@ describe(DrugIndex, () => {
       count: 1,
     };
     const substances = [substance];
-    const component = mount(<DrugIndex title={'Coffee'} items={substances} />);
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={substances}
+        indexType={IndexType.ProductsIndex}
+      />,
+    );
     expect(component).toMatchSnapshot();
   });
 });
