@@ -619,6 +619,19 @@ mod test {
         )
     }
 
+    fn when_we_build_a_search_using_facets(
+        client: reqwest::Client,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_facet_search(
+            &String::from("field"),
+            &String::from("I, IBUPROFEN"),
+            &String::from("eq"),
+            &client,
+            &config,
+        )
+    }
+
     fn then_search_url_with_pagination_is_as_expected(
         actual_result: Result<reqwest::Request, reqwest::Error>,
     ) {
@@ -661,6 +674,20 @@ mod test {
         }
     }
 
+    fn then_search_with_facets_and_filter_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&%24filter=field%2Fany%28f%3A+f+eq+%27I%2C+IBUPROFEN%27%29&facet=facets%2Ccount%3A50000%2Csort%3Avalue&%24top=0"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            panic!("Provided search request is an error");
+        }
+    }
+
     #[test]
     fn test_build_search_with_pagination() {
         let client = given_we_have_a_search_client();
@@ -688,6 +715,14 @@ mod test {
         let actual =
             when_we_build_a_search_request_with_pagination_and_filter(client, search_term, config);
         then_search_url_with_pagination_and_filter_is_as_expected(actual);
+    }
+
+    #[test]
+    fn test_build_search_with_facets() {
+        let client = given_we_have_a_search_client();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_using_facets(client, config);
+        then_search_with_facets_and_filter_is_as_expected(actual);
     }
 
     #[test]
