@@ -2,7 +2,7 @@
 
 exports[`Button should render 1`] = `
 <input
-  className="sc-AxirZ fdlzyX"
+  className="sc-gtssRu elyfng"
   type="submit"
   value="val"
 />
