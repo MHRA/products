@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import { errorRed } from '../../styles/colors';
 
 const StyledProductList = styled.nav`
   h2 {
@@ -36,12 +37,33 @@ const StyledProductList = styled.nav`
   }
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
 interface IIndex {
   title: string;
   products: IProduct[];
+  errorFetchingResults?: boolean;
 }
 
-const ProductList: React.FC<IIndex> = ({ title, products }) => {
+const ProductList: React.FC<IIndex> = ({
+  title,
+  products,
+  errorFetchingResults,
+}) => {
+  if (errorFetchingResults) {
+    return (
+      <StyledProductList>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledProductList>
+    );
+  }
+
   if (products === undefined || products.length === 0) {
     return <></>;
   }

@@ -1,5 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DrugIndex should render error message 1`] = `
+<DrugIndex
+  errorFetchingResults={true}
+  indexType={2}
+  items={
+    Array [
+      Object {
+        "count": 1,
+        "name": "Ibuprofen",
+        "products": Array [
+          Object {
+            "count": 1,
+            "name": "Ibuprofen gel",
+          },
+        ],
+      },
+    ]
+  }
+  title="Coffee"
+>
+  <styled.nav>
+    <nav
+      className="sc-AxjAm jJjbyf"
+    >
+      <styled.p>
+        <p
+          className="sc-AxirZ eZCVsL"
+        >
+          Sorry - the site is experiencing technical issues right now. Please try again later.
+        </p>
+      </styled.p>
+    </nav>
+  </styled.nav>
+</DrugIndex>
+`;
+
 exports[`DrugIndex should render horizontal items 1`] = `
 <DrugIndex
   indexType={0}

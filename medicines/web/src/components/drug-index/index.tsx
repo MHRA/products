@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { IProduct, isIndex, isSubstance } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import { errorRed } from '../../styles/colors';
 
 const StyledDrugIndex = styled.nav`
   h2 {
@@ -56,6 +57,11 @@ const StyledDrugIndex = styled.nav`
       flex-basis: 15%;
     }
   }
+`;
+
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
 `;
 
 export const index: IProduct[] = [
@@ -112,9 +118,26 @@ interface IIndex {
   title: string;
   items: IProduct[];
   indexType: IndexType;
+  errorFetchingResults?: boolean;
 }
 
-const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
+const DrugIndex: React.FC<IIndex> = ({
+  title,
+  items,
+  indexType,
+  errorFetchingResults,
+}) => {
+  if (errorFetchingResults) {
+    return (
+      <StyledDrugIndex>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledDrugIndex>
+    );
+  }
+
   if (items === undefined || items.length === 0) {
     return <></>;
   }

@@ -20,6 +20,7 @@ const App: NextPage = () => {
   );
   const [results, setResults] = React.useState<ISubstance[]>([]);
   const [substanceIndex, setSubstanceIndex] = React.useState('');
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -35,10 +36,13 @@ const App: NextPage = () => {
       const index = queryQS.toString();
 
       const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
-
-      setResults(await loader.load(index));
-      setSubstanceIndex(index);
-      Events.viewSubstancesStartingWith(index);
+      try {
+        setResults(await loader.load(index));
+        setSubstanceIndex(index);
+        Events.viewSubstancesStartingWith(index);
+      } catch {
+        setErrorFetchingResults(true);
+      }
     })();
   }, [queryQS]);
 
@@ -59,6 +63,7 @@ const App: NextPage = () => {
           title={`${substanceIndex || '...'}`}
           items={results}
           indexType={IndexType.SubstancesIndex}
+          errorFetchingResults={errorFetchingResults}
         />
         <SubstanceListStructuredData
           substanceNames={results.map((substance) => substance.name)}

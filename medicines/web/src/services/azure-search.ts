@@ -6,6 +6,7 @@ const searchIndex = process.env.AZURE_SEARCH_INDEX;
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
+const requestTimeoutMs: number = 10000;
 
 export enum DocType {
   Par = 'Par',
@@ -69,8 +70,13 @@ const addFilterParameter = (url: URL, filters: ISearchFilters) => {
   }
 };
 
+interface IFacet {
+  count: number;
+  value: string;
+}
+
 export interface IFacetResult {
-  facets: Array<{ count: number; value: string }>;
+  facets: IFacet[];
 }
 
 const buildBaseUrl = () => {
@@ -93,13 +99,25 @@ const buildFacetUrl = (query: string): string => {
   return url.toString();
 };
 
-const getJson = async (url: string): Promise<any> => {
-  const resp: Response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+const timeout = (timeoutMs: number, promise: Promise<any>): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error('Request timed out'));
+    }, timeoutMs);
+    promise.then(resolve, reject);
   });
+};
+
+const getJson = async (url: string): Promise<any> => {
+  const resp: Response = await timeout(
+    requestTimeoutMs,
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+  );
 
   if (resp.ok) {
     return resp.json();

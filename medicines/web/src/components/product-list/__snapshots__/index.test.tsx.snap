@@ -87,3 +87,11 @@ exports[`ProductList should render 1`] = `
   </ul>
 </styled.nav>
 `;
+
+exports[`ProductList should render error message 1`] = `
+<styled.nav>
+  <styled.p>
+    Sorry - the site is experiencing technical issues right now. Please try again later.
+  </styled.p>
+</styled.nav>
+`;

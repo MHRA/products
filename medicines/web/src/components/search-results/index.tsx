@@ -4,7 +4,7 @@ import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/substance';
 import { DocType } from '../../services/azure-search';
-import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
+import { errorRed, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -147,6 +147,11 @@ const HiddenHeader = styled.h3`
   height: 0;
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
 const emaWebsiteLink = () => (
   <a href="https://www.ema.europa.eu/en" target="_new">
     European Medicines Agency
@@ -198,10 +203,8 @@ const normalizeDescription = (description: string): string => {
 
 function toSentenceCase(substance: string): string {
   return (
-    (substance as string)
-      .toLowerCase()
-      .charAt(0)
-      .toUpperCase() + substance.slice(1)
+    (substance as string).toLowerCase().charAt(0).toUpperCase() +
+    substance.slice(1)
   );
 }
 
@@ -218,6 +221,7 @@ interface ISearchResultsProps {
   handlePageChange: (num: number) => void;
   isLoading: boolean;
   rerouteType: RerouteType;
+  errorFetchingResults?: boolean;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -248,6 +252,7 @@ const SearchResults = (props: ISearchResultsProps) => {
     docTypes,
     updateDocTypes,
     rerouteType,
+    errorFetchingResults,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -258,6 +263,17 @@ const SearchResults = (props: ISearchResultsProps) => {
     event.preventDefault();
     setShowDisclaimerWarning(false);
   };
+
+  if (errorFetchingResults) {
+    return (
+      <StyledDrugList>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledDrugList>
+    );
+  }
 
   return props.isLoading ? (
     <StyledDrugList>
@@ -349,7 +365,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                             <p className="metadata">
                               Active substances:{' '}
                               {drug.activeSubstances
-                                .map(substance => toSentenceCase(substance))
+                                .map((substance) => toSentenceCase(substance))
                                 .join(', ')}
                             </p>
                           )}

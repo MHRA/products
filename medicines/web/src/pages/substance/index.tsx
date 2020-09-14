@@ -35,6 +35,7 @@ const App: NextPage = () => {
   );
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
   const router = useRouter();
   const {
@@ -51,11 +52,13 @@ const App: NextPage = () => {
         ? graphQlProductsLoader
         : azureProductsLoader;
 
-      loader(substanceName).then((products) => {
-        setProducts(products);
-        setSubstanceName(substanceName);
-        Events.viewProductsForSubstance(substanceName);
-      });
+      loader(substanceName)
+        .then((products) => {
+          setProducts(products);
+          setSubstanceName(substanceName);
+          Events.viewProductsForSubstance(substanceName);
+        })
+        .catch((error) => setErrorFetchingResults(true));
     })();
   }, [queryQS]);
 
@@ -72,7 +75,11 @@ const App: NextPage = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <ProductList title={substanceName} products={products} />
+        <ProductList
+          title={substanceName}
+          products={products}
+          errorFetchingResults={errorFetchingResults}
+        />
         <SubstanceStructuredData substanceName={substanceName} />
         {products && products.length ? (
           <DrugListStructuredData

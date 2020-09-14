@@ -178,6 +178,14 @@ exports[`SearchResults should render 1`] = `
 </Fragment>
 `;
 
+exports[`SearchResults should render error message 1`] = `
+<styled.div>
+  <styled.p>
+    Sorry - the site is experiencing technical issues right now. Please try again later.
+  </styled.p>
+</styled.div>
+`;
+
 exports[`SearchResults should render loading page 1`] = `
 <styled.div>
   <h2
