@@ -5,7 +5,7 @@ mod query_normalizer;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::models::{AzureIndexChangedResults, IndexEntry, IndexResults};
+use crate::models::{AzureIndexChangedResults, FacetResults, IndexEntry, IndexResults};
 use crate::query_normalizer::{
     escape_special_characters, escape_special_words, extract_normalized_product_licences,
     prefer_exact_match_but_support_fuzzy_match,
@@ -21,13 +21,13 @@ struct AzureConfig {
     search_index: String,
     api_key: String,
     api_version: String,
+    search_fuzziness: String,
+    search_exactness_boost: String,
 }
 
 pub struct AzureSearchClient {
     client: reqwest::Client,
     config: AzureConfig,
-    search_fuzziness: String,
-    search_exactness: String,
 }
 
 pub struct AzurePagination {
@@ -52,8 +52,8 @@ impl AzureSearchClient {
         let search_service = get_env("SEARCH_SERVICE");
         let api_version = get_env("AZURE_SEARCH_API_VERSION");
 
-        let search_word_fuzziness = get_env("AZURE_SEARCH_WORD_FUZZINESS");
-        let search_exactness_boost = get_env("AZURE_SEARCH_EXACTNESS_BOOST");
+        let search_fuzziness = get_env_or_default("AZURE_SEARCH_WORD_FUZZINESS", "1");
+        let search_exactness_boost = get_env_or_default("AZURE_SEARCH_EXACTNESS_BOOST", "4");
 
         AzureSearchClient {
             client: reqwest::Client::new(),
@@ -62,15 +62,22 @@ impl AzureSearchClient {
                 search_index,
                 search_service,
                 api_version,
+                search_fuzziness,
+                search_exactness_boost,
             },
-            search_exactness: search_exactness_boost,
-            search_fuzziness: search_word_fuzziness,
         }
     }
 }
 
 pub fn get_env(key: &str) -> String {
     std::env::var(key).unwrap_or_else(|_| panic!("Set env variable {} first!", key))
+}
+
+pub fn get_env_or_default(key: &str, default: &str) -> String {
+    std::env::var(key).unwrap_or_else(|e| {
+        tracing::warn!(r#"defaulting {} to "{}" ({})"#, key, &default, e);
+        default.to_string()
+    })
 }
 
 pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
@@ -96,6 +103,12 @@ pub trait Search {
         filter: Option<&str>,
     ) -> Result<IndexResults, reqwest::Error>;
 
+    async fn search_by_facet_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<FacetResults, reqwest::Error>;
+
     async fn filter_by_collection_field(
         &self,
         field_name: &str,
@@ -112,17 +125,7 @@ pub trait Search {
 #[async_trait]
 impl Search for AzureSearchClient {
     async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
-        search(
-            search_term,
-            None,
-            None,
-            None,
-            &self.client,
-            &self.config,
-            &self.search_fuzziness,
-            &self.search_exactness,
-        )
-        .await
+        search(search_term, None, None, None, &self.client, &self.config).await
     }
 
     async fn search_with_pagination(
@@ -138,8 +141,6 @@ impl Search for AzureSearchClient {
             None,
             &self.client,
             &self.config,
-            &self.search_fuzziness,
-            &self.search_exactness,
         )
         .await
     }
@@ -158,10 +159,25 @@ impl Search for AzureSearchClient {
             filter,
             &self.client,
             &self.config,
-            &self.search_fuzziness,
-            &self.search_exactness,
         )
         .await
+    }
+
+    async fn search_by_facet_field(
+        &self,
+        field_name: &str,
+        field_value: &str,
+    ) -> Result<FacetResults, reqwest::Error> {
+        let request =
+            build_facet_search(field_name, field_value, "eq", &self.client, &self.config)?;
+
+        tracing::debug!("Requesting from URL: {}", &request.url());
+        self.client
+            .execute(request)
+            .await?
+            .error_for_status()?
+            .json::<FacetResults>()
+            .await
     }
 
     async fn filter_by_collection_field(
@@ -214,18 +230,25 @@ fn clean_up_search_term(search_term: &str) -> String {
     escape_special_words(&search_term)
 }
 
-fn add_fuzzy_search(search_term: &str, search_fuzziness: &str, search_exactness: &str) -> String {
+fn add_fuzzy_search(
+    search_term: &str,
+    search_fuzziness: &str,
+    search_exactness_boost: &str,
+) -> String {
     search_term
         .split(' ')
         .filter(|word| !word.is_empty())
         .map(|word| {
-            prefer_exact_match_but_support_fuzzy_match(word, search_fuzziness, search_exactness)
+            prefer_exact_match_but_support_fuzzy_match(
+                word,
+                search_fuzziness,
+                search_exactness_boost,
+            )
         })
         .collect::<Vec<String>>()
         .join(" ")
 }
 
-#[allow(clippy::too_many_arguments)]
 fn build_search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -233,8 +256,6 @@ fn build_search(
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
-    search_fuzziness: &str,
-    search_exactness: &str,
 ) -> Result<reqwest::Request, reqwest::Error> {
     let base_url = format!(
         "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
@@ -245,7 +266,11 @@ fn build_search(
     let include_count = include_count.unwrap_or(false).to_string();
 
     let search_term = clean_up_search_term(search_term);
-    let search_term = add_fuzzy_search(&search_term, search_fuzziness, search_exactness);
+    let search_term = add_fuzzy_search(
+        &search_term,
+        &config.search_fuzziness,
+        &config.search_exactness_boost,
+    );
 
     let mut request_builder = client
         .get(&base_url)
@@ -289,7 +314,7 @@ fn build_filter_by_collection_request(
     );
 
     let filter = format!(
-        "{field_name}/any(value: value {operator} '{value}')",
+        "{field_name}/any(f: f {operator} '{value}')",
         field_name = field_name,
         value = value,
         operator = operator,
@@ -298,6 +323,38 @@ fn build_filter_by_collection_request(
     client
         .get(&base_url)
         .query(&[("api-version", &config.api_version), ("$filter", &filter)])
+        .header("api-key", &config.api_key)
+        .build()
+}
+
+fn build_facet_search(
+    field_name: &str,
+    value: &str,
+    operator: &str,
+    client: &reqwest::Client,
+    config: &AzureConfig,
+) -> Result<reqwest::Request, reqwest::Error> {
+    let base_url = format!(
+        "https://{search_service}.search.windows.net/indexes/{search_index}/docs",
+        search_service = config.search_service,
+        search_index = config.search_index
+    );
+
+    let filter = format!(
+        "{field_name}/any(f: f {operator} '{value}')",
+        field_name = field_name,
+        value = value,
+        operator = operator,
+    );
+
+    client
+        .get(&base_url)
+        .query(&[
+            ("api-version", &config.api_version),
+            ("$filter", &filter),
+            ("facet", &String::from("facets,count:50000,sort:value")),
+            ("$top", &String::from("0")),
+        ])
         .header("api-key", &config.api_key)
         .build()
 }
@@ -371,7 +428,6 @@ impl CreateIndexEntry for AzureSearchClient {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 async fn search(
     search_term: &str,
     pagination: Option<AzurePagination>,
@@ -379,8 +435,6 @@ async fn search(
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
-    search_fuzziness: &str,
-    search_exactness: &str,
 ) -> Result<IndexResults, reqwest::Error> {
     let req = build_search(
         search_term,
@@ -389,8 +443,6 @@ async fn search(
         filter,
         &client,
         &config,
-        search_fuzziness,
-        search_exactness,
     )?;
 
     tracing::debug!("Requesting from URL: {}", &req.url());
@@ -471,6 +523,8 @@ mod test {
             search_index: "search_index".to_string(),
             search_service: "search_service".to_string(),
             api_version: "api_version".to_string(),
+            search_exactness_boost: "4".to_string(),
+            search_fuzziness: "1".to_string(),
         }
     }
 
@@ -479,7 +533,7 @@ mod test {
         search_term: String,
         config: AzureConfig,
     ) -> Result<reqwest::Request, reqwest::Error> {
-        build_search(&search_term, None, None, None, &client, &config, "1", "4")
+        build_search(&search_term, None, None, None, &client, &config)
     }
 
     fn then_search_url_without_pagination_is_as_expected(
@@ -544,8 +598,6 @@ mod test {
             None,
             &client,
             &config,
-            "1",
-            "4",
         )
     }
 
@@ -564,8 +616,19 @@ mod test {
             Some("(my_cool_field eq 'my cool value' xor my_cool_field ne 'my uncool value')"),
             &client,
             &config,
-            "1",
-            "4",
+        )
+    }
+
+    fn when_we_build_a_search_using_facets(
+        client: reqwest::Client,
+        config: AzureConfig,
+    ) -> Result<reqwest::Request, reqwest::Error> {
+        build_facet_search(
+            &String::from("field"),
+            &String::from("I, IBUPROFEN"),
+            &String::from("eq"),
+            &client,
+            &config,
         )
     }
 
@@ -611,6 +674,20 @@ mod test {
         }
     }
 
+    fn then_search_with_facets_and_filter_is_as_expected(
+        actual_result: Result<reqwest::Request, reqwest::Error>,
+    ) {
+        if let Ok(actual) = actual_result {
+            let actual = actual.url().to_string();
+            let expected = "https://search_service.search.windows.net/indexes/search_index/docs?api-version=api_version&%24filter=field%2Fany%28f%3A+f+eq+%27I%2C+IBUPROFEN%27%29&facet=facets%2Ccount%3A50000%2Csort%3Avalue&%24top=0"
+                .to_string();
+
+            assert_eq!(actual, expected);
+        } else {
+            panic!("Provided search request is an error");
+        }
+    }
+
     #[test]
     fn test_build_search_with_pagination() {
         let client = given_we_have_a_search_client();
@@ -641,6 +718,14 @@ mod test {
     }
 
     #[test]
+    fn test_build_search_with_facets() {
+        let client = given_we_have_a_search_client();
+        let config = given_we_have_a_config();
+        let actual = when_we_build_a_search_using_facets(client, config);
+        then_search_with_facets_and_filter_is_as_expected(actual);
+    }
+
+    #[test]
     fn test_build_filter_by_collection_request() {
         let client = reqwest::Client::new();
         let config = AzureConfig {
@@ -648,6 +733,8 @@ mod test {
             search_index: "my_cool_search_index".to_string(),
             api_key: "my_cool_api_key".to_string(),
             api_version: "2017-11-11".to_string(),
+            search_fuzziness: "1".to_string(),
+            search_exactness_boost: "4".to_string(),
         };
 
         let req = build_filter_by_collection_request(
@@ -680,7 +767,7 @@ mod test {
                 .find(|query_pair| query_pair.0 == "$filter")
                 .unwrap()
                 .1,
-            "my_cool_field/any(value: value cooler_than 'my cool value')"
+            "my_cool_field/any(f: f cooler_than 'my cool value')"
         );
     }
 }

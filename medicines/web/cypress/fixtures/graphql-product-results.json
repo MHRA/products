@@ -1,0 +1,184 @@
+{
+  "data": {
+    "product": {
+      "name": "PARACETAMOL 500MG CAPSULES",
+      "documents": {
+        "count": 149,
+        "edges": [
+          {
+            "cursor": "MA==",
+            "node": {
+              "product": "My cool document",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": null,
+              "created": null,
+              "docType": "Pil",
+              "fileBytes": 75727,
+              "title": "leaflet MAH GENERIC_PL 20395-0089.pdf",
+              "url": "https://example.com/my-cool-document.pdf"
+            }
+          },
+          {
+            "cursor": "MQ==",
+            "node": {
+              "product": "PARACETAMOL 500MG CAPLETS, PARACETAMOL 500MG TABLETS",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": null,
+              "created": null,
+              "docType": "Pil",
+              "fileBytes": 2771559,
+              "title": "leaflet LLOYDS_PL 20416-0186.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/113cd5df6a0166ae34293cac0d6415daf67882b8"
+            }
+          },
+          {
+            "cursor": "Mg==",
+            "node": {
+              "product": "PARACETAMOL 500MG CAPSULES",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": [
+                "SUMMARY OF PRODUCT CHARACTERISTICS \n \n\n1 NAME OF THE MEDICINAL PRODUCT \n \n\n<em>Paracetamol</em> 500mg Capsules \n\n \n\n \n2 QUALITATIVE AND QUANTITATIVE COMPOSITION \n\n \n\nActive ingredient: <em>Paracetamol</em> 500mg.",
+                "Contains <em>Paracetamol</em>.",
+                "Do not take anything else containing <em>paracetamol</em> while taking this medicine.",
+                "Patients should be advised that <em>paracetamol</em> may cause severe skin reactions.",
+                "Less than 5% is excreted as unchanged \n<em>paracetamol</em>."
+              ],
+              "created": null,
+              "docType": "Spc",
+              "fileBytes": 34847,
+              "title": "spc-doc_PL 20395-0089.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/b87c7f827ae64231390e3dd64ea53e286512459e"
+            }
+          },
+          {
+            "cursor": "Mw==",
+            "node": {
+              "product": "PARACETAMOL AND CAFFEINE TABLETS, MAX REMEDIES PARACETAMOL AND CAFFEINE CAPLETS, MAX REMEDIES PARACETAMOL PLUS CAPLETS",
+              "activeSubstances": ["CAFFEINE", "PARACETAMOL"],
+              "highlights": [
+                "SUMMARY OF PRODUCT CHARACTERISTICS \n \n\n1 NAME OF THE MEDICINAL PRODUCT \nMax Remedies <em>Paracetamol</em> Plus Caplets \n\nMax Remedies <em>Paracetamol</em> and Caffeine Caplets \n\n<em>Paracetamol</em> & Caffeine Tablets \n\n \n \n \n2.",
+                "The label will say: Contains <em>paracetamol</em>.",
+                "Do not take with any other \n<em>paracetamol</em> - containing products.",
+                "<em>Paracetamol</em> is excreted in breast milk but not in a clinically significant \namount.",
+                "Available published data do not contraindicate breast feeding for \n<em>paracetamol</em>."
+              ],
+              "created": null,
+              "docType": "Spc",
+              "fileBytes": 34430,
+              "title": "spc-doc_PL 31308-0034.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/a46bc0754bff6949ae62b687e78de04d22fa1a98"
+            }
+          },
+          {
+            "cursor": "NA==",
+            "node": {
+              "product": "PARACETAMOL 1000 MG SOLUBLE TABLETS",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": [
+                "How to take <em>Paracetamol</em> Soluble Tablets \n4.",
+                "How to store <em>Paracetamol</em> Soluble Tablets \n6.",
+                "What <em>Paracetamol</em> Soluble Tablets are and what they are used for  \n\n \n<em>Paracetamol</em> Soluble Tablets contain <em>Paracetamol</em>, which relieves pain (analgesic) and reduces the \nbody temperature in fever (antipyretic).",
+                "What you need to know before you take <em>Paracetamol</em> Soluble Tablets \n\n \n\nDo not take <em>Paracetamol</em> Soluble Tablets \n\n• If you are allergic to <em>paracetamol</em> or any of the ingredients of this medicine (listed in section 6).",
+                "<em>Paracetamol</em> Soluble Tablets with food and drink \nMeals will not affect how much <em>Paracetamol</em> gets into the body."
+              ],
+              "created": null,
+              "docType": "Pil",
+              "fileBytes": 165747,
+              "title": "leaflet MAH GENERIC_PL 20075-0667.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/0b5910181ae6c10531f9c00769f0af5416e1509e"
+            }
+          },
+          {
+            "cursor": "NQ==",
+            "node": {
+              "product": "PARACETAMOL 1000 MG SOLUBLE TABLETS",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": [
+                "<em>Paracetamol</em> 1000 mg Soluble Tablets are for oral administration.",
+                "<em>Paracetamol</em> Soluble Tablet is considered high in sodium.",
+                "• Cholestyramine reduces absorption of <em>Paracetamol</em> and therefore should not \n\nbe administered within an hour following <em>Paracetamol</em> administration",
+                "Overdose of <em>Paracetamol</em> is potentially fatal in all populations.",
+                "<em>Paracetamol</em> crosses the placental barrier."
+              ],
+              "created": null,
+              "docType": "Spc",
+              "fileBytes": 58372,
+              "title": "spc-doc_PL 20075-0667.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/08566551ced456dbc3a156578fb1ef97e8d2e79f"
+            }
+          },
+          {
+            "cursor": "Ng==",
+            "node": {
+              "product": "PARACETAMOL AND CAFFEINE TABLETS, MAX REMEDIES PARACETAMOL AND CAFFEINE CAPLETS, MAX REMEDIES PARACETAMOL PLUS CAPLETS",
+              "activeSubstances": ["PARACETAMOL", "CAFFEINE"],
+              "highlights": null,
+              "created": null,
+              "docType": "Pil",
+              "fileBytes": 4467273,
+              "title": "leaflet MAH BRAND_PL 31308-0033.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/88ec06719aaffef8c96a6bf046e15952663995b8"
+            }
+          },
+          {
+            "cursor": "Nw==",
+            "node": {
+              "product": "PARACETAMOL EXTRA CAPLETS",
+              "activeSubstances": ["CAFFEINE ANHYDROUS", "PARACETAMOL"],
+              "highlights": [
+                "What <em>Paracetamol</em> Extra Caplets are and what they are used for\n2.",
+                "What you need to know before you take <em>Paracetamol</em> Extra Caplets\n3.",
+                "How to take <em>Paracetamol</em> Extra Caplets\n4.",
+                "How to store <em>Paracetamol</em> Extra Caplets\n6.",
+                "CONTENTS OF THE PACK AND OTHER INFORMATION\nThe active ingredients in <em>Paracetamol</em> Extra Caplets are <em>Paracetamol</em> 500mg and \nCaffeine Anhydrous 65mg."
+              ],
+              "created": "2020-04-21T14:14:18Z",
+              "docType": "Pil",
+              "fileBytes": 171810,
+              "title": "leaflet MAH GENERIC_PL 08977-0025.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/4f084d42a6bc6f921a55ce6f65ccb37b0e129984"
+            }
+          },
+          {
+            "cursor": "OA==",
+            "node": {
+              "product": "PARACETAMOL 500MG CAPLETS, PARACETAMOL 500MG TABLETS",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": [
+                "Summary of Product Characteristics \n\n \n\n1 Name of the medicinal product \n \n\n<em>Paracetamol</em> 500 mg Caplets \n \n\n<em>Paracetamol</em> 500 mg Tablets  \n\n \n2.",
+                "Contra-Indications \n\n \n\nHypersensitivity to <em>paracetamol</em> and/or other constituents. \n\n \n\n \n\n \n\n4.4 Special warnings and precautions for use \n \n\nCare is advised in the administration of <em>paracetamol</em> to patients with severe renal or \nsevere hepatic impairment.",
+                "<em>Paracetamol</em> is excreted in breast milk but not in a clinically significant amount.",
+                "Management: \n\n\n\nImmediate treatment is essential in the management of <em>paracetamol</em> overdose.",
+                "Pharmacodynamic Properties \n\n \n\n<em>Paracetamol</em> is an analgesic with antipyretic properties."
+              ],
+              "created": null,
+              "docType": "Spc",
+              "fileBytes": 35680,
+              "title": "spc-doc_PL 20416-0186.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/25ce3d0e8efe595d2ab80ea1e12ae1eba2f845fb"
+            }
+          },
+          {
+            "cursor": "OQ==",
+            "node": {
+              "product": "PARACETAMOL 500MG CAPSULES",
+              "activeSubstances": ["PARACETAMOL"],
+              "highlights": [
+                "SUMMARY OF PRODUCT CHARACTERISTICS \n \n\n1 NAME OF THE MEDICINAL PRODUCT \n<em>Paracetamol</em> 500mg Capsules \n\n \n\n \n \n \n \n\n \n2 QUALITATIVE AND QUANTITATIVE COMPOSITION \n\n \n\nActive ingredient: <em>Paracetamol</em> 500mg.",
+                "Contains <em>Paracetamol</em>.",
+                "Do not take anything else containing <em>paracetamol</em> while taking this medicine.",
+                "Patients should be advised that <em>paracetamol</em> may cause severe skin reactions.",
+                "Less than 5% is excreted as unchanged \n<em>paracetamol</em>."
+              ],
+              "created": null,
+              "docType": "Spc",
+              "fileBytes": 35103,
+              "title": "spc-doc_PL 20395-0081.pdf",
+              "url": "https://mhraproductsnonprod.blob.core.windows.net/docs/7c3da8454ce6c86754f171615895df7b7041dc2f"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

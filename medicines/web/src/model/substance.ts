@@ -4,7 +4,7 @@ export interface IProduct {
 }
 
 export interface ISubstance extends IProduct {
-  products: IProduct[];
+  products?: IProduct[];
 }
 
 export function isSubstance(obj: any): obj is ISubstance {

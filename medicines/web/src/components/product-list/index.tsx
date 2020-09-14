@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct, isIndex, isSubstance } from '../../model/substance';
+import { IProduct } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledProductList = styled.nav`
@@ -54,7 +54,7 @@ const ProductList: React.FC<IIndex> = ({ title, products }) => {
     <StyledProductList>
       <h3>{title}</h3>
       <ul>
-        {products.map(product => {
+        {products.map((product) => {
           return (
             <li key={product.name} className="product-name">
               <Link href={searchLink(product.name)}>
