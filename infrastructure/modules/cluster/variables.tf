@@ -57,6 +57,8 @@ variable "diagnostic_log_types" {
     "kube-audit",
     "kube-controller-manager",
     "kube-scheduler",
+    "guard",
+    "kube-audit-admin",
   "cluster-autoscaler"]
 }
 
