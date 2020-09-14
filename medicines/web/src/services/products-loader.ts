@@ -2,51 +2,39 @@ import DataLoader from 'dataloader';
 import { IProduct } from '../model/substance';
 import { graphqlRequest } from './graphql';
 
-interface IResponse {
-  substance: {
-    products: IProductResponse[];
-  };
+interface IProductIndexItem {
+  name: string;
+  count: number;
 }
 
-interface IProductResponse {
-  name: string;
-  documents: { count: number };
+interface IResponse {
+  productsIndex: IProductIndexItem[];
 }
 
 const query = `
-query ($substanceName: String) {
-  substance(name: $substanceName) {
-    products {
-      name
-      documents {
-        count: totalCount
-      }
-    }
+query ($substance: String) {
+  productsIndex(substance: $substance) {
+    name
+    count
   }
 }`;
 
-const convertResponseToProduct = ({
-  name,
-  documents: { count },
-}: IProductResponse): IProduct => {
-  return {
-    name,
-    count,
-  };
-};
-
-export const products = new DataLoader<string, IProduct[]>(
-  async substanceNames => {
+export const graphqlProductsLoader = new DataLoader<string, IProduct[]>(
+  async (substanceNames) => {
     return Promise.all(
       substanceNames.map(async (substanceName: string) => {
-        const variables = { substanceName };
+        const variables = { substance: substanceName };
 
-        const { data } = await graphqlRequest<IResponse, typeof variables>({
+        const response = await graphqlRequest<IResponse, typeof variables>({
           query,
           variables,
         });
 
-        return data.substance.products.map(convertResponseToProduct);
+        if (!response.data) {
+          return [];
+        }
+
+        return response.data.productsIndex;
       }),
     );
   },

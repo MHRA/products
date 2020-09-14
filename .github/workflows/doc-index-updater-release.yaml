@@ -75,7 +75,7 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            cd deployments/doc-index-updater/overlays/prod-new
+            cd deployments/doc-index-updater/overlays/prod
 
             kustomize edit set image $DIGEST
 

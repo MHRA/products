@@ -32,13 +32,6 @@ impl Document {
     pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
         self.doc_type == Some(doc_type)
     }
-
-    pub fn substances(&self) -> impl Iterator<Item = &str> {
-        self.active_substances
-            .iter()
-            .flat_map(|s| s.iter())
-            .map(|s| s.as_str())
-    }
 }
 
 impl From<IndexResult> for Document {
@@ -179,7 +172,7 @@ fn build_product_name_filter(product_name: &str) -> String {
 mod test {
     use super::*;
     use async_trait::async_trait;
-    use search_client::models::IndexResults;
+    use search_client::models::{FacetResults, IndexResults};
     use test_case::test_case;
     use tokio_test::block_on;
 
@@ -218,6 +211,13 @@ mod test {
                 context: String::from(""),
                 count: Some(1234),
             })
+        }
+        async fn search_by_facet_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<FacetResults, reqwest::Error> {
+            unimplemented!()
         }
         async fn filter_by_collection_field(
             &self,

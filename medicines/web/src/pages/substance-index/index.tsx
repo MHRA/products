@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import DrugIndex from '../../components/drug-index/index';
+import DrugIndex, { IndexType } from '../../components/drug-index/index';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/search-wrapper';
 import { SubstanceListStructuredData } from '../../components/structured-data';
@@ -55,9 +55,13 @@ const App: NextPage = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <DrugIndex title={`${substanceIndex || '...'}`} items={results} />
+        <DrugIndex
+          title={`${substanceIndex || '...'}`}
+          items={results}
+          indexType={IndexType.SubstancesIndex}
+        />
         <SubstanceListStructuredData
-          substanceNames={results.map(substance => substance.name)}
+          substanceNames={results.map((substance) => substance.name)}
         />
       </SearchWrapper>
     </Page>

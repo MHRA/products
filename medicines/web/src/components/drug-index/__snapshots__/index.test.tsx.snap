@@ -2,7 +2,7 @@
 
 exports[`DrugIndex should render horizontal items 1`] = `
 <DrugIndex
-  horizontal={true}
+  indexType={0}
   items={
     Array [
       Object {
@@ -749,6 +749,7 @@ exports[`DrugIndex should render horizontal items 1`] = `
 
 exports[`DrugIndex should render substances 1`] = `
 <DrugIndex
+  indexType={2}
   items={
     Array [
       Object {
@@ -780,10 +781,10 @@ exports[`DrugIndex should render substances 1`] = `
           key="Ibuprofen"
         >
           <Link
-            href="/substance?substance=Ibuprofen"
+            href="/product?product=Ibuprofen"
           >
             <a
-              href="/substance?substance=Ibuprofen"
+              href="/product?product=Ibuprofen"
               onClick={[Function]}
               onMouseEnter={[Function]}
             >

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { accessibleBackgroundBlue } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
 
-import DrugIndex, { index } from '../drug-index';
+import DrugIndex, { index, IndexType } from '../drug-index';
 import Search from '../search';
 import YellowCard from '../yellow-card';
 
@@ -53,7 +53,7 @@ const formatSearchTerm = (s: string): string => {
     .toLowerCase();
 };
 
-const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
+const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
   const [search, setSearch] = React.useState('');
   const router = useRouter();
 
@@ -101,7 +101,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = props => {
         <DrugIndex
           title="or find by active substance:"
           items={index}
-          horizontal
+          indexType={IndexType.Horizontal}
         />
       </section>
       <YellowCard />

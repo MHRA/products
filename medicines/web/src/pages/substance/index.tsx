@@ -11,13 +11,13 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/substance';
 import Events from '../../services/events';
-import { products } from '../../services/products-loader';
 import substanceLoader from '../../services/substance-loader';
+import { graphqlProductsLoader } from '../../services/products-loader';
 
 const azureProductsLoader = async (substance: string) => {
   const firstLetter = substance.charAt(0);
   const substanceIndex = await substanceLoader.load(firstLetter);
-  const substanceMatch = substanceIndex.find(s => s.name === substance);
+  const substanceMatch = substanceIndex.find((s) => s.name === substance);
   if (substanceMatch) {
     return substanceMatch.products;
   }
@@ -25,7 +25,7 @@ const azureProductsLoader = async (substance: string) => {
 };
 
 const graphQlProductsLoader = async (substance: string) => {
-  return products.load(substance);
+  return graphqlProductsLoader.load(substance);
 };
 
 const App: NextPage = () => {
@@ -51,7 +51,7 @@ const App: NextPage = () => {
         ? graphQlProductsLoader
         : azureProductsLoader;
 
-      loader(substanceName).then(products => {
+      loader(substanceName).then((products) => {
         setProducts(products);
         setSubstanceName(substanceName);
         Events.viewProductsForSubstance(substanceName);
@@ -74,9 +74,13 @@ const App: NextPage = () => {
       <SearchWrapper initialSearchValue="">
         <ProductList title={substanceName} products={products} />
         <SubstanceStructuredData substanceName={substanceName} />
-        <DrugListStructuredData
-          drugNames={products.map(product => product.name)}
-        />
+        {products && products.length ? (
+          <DrugListStructuredData
+            drugNames={products.map((product) => product.name)}
+          />
+        ) : (
+          <></>
+        )}
       </SearchWrapper>
     </Page>
   );

@@ -222,8 +222,8 @@ mod test {
     };
     use search_client::{
         models::{
-            AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, IndexResult,
-            IndexResults,
+            AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, FacetResults,
+            IndexResult, IndexResults,
         },
         Search,
     };
@@ -707,6 +707,14 @@ mod test {
         ) -> Result<IndexResults, reqwest::Error> {
             unimplemented!()
         }
+        async fn search_by_facet_field(
+            &self,
+            _field_name: &str,
+            _field_value: &str,
+        ) -> Result<FacetResults, reqwest::Error> {
+            unimplemented!()
+        }
+
         async fn filter_by_collection_field(
             &self,
             _field_name: &str,

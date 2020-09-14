@@ -41,6 +41,27 @@ pub struct IndexResults {
     pub count: Option<i32>,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+pub struct Facet {
+    pub count: i32,
+    pub value: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct FacetResult {
+    pub facets: Vec<Facet>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FacetResults {
+    #[serde(rename = "value")]
+    pub search_results: Vec<IndexResult>,
+    #[serde(rename = "@search.facets")]
+    pub facet_results: FacetResult,
+    #[serde(rename = "@odata.context")]
+    pub context: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct AzureIndexChangedResults {
     pub value: Vec<AzureIndexChangedResult>,
@@ -160,5 +181,23 @@ mod tests {
         );
         assert_eq!(results.search_results[0].doc_type, DocumentType::Pil);
         assert_eq!(results.search_results[3].doc_type, DocumentType::Spc);
+    }
+
+    #[test]
+    fn index_results_deserializes_correctly() {
+        let json = "{\"@odata.context\":\"https://mhraproductsproduction.search.windows.net/indexes('products-index')/$metadata#docs(*)\",\"value\":[],\"@search.facets\":{\"facets\":[
+            {\"value\":\"A, ACETOMENAPHTHONE, KETOVITE TABLETS\",\"count\":3},
+            {\"value\":\"A, ACETYLCYSTEINE\",\"count\":10},
+            {\"value\":\"A, ALANINE, NUTRIFLEX LIPID PERI EMULSION FOR INFUSION\",\"count\":6}
+        ]}}";
+
+        let results: FacetResults = serde_json::from_str(json).unwrap();
+
+        assert_eq!(results.facet_results.facets.len(), 3);
+        assert_eq!(
+            results.facet_results.facets[0].value,
+            "A, ACETOMENAPHTHONE, KETOVITE TABLETS".to_string()
+        );
+        assert_eq!(results.facet_results.facets[2].count, 6);
     }
 }

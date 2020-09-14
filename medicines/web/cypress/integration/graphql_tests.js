@@ -11,12 +11,12 @@ let polyfill;
 before(() => {
   const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js';
 
-  cy.request(polyfillUrl).then(response => {
+  cy.request(polyfillUrl).then((response) => {
     polyfill = response.body;
   });
 });
 
-Cypress.on('window:before:load', win => {
+Cypress.on('window:before:load', (win) => {
   delete win.fetch;
   // since the application code does not ship with a polyfill
   // load a polyfilled "fetch" from the test
@@ -34,8 +34,8 @@ const mockParacetamolResultsForGraphQl = () =>
 
 const longerTimeout = 20000;
 
-describe('Search using GraphQl', function() {
-  it('can search for Paracetamol', function() {
+describe('Search using GraphQl', function () {
+  it('can search for Paracetamol', function () {
     cy.server();
     mockParacetamolResultsForGraphQl();
     cy.visit('/search?search=paracetamol&page=1');
@@ -47,15 +47,28 @@ describe('Search using GraphQl', function() {
   });
 });
 
-describe('A-Z Index', function() {
-  it('can navigate to Paracetamol Tablets with GraphQL feature on', function() {
+describe('A-Z Index', function () {
+  it('can navigate to Paracetamol Tablets with GraphQL feature on', function () {
     cy.server();
-
     // Mock out GraphQL response.
-    cy.route('POST', graphQlUrl, 'fixture:graphql-substances.json');
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substances-index.json');
 
-    cy.visit('/substance?substance=PARACETAMOL');
-    cy.contains('PARACETAMOL TABLETS FROM GRAPHQL');
-    cy.contains('WRONG THING', { timeout: 0 }).should('not.exist');
+    cy.visit('/');
+    cy.get('nav').contains('P').click();
+    cy.contains('PARACETAMOL');
+
+    cy.route('POST', graphQlUrl, 'fixture:graphql-products-index.json');
+
+    cy.contains('PARACETAMOL').click();
+    cy.contains('PARACETAMOL 500MG CAPSULES');
+
+    cy.route('POST', graphQlUrl, 'fixture:graphql-product-results.json');
+
+    cy.contains('PARACETAMOL 500MG CAPSULES').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.get("a[href='https://example.com/my-cool-document.pdf']");
   });
 });
