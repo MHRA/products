@@ -252,7 +252,6 @@ const SearchResults = (props: ISearchResultsProps) => {
     docTypes,
     updateDocTypes,
     rerouteType,
-    errorFetchingResults,
   } = props;
 
   const hasDrugs = drugs.length > 0;
@@ -264,7 +263,7 @@ const SearchResults = (props: ISearchResultsProps) => {
     setShowDisclaimerWarning(false);
   };
 
-  if (errorFetchingResults) {
+  if (props.errorFetchingResults) {
     return (
       <StyledDrugList>
         <TechnicalErrorMessage>
@@ -275,13 +274,17 @@ const SearchResults = (props: ISearchResultsProps) => {
     );
   }
 
-  return props.isLoading ? (
-    <StyledDrugList>
-      <h2 className="title">
-        {`Loading results for ${showingResultsForTerm}...`}
-      </h2>
-    </StyledDrugList>
-  ) : (
+  if (props.isLoading) {
+    return (
+      <StyledDrugList>
+        <h2 className="title">
+          {`Loading results for ${showingResultsForTerm}...`}
+        </h2>
+      </StyledDrugList>
+    );
+  }
+
+  return (
     <>
       <StyledDrugList>
         <div>

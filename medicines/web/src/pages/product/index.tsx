@@ -114,19 +114,18 @@ const App: NextPage = () => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      try {
-        const { documents, count } = await getProduct({
-          name: product,
-          page,
-          docTypes,
-        });
-        setDocuments(documents);
-        setCount(count);
-      } catch {
-        setErrorFetchingResults(true);
-      }
+      getProduct({
+        name: product,
+        page,
+        docTypes,
+      })
+        .then(({ documents, count }) => {
+          setDocuments(documents);
+          setCount(count);
+          setIsLoading(false);
+        })
+        .catch((e) => setErrorFetchingResults(true));
 
-      setIsLoading(false);
       Events.viewResultsForProduct({
         productName: product,
         pageNo: page,

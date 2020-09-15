@@ -69,19 +69,23 @@ describe(DrugIndex, () => {
     expect(component).toMatchSnapshot();
   });
   it('should render error message', () => {
-    const product: IProduct = { name: 'Ibuprofen gel', count: 1 };
-    const substance: ISubstance = {
-      name: 'Ibuprofen',
-      products: [product],
-      count: 1,
-    };
-    const substances = [substance];
     const component = mount(
       <DrugIndex
         title={'Coffee'}
-        items={substances}
+        items={[]}
         indexType={IndexType.ProductsIndex}
         errorFetchingResults
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
+  it('should render loading message', () => {
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={[]}
+        indexType={IndexType.ProductsIndex}
+        isLoading
       />,
     );
     expect(component).toMatchSnapshot();

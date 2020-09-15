@@ -1,4 +1,5 @@
 import fetch, { Response } from 'node-fetch';
+import { requestTimeout } from './request-helper';
 import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
@@ -6,7 +7,7 @@ const searchIndex = process.env.AZURE_SEARCH_INDEX;
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
-const requestTimeoutMs: number = 10000;
+const requestTimeoutMs: number = 15000;
 
 export enum DocType {
   Par = 'Par',
@@ -99,17 +100,8 @@ const buildFacetUrl = (query: string): string => {
   return url.toString();
 };
 
-const timeout = (timeoutMs: number, promise: Promise<any>): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error('Request timed out'));
-    }, timeoutMs);
-    promise.then(resolve, reject);
-  });
-};
-
 const getJson = async (url: string): Promise<any> => {
-  const resp: Response = await timeout(
+  const resp: Response = await requestTimeout(
     requestTimeoutMs,
     fetch(url, {
       method: 'GET',

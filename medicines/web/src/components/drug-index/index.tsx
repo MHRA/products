@@ -118,6 +118,7 @@ interface IIndex {
   title: string;
   items: IProduct[];
   indexType: IndexType;
+  isLoading?: boolean;
   errorFetchingResults?: boolean;
 }
 
@@ -125,6 +126,7 @@ const DrugIndex: React.FC<IIndex> = ({
   title,
   items,
   indexType,
+  isLoading,
   errorFetchingResults,
 }) => {
   if (errorFetchingResults) {
@@ -138,8 +140,12 @@ const DrugIndex: React.FC<IIndex> = ({
     );
   }
 
-  if (items === undefined || items.length === 0) {
-    return <></>;
+  if (isLoading) {
+    return (
+      <StyledDrugIndex>
+        <h2>{`Loading results for ${title}...`}</h2>
+      </StyledDrugIndex>
+    );
   }
 
   const searchLink = (itemName: string) => {
@@ -160,22 +166,26 @@ const DrugIndex: React.FC<IIndex> = ({
         <h2>{title}</h2>
       )}
       <ul className={indexType === IndexType.Horizontal ? 'horizontal' : ''}>
-        {items.map((item) => {
-          return (
-            <li
-              key={item.name}
-              className={
-                indexType !== IndexType.Horizontal ? 'substance-name' : ''
-              }
-            >
-              <Link href={searchLink(item.name)}>
-                <a>
-                  {item.name} {item.count && <>({item.count} files)</>}
-                </a>
-              </Link>
-            </li>
-          );
-        })}
+        {items && items.length ? (
+          items.map((item) => {
+            return (
+              <li
+                key={item.name}
+                className={
+                  indexType !== IndexType.Horizontal ? 'substance-name' : ''
+                }
+              >
+                <Link href={searchLink(item.name)}>
+                  <a>
+                    {item.name} {item.count && <>({item.count} files)</>}
+                  </a>
+                </Link>
+              </li>
+            );
+          })
+        ) : (
+          <li>No results for {title}</li>
+        )}
       </ul>
     </StyledDrugIndex>
   );

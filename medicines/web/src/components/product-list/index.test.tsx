@@ -34,4 +34,10 @@ describe(ProductList, () => {
     );
     expect(component).toMatchSnapshot();
   });
+  it('should render loading message', () => {
+    const component = shallow(
+      <ProductList title={'Coffee'} products={[]} isLoading />,
+    );
+    expect(component).toMatchSnapshot();
+  });
 });

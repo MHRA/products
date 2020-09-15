@@ -35,6 +35,7 @@ const App: NextPage = () => {
   );
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(true);
   const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
   const router = useRouter();
@@ -56,9 +57,11 @@ const App: NextPage = () => {
         .then((products) => {
           setProducts(products);
           setSubstanceName(substanceName);
-          Events.viewProductsForSubstance(substanceName);
+          setIsLoading(false);
         })
-        .catch((error) => setErrorFetchingResults(true));
+        .catch((e) => setErrorFetchingResults(true));
+
+      Events.viewProductsForSubstance(substanceName);
     })();
   }, [queryQS]);
 
@@ -79,6 +82,7 @@ const App: NextPage = () => {
           title={substanceName}
           products={products}
           errorFetchingResults={errorFetchingResults}
+          isLoading={isLoading}
         />
         <SubstanceStructuredData substanceName={substanceName} />
         {products && products.length ? (

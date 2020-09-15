@@ -783,6 +783,25 @@ exports[`DrugIndex should render horizontal items 1`] = `
 </DrugIndex>
 `;
 
+exports[`DrugIndex should render loading message 1`] = `
+<DrugIndex
+  indexType={2}
+  isLoading={true}
+  items={Array []}
+  title="Coffee"
+>
+  <styled.nav>
+    <nav
+      className="sc-AxjAm jJjbyf"
+    >
+      <h2>
+        Loading results for Coffee...
+      </h2>
+    </nav>
+  </styled.nav>
+</DrugIndex>
+`;
+
 exports[`DrugIndex should render substances 1`] = `
 <DrugIndex
   indexType={2}

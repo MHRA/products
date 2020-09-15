@@ -45,12 +45,14 @@ const TechnicalErrorMessage = styled.p`
 interface IIndex {
   title: string;
   products: IProduct[];
+  isLoading?: boolean;
   errorFetchingResults?: boolean;
 }
 
 const ProductList: React.FC<IIndex> = ({
   title,
   products,
+  isLoading,
   errorFetchingResults,
 }) => {
   if (errorFetchingResults) {
@@ -64,8 +66,12 @@ const ProductList: React.FC<IIndex> = ({
     );
   }
 
-  if (products === undefined || products.length === 0) {
-    return <></>;
+  if (isLoading) {
+    return (
+      <StyledProductList>
+        <h2>{`Loading results for ${title}...`}</h2>
+      </StyledProductList>
+    );
   }
 
   const searchLink = (itemName: string) => {
@@ -74,19 +80,24 @@ const ProductList: React.FC<IIndex> = ({
 
   return (
     <StyledProductList>
-      <h3>{title}</h3>
+      <h2>{title}</h2>
       <ul>
-        {products.map((product) => {
-          return (
-            <li key={product.name} className="product-name">
-              <Link href={searchLink(product.name)}>
-                <a>
-                  {product.name} {product.count && <>({product.count} files)</>}
-                </a>
-              </Link>
-            </li>
-          );
-        })}
+        {products && products.length ? (
+          products.map((product) => {
+            return (
+              <li key={product.name} className="product-name">
+                <Link href={searchLink(product.name)}>
+                  <a>
+                    {product.name}{' '}
+                    {product.count && <>({product.count} files)</>}
+                  </a>
+                </Link>
+              </li>
+            );
+          })
+        ) : (
+          <li>No results to show for {title}</li>
+        )}
       </ul>
     </StyledProductList>
   );

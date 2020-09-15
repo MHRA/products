@@ -111,19 +111,18 @@ const App: NextPage = (props) => {
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
     (async () => {
-      try {
-        const { documents, count } = await getSearchResults({
-          searchTerm: query,
-          page,
-          docTypes,
-        });
-        setDocuments(documents);
-        setCount(count);
-      } catch {
-        setErrorFetchingResults(true);
-      }
+      getSearchResults({
+        searchTerm: query,
+        page,
+        docTypes,
+      })
+        .then(({ documents, count }) => {
+          setDocuments(documents);
+          setCount(count);
+          setIsLoading(false);
+        })
+        .catch((e) => setErrorFetchingResults(true));
 
-      setIsLoading(false);
       Events.searchForProductsMatchingKeywords({
         searchTerm: query,
         pageNo: page,
