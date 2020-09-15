@@ -113,25 +113,29 @@ const App: NextPage = () => {
     setPageNumber(page);
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
-    (async () => {
-      getProduct({
-        name: product,
-        page,
-        docTypes,
-      })
-        .then(({ documents, count }) => {
-          setDocuments(documents);
-          setCount(count);
-          setIsLoading(false);
-        })
-        .catch((e) => setErrorFetchingResults(true));
 
-      Events.viewResultsForProduct({
-        productName: product,
-        pageNo: page,
-        docTypes: queryStringFromDocTypes(docTypes),
-      });
-    })();
+    setDocuments([]);
+    setCount(0);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
+
+    getProduct({
+      name: product,
+      page,
+      docTypes,
+    })
+      .then(({ documents, count }) => {
+        setDocuments(documents);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.viewResultsForProduct({
+      productName: product,
+      pageNo: page,
+      docTypes: queryStringFromDocTypes(docTypes),
+    });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {

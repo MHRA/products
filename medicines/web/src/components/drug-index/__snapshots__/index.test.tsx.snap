@@ -4,20 +4,7 @@ exports[`DrugIndex should render error message 1`] = `
 <DrugIndex
   errorFetchingResults={true}
   indexType={2}
-  items={
-    Array [
-      Object {
-        "count": 1,
-        "name": "Ibuprofen",
-        "products": Array [
-          Object {
-            "count": 1,
-            "name": "Ibuprofen gel",
-          },
-        ],
-      },
-    ]
-  }
+  items={Array []}
   title="Coffee"
 >
   <styled.nav>
@@ -795,8 +782,15 @@ exports[`DrugIndex should render loading message 1`] = `
       className="sc-AxjAm jJjbyf"
     >
       <h2>
-        Loading results for Coffee...
+        Coffee
       </h2>
+      <ul
+        className=""
+      >
+        <li>
+          Loading results...
+        </li>
+      </ul>
     </nav>
   </styled.nav>
 </DrugIndex>

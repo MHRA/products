@@ -99,7 +99,12 @@ exports[`ProductList should render error message 1`] = `
 exports[`ProductList should render loading message 1`] = `
 <styled.nav>
   <h2>
-    Loading results for Coffee...
+    Coffee
   </h2>
+  <ul>
+    <li>
+      Loading results...
+    </li>
+  </ul>
 </styled.nav>
 `;

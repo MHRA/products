@@ -4,16 +4,18 @@ exports[`SearchResults should render 1`] = `
 <Fragment>
   <styled.div>
     <div>
-      <h2
-        className="title"
-      >
-        Showing results for Tea
-      </h2>
-      <p
-        className="no-of-results"
-      >
-        1 to 2 of 200
-      </p>
+      <styled.div>
+        <h2
+          className="title"
+        >
+          Showing results for Tea
+        </h2>
+        <styled.p
+          className="no-of-results"
+        >
+          1 to 2 of 200
+        </styled.p>
+      </styled.div>
       <p
         className="ema-message"
       >

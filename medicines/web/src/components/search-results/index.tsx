@@ -23,12 +23,6 @@ const StyledDrugList = styled.div`
     margin: 0;
   }
 
-  .no-of-results {
-    padding-top: 0;
-    padding-bottom: 30px;
-    margin: 0;
-  }
-
   .ema-message {
     padding: 0;
     margin: 0;
@@ -150,6 +144,15 @@ const HiddenHeader = styled.h3`
 const TechnicalErrorMessage = styled.p`
   background-color: ${errorRed};
   padding: 20px;
+`;
+
+const TitleAndCountContainer = styled.div`
+  margin-bottom: 30px;
+`;
+
+const Count = styled.p`
+  margin: 0 0 30px;
+  padding: 0;
 `;
 
 const emaWebsiteLink = () => (
@@ -288,19 +291,21 @@ const SearchResults = (props: ISearchResultsProps) => {
     <>
       <StyledDrugList>
         <div>
-          <h2 className="title">
-            {searchResultsTitle(showingResultsForTerm, drugs.length)}
-          </h2>
-          {hasDrugs && (
-            <p className="no-of-results">
-              {searchResultsNumberingInformation({
-                page,
-                pageSize,
-                shownResultCount: drugs.length,
-                totalResultCount: resultCount,
-              })}
-            </p>
-          )}
+          <TitleAndCountContainer>
+            <h2 className="title">
+              {searchResultsTitle(showingResultsForTerm, drugs.length)}
+            </h2>
+            {hasDrugs && (
+              <Count className="no-of-results">
+                {searchResultsNumberingInformation({
+                  page,
+                  pageSize,
+                  shownResultCount: drugs.length,
+                  totalResultCount: resultCount,
+                })}
+              </Count>
+            )}
+          </TitleAndCountContainer>
           <p className="ema-message">
             If the product information you are seeking does not appear below, it
             is possible that the product holds a European licence and its

@@ -47,22 +47,25 @@ const App: NextPage = () => {
     if (!queryQS) {
       return;
     }
-    (async () => {
-      const substanceName = queryQS.toString();
-      const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
-        ? graphQlProductsLoader
-        : azureProductsLoader;
+    const substanceName = queryQS.toString();
+    setSubstanceName(substanceName);
 
-      loader(substanceName)
-        .then((products) => {
-          setProducts(products);
-          setSubstanceName(substanceName);
-          setIsLoading(false);
-        })
-        .catch((e) => setErrorFetchingResults(true));
+    setProducts([]);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
 
-      Events.viewProductsForSubstance(substanceName);
-    })();
+    const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
+      ? graphQlProductsLoader
+      : azureProductsLoader;
+
+    loader(substanceName)
+      .then((products) => {
+        setProducts(products);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.viewProductsForSubstance(substanceName);
   }, [queryQS]);
 
   useEffect(() => {

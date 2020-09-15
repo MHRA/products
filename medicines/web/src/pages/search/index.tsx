@@ -110,25 +110,29 @@ const App: NextPage = (props) => {
     setPageNumber(page);
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
-    (async () => {
-      getSearchResults({
-        searchTerm: query,
-        page,
-        docTypes,
-      })
-        .then(({ documents, count }) => {
-          setDocuments(documents);
-          setCount(count);
-          setIsLoading(false);
-        })
-        .catch((e) => setErrorFetchingResults(true));
 
-      Events.searchForProductsMatchingKeywords({
-        searchTerm: query,
-        pageNo: page,
-        docTypes: queryStringFromDocTypes(docTypes),
-      });
-    })();
+    setDocuments([]);
+    setCount(0);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
+
+    getSearchResults({
+      searchTerm: query,
+      page,
+      docTypes,
+    })
+      .then(({ documents, count }) => {
+        setDocuments(documents);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.searchForProductsMatchingKeywords({
+      searchTerm: query,
+      pageNo: page,
+      docTypes: queryStringFromDocTypes(docTypes),
+    });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {

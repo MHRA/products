@@ -2,7 +2,6 @@ import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { IProduct } from '../../model/substance';
-import { mobileBreakpoint } from '../../styles/dimensions';
 import { errorRed } from '../../styles/colors';
 
 const StyledProductList = styled.nav`
@@ -66,22 +65,13 @@ const ProductList: React.FC<IIndex> = ({
     );
   }
 
-  if (isLoading) {
-    return (
-      <StyledProductList>
-        <h2>{`Loading results for ${title}...`}</h2>
-      </StyledProductList>
-    );
-  }
-
   const searchLink = (itemName: string) => {
     return `/product?product=${encodeURIComponent(itemName)}`;
   };
 
-  return (
-    <StyledProductList>
-      <h2>{title}</h2>
-      <ul>
+  const getResultListItems = () => {
+    return (
+      <>
         {products && products.length ? (
           products.map((product) => {
             return (
@@ -96,9 +86,15 @@ const ProductList: React.FC<IIndex> = ({
             );
           })
         ) : (
-          <li>No results to show for {title}</li>
+          <li>No results for {title}</li>
         )}
-      </ul>
+      </>
+    );
+  };
+  return (
+    <StyledProductList>
+      <h2>{title}</h2>
+      <ul>{isLoading ? <li>Loading results...</li> : getResultListItems()}</ul>
     </StyledProductList>
   );
 };

@@ -33,23 +33,26 @@ const App: NextPage = () => {
     if (!queryQS) {
       return;
     }
-    (async () => {
-      const index = queryQS.toString();
 
-      const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
-      loader
-        .load(index)
-        .then((results) => {
-          setResults(results);
-          setSubstanceIndex(index);
-          setIsLoading(false);
-        })
-        .catch((e) => {
-          setErrorFetchingResults(true);
-        });
+    const index = queryQS.toString();
+    setSubstanceIndex(index);
 
-      Events.viewSubstancesStartingWith(index);
-    })();
+    setErrorFetchingResults(false);
+    setIsLoading(true);
+    setResults([]);
+
+    const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
+    loader
+      .load(index)
+      .then((results) => {
+        setResults(results);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setErrorFetchingResults(true);
+      });
+
+    Events.viewSubstancesStartingWith(index);
   }, [queryQS]);
 
   useEffect(() => {

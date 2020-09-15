@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct, isIndex, isSubstance } from '../../model/substance';
+import { IProduct } from '../../model/substance';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { errorRed } from '../../styles/colors';
 
@@ -103,11 +103,6 @@ export const index: IProduct[] = [
   { name: '9' },
 ];
 
-export interface IFacet {
-  count?: number;
-  value: string;
-}
-
 export enum IndexType {
   Horizontal,
   SubstancesIndex,
@@ -140,14 +135,6 @@ const DrugIndex: React.FC<IIndex> = ({
     );
   }
 
-  if (isLoading) {
-    return (
-      <StyledDrugIndex>
-        <h2>{`Loading results for ${title}...`}</h2>
-      </StyledDrugIndex>
-    );
-  }
-
   const searchLink = (itemName: string) => {
     if (indexType === IndexType.Horizontal) {
       return `/substance-index?letter=${itemName}`;
@@ -158,14 +145,9 @@ const DrugIndex: React.FC<IIndex> = ({
     return `/product?product=${encodeURIComponent(itemName)}`;
   };
 
-  return (
-    <StyledDrugIndex>
-      {indexType === IndexType.Horizontal ? (
-        <p className="horizontal">{title}</p>
-      ) : (
-        <h2>{title}</h2>
-      )}
-      <ul className={indexType === IndexType.Horizontal ? 'horizontal' : ''}>
+  const getResultListItems = () => {
+    return (
+      <>
         {items && items.length ? (
           items.map((item) => {
             return (
@@ -186,6 +168,19 @@ const DrugIndex: React.FC<IIndex> = ({
         ) : (
           <li>No results for {title}</li>
         )}
+      </>
+    );
+  };
+
+  return (
+    <StyledDrugIndex>
+      {indexType === IndexType.Horizontal ? (
+        <p className="horizontal">{title}</p>
+      ) : (
+        <h2>{title}</h2>
+      )}
+      <ul className={indexType === IndexType.Horizontal ? 'horizontal' : ''}>
+        {isLoading ? <li>Loading results...</li> : getResultListItems()}
       </ul>
     </StyledDrugIndex>
   );
