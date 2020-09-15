@@ -2,9 +2,10 @@
 extern crate clap;
 
 use azure_sdk_core::errors::AzureError;
+use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
-use import::{par, spc_pil};
+use import::bmgf;
 use std::path::Path;
 use tokio_core::reactor::Core;
 
@@ -19,34 +20,25 @@ fn main() -> Result<(), AzureError> {
     };
     let dryrun = matches.is_present("dryrun");
     match matches.subcommand() {
-        ("spcpil", Some(m)) => {
+        ("bmgf", Some(m)) => {
             let path = m
                 .value_of("directory")
                 .expect("yaml is incorrect: directory should be a required arg");
-            let (client, core) = initialize()?;
+            let client = initialize()?;
             let dir = Path::new(&path);
-            spc_pil::import(dir, client, core, verbosity, dryrun)?
+            bmgf::import(dir, client, verbosity, dryrun)?
         }
-        ("par", Some(m)) => {
-            let path = m
-                .value_of("directory")
-                .expect("yaml is incorrect: directory should be a required arg");
-            let (client, core) = initialize()?;
-            let dir = Path::new(&path);
-            par::import(dir, client, core, verbosity, dryrun)?
-        }
-        _ => println!("yaml is incorrect: pdf is currently the only subcommand"),
+        _ => println!("command did not match available commands."),
     }
     Ok(())
 }
 
-fn initialize() -> Result<(Client, Core), AzureError> {
-    let account =
+fn initialize() -> Result<Box<dyn Client>, AzureError> {
+    let storage_account =
         std::env::var("STORAGE_ACCOUNT").expect("Set env variable STORAGE_ACCOUNT first!");
     let master_key =
         std::env::var("STORAGE_MASTER_KEY").expect("Set env variable STORAGE_MASTER_KEY first!");
 
-    let core = Core::new()?;
-
-    Ok((Client::new(&account, &master_key)?, core))
+    let client = client::with_access_key(&storage_account, &master_key);
+    Ok(Box::new(client))
 }
