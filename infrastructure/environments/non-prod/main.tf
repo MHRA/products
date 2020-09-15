@@ -33,6 +33,7 @@ module products {
   location            = var.REGION
   namespace           = local.namespace
   resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  search_replicas     = 1
 }
 
 # CPD
