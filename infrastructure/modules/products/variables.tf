@@ -23,8 +23,3 @@ variable "cdn_region" {
   description = "Region where the CDN profile should be deployed"
   default     = "westeurope" # uksouth is not a valid option currently for cdn profiles
 }
-
-variable "search_replicas" {
-  description = "Number of replicas of the search service to provision. More replicas gives higher reliability and ability to service more requests"
-  default     = 1
-}

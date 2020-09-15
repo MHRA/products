@@ -38,7 +38,6 @@ module products {
   namespace           = local.namespace
   resource_group_name = var.RESOURCE_GROUP_PRODUCTS
   search_sku          = "standard"
-  search_replicas     = 2
 }
 
 # CPD
