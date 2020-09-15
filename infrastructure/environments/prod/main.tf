@@ -22,11 +22,11 @@ resource "random_integer" "deployment" {
 }
 
 locals {
-  namespace                   = "mhraproducts${random_integer.deployment.result}"
-  cpd_namespace               = "mhracpd${random_integer.deployment.result}"
-  pars_namespace              = "mhrapars${random_integer.deployment.result}"
+  namespace        = "mhraproducts${random_integer.deployment.result}"
+  cpd_namespace    = "mhracpd${random_integer.deployment.result}"
+  pars_namespace   = "mhrapars${random_integer.deployment.result}"
   doc_index_updater_namespace = "doc-index-updater-${random_integer.deployment.result}"
-  logs_namespace              = "mhralogs${random_integer.deployment.result}"
+  logs_namespace   = "mhralogs${random_integer.deployment.result}"
 }
 
 # Website
@@ -100,12 +100,12 @@ module service_bus {
 module redis {
   source = "../../modules/redis"
 
-  environment         = var.ENVIRONMENT
-  location            = var.REGION
-  name                = local.doc_index_updater_namespace
-  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
-  redis_use_firewall  = true
-  redis_firewall_ip   = module.cluster.cluster_outbound_ip
+  environment             = var.ENVIRONMENT
+  location                = var.REGION
+  name                    = local.doc_index_updater_namespace
+  resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
+  redis_use_firewall      = true
+  redis_firewall_ip       = module.cluster.cluster_outbound_ip
 }
 
 # Key vault
