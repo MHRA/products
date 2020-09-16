@@ -26,27 +26,38 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
     metadata.insert("report_name".to_string(), report_name);
 
     let file_name = row.get(1).unwrap().to_string();
+    metadata.insert("file_name".to_string(), file_name);
     // let pdf_file_path = path.parent();
 
     let summary = row.get(2).unwrap().to_string();
-    let active_substances = row.get(3).unwrap().to_string().to_uppercase();
-    let products = row.get(4).unwrap().to_string().to_uppercase();
-    let pl_number = row.get(5).unwrap().to_string();
-    let pbpk_models = row.get(6).unwrap().to_string();
-    let matrices = row.get(7).unwrap().to_string();
+    metadata.insert("summary".to_string(), summary);
 
-    let mut facets = active_substances
-        .split(',')
-        .map(|active_substance| {
-            let active_substance = active_substance.trim();
-            let substance_first_letter = active_substance.chars().next().unwrap();
-            let substance_facet = format!("{}, {}", substance_first_letter, active_substance);
-            return vec![substance_first_letter.to_string(), substance_facet];
-        })
-        .flatten()
-        .collect::<Vec<String>>();
-    facets.sort();
-    facets.dedup();
+    let active_substances = row.get(3).unwrap().to_string().to_uppercase();
+    let active_substances = metadata::to_array(&active_substances);
+    metadata.insert(
+        "active_substances".to_string(),
+        metadata::to_json(active_substances.clone()),
+    );
+
+    let facets = metadata::create_facets_by_active_substance(active_substances);
+    metadata.insert("facets".to_string(), metadata::to_json(facets));
+
+    let products = row.get(4).unwrap().to_string().to_uppercase();
+    let products = metadata::to_array(&products);
+    metadata.insert("products".to_string(), metadata::to_json(products));
+
+    let pl_numbers = row.get(5).unwrap().to_string();
+    let pl_numbers = metadata::extract_product_licences(&pl_numbers);
+    metadata.insert("pl_numbers".to_string(), pl_numbers);
+
+    let pbpk_models = row.get(6).unwrap().to_string();
+    let pbpk_models = metadata::to_array(&pbpk_models);
+    metadata.insert("pbpk_models".to_string(), metadata::to_json(pbpk_models));
+
+    let matrices = row.get(7).unwrap().to_string();
+    let matrices = metadata::to_array(&matrices);
+    metadata.insert("matrices".to_string(), metadata::to_json(matrices));
+
     metadata
 }
 
@@ -196,4 +207,58 @@ pub fn import(
     //     report.print_report();
     // }
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn extract_data_from_row() {
+        // let range: [DataType] = [];
+        let report_name = DataType::String(String::from("Example report"));
+        let file_name = DataType::String(String::from("Example file name"));
+        let summary = DataType::String(String::from("An example summary"));
+        let active_substances = DataType::String(String::from("Substance 1, Substance 2"));
+        let products = DataType::String(String::from("Product 1, Product 2"));
+        let pl_numbers = DataType::String(String::from("PL 12345/1234, PL 23456/2345"));
+        let pbpk_models = DataType::String(String::from("Model 1, Model 2"));
+        let matrices = DataType::String(String::from("Matrix 1, Matrix 2"));
+
+        let row = [
+            report_name,
+            file_name,
+            summary,
+            active_substances,
+            products,
+            pl_numbers,
+            pbpk_models,
+            matrices,
+        ];
+        let data = extract_file_data(&row);
+        assert_eq!(data.get("report_name").unwrap(), "Example report");
+        assert_eq!(data.get("file_name").unwrap(), "Example file name");
+        assert_eq!(data.get("summary").unwrap(), "An example summary");
+        assert_eq!(
+            data.get("active_substances").unwrap(),
+            "[\"SUBSTANCE 1\",\"SUBSTANCE 2\"]"
+        );
+        assert_eq!(
+            data.get("products").unwrap(),
+            "[\"PRODUCT 1\",\"PRODUCT 2\"]"
+        );
+        assert_eq!(
+            data.get("pl_numbers").unwrap(),
+            "[\"PL123451234\",\"PL234562345\"]"
+        );
+        assert_eq!(
+            data.get("pbpk_models").unwrap(),
+            "[\"Model 1\",\"Model 2\"]"
+        );
+        assert_eq!(data.get("matrices").unwrap(), "[\"Matrix 1\",\"Matrix 2\"]");
+        assert_eq!(
+            data.get("facets").unwrap(),
+            "[\"S\",\"S, SUBSTANCE 1\",\"S, SUBSTANCE 2\"]"
+        );
+    }
 }
