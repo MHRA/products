@@ -8,6 +8,7 @@ on:
       - medicines/doc-index-updater/**
       - medicines/search-client/**
       - .github/workflows/doc-index-updater-master.yaml
+      - .github/workflows/doc-index-updater-release.yaml
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater

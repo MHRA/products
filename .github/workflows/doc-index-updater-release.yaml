@@ -37,8 +37,8 @@ jobs:
       - name: Docker login to prod
         uses: azure/docker-login@v1
         with:
-          login-server: mhraproductsproductionregistry.azurecr.io
-          username: mhraproductsproductionregistry
+          login-server: mhraproducts4853registry.azurecr.io
+          username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
       - name: Push image for tagged commit
