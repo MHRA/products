@@ -7,4 +7,5 @@ extern crate serde_derive;
 
 pub mod bmgf;
 mod date_de;
+mod metadata;
 pub mod model;

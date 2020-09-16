@@ -1,4 +1,4 @@
-use crate::model::ImportError;
+use crate::{metadata, model::ImportError};
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
@@ -6,6 +6,49 @@ use calamine::{open_workbook, DataType, Range, Reader, Xlsx};
 use indicatif::{HumanDuration, ProgressBar};
 use std::{collections::HashMap, fs, path::Path, str, time::Instant};
 use tokio_core::reactor::Core;
+
+pub fn get_worksheet_range(path: &Path, sheet_name: &str) -> Result<Range<DataType>, ImportError> {
+    let mut workbook: Xlsx<_> = open_workbook(path).expect("Cannot open file");
+
+    match workbook.worksheet_range(sheet_name) {
+        Some(Ok(retrieved_range)) => Ok(retrieved_range),
+        Some(Err(e)) => Err(ImportError::WorkbookOpenError(format!("{:?}", e))),
+        None => Err(ImportError::WorkbookOpenError(String::from(
+            "Couldn't open workbook",
+        ))),
+    }
+}
+
+pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
+    let mut metadata: HashMap<String, String> = HashMap::new();
+
+    let report_name = row.get(0).unwrap().to_string();
+    metadata.insert("report_name".to_string(), report_name);
+
+    let file_name = row.get(1).unwrap().to_string();
+    // let pdf_file_path = path.parent();
+
+    let summary = row.get(2).unwrap().to_string();
+    let active_substances = row.get(3).unwrap().to_string().to_uppercase();
+    let products = row.get(4).unwrap().to_string().to_uppercase();
+    let pl_number = row.get(5).unwrap().to_string();
+    let pbpk_models = row.get(6).unwrap().to_string();
+    let matrices = row.get(7).unwrap().to_string();
+
+    let mut facets = active_substances
+        .split(',')
+        .map(|active_substance| {
+            let active_substance = active_substance.trim();
+            let substance_first_letter = active_substance.chars().next().unwrap();
+            let substance_facet = format!("{}, {}", substance_first_letter, active_substance);
+            return vec![substance_first_letter.to_string(), substance_facet];
+        })
+        .flatten()
+        .collect::<Vec<String>>();
+    facets.sort();
+    facets.dedup();
+    metadata
+}
 
 pub fn import(
     path: &Path,
@@ -15,42 +58,27 @@ pub fn import(
 ) -> Result<(), ImportError> {
     // TODO: Add facets based on active substance - I, Ibuprofen
     // Map to model when reading from
-
-    let mut workbook: Xlsx<_> = open_workbook(path).expect("Cannot open file");
-
-    let mut range: Range<DataType>;
-
-    match workbook.worksheet_range("Sheet 1") {
-        Some(Ok(retrieved_range)) => range = retrieved_range,
-        Some(Err(e)) => return Err(ImportError::WorkbookOpenError(format!("{:?}", e))),
-        None => {
-            return Err(ImportError::WorkbookOpenError(String::from(
-                "Couldn't open workbook",
-            )))
-        }
+    if dryrun {
+        println!("This is a dry run, nothing will be uploaded!");
     }
+    let started = Instant::now();
 
+    let range = get_worksheet_range(path, "Sheet 1")?;
+
+    let progress_bar = ProgressBar::new((range.rows().count() as u64) - 1);
     for (i, row) in range.rows().enumerate() {
         if i == 0 {
             continue;
         }
-        let report_name = row.get(0).unwrap().to_string();
-        let active_substances = row.get(1).unwrap().to_string().to_uppercase();
-        let pl_number = row.get(2).unwrap().to_string();
-        let summary = row.get(3).unwrap().to_string();
-        let mut facets = active_substances
-            .split(',')
-            .map(|active_substance| {
-                let active_substance = active_substance.trim();
-                let substance_first_letter = active_substance.chars().next().unwrap();
-                let substance_facet = format!("{}, {}", substance_first_letter, active_substance);
-                return vec![substance_first_letter.to_string(), substance_facet];
-            })
-            .flatten()
-            .collect::<Vec<String>>();
-        facets.sort();
-        facets.dedup();
+        let data = extract_file_data(row);
+        println!("{:?}", data);
+        progress_bar.inc(1);
     }
+    progress_bar.finish();
+    println!(
+        "Uploading BMGF reports finished in {}",
+        HumanDuration(started.elapsed())
+    );
 
     // for x in 0..range.get_size().0 {
     //     match range.get_value((0, x.into())) {
