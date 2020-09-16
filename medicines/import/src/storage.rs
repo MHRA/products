@@ -1,61 +1,76 @@
-// use azure_sdk_core::{errors::AzureError, prelude::*};
-// use azure_sdk_storage_blob::{
-//     container::{PublicAccess, PublicAccessSupport},
-//     prelude::*,
-// };
-// use azure_sdk_storage_core::prelude::*;
-// use std::collections::HashMap;
-// use tokio_core::reactor::Core;
+use azure_sdk_core::errors::AzureError;
+use azure_sdk_storage_blob::Blob;
+use azure_sdk_storage_core::prelude::*;
 
-// #[allow(clippy::implicit_hasher)]
-// pub fn upload(
-//     blob_name: &str,
-//     client: Box<dyn Client>,
-//     data: &[u8],
-//     metadata: &HashMap<&str, &str>,
-//     verbosity: i8,
-// ) -> Result<(), AzureError> {
-//     let container_name =
-//         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+use std::{
+    collections::HashMap,
+    fs,
+    path::{Path, PathBuf},
+};
 
-//     if verbosity >= 2 {
-//         println!("---------------");
-//         println!("Blob storage name for file is:");
-//         println!("{}", blob_name);
-//         println!("Metadata for file is:");
-//         println!("{:?}", metadata);
-//     }
+#[allow(clippy::implicit_hasher)]
+pub fn upload(
+    client: &Box<dyn Client>,
+    path: &Path,
+    metadata: &HashMap<String, String>,
+    verbosity: i8,
+) -> Result<(), AzureError> {
+    let container_name =
+        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
 
-//     if core
-//         .run(client.list_containers().finalize())?
-//         .incomplete_vector
-//         .iter()
-//         .find(|x| x.name == container_name)
-//         .is_none()
-//     {
-//         core.run(
-//             client
-//                 .create_container()
-//                 .with_container_name(&container_name)
-//                 .with_public_access(PublicAccess::Blob)
-//                 .finalize(),
-//         )?;
-//     }
+    if verbosity >= 2 {
+        println!("Metadata for file is:");
+        println!("{:?}", metadata);
+    }
 
-//     // calculate md5 too!
-//     let digest = md5::compute(&data[..]);
-//     let future = client
-//         .put_block_blob()
-//         .with_container_name(&container_name)
-//         .with_blob_name(&blob_name)
-//         .with_content_type("application/pdf")
-//         .with_metadata(metadata)
-//         .with_body(&data[..])
-//         .with_content_md5(&digest[..])
-//         .finalize();
+    let report_name = metadata.get("report_name").unwrap();
+    let report_dir = format!("{:?}/{}/", path.parent().unwrap(), &report_name,);
+    let pdf_file_name = format!("{}.pdf", metadata.get("file_name").unwrap());
+    let pdf_file_path = format!("{}{}", &report_dir, &pdf_file_name,);
+    let pdf_file = fs::read(pdf_file_path)?;
+    let pdf_file_digest = md5::compute(&pdf_file[..]);
+    let pdf_file_storage_name = format!("{}/{}", &report_name, &pdf_file_name);
 
-//     core.run(future)?;
+    let html_file_name = format!("{}.html", metadata.get("file_name").unwrap());
+    let html_file_path = format!("{}{}.html", &report_dir, &html_file_name,);
+    let html_file = fs::read(html_file_path)?;
+    let html_file_storage_name = format!("{}/{}", &report_name, &html_file_name);
 
-//     trace!("created {:?}", blob_name);
-//     Ok(())
-// }
+    let html_assets_dir = format!("{}{}.fld", &report_dir, metadata.get("file_name").unwrap(),);
+
+    let report_images = fs::read_dir(html_assets_dir)?
+        .filter_map(Result::ok)
+        .filter(|entry| entry.path().extension().unwrap_or_default() == "jpg")
+        .filter_map(|entry| {
+            if let Ok(file) = fs::read(entry.path()) {
+                return Some(file);
+            }
+            None
+        })
+        .collect::<Vec<Vec<u8>>>();
+
+    client
+        .put_block_blob()
+        .with_container_name(&container_name)
+        .with_blob_name(&pdf_file_storage_name)
+        .with_content_type("application/pdf")
+        .with_metadata(&metadata)
+        .with_body(pdf_file)
+        .with_content_md5(&pdf_file_digest[..])
+        .finalize()
+        .await?;
+    // calculate md5 too!
+    // let digest = md5::compute(&data[..]);
+    // let future = client
+    //     .put_block_blob()
+    //     .with_container_name(&container_name)
+    //     .with_blob_name(&blob_name)
+    //     .with_content_type("application/pdf")
+    //     .with_metadata(metadata)
+    //     .with_body(&data[..])
+    //     .with_content_md5(&digest[..])
+    //     .finalize();
+
+    // trace!("created {:?}", pdf_file_path);
+    Ok(())
+}

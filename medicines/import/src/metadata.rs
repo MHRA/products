@@ -31,7 +31,10 @@ pub fn create_facets_by_active_substance(active_substances: Vec<String>) -> Vec<
     let mut facets: Vec<String> = active_substances
         .iter()
         .map(|a| {
-            let first = a.chars().next().unwrap();
+            let first = a
+                .chars()
+                .next()
+                .expect("Active substance was found empty when trying to get first character");
             vec![
                 first.to_string(),
                 [first.to_string(), a.to_string()].join(", "),

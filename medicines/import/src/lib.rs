@@ -9,3 +9,4 @@ pub mod bmgf;
 mod date_de;
 mod metadata;
 pub mod model;
+mod storage;
