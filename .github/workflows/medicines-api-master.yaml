@@ -8,6 +8,7 @@ on:
       - medicines/api/**
       - medicines/search-client/**
       - .github/workflows/medicines-api-master.yaml
+      - .github/workflows/medicines-api-release.yaml
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
