@@ -878,6 +878,7 @@ dependencies = [
  "serde_json",
  "sha1",
  "tantivy",
+ "thiserror",
  "tokio-core",
 ]
 

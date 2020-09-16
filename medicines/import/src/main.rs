@@ -5,11 +5,11 @@ use azure_sdk_core::errors::AzureError;
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
-use import::bmgf;
+use import::{bmgf, model::ImportError};
 use std::path::Path;
 use tokio_core::reactor::Core;
 
-fn main() -> Result<(), AzureError> {
+fn main() -> Result<(), ImportError> {
     let yaml = load_yaml!("cli.yaml");
     let matches = App::from_yaml(yaml).get_matches();
     let verbosity: i8;
@@ -25,8 +25,8 @@ fn main() -> Result<(), AzureError> {
                 .value_of("directory")
                 .expect("yaml is incorrect: directory should be a required arg");
             let client = initialize()?;
-            let dir = Path::new(&path);
-            bmgf::import(dir, client, verbosity, dryrun)?
+            let path = Path::new(&path);
+            bmgf::import(path, client, verbosity, dryrun)?
         }
         _ => println!("command did not match available commands."),
     }

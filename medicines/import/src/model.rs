@@ -1,10 +1,20 @@
+use azure_sdk_core::errors::AzureError;
 use chrono::{DateTime, Utc};
+use thiserror::Error;
 
 #[derive(Debug)]
 pub enum DocType {
     Par,
     Pil,
     Spc,
+}
+
+#[derive(Error, Debug)]
+pub enum ImportError {
+    #[error(transparent)]
+    AzureError(#[from] AzureError),
+    #[error("Could not open worksheet: {0}")]
+    WorkbookOpenError(String),
 }
 
 #[derive(Debug, Deserialize, Clone)]
