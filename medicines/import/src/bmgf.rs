@@ -106,7 +106,7 @@ pub async fn import(
             continue;
         }
         let metadata = extract_file_data(row);
-        let _ = storage::upload(&client, path, &metadata.into(), verbosity).await?;
+        let _ = storage::upload_report(&client, path, &metadata, verbosity).await?;
         progress_bar.inc(1);
     }
     progress_bar.finish();

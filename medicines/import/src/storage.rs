@@ -6,13 +6,9 @@ use azure_sdk_core::{
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 
-use std::{
-    collections::HashMap,
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, fs, path::Path};
 
-pub async fn upload(
+pub async fn upload_report(
     client: &Box<dyn Client>,
     path: &Path,
     metadata: &HashMap<String, String>,
@@ -26,65 +22,97 @@ pub async fn upload(
         println!("{:?}", metadata);
     }
 
+    let metadata_empty = HashMap::new();
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
     for (key, val) in metadata {
         metadata_ref.insert(&key, &val);
     }
 
     let report_name = metadata.get("report_name").unwrap();
-    let report_dir = format!(
+    let file_name = metadata.get("file_name").unwrap();
+    let reports_dir = format!(
         "{}/{}/",
         path.parent().unwrap().to_str().unwrap(),
         &report_name,
     );
 
-    let pdf_file_name = format!("{}.pdf", metadata.get("file_name").unwrap());
-    let pdf_file_path = format!("{}{}", &report_dir, &pdf_file_name,);
-    println!("PDF FILE PATH: {}", &pdf_file_path);
-    let pdf_file = fs::read(pdf_file_path)?;
-    let pdf_file_digest = md5::compute(&pdf_file[..]);
-    let pdf_file_storage_name = format!("{}/{}", &report_name, &pdf_file_name);
+    let pdf_file_name = format!("{}.pdf", &file_name);
+    let _ = upload_file(
+        &pdf_file_name,
+        &"application/pdf",
+        &report_name,
+        &reports_dir,
+        &"",
+        &metadata_ref,
+        client,
+        &container_name,
+    )
+    .await?;
 
-    let html_file_name = format!("{}.html", metadata.get("file_name").unwrap());
-    let html_file_path = format!("{}{}", &report_dir, &html_file_name,);
-    println!("HTML FILE PATH: {}", &html_file_path);
-    let html_file = fs::read(html_file_path)?;
-    let html_file_storage_name = format!("{}/{}", &report_name, &html_file_name);
+    let html_file_name = format!("{}.html", &file_name);
+    let _ = upload_file(
+        &html_file_name,
+        &"text/html",
+        &report_name,
+        &reports_dir,
+        &"",
+        &metadata_empty,
+        client,
+        &container_name,
+    )
+    .await?;
 
-    let html_assets_dir = format!("{}{}.fld", &report_dir, metadata.get("file_name").unwrap(),);
-
-    let report_images = fs::read_dir(html_assets_dir)?
+    let html_assets_dir = format!("{}{}.fld/", &reports_dir, &file_name,);
+    let report_images = fs::read_dir(&html_assets_dir)?
         .filter_map(Result::ok)
         .filter(|entry| entry.path().extension().unwrap_or_default() == "jpg")
-        .filter_map(|entry| {
-            if let Ok(file) = fs::read(entry.path()) {
-                return Some(file);
-            }
-            None
-        })
-        .collect::<Vec<Vec<u8>>>();
+        .collect::<Vec<fs::DirEntry>>();
+
+    for image in report_images {
+        println!("{}", image.path().file_name().unwrap().to_str().unwrap());
+        upload_file(
+            image.path().file_name().unwrap().to_str().unwrap(),
+            &"image/jpeg",
+            &report_name,
+            &html_assets_dir,
+            &"assets/",
+            &metadata_empty,
+            &client,
+            &container_name,
+        )
+        .await?;
+    }
+
+    trace!("created {}", report_name);
+    Ok(())
+}
+
+pub async fn upload_file(
+    file_name: &str,
+    content_type: &str,
+    report_name: &str,
+    local_dir_path: &str,
+    azure_storage_prefix: &str,
+    metadata: &HashMap<&str, &str>,
+    client: &Box<dyn Client>,
+    container_name: &str,
+) -> Result<(), AzureError> {
+    let local_file_path = format!("{}{}", &local_dir_path, &file_name,);
+    let file_contents = fs::read(local_file_path)?;
+    let file_digest = md5::compute(&file_contents[..]);
+    let file_azure_storage_name =
+        format!("{}/{}{}", &report_name, &azure_storage_prefix, &file_name);
 
     client
         .put_block_blob()
         .with_container_name(&container_name)
-        .with_blob_name(&pdf_file_storage_name)
-        .with_content_type("application/pdf")
-        .with_metadata(&metadata_ref)
-        .with_body(&pdf_file)
-        .with_content_md5(&pdf_file_digest[..])
+        .with_blob_name(&file_azure_storage_name)
+        .with_content_type(content_type)
+        .with_metadata(&metadata)
+        .with_body(&file_contents)
+        .with_content_md5(&file_digest[..])
         .finalize()
         .await?;
-    // calculate md5 too!
-    // let digest = md5::compute(&data[..]);
-    // let future = client
-    //     .put_block_blob()
-    //     .with_container_name(&container_name)
-    //     .with_blob_name(&blob_name)
-    //     .with_content_type("application/pdf")
-    //     .with_metadata(metadata)
-    //     .with_body(&data[..])
-    //     .with_content_md5(&digest[..])
-    //     .finalize();
 
     // trace!("created {:?}", pdf_file_path);
     Ok(())
