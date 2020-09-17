@@ -2,7 +2,7 @@ extern crate rand;
 
 use std::env;
 
-pub const API_ADMIN_KEY: &str = "API_ADMIN_KEY";
+pub const SEARCH_API_ADMIN_KEY: &str = "SEARCH_API_ADMIN_KEY";
 pub const DATASOURCE_NAME: &str = "DATASOURCE_NAME";
 pub const INDEX_NAME: &str = "INDEX_NAME";
 pub const INDEXER_NAME: &str = "INDEXER_NAME";

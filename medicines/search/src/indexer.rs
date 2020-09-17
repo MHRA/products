@@ -1,16 +1,24 @@
 use crate::{
     azure_rest,
-    env::{get_from_env, API_ADMIN_KEY, DATASOURCE_NAME, INDEXER_NAME, INDEX_NAME, SEARCH_SERVICE},
+    env::{
+        get_from_env, DATASOURCE_NAME, INDEXER_NAME, INDEX_NAME, SEARCH_API_ADMIN_KEY,
+        SEARCH_SERVICE,
+    },
 };
 
-pub async fn create_indexer() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+pub async fn create_indexer(indexer_definition: &str) -> Result<(), reqwest::Error> {
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
     let index_name = get_from_env(INDEX_NAME);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
+    let raw_indexer_definition;
+    match indexer_definition {
+        "bmgf" => raw_indexer_definition = get_bmgf_raw_indexer_definition(),
+        _ => raw_indexer_definition = get_default_raw_indexer_definition(),
+    }
     let indexer_definition = get_indexer_definition(
-        get_raw_indexer_definition(),
+        raw_indexer_definition,
         &datasource_name,
         &index_name,
         &indexer_name,
@@ -21,7 +29,7 @@ pub async fn create_indexer() -> Result<(), reqwest::Error> {
 }
 
 pub async fn delete_indexer() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &indexer_name);
@@ -30,7 +38,7 @@ pub async fn delete_indexer() -> Result<(), reqwest::Error> {
 }
 
 pub async fn run_indexer() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_run_url(&search_service, &indexer_name);
@@ -39,7 +47,7 @@ pub async fn run_indexer() -> Result<(), reqwest::Error> {
 }
 
 pub async fn reset_indexer() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let indexer_name = get_from_env(INDEXER_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_reset_url(&search_service, &indexer_name);
@@ -47,8 +55,12 @@ pub async fn reset_indexer() -> Result<(), reqwest::Error> {
     azure_rest::make_post_request(&url, &api_key).await
 }
 
-fn get_raw_indexer_definition() -> String {
+fn get_default_raw_indexer_definition() -> String {
     include_str!("../definitions/indexers/default.json").to_string()
+}
+
+fn get_bmgf_raw_indexer_definition() -> String {
+    include_str!("../definitions/indexers/bmgf.json").to_string()
 }
 
 fn get_indexer_definition(

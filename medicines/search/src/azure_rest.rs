@@ -4,6 +4,8 @@ pub async fn make_post_request_with_body(
     api_key: &str,
 ) -> Result<(), reqwest::Error> {
     let client = reqwest::Client::new();
+    println!("{}", url);
+    println!("{}", definition);
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
