@@ -15,7 +15,7 @@ use std::{
 pub async fn upload(
     client: &Box<dyn Client>,
     path: &Path,
-    metadata: &HashMap<&str, &str>,
+    metadata: &HashMap<String, String>,
     verbosity: i8,
 ) -> Result<(), AzureError> {
     let container_name =
@@ -26,16 +26,28 @@ pub async fn upload(
         println!("{:?}", metadata);
     }
 
+    let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
+    for (key, val) in metadata {
+        metadata_ref.insert(&key, &val);
+    }
+
     let report_name = metadata.get("report_name").unwrap();
-    let report_dir = format!("{:?}/{}/", path.parent().unwrap(), &report_name,);
+    let report_dir = format!(
+        "{}/{}/",
+        path.parent().unwrap().to_str().unwrap(),
+        &report_name,
+    );
+
     let pdf_file_name = format!("{}.pdf", metadata.get("file_name").unwrap());
     let pdf_file_path = format!("{}{}", &report_dir, &pdf_file_name,);
+    println!("PDF FILE PATH: {}", &pdf_file_path);
     let pdf_file = fs::read(pdf_file_path)?;
     let pdf_file_digest = md5::compute(&pdf_file[..]);
     let pdf_file_storage_name = format!("{}/{}", &report_name, &pdf_file_name);
 
     let html_file_name = format!("{}.html", metadata.get("file_name").unwrap());
-    let html_file_path = format!("{}{}.html", &report_dir, &html_file_name,);
+    let html_file_path = format!("{}{}", &report_dir, &html_file_name,);
+    println!("HTML FILE PATH: {}", &html_file_path);
     let html_file = fs::read(html_file_path)?;
     let html_file_storage_name = format!("{}/{}", &report_name, &html_file_name);
 
@@ -57,8 +69,8 @@ pub async fn upload(
         .with_container_name(&container_name)
         .with_blob_name(&pdf_file_storage_name)
         .with_content_type("application/pdf")
-        .with_metadata(metadata)
-        .with_body(pdf_file)
+        .with_metadata(&metadata_ref)
+        .with_body(&pdf_file)
         .with_content_md5(&pdf_file_digest[..])
         .finalize()
         .await?;
