@@ -10,8 +10,6 @@ pub async fn import(
     verbosity: i8,
     dry_run: bool,
 ) -> Result<(), ImportError> {
-    // TODO: Add facets based on active substance - I, Ibuprofen
-    // Map to model when reading from
     if dry_run {
         println!("This is a dry run, nothing will be uploaded!");
     }
@@ -21,12 +19,9 @@ pub async fn import(
 
     let progress_bar = ProgressBar::new((range.rows().count() as u64) - 1);
 
-    let mut uploaded_reports: Vec<Vec<u8>> = vec![];
+    let mut uploaded_html_files: Vec<Vec<u8>> = vec![];
 
-    for (i, row) in range.rows().enumerate() {
-        if i == 0 {
-            continue;
-        }
+    for row in range.rows().skip(1) {
         let metadata = extract_file_data(row);
         match storage::upload_report(&client, path, &metadata, verbosity, dry_run).await {
             Ok(()) => {
@@ -35,15 +30,15 @@ pub async fn import(
                     metadata.get("report_name").unwrap(),
                     metadata.get("file_name").unwrap()
                 );
-                uploaded_reports.push(azure_html_path.as_bytes().to_owned());
+                uploaded_html_files.push(azure_html_path.as_bytes().to_owned());
             }
             Err(e) => eprint!("Error uploading report: {}", e.to_string()),
         }
         progress_bar.inc(1);
     }
 
-    let index_file: Vec<u8> = uploaded_reports.into_iter().flatten().collect();
-    let _ = storage::upload_index_file(&index_file, &client, dry_run).await?;
+    let uploaded_html_files_index: Vec<u8> = uploaded_html_files.into_iter().flatten().collect();
+    let _ = storage::upload_index_file(&uploaded_html_files_index, &client, dry_run).await?;
     progress_bar.finish();
 
     println!(
@@ -56,7 +51,7 @@ pub async fn import(
 
 pub fn get_worksheet_range(path: &Path, sheet_name: &str) -> Result<Range<DataType>, ImportError> {
     let mut workbook: Xlsx<_> =
-        open_workbook(path).expect(&format!("Cannot open file: {:?}", path));
+        open_workbook(path).expect("Cannot find Excel worksheet - please check -d argument");
 
     match workbook.worksheet_range(sheet_name) {
         Some(Ok(retrieved_range)) => Ok(retrieved_range),
@@ -142,7 +137,6 @@ mod test {
 
     #[test]
     fn extract_data_from_row() {
-        // let range: [DataType] = [];
         let report_name = DataType::String(String::from("Example report"));
         let file_name = DataType::String(String::from("Example file name"));
         let summary = DataType::String(String::from("An example summary"));
