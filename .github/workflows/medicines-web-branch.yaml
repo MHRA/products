@@ -22,6 +22,7 @@ env:
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://does-not-matter/this-gets-mocked
   USE_GRAPHQL: true
+  SHOW_BMGF: true
 
 jobs:
   build:

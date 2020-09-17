@@ -16,7 +16,7 @@ module.exports = {
     GRAPHQL_URL: process.env.GRAPHQL_URL,
     USE_GRAPHQL: process.env.USE_GRAPHQL,
   },
-  webpack: config => {
+  webpack: (config) => {
     config.module.rules.push({
       test: /\.(md)$/,
       use: [
