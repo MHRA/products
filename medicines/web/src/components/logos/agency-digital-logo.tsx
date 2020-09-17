@@ -10,7 +10,7 @@ const SvgAgencyDigitalLogo = (props: React.SVGProps<SVGSVGElement>) => (
     role="img"
     {...props}
   >
-    <title>Agency Logo</title>
+    <title>Medicines and Healthcare products Regulatory Agency</title>
     <style>{'.agency-digital-logo_svg__st1{fill:#1d1d1b}'}</style>
     <path fill="#00a297" d="M0 0h4.2v175.3H0z" />
     <path

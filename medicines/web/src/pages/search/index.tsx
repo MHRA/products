@@ -61,7 +61,7 @@ const graphQlSearchPageLoader = async ({
   return searchResults.load({ searchTerm, page, pageSize, docTypes });
 };
 
-const App: NextPage = props => {
+const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
@@ -173,6 +173,7 @@ const App: NextPage = props => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | Search"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

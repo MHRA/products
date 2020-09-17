@@ -31,6 +31,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Cookie Policy"
+      metaTitle="Products | Cookie Policy"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

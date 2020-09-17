@@ -30,6 +30,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Accessibility Statement"
+      metaTitle="Products | Accessibility Statement"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
