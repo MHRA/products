@@ -1,6 +1,5 @@
 use regex::Regex;
 use std::str;
-use tantivy::tokenizer::*;
 
 pub fn sanitize(s: &str) -> String {
     s.replace(|c: char| !c.is_ascii(), "")

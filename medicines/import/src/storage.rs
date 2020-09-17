@@ -1,11 +1,10 @@
-use azure_sdk_core::errors::AzureError;
+use crate::model::ImportError;
 use azure_sdk_core::{
     BlobNameSupport, BodySupport, ContainerNameSupport, ContentMD5Support, ContentTypeSupport,
     MetadataSupport,
 };
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
-
 use std::{collections::HashMap, fs, path::Path};
 
 pub async fn upload_report(
@@ -13,7 +12,8 @@ pub async fn upload_report(
     path: &Path,
     metadata: &HashMap<String, String>,
     verbosity: i8,
-) -> Result<(), AzureError> {
+    dry_run: bool,
+) -> Result<(), ImportError> {
     let container_name =
         std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
 
@@ -22,15 +22,16 @@ pub async fn upload_report(
         println!("{:?}", metadata);
     }
 
-    let metadata_empty = HashMap::new();
+    let empty_metadata = HashMap::new();
     let mut metadata_ref: HashMap<&str, &str> = HashMap::new();
     for (key, val) in metadata {
         metadata_ref.insert(&key, &val);
     }
 
-    let report_name = metadata.get("report_name").unwrap();
     let file_name = metadata.get("file_name").unwrap();
-    let reports_dir = format!(
+
+    let report_name = metadata.get("report_name").unwrap();
+    let report_dir = format!(
         "{}/{}/",
         path.parent().unwrap().to_str().unwrap(),
         &report_name,
@@ -41,11 +42,12 @@ pub async fn upload_report(
         &pdf_file_name,
         &"application/pdf",
         &report_name,
-        &reports_dir,
+        &report_dir,
         &"",
         &metadata_ref,
         client,
         &container_name,
+        dry_run,
     )
     .await?;
 
@@ -54,31 +56,33 @@ pub async fn upload_report(
         &html_file_name,
         &"text/html",
         &report_name,
-        &reports_dir,
+        &report_dir,
         &"",
-        &metadata_empty,
+        &empty_metadata,
         client,
         &container_name,
+        dry_run,
     )
     .await?;
 
-    let html_assets_dir = format!("{}{}.fld/", &reports_dir, &file_name,);
-    let report_images = fs::read_dir(&html_assets_dir)?
+    let html_assets_dir = format!("{}{}.fld/", &report_dir, &file_name,);
+    let report_images = fs::read_dir(&html_assets_dir)
+        .map_err(|e| ImportError::FileOpenError(e.to_string()))?
         .filter_map(Result::ok)
         .filter(|entry| entry.path().extension().unwrap_or_default() == "jpg")
         .collect::<Vec<fs::DirEntry>>();
 
     for image in report_images {
-        println!("{}", image.path().file_name().unwrap().to_str().unwrap());
         upload_file(
             image.path().file_name().unwrap().to_str().unwrap(),
             &"image/jpeg",
             &report_name,
             &html_assets_dir,
             &"assets/",
-            &metadata_empty,
+            &empty_metadata,
             &client,
             &container_name,
+            dry_run,
         )
         .await?;
     }
@@ -87,7 +91,7 @@ pub async fn upload_report(
     Ok(())
 }
 
-pub async fn upload_file(
+async fn upload_file(
     file_name: &str,
     content_type: &str,
     report_name: &str,
@@ -96,12 +100,18 @@ pub async fn upload_file(
     metadata: &HashMap<&str, &str>,
     client: &Box<dyn Client>,
     container_name: &str,
-) -> Result<(), AzureError> {
+    dry_run: bool,
+) -> Result<(), ImportError> {
     let local_file_path = format!("{}{}", &local_dir_path, &file_name,);
-    let file_contents = fs::read(local_file_path)?;
+    let file_contents =
+        fs::read(local_file_path).map_err(|e| ImportError::FileOpenError(e.to_string()))?;
     let file_digest = md5::compute(&file_contents[..]);
     let file_azure_storage_name =
         format!("{}/{}{}", &report_name, &azure_storage_prefix, &file_name);
+
+    if dry_run {
+        return Ok(());
+    }
 
     client
         .put_block_blob()
@@ -112,8 +122,35 @@ pub async fn upload_file(
         .with_body(&file_contents)
         .with_content_md5(&file_digest[..])
         .finalize()
-        .await?;
+        .await
+        .map_err(ImportError::AzureError)?;
 
-    // trace!("created {:?}", pdf_file_path);
+    Ok(())
+}
+
+pub async fn upload_index_file(
+    file_contents: &[u8],
+    client: &Box<dyn Client>,
+    dry_run: bool,
+) -> Result<(), ImportError> {
+    let container_name =
+        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
+    let file_digest = md5::compute(&file_contents[..]);
+
+    if dry_run {
+        return Ok(());
+    }
+
+    client
+        .put_block_blob()
+        .with_container_name(&container_name)
+        .with_blob_name(&"upload-index.txt")
+        .with_content_type("text/text")
+        .with_body(file_contents)
+        .with_content_md5(&file_digest[..])
+        .finalize()
+        .await
+        .map_err(ImportError::AzureError)?;
+
     Ok(())
 }

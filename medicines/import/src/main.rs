@@ -2,7 +2,6 @@
 extern crate clap;
 
 use azure_sdk_core::errors::AzureError;
-use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 use clap::App;
 use import::{bmgf, model::ImportError};
