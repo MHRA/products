@@ -7,9 +7,9 @@ use azure_sdk_storage_core::prelude::*;
 use clap::App;
 use import::{bmgf, model::ImportError};
 use std::path::Path;
-use tokio_core::reactor::Core;
 
-fn main() -> Result<(), ImportError> {
+#[tokio::main]
+async fn main() -> Result<(), ImportError> {
     let yaml = load_yaml!("cli.yaml");
     let matches = App::from_yaml(yaml).get_matches();
     let verbosity: i8;
@@ -26,7 +26,7 @@ fn main() -> Result<(), ImportError> {
                 .expect("yaml is incorrect: directory should be a required arg");
             let client = initialize()?;
             let path = Path::new(&path);
-            bmgf::import(path, client, verbosity, dryrun)?
+            bmgf::import(path, client, verbosity, dryrun).await?
         }
         _ => println!("command did not match available commands."),
     }

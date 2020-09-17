@@ -1,4 +1,8 @@
 use azure_sdk_core::errors::AzureError;
+use azure_sdk_core::{
+    BlobNameSupport, BodySupport, ContainerNameSupport, ContentMD5Support, ContentTypeSupport,
+    MetadataSupport,
+};
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 
@@ -8,11 +12,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[allow(clippy::implicit_hasher)]
-pub fn upload(
+pub async fn upload(
     client: &Box<dyn Client>,
     path: &Path,
-    metadata: &HashMap<String, String>,
+    metadata: &HashMap<&str, &str>,
     verbosity: i8,
 ) -> Result<(), AzureError> {
     let container_name =
@@ -54,7 +57,7 @@ pub fn upload(
         .with_container_name(&container_name)
         .with_blob_name(&pdf_file_storage_name)
         .with_content_type("application/pdf")
-        .with_metadata(&metadata)
+        .with_metadata(metadata)
         .with_body(pdf_file)
         .with_content_md5(&pdf_file_digest[..])
         .finalize()

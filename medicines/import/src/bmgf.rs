@@ -1,11 +1,8 @@
 use crate::{metadata, model::ImportError, storage};
-use azure_sdk_core::errors::AzureError;
-use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
 use calamine::{open_workbook, DataType, Range, Reader, Xlsx};
 use indicatif::{HumanDuration, ProgressBar};
 use std::{collections::HashMap, fs, path::Path, str, time::Instant};
-use tokio_core::reactor::Core;
 
 pub fn get_worksheet_range(path: &Path, sheet_name: &str) -> Result<Range<DataType>, ImportError> {
     let mut workbook: Xlsx<_> =
@@ -88,7 +85,7 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
     metadata
 }
 
-pub fn import(
+pub async fn import(
     path: &Path,
     client: Box<dyn Client>,
     verbosity: i8,
@@ -109,7 +106,7 @@ pub fn import(
             continue;
         }
         let metadata = extract_file_data(row);
-        let _ = storage::upload(&client, path, &metadata, verbosity);
+        let _ = storage::upload(&client, path, &metadata.into(), verbosity).await?;
         progress_bar.inc(1);
     }
     progress_bar.finish();
