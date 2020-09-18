@@ -164,8 +164,6 @@ export const docSearch = async (
 export const bmgfDocSearch = async (
   query: ISearchQuery,
 ): Promise<IBmgfSearchResults> => {
-  console.log('SEARCH INDEX: ');
-  console.log(bmgfSearchIndex);
   const body = await getJson(
     buildSearchUrl(
       buildFuzzyQuery(query.query),

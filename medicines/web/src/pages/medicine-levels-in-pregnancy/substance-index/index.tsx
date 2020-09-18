@@ -2,16 +2,19 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import DrugIndex, { IndexType } from '../../components/drug-index/index';
-import Page from '../../components/page';
-import SearchWrapper from '../../components/search-wrapper';
-import { SubstanceListStructuredData } from '../../components/structured-data';
-import { useLocalStorage } from '../../hooks';
-import { ISubstance } from '../../model/substance';
-import Events from '../../services/events';
+import DrugIndex, {
+  IndexType,
+} from '../../../components/bmgf/drug-index/index';
+import Page from '../../../components/page';
+import SearchWrapper from '../../../components/bmgf/search-wrapper';
+import { SubstanceListStructuredData } from '../../../components/structured-data';
+import { useLocalStorage } from '../../../hooks';
+import { ISubstance } from '../../../model/substance';
+import Events from '../../../services/events';
 import substanceLoader, {
+  bmgfSubstanceLoader,
   graphqlSubstanceLoader,
-} from '../../services/substance-loader';
+} from '../../../services/substance-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -34,7 +37,7 @@ const App: NextPage = () => {
     (async () => {
       const index = queryQS.toString();
 
-      const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
+      const loader = useGraphQl ? graphqlSubstanceLoader : bmgfSubstanceLoader;
 
       setResults(await loader.load(index));
       setSubstanceIndex(index);
