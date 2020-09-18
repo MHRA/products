@@ -204,7 +204,7 @@ const createFilter = (filters: ISearchFilters) => {
   }
   if (filters.substanceName) {
     filterParams.push(
-      `substance_name/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
+      `active_substances/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
     );
   }
   if (filters.productName) {
