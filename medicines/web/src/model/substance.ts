@@ -25,3 +25,17 @@ export interface IDocument {
   product: string;
   url: string;
 }
+
+export interface IBmgfDocument {
+  activeSubstances: string[];
+  context: string;
+  fileName: string;
+  fileSize: string;
+  fileUrl: string;
+  title: string;
+  products: string[];
+  matrices: string[];
+  pbpkModels: string[];
+  summary: string;
+  url: string;
+}

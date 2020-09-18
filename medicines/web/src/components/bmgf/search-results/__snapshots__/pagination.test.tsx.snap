@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pagination should render 1`] = `
+<styled.nav>
+  <nav
+    aria-label="Pagination Navigation"
+    role="navigation"
+  >
+    <ul
+      className="pagination"
+    >
+      <li
+        aria-label="Goto previous page, Page 1"
+        className="arrow"
+        onClick={[Function]}
+      >
+        <span
+          className="link-text"
+        >
+          Previous
+        </span>
+      </li>
+      <div
+        className="pagination-number"
+      >
+        <li
+          aria-label="Goto Page 1"
+          key="1"
+          onClick={[Function]}
+        >
+          <span
+            className="link-text"
+          >
+            1
+          </span>
+          <span>
+            –
+          </span>
+        </li>
+        <li
+          aria-current="true"
+          aria-label="Current Page, Page 2"
+          key="2"
+        >
+          2
+          <span>
+            –
+          </span>
+        </li>
+        <li
+          aria-label="Goto Page 3"
+          key="3"
+          onClick={[Function]}
+        >
+          <span
+            className="link-text"
+          >
+            3
+          </span>
+        </li>
+        <div
+          className="middle-group"
+        />
+        <li>
+          …
+        </li>
+        <li
+          aria-label="Goto Page 6"
+          key="6"
+          onClick={[Function]}
+        >
+          <span
+            className="link-text"
+          >
+            6
+          </span>
+        </li>
+      </div>
+      <li
+        aria-label="Goto next page, Page 3"
+        className="arrow"
+        onClick={[Function]}
+      >
+        <span
+          className="link-text"
+        >
+          Next
+        </span>
+      </li>
+    </ul>
+  </nav>
+</styled.nav>
+`;
