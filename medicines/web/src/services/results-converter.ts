@@ -46,6 +46,6 @@ export const convertBmgfResults = (doc: IBmgfSearchResult): IBmgfDocument => {
     fileSize: Math.ceil(
       (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
     ).toLocaleString('en-GB'),
-    url: doc.metadata_storage_path.replace('.pdf', '.html'),
+    url: `/medicine-levels-in-pregnancy/reports/${doc.report_name}`,
   };
 };
