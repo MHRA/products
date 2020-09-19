@@ -1,17 +1,13 @@
 use crate::{
     azure_context::AzureContext,
-    products::document::{get_documents, Documents},
-    products::product::{
+    document::{get_documents, Documents},
+    product::{
         get_product, get_products_index, get_substance_with_products, Product, ProductIndex,
     },
-    products::substance::{get_substances_index, Substance, SubstanceIndex},
+    substance::{get_substances_index, Substance, SubstanceIndex},
 };
 use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
-
-mod document;
-mod product;
-mod substance;
 
 pub struct Products {
     substance: Option<Substance>,
@@ -43,7 +39,7 @@ impl Products {
     ) -> FieldResult<Substance> {
         let context = context.data::<AzureContext>()?;
         match name {
-            Some(name) => get_substance_with_products(&name, &context.client)
+            Some(name) => get_substance_with_products(&name, &context.products_client)
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
@@ -70,7 +66,7 @@ impl Products {
         letter: String,
     ) -> FieldResult<Vec<SubstanceIndex>> {
         let context = context.data::<AzureContext>()?;
-        get_substances_index(&context.client, letter.chars().next().unwrap())
+        get_substances_index(&context.products_client, letter.chars().next().unwrap())
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
@@ -85,7 +81,7 @@ impl Products {
         substance: String,
     ) -> FieldResult<Vec<ProductIndex>> {
         let context = context.data::<AzureContext>()?;
-        get_products_index(&context.client, &substance)
+        get_products_index(&context.products_client, &substance)
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
@@ -107,7 +103,7 @@ impl Products {
         let offset = get_offset_or_default(skip, after, 0);
 
         get_documents(
-            &context.client,
+            &context.products_client,
             search.as_deref().unwrap_or(" "),
             first,
             offset,

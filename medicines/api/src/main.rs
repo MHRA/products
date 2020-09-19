@@ -15,9 +15,12 @@ use warp::{
 };
 
 mod azure_context;
+mod document;
 mod pagination;
-pub mod products;
+mod product;
+mod products_query_root;
 mod schema;
+mod substance;
 
 const PORT: u16 = 8000;
 
