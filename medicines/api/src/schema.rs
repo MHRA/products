@@ -1,6 +1,6 @@
 use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
 
-use crate::{azure_context::AzureContext, products_query_root::Products};
+use crate::{azure_context::AzureContext, query_objects::products::products_query_root::Products};
 use search_client::models::DocumentType;
 
 pub struct QueryRoot;

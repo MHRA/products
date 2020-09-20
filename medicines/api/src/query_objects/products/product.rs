@@ -1,4 +1,4 @@
-use crate::{
+use crate::query_objects::products::{
     document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
     substance::Substance,
 };

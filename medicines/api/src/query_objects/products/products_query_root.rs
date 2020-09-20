@@ -1,10 +1,12 @@
 use crate::{
     azure_context::AzureContext,
-    document::{get_documents, Documents},
-    product::{
-        get_product, get_products_index, get_substance_with_products, Product, ProductIndex,
+    query_objects::products::{
+        document::{get_documents, Documents},
+        product::{
+            get_product, get_products_index, get_substance_with_products, Product, ProductIndex,
+        },
+        substance::{get_substances_index, Substance, SubstanceIndex},
     },
-    substance::{get_substances_index, Substance, SubstanceIndex},
 };
 use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
@@ -12,8 +14,8 @@ use search_client::models::DocumentType;
 pub struct Products {
     substance: Option<Substance>,
     product: Option<Product>,
-    substancesIndex: Option<Vec<SubstanceIndex>>,
-    productsIndex: Option<Vec<ProductIndex>>,
+    substances_index: Option<Vec<SubstanceIndex>>,
+    products_index: Option<Vec<ProductIndex>>,
     documents: Option<Documents>,
 }
 
@@ -22,8 +24,8 @@ impl Products {
         Self {
             substance: None,
             product: None,
-            substancesIndex: None,
-            productsIndex: None,
+            substances_index: None,
+            products_index: None,
             documents: None,
         }
     }
