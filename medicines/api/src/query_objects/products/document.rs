@@ -1,7 +1,7 @@
 use crate::{pagination, pagination::PageInfo};
 use async_graphql::SimpleObject;
 use search_client::{
-    models::{DocumentType, IndexResult},
+    models::{DocumentType, IndexResult, IndexResults},
     Search,
 };
 
@@ -107,7 +107,7 @@ pub async fn get_documents(
     let result_count = first.unwrap_or(10);
 
     let azure_result = client
-        .search_with_pagination_and_filter(
+        .search_with_pagination_and_filter::<IndexResults>(
             &search,
             search_client::AzurePagination {
                 result_count,
@@ -173,6 +173,7 @@ mod test {
     use super::*;
     use async_trait::async_trait;
     use search_client::models::{FacetResults, IndexResults};
+    use serde::de::DeserializeOwned;
     use test_case::test_case;
     use tokio_test::block_on;
 
@@ -188,24 +189,30 @@ mod test {
 
     #[async_trait]
     impl Search for TestAzureSearchClient {
-        async fn search(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        async fn search<T>(&self, _search_term: &str) -> Result<T, reqwest::Error> {
             unimplemented!()
         }
-        async fn search_with_pagination(
+        async fn search_with_pagination<T>(
             &self,
             _search_term: &str,
             _pagination: search_client::AzurePagination,
             _include_count: bool,
-        ) -> Result<IndexResults, reqwest::Error> {
+        ) -> Result<T, reqwest::Error>
+        where
+            T: DeserializeOwned,
+        {
             unimplemented!();
         }
-        async fn search_with_pagination_and_filter(
+        async fn search_with_pagination_and_filter<T>(
             &self,
             _search_term: &str,
             _pagination: search_client::AzurePagination,
             _include_count: bool,
             _filter: Option<&str>,
-        ) -> Result<IndexResults, reqwest::Error> {
+        ) -> Result<T, reqwest::Error>
+        where
+            T: DeserializeOwned,
+        {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
                 context: String::from(""),
@@ -219,18 +226,24 @@ mod test {
         ) -> Result<FacetResults, reqwest::Error> {
             unimplemented!()
         }
-        async fn filter_by_collection_field(
+        async fn filter_by_collection_field<T>(
             &self,
             _field_name: &str,
             _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
+        ) -> Result<T, reqwest::Error>
+        where
+            T: DeserializeOwned,
+        {
             unimplemented!()
         }
-        async fn filter_by_non_collection_field(
+        async fn filter_by_non_collection_field<T>(
             &self,
             _field_name: &str,
             _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
+        ) -> Result<T, reqwest::Error>
+        where
+            T: DeserializeOwned,
+        {
             unimplemented!()
         }
     }

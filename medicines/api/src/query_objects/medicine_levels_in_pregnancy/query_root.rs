@@ -2,11 +2,11 @@ use crate::{
     azure_context::AzureContext,
     query_objects::products::{
         document::{get_documents, Documents},
-        product::{
-            get_product, get_products_index, get_substance_with_products, Product, ProductIndex,
-        },
-        substance::{get_substances_index, Substance, SubstanceIndex},
+        product::{get_product, Product},
+        products_index::{get_products_index, ProductIndex},
+        substance::{get_substance_with_products, Substance},
     },
+    query_objects::shared::substances_index::{get_substances_index, SubstanceIndex},
 };
 use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
