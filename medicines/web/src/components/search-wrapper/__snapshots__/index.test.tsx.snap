@@ -822,7 +822,6 @@ exports[`SearchWrapper should render 1`] = `
           >
             <header
               aria-label="Yellow card"
-              role="img"
             >
               <styled.h2>
                 <h2

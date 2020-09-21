@@ -40,6 +40,13 @@ const Legend = styled.legend`
   margin: 19px 0;
 `;
 
+const AccessibleHeading = styled.h3`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
+
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
   updateDocTypes: (d: DocType[]) => void;
@@ -128,6 +135,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = (props) => {
 
   return (
     <StyledSearchFilter>
+      <AccessibleHeading>Documents filter</AccessibleHeading>
       <Fieldset>
         <Legend ref={filterHeader}>Filter documents by</Legend>
         {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}

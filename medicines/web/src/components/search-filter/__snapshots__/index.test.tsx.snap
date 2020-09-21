@@ -10,6 +10,13 @@ exports[`SearchFilter should render search filter 1`] = `
     <section
       className="sc-dlnjPT ldjroq"
     >
+      <styled.h3>
+        <h3
+          className="sc-gKAblj gHUsfJ"
+        >
+          Documents filter
+        </h3>
+      </styled.h3>
       <styled.fieldset>
         <fieldset
           className="sc-eCApGN RCFDc"

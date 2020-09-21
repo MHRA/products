@@ -9,7 +9,7 @@ import Events from '../services/events';
 import { mhra70 } from '../styles/colors';
 import { baseSpace } from '../styles/dimensions';
 
-const StyledMain = styled.main`
+const StyledMain = styled.div`
   padding: ${baseSpace};
   padding-bottom: 0;
   font-size: 19px;

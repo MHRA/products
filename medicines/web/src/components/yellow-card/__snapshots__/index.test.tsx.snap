@@ -4,7 +4,6 @@ exports[`YellowCard should render 1`] = `
 <styled.section>
   <header
     aria-label="Yellow card"
-    role="img"
   >
     <styled.h2>
       Yellow Card

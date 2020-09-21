@@ -100,7 +100,7 @@ const linkText = 'Make\u00a0a\u00a0report';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
-    <header role="img" aria-label="Yellow card">
+    <header aria-label="Yellow card">
       <AccessibleTitle>{title}</AccessibleTitle>
     </header>
     <div className="action-bar">
