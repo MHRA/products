@@ -53,9 +53,13 @@ The majority of PDFs, whether created by the MHRA or by third parties, were also
 
 ### Non compliance with the accessibility regulations
 
-The website does not feature a ‘Skip to Content’ link
-This fails on WCAG 2.1 AA 2.4.1 (Bypass Blocks)
-We plan to fix this in the first half of 2020
+The SVG image in the footer does not have a title. This fails on WCAG 2.1 A 1.1.1 (Non-text Content. We will fix this by the end of October 2020.
+
+We have not added fieldset labels to the filter form. This fails on WCAG 2.1 1.3.1 (Info & Relationships). We will fix this by the end of October 2020.
+
+We require more distinctive page titles. This fails on WCAG 2.1 A 2.4.2 (Page Titles). We will fix this by the end of October 2020.
+
+We have not implemented proper nesting. This fails on WCAG 2.1 A 4.1.1 (Parsing). We will fix this by the end of October 2020.
 
 ### Content that’s not within the scope of the accessibility regulations
 
@@ -85,7 +89,7 @@ We tested different search terms on the website, including PIL numbers. We also 
 
 We used a colour picker tool and the WCAG site to check colour contrast.
 
-This statement was prepared on 17 December 2019. It was last updated on 17 December 2019.
+This statement was prepared on 17 December 2019. It was last updated on 23 September 2020.
 
 [1]: mailto:webupdates@mhra.gov.uk
 [2]: https://www.legislation.gov.uk/uksi/2018/952/regulation/4/made
