@@ -99,6 +99,7 @@ pub async fn get_reports(
     search: &str,
     first: Option<i32>,
     offset: i32,
+    substance_name: Option<&str>,
 ) -> Result<AzureReportResult, anyhow::Error> {
     let result_count = first.unwrap_or(10);
 
@@ -110,7 +111,7 @@ pub async fn get_reports(
                 offset,
             },
             true,
-            None,
+            build_filter(substance_name).as_deref(),
         )
         .await?;
 
@@ -127,6 +128,20 @@ pub async fn get_reports(
         total_count,
         offset,
     })
+}
+
+fn build_filter(substance_name: Option<&str>) -> Option<String> {
+    match substance_name {
+        Some(substance) => Some(build_substance_name_filter(substance)),
+        None => None,
+    }
+}
+
+fn build_substance_name_filter(substance_name: &str) -> String {
+    format!(
+        "active_substances/any(substance: substance eq '{}')",
+        substance_name
+    )
 }
 
 #[cfg(test)]
@@ -222,7 +237,6 @@ mod test {
             file_name: "file name".to_string(),
             matrices: Some(vec!["matrix".to_string()]),
             pbpk_models: Some(vec!["pbpk model".to_string()]),
-            facets: vec!["facet".to_string()],
             summary: "summary".to_string(),
             metadata_storage_size: 300,
             score: 1.0,

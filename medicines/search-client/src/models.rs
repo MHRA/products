@@ -56,7 +56,6 @@ pub struct ReportResult {
     pub matrices: Option<Vec<String>>,
     pub metadata_storage_name: String,
     pub report_name: String,
-    pub facets: Vec<String>,
     pub metadata_storage_size: i32,
 }
 

@@ -1,11 +1,8 @@
 use crate::query_objects::products::document::{
     self, get_documents, get_documents_graph_from_documents_vector, Document,
 };
-use async_graphql::{FieldResult, Object, SimpleObject};
-use search_client::{
-    models::{DocumentType, FacetResults},
-    Search,
-};
+use async_graphql::{FieldResult, Object};
+use search_client::models::DocumentType;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {

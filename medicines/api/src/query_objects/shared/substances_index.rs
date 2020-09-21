@@ -1,4 +1,3 @@
-use crate::query_objects::products::product::Product;
 use async_graphql::SimpleObject;
 use search_client::{models::FacetResults, Search};
 

@@ -1,6 +1,10 @@
 use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
 
-use crate::{azure_context::AzureContext, query_objects::products::query_root::Products};
+use crate::{
+    azure_context::AzureContext,
+    query_objects::medicine_levels_in_pregnancy::query_root::MedicineLevelsInPregnancy,
+    query_objects::products::query_root::Products,
+};
 use search_client::models::DocumentType;
 
 pub struct QueryRoot;
@@ -92,6 +96,12 @@ impl QueryRoot {
 
     async fn products(&self, context: &Context<'_>) -> FieldResult<Products> {
         Ok(Products::new())
+    }
+    async fn medicine_levels_in_pregnancy(
+        &self,
+        context: &Context<'_>,
+    ) -> FieldResult<MedicineLevelsInPregnancy> {
+        Ok(MedicineLevelsInPregnancy::new())
     }
 }
 

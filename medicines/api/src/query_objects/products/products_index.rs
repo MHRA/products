@@ -1,12 +1,5 @@
-use crate::query_objects::products::{
-    document::{self, get_documents, get_documents_graph_from_documents_vector, Document},
-    substance::Substance,
-};
-use async_graphql::{FieldResult, Object, SimpleObject};
-use search_client::{
-    models::{DocumentType, FacetResults},
-    Search,
-};
+use async_graphql::SimpleObject;
+use search_client::{models::FacetResults, Search};
 
 #[SimpleObject(desc = "A medical product containing active ingredients")]
 #[derive(Debug, PartialEq)]

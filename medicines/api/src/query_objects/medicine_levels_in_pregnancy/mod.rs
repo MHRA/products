@@ -1,2 +1,3 @@
-mod query_root;
-mod report;
+pub mod query_root;
+pub mod report;
+pub mod substance;
