@@ -9,11 +9,11 @@ exports[`DrugIndex should render error message 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-AxjAm jJjbyf"
+      className="sc-bdnylx iZXMvu"
     >
       <styled.p>
         <p
-          className="sc-AxirZ eZCVsL"
+          className="sc-gtssRu cxxuwU"
         >
           Sorry - the site is experiencing technical issues right now. Please try again later.
         </p>
@@ -779,7 +779,7 @@ exports[`DrugIndex should render loading message 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-AxjAm jJjbyf"
+      className="sc-bdnylx iZXMvu"
     >
       <h2>
         Coffee
