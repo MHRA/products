@@ -22,14 +22,6 @@ const StyledYellowCard = styled.section`
   margin: 0;
   margin-bottom: ${baseSpace};
 
-  header {
-    padding: 1rem;
-    background-color: ${mhraYellow};
-    svg {
-      height: 31px;
-    }
-  }
-
   div.action-bar {
     display: flex;
     width: 100%;
@@ -63,10 +55,6 @@ const StyledYellowCard = styled.section`
   }
 
   @media ${mobileBreakpoint} {
-    picture {
-      max-width: 200px;
-      margin: 0 auto;
-    }
     div.action-bar {
       flex-direction: column;
     }
@@ -84,18 +72,44 @@ const StyledYellowCard = styled.section`
   }
 `;
 
+const LogoContainer = styled.div`
+  padding: 1rem;
+  background-color: ${mhraYellow};
+  svg {
+    height: 31px;
+  }
+
+  @media ${mobileBreakpoint} {
+    div {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+  }
+`;
+
+const AccessibleTitle = styled.h2`
+  visibility: hidden;
+  margin: 0;
+  height: 0;
+  width: 0;
+`;
+
 const title = 'Yellow Card';
 const content = 'Report a side effect with a medicine or medical device';
 const linkText = 'Make\u00a0a\u00a0report';
 
 const YellowCard: React.FC = () => (
   <StyledYellowCard>
+    <header role="img" aria-label="Yellow card">
+      <AccessibleTitle>{title}</AccessibleTitle>
+    </header>
     <div className="action-bar">
-      <header role="img" aria-label="Yellow card">
-        <picture>
+      <LogoContainer role="img">
+        <div>
           <SvgYellowCard />
-        </picture>
-      </header>
+        </div>
+      </LogoContainer>
+
       <p>{content}</p>
       <a
         className="primary-button"

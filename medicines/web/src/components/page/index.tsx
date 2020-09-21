@@ -69,10 +69,6 @@ const App: React.FC<IPageProps> = (props) => {
     <>
       <Head>
         <title>MHRA {props.metaTitle}</title>
-        <meta
-          httpEquiv="Content-Security-Policy-Report-Only"
-          content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
-        />
       </Head>
       <WithStyles>
         <Normalize />

@@ -2,17 +2,24 @@
 
 exports[`YellowCard should render 1`] = `
 <styled.section>
+  <header
+    aria-label="Yellow card"
+    role="img"
+  >
+    <styled.h2>
+      Yellow Card
+    </styled.h2>
+  </header>
   <div
     className="action-bar"
   >
-    <header
-      aria-label="Yellow card"
+    <styled.div
       role="img"
     >
-      <picture>
+      <div>
         <SvgYellowCard />
-      </picture>
-    </header>
+      </div>
+    </styled.div>
     <p>
       Report a side effect with a medicine or medical device
     </p>
