@@ -25,6 +25,8 @@ resource "azurerm_servicebus_queue" "service_bus_queue" {
   count               = length(local.queue_names)
   namespace_name      = azurerm_servicebus_namespace.service_bus.name
   resource_group_name = var.resource_group_name
+  lock_duration       = "PT20S"
+  max_delivery_count  = 5
 }
 
 resource "azurerm_servicebus_queue_authorization_rule" "service_bus_queue_auth_rule" {

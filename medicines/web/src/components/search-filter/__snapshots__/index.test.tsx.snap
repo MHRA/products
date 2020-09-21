@@ -8,7 +8,7 @@ exports[`SearchFilter should render search filter 1`] = `
 >
   <styled.section>
     <section
-      className="sc-AxiKw bbPljN"
+      className="sc-dlnjPT ldjroq"
     >
       <h3>
         Filter documents by
@@ -42,7 +42,7 @@ exports[`SearchFilter should render search filter 1`] = `
               >
                 <input
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
+                  className="sc-bdnylx dUVSoV"
                   id="filter-spc"
                   name="doc"
                   onChange={[Function]}
@@ -91,7 +91,7 @@ exports[`SearchFilter should render search filter 1`] = `
               >
                 <input
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
+                  className="sc-bdnylx dUVSoV"
                   id="filter-pil"
                   name="doc"
                   onChange={[Function]}
@@ -140,7 +140,7 @@ exports[`SearchFilter should render search filter 1`] = `
               >
                 <input
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
+                  className="sc-bdnylx dUVSoV"
                   id="filter-par"
                   name="doc"
                   onChange={[Function]}
@@ -162,7 +162,7 @@ exports[`SearchFilter should render search filter 1`] = `
       </DocTypeCheckbox>
       <styled.div>
         <div
-          className="sc-AxhCb jDrcYF"
+          className="sc-hKFyIo hodwMc"
         >
           <styled.input
             onClick={[Function]}
@@ -170,7 +170,7 @@ exports[`SearchFilter should render search filter 1`] = `
             value="Submit"
           >
             <input
-              className="sc-AxirZ fdlzyX"
+              className="sc-gtssRu elyfng"
               onClick={[Function]}
               type="submit"
               value="Submit"
