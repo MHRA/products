@@ -70,6 +70,7 @@ envsubst
 ErgFGAmFm
 externalTrafficPolicy
 fHnH
+fieldset
 gatling
 GatsbyJS
 GCP
@@ -206,6 +207,7 @@ Stellent
 stunnel
 subnets
 svc
+SVG
 SVGR
 tADWy
 terraform
