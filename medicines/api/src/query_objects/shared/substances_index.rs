@@ -1,7 +1,7 @@
 use async_graphql::SimpleObject;
 use search_client::{models::FacetResults, Search};
 
-#[SimpleObject(desc = "An active ingredient found in medical products")]
+#[SimpleObject(desc = "The number of documents associated with an active substance")]
 #[derive(Debug, PartialEq)]
 pub struct SubstanceIndex {
     name: String,

@@ -1,6 +1,7 @@
 use crate::query_objects::products::document::{
     self, get_documents, get_documents_graph_from_documents_vector, Document,
 };
+use anyhow::anyhow;
 use async_graphql::{FieldResult, Object};
 use search_client::models::DocumentType;
 
@@ -26,12 +27,12 @@ impl Product {
 
 #[Object(desc = "A medical product containing active ingredients")]
 impl Product {
-    #[field(desc = "name")]
+    #[field(desc = "Name")]
     async fn name(&self) -> &str {
         &self.name
     }
 
-    #[field(desc = "documents")]
+    #[field(desc = "Documents related to product")]
     async fn documents(
         &self,
         first: Option<i32>,
@@ -80,7 +81,7 @@ impl Product {
                     "Error fetching documents from Azure search service: {:?}",
                     e
                 );
-                e.into()
+                anyhow!("Error retrieving results").into()
             })
         }
     }
@@ -110,7 +111,7 @@ pub async fn get_product(product_name: String) -> Result<Product, reqwest::Error
 #[cfg(test)]
 mod test {
     use super::*;
-    use search_client::models::{Facet, FacetResult, IndexResult};
+    use search_client::models::IndexResult;
 
     fn azure_result_factory(product_name: Option<String>) -> Document {
         let result = IndexResult {

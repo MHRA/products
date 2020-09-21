@@ -5,26 +5,26 @@ use search_client::{
     Search,
 };
 
-#[SimpleObject(desc = "A document")]
+#[SimpleObject(desc = "An SPC, PIL or PAR document")]
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
-    #[field(desc = "product name")]
+    #[field(desc = "Product associated with document")]
     pub product_name: Option<String>,
-    #[field(desc = "active substances")]
+    #[field(desc = "Active substances associated with document")]
     pub active_substances: Option<Vec<String>>,
-    #[field(desc = "title")]
+    #[field(desc = "Title")]
     pub title: Option<String>,
-    #[field(desc = "highlights")]
+    #[field(desc = "Highlights")]
     pub highlights: Option<Vec<String>>,
-    #[field(desc = "created")]
+    #[field(desc = "Created date")]
     pub created: Option<String>,
-    #[field(desc = "doc type")]
+    #[field(desc = "Document type")]
     pub doc_type: Option<DocumentType>,
-    #[field(desc = "file size")]
+    #[field(desc = "File size")]
     pub file_size_in_bytes: Option<i32>,
-    #[field(desc = "name")]
+    #[field(desc = "PDF file name")]
     pub name: Option<String>,
-    #[field(desc = "url")]
+    #[field(desc = "PDF file url")]
     pub url: Option<String>,
 }
 

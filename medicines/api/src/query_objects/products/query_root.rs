@@ -1,5 +1,6 @@
 use crate::{
     azure_context::AzureContext,
+    pagination::{convert_after_to_offset, get_offset_or_default},
     query_objects::products::{
         document::{get_documents, Documents},
         product::{get_product, Product},
@@ -8,6 +9,7 @@ use crate::{
     },
     query_objects::shared::substances_index::{get_substances_index, SubstanceIndex},
 };
+use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
 
@@ -31,9 +33,9 @@ impl Products {
     }
 }
 
-#[Object(desc = "Entrypoint for products")]
+#[Object(desc = "Entrypoint for products, where you can find associated SPCs, PILs and PARs")]
 impl Products {
-    #[field(desc = "substance")]
+    #[field(desc = "Retrieves all products associated with the queried active substance")]
     async fn substance(
         &self,
         context: &Context<'_>,
@@ -45,7 +47,7 @@ impl Products {
                 .await
                 .map_err(|e| {
                     tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                    e.into()
+                    anyhow!("Error retrieving results").into()
                 }),
             None => Err(anyhow::anyhow!(
                 "Getting a substance without providing a substance name is not supported."
@@ -53,15 +55,17 @@ impl Products {
             .into()),
         }
     }
-    #[field(desc = "product")]
+    #[field(desc = "Retrieves all documents associated with the queried product")]
     async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
         get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            e.into()
+            anyhow!("Error retrieving results").into()
         })
     }
 
-    #[field(desc = "substances_index")]
+    #[field(
+        desc = "List of active substances beginning with the provided letter that have reports associated with them, along with the count of documents for each"
+    )]
     async fn substances_index(
         &self,
         context: &Context<'_>,
@@ -72,11 +76,13 @@ impl Products {
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                e.into()
+                anyhow!("Error retrieving results").into()
             })
     }
 
-    #[field(desc = "products_index")]
+    #[field(
+        desc = "List of products associated with the provided active substances that have reports associated with them, along with the count of documents for each"
+    )]
     async fn products_index(
         &self,
         context: &Context<'_>,
@@ -87,11 +93,11 @@ impl Products {
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                e.into()
+                anyhow!("Error retrieving results").into()
             })
     }
 
-    #[field(desc = "documents")]
+    #[field(desc = "SPC, PIL and PAR Documents related to products")]
     async fn documents(
         &self,
         context: &Context<'_>,
@@ -116,24 +122,7 @@ impl Products {
         .map(Into::into)
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            e.into()
+            anyhow!("Error retrieving results").into()
         })
     }
-}
-
-fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
-    match (after, skip) {
-        (Some(encoded), _) => match convert_after_to_offset(encoded) {
-            Ok(a) => a,
-            _ => default,
-        },
-        (None, Some(offset)) => offset,
-        _ => default,
-    }
-}
-
-fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
-    let bytes = base64::decode(encoded)?;
-    let string = std::str::from_utf8(&bytes)?;
-    Ok(string.parse::<i32>()? + 1)
 }

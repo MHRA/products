@@ -1,11 +1,13 @@
 use crate::{
     azure_context::AzureContext,
+    pagination::{convert_after_to_offset, get_offset_or_default},
     query_objects::medicine_levels_in_pregnancy::{
         report::{get_reports, Reports},
         substance::{get_substance, SubstanceReports},
     },
     query_objects::shared::substances_index::{get_substances_index, SubstanceIndex},
 };
+use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
 
 pub struct MedicineLevelsInPregnancy {
@@ -24,9 +26,9 @@ impl MedicineLevelsInPregnancy {
     }
 }
 
-#[Object(desc = "Entrypoint for medicine levels in pregnancy")]
+#[Object(desc = "Entrypoint for reports related to medicine levels in pregnancy")]
 impl MedicineLevelsInPregnancy {
-    #[field(desc = "substance")]
+    #[field(desc = "Retrieves all reports associated with the queried active substance")]
     async fn substance(
         &self,
         context: &Context<'_>,
@@ -35,7 +37,7 @@ impl MedicineLevelsInPregnancy {
         match name {
             Some(name) => get_substance(name).await.map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                e.into()
+                anyhow!("Error retrieving results").into()
             }),
             None => Err(anyhow::anyhow!(
                 "Getting a substance without providing a substance name is not supported."
@@ -43,7 +45,9 @@ impl MedicineLevelsInPregnancy {
             .into()),
         }
     }
-    #[field(desc = "substances_index")]
+    #[field(
+        desc = "List of active substances beginning with the provided letter that have reports associated with them, along with the count of reports for each"
+    )]
     async fn substances_index(
         &self,
         context: &Context<'_>,
@@ -54,11 +58,11 @@ impl MedicineLevelsInPregnancy {
             .await
             .map_err(|e| {
                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-                e.into()
+                anyhow!("Error retrieving results").into()
             })
     }
 
-    #[field(desc = "reports")]
+    #[field(desc = "Reports related to medicine levels in pregnancy")]
     async fn reports(
         &self,
         context: &Context<'_>,
@@ -81,24 +85,7 @@ impl MedicineLevelsInPregnancy {
         .map(Into::into)
         .map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-            e.into()
+            anyhow!("Error retrieving results").into()
         })
     }
-}
-
-fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
-    match (after, skip) {
-        (Some(encoded), _) => match convert_after_to_offset(encoded) {
-            Ok(a) => a,
-            _ => default,
-        },
-        (None, Some(offset)) => offset,
-        _ => default,
-    }
-}
-
-fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
-    let bytes = base64::decode(encoded)?;
-    let string = std::str::from_utf8(&bytes)?;
-    Ok(string.parse::<i32>()? + 1)
 }

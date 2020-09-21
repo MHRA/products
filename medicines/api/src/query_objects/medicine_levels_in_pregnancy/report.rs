@@ -5,28 +5,28 @@ use search_client::{
     Search,
 };
 
-#[SimpleObject(desc = "A report")]
+#[SimpleObject(desc = "A report related to medicine levels in pregnancy")]
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Report {
-    #[field(desc = "products")]
+    #[field(desc = "Products associated with report")]
     pub products: Option<Vec<String>>,
-    #[field(desc = "active substances")]
+    #[field(desc = "Active substances associated with report")]
     pub active_substances: Option<Vec<String>>,
-    #[field(desc = "report name")]
+    #[field(desc = "Report name")]
     pub title: Option<String>,
-    #[field(desc = "highlights")]
+    #[field(desc = "Highlights")]
     pub highlights: Option<Vec<String>>,
-    #[field(desc = "file size")]
+    #[field(desc = "File size")]
     pub file_size_in_bytes: Option<i32>,
-    #[field(desc = "file name")]
+    #[field(desc = "PDF file name")]
     pub file_name: Option<String>,
-    #[field(desc = "file url")]
+    #[field(desc = "PDF file url")]
     pub file_url: Option<String>,
-    #[field(desc = "summary")]
+    #[field(desc = "Summary")]
     pub summary: Option<String>,
-    #[field(desc = "matrices")]
+    #[field(desc = "Matrices")]
     pub matrices: Option<Vec<String>>,
-    #[field(desc = "pbpk models")]
+    #[field(desc = "PBPK models")]
     pub pbpk_models: Option<Vec<String>>,
 }
 
