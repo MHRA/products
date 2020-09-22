@@ -5,7 +5,7 @@ exports[`header should render 1`] = `
   <div
     className="wrapper"
   >
-    <picture>
+    <styled.div>
       <Link
         href="/"
       >
@@ -13,7 +13,7 @@ exports[`header should render 1`] = `
           <SvgMhraLogo />
         </a>
       </Link>
-    </picture>
+    </styled.div>
     <h1>
       MHRA
     </h1>

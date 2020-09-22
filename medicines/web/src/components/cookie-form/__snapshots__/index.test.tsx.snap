@@ -2,6 +2,9 @@
 
 exports[`CookieForm should render 🍪 1`] = `
 <styled.section>
+  <styled.h3>
+    Toggle cookie permissions
+  </styled.h3>
   <form
     onSubmit={[Function]}
   >
@@ -10,11 +13,11 @@ exports[`CookieForm should render 🍪 1`] = `
         htmlFor="cookie-on"
       >
         <input
+          aria-checked={true}
           checked={true}
           id="cookie-on"
           name="cookie"
           onChange={[Function]}
-          role="button"
           type="radio"
           value="on"
         />
@@ -24,18 +27,18 @@ exports[`CookieForm should render 🍪 1`] = `
         htmlFor="cookie-off"
       >
         <input
+          aria-checked={true}
           checked={false}
           id="cookie-off"
           name="cookie"
           onChange={[Function]}
-          role="button"
           type="radio"
           value="off"
         />
         Off
       </label>
     </p>
-    <styled.main
+    <styled.div
       dangerouslySetInnerHTML={
         Object {
           "__html": Object {
@@ -55,6 +58,9 @@ exports[`CookieForm should render 🍪 1`] = `
 
 exports[`CookieForm should render 🚫 1`] = `
 <styled.section>
+  <styled.h3>
+    Toggle cookie permissions
+  </styled.h3>
   <form
     onSubmit={[Function]}
   >
@@ -63,11 +69,11 @@ exports[`CookieForm should render 🚫 1`] = `
         htmlFor="cookie-on"
       >
         <input
+          aria-checked={false}
           checked={false}
           id="cookie-on"
           name="cookie"
           onChange={[Function]}
-          role="button"
           type="radio"
           value="on"
         />
@@ -77,18 +83,18 @@ exports[`CookieForm should render 🚫 1`] = `
         htmlFor="cookie-off"
       >
         <input
+          aria-checked={false}
           checked={true}
           id="cookie-off"
           name="cookie"
           onChange={[Function]}
-          role="button"
           type="radio"
           value="off"
         />
         Off
       </label>
     </p>
-    <styled.main
+    <styled.div
       dangerouslySetInnerHTML={
         Object {
           "__html": Object {

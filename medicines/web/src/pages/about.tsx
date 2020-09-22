@@ -9,7 +9,7 @@ import about from '../copy/about.md';
 import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
-const StyledMain = styled.main`
+const StyledMain = styled.div`
   padding: ${baseSpace};
   font-size: 19px;
   line-height: 28px;
@@ -33,6 +33,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | About"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

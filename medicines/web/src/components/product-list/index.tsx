@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { IProduct } from '../../model/product';
 import { pluralise } from '../../services/content-helpers';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import { errorRed } from '../../styles/colors';
 
 const StyledProductList = styled.nav`
   h2 {
@@ -37,42 +38,70 @@ const StyledProductList = styled.nav`
   }
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
 interface IIndex {
   title: string;
   products: IProduct[];
+  isLoading?: boolean;
+  errorFetchingResults?: boolean;
 }
 
-const ProductList: React.FC<IIndex> = ({ title, products }) => {
-  if (products === undefined || products.length === 0) {
-    return <></>;
+const ProductList: React.FC<IIndex> = ({
+  title,
+  products,
+  isLoading,
+  errorFetchingResults,
+}) => {
+  if (errorFetchingResults) {
+    return (
+      <StyledProductList>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledProductList>
+    );
   }
 
   const searchLink = (itemName: string) => {
     return `/product?product=${encodeURIComponent(itemName)}`;
   };
 
+  const getResultListItems = () => {
+    return (
+      <>
+        {products && products.length ? (
+          products.map((product) => {
+            return (
+              <li key={product.name} className="product-name">
+                <Link href={searchLink(product.name)}>
+                  <a>
+                    {product.name}{' '}
+                    {product.count && (
+                      <>
+                        ({product.count}{' '}
+                        {pluralise('file', 'files', product.count)})
+                      </>
+                    )}
+                  </a>
+                </Link>
+              </li>
+            );
+          })
+        ) : (
+          <li>No results for {title}</li>
+        )}
+      </>
+    );
+  };
   return (
     <StyledProductList>
-      <h3>{title}</h3>
-      <ul>
-        {products.map((product) => {
-          return (
-            <li key={product.name} className="product-name">
-              <Link href={searchLink(product.name)}>
-                <a>
-                  {product.name}{' '}
-                  {product.count && (
-                    <>
-                      ({product.count}{' '}
-                      {pluralise('file', 'files', product.count)})
-                    </>
-                  )}
-                </a>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <h2>{title}</h2>
+      <ul>{isLoading ? <li>Loading results...</li> : getResultListItems()}</ul>
     </StyledProductList>
   );
 };

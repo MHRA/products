@@ -33,7 +33,7 @@ const StyledCookieForm = styled.section`
   }
 `;
 
-const StyledContentWrapper = styled.main`
+const StyledContentWrapper = styled.div`
   font-size: 19px;
   line-height: 28px;
 
@@ -57,6 +57,13 @@ const StyledContentWrapper = styled.main`
   }
 `;
 
+const AccessibleHeading = styled.h3`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
+
 const cookieDomain = (process.env.ROOT_URL_DOMAIN as string) || 'localhost';
 
 interface ICookieForm {
@@ -64,7 +71,7 @@ interface ICookieForm {
   setStorageAllowed: any;
 }
 
-const CookieForm: React.FC<ICookieForm> = props => {
+const CookieForm: React.FC<ICookieForm> = (props) => {
   // NOTE: By "cookies", we mean "cookies and similar technologies". This includes
   // local storage, session storage, etc.
 
@@ -104,6 +111,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
 
   return (
     <StyledCookieForm>
+      <AccessibleHeading>Toggle cookie permissions</AccessibleHeading>
       <form onSubmit={handleCookieFormSubmit}>
         <p>
           <label htmlFor="cookie-on">
@@ -114,7 +122,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
               value="on"
               onChange={handleCookiesOn}
               checked={cookieToggle}
-              role="button"
+              aria-checked={cookieToggle}
             />
             On
           </label>
@@ -126,7 +134,7 @@ const CookieForm: React.FC<ICookieForm> = props => {
               value="off"
               onChange={handleCookiesOff}
               checked={!cookieToggle}
-              role="button"
+              aria-checked={cookieToggle}
             />
             Off
           </label>

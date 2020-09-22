@@ -9,7 +9,7 @@ import accessibility from '../copy/accessibility.md';
 import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
-const StyledMain = styled.main`
+const StyledMain = styled.div`
   padding: ${baseSpace};
   font-size: 19px;
   line-height: 28px;
@@ -30,6 +30,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Accessibility Statement"
+      metaTitle="Products | Accessibility Statement"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

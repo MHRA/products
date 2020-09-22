@@ -89,7 +89,7 @@ describe('Search', function () {
     mockParacetamolResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('paracetamol');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -104,7 +104,7 @@ describe('Search', function () {
     mockIbuprofenSpcResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -121,7 +121,7 @@ describe('Search', function () {
     mockIbuprofenSpcPilResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -140,7 +140,7 @@ describe('Search', function () {
     mockIbuprofenSpcResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -163,7 +163,7 @@ describe('Search', function () {
     mockIbuprofenSpcResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -193,7 +193,7 @@ describe('A-Z Index', function () {
     );
     // Mock out second page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
       'fixture:search_results.json',
     );
 

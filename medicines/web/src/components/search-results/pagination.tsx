@@ -3,28 +3,38 @@ import React from 'react';
 import styled from 'styled-components';
 import { DocType } from '../../services/azure-search';
 import { queryStringFromDocTypes } from '../../services/querystring-interpreter';
-import { mhra70, mhraBlue, mhraWhite, primaryColor } from '../../styles/colors';
+import {
+  mhra,
+  mhra70,
+  mhraBlue,
+  mhraWhite,
+  primaryColor,
+} from '../../styles/colors';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { getPaginationGroups } from './pagination-groups';
 
 const StyledPagination = styled.nav`
-  ul {
+  div {
     display: flex;
     justify-content: space-between;
     list-style: none;
-    margin: 40px auto 20px;
+    margin: 20px auto 0px;
     max-width: 80%;
     padding: 0;
   }
 
-  .pagination-number,
-  .middle-group {
+  .pagination-number {
     display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    align-self: center;
     flex-wrap: nowrap;
+    list-style: none;
+    padding: 0 12px;
+    margin: 0;
   }
 
-  .pagination-number li,
-  .middle-group li {
+  .pagination-number li {
     margin-right: 0.5rem;
   }
 
@@ -45,20 +55,25 @@ const StyledPagination = styled.nav`
     cursor: pointer;
   }
 
-  .arrow .link-text {
+  .arrow {
     color: ${mhraWhite};
     background-color: ${primaryColor};
-    padding: 12px 15px;
     border-radius: 6px;
     text-decoration: none;
+    appearance: none;
+    border: 0;
+    display: block;
+    padding: 12px 15px;
+    cursor: pointer;
+    height: max-content;
   }
 
-  .arrow .link-text:hover {
+  .arrow:hover {
     background-color: ${mhra70};
   }
 
   @media ${mobileBreakpoint} {
-    .arrow .link-text {
+    .arrow {
       padding: 7px 10px;
       border-radius: 4px;
     }
@@ -114,40 +129,38 @@ const Pagination = (props: IPaginationProps) => {
 
   return (
     <StyledPagination>
-      <nav role="navigation" aria-label="Pagination Navigation">
-        <ul className="pagination">
+      <nav aria-label="Pagination Navigation">
+        <div className="pagination">
           {props.currentPage !== 1 ? (
-            <li
+            <button
               className="arrow"
               onClick={getPageChangeHandler(props.currentPage - 1)}
               aria-label={`Goto previous page, Page ${props.currentPage - 1}`}
             >
-              <span className="link-text">Previous</span>
-            </li>
+              Previous
+            </button>
           ) : (
-            <li className="arrow" />
+            <></>
           )}
-          <div className="pagination-number">
+          <ul className="pagination-number">
             {firstGroup.map(createPaginationButton)}
             {middleGroup.length > 0 ? <li>&hellip;</li> : ''}
-            <div className="middle-group">
-              {middleGroup.map(createPaginationButton)}
-            </div>
+            {middleGroup.map(createPaginationButton)}
             {lastGroup.length > 0 ? <li>&hellip;</li> : ''}
             {lastGroup.map(createPaginationButton)}
-          </div>
+          </ul>
           {props.currentPage !== pageCount ? (
-            <li
+            <button
               className="arrow"
               onClick={getPageChangeHandler(props.currentPage + 1)}
               aria-label={`Goto next page, Page ${props.currentPage + 1}`}
             >
-              <span className="link-text">Next</span>
-            </li>
+              Next
+            </button>
           ) : (
-            <li className="arrow" />
+            <></>
           )}
-        </ul>
+        </div>
       </nav>
     </StyledPagination>
   );

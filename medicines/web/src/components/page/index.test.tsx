@@ -10,6 +10,7 @@ describe(App, () => {
       <App
         children={<></>}
         title={'MHRA'}
+        metaTitle={'MHRA meta title'}
         storageAllowed
         setStorageAllowed={noop}
       />,

@@ -1,4 +1,5 @@
 import fetch, { Response } from 'node-fetch';
+import { requestTimeout } from './request-helper';
 import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
@@ -7,6 +8,7 @@ const bmgfSearchIndex = process.env.BMGF_AZURE_SEARCH_INDEX || '';
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
+const requestTimeoutMs: number = 15000;
 
 export enum DocType {
   Par = 'Par',
@@ -122,12 +124,15 @@ const buildFacetUrl = (query: string, index: string): string => {
 };
 
 const getJson = async (url: string): Promise<any> => {
-  const resp: Response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const resp: Response = await requestTimeout(
+    requestTimeoutMs,
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+  );
 
   if (resp.ok) {
     return resp.json();

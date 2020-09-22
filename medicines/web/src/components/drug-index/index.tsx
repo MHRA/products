@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { IProduct } from '../../model/product';
 import { pluralise } from '../../services/content-helpers';
 import { mobileBreakpoint } from '../../styles/dimensions';
+import { errorRed } from '../../styles/colors';
 
 const StyledDrugIndex = styled.nav`
   h2 {
@@ -59,6 +60,11 @@ const StyledDrugIndex = styled.nav`
   }
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
 export const index: IProduct[] = [
   { name: 'A' },
   { name: 'B' },
@@ -98,11 +104,6 @@ export const index: IProduct[] = [
   { name: '9' },
 ];
 
-export interface IFacet {
-  count?: number;
-  value: string;
-}
-
 export enum IndexType {
   Horizontal,
   SubstancesIndex,
@@ -113,11 +114,26 @@ interface IIndex {
   title: string;
   items: IProduct[];
   indexType: IndexType;
+  isLoading?: boolean;
+  errorFetchingResults?: boolean;
 }
 
-const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
-  if (items === undefined || items.length === 0) {
-    return <></>;
+const DrugIndex: React.FC<IIndex> = ({
+  title,
+  items,
+  indexType,
+  isLoading,
+  errorFetchingResults,
+}) => {
+  if (errorFetchingResults) {
+    return (
+      <StyledDrugIndex>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledDrugIndex>
+    );
   }
 
   const searchLink = (itemName: string) => {
@@ -130,6 +146,38 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
     return `/product?product=${encodeURIComponent(itemName)}`;
   };
 
+  const getResultListItems = () => {
+    return (
+      <>
+        {items && items.length ? (
+          items.map((item) => {
+            return (
+              <li
+                key={item.name}
+                className={
+                  indexType !== IndexType.Horizontal ? 'substance-name' : ''
+                }
+              >
+                <Link href={searchLink(item.name)}>
+                  <a>
+                    {item.name}{' '}
+                    {item.count && (
+                      <>
+                        ({item.count} {pluralise('file', 'files', item.count)})
+                      </>
+                    )}
+                  </a>
+                </Link>
+              </li>
+            );
+          })
+        ) : (
+          <li>No results for {title}</li>
+        )}
+      </>
+    );
+  };
+
   return (
     <StyledDrugIndex>
       {indexType === IndexType.Horizontal ? (
@@ -138,27 +186,7 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
         <h2>{title}</h2>
       )}
       <ul className={indexType === IndexType.Horizontal ? 'horizontal' : ''}>
-        {items.map((item) => {
-          return (
-            <li
-              key={item.name}
-              className={
-                indexType !== IndexType.Horizontal ? 'substance-name' : ''
-              }
-            >
-              <Link href={searchLink(item.name)}>
-                <a>
-                  {item.name}{' '}
-                  {item.count && (
-                    <>
-                      ({item.count} {pluralise('file', 'files', item.count)})
-                    </>
-                  )}
-                </a>
-              </Link>
-            </li>
-          );
-        })}
+        {isLoading ? <li>Loading results...</li> : getResultListItems()}
       </ul>
     </StyledDrugIndex>
   );

@@ -2,6 +2,9 @@
 
 exports[`Search should render 1`] = `
 <styled.section>
+  <styled.h3>
+    Search by text
+  </styled.h3>
   <form
     aria-label="Search for medicines"
     onSubmit={[MockFunction]}
