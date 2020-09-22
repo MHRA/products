@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 import React from 'react';
-import { IProduct, ISubstance } from '../../model/substance';
+import { ISubstanceIndex } from '../../../model/substance';
 import DrugIndex, { IndexType } from './index';
 
 describe(DrugIndex, () => {
@@ -52,10 +52,8 @@ describe(DrugIndex, () => {
     expect(component).toMatchSnapshot();
   });
   it('should render substances', () => {
-    const product: IProduct = { name: 'Ibuprofen gel', count: 1 };
-    const substance: ISubstance = {
+    const substance: ISubstanceIndex = {
       name: 'Ibuprofen',
-      products: [product],
       count: 1,
     };
     const substances = [substance];
@@ -63,7 +61,7 @@ describe(DrugIndex, () => {
       <DrugIndex
         title={'Coffee'}
         items={substances}
-        indexType={IndexType.ProductsIndex}
+        indexType={IndexType.SubstancesIndex}
       />,
     );
     expect(component).toMatchSnapshot();
