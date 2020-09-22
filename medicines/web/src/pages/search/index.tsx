@@ -74,6 +74,7 @@ const App: NextPage = (props) => {
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -109,21 +110,29 @@ const App: NextPage = (props) => {
     setPageNumber(page);
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
-    (async () => {
-      const { documents, count } = await getSearchResults({
-        searchTerm: query,
-        page,
-        docTypes,
-      });
-      setDocuments(documents);
-      setCount(count);
-      setIsLoading(false);
-      Events.searchForProductsMatchingKeywords({
-        searchTerm: query,
-        pageNo: page,
-        docTypes: queryStringFromDocTypes(docTypes),
-      });
-    })();
+
+    setDocuments([]);
+    setCount(0);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
+
+    getSearchResults({
+      searchTerm: query,
+      page,
+      docTypes,
+    })
+      .then(({ documents, count }) => {
+        setDocuments(documents);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.searchForProductsMatchingKeywords({
+      searchTerm: query,
+      pageNo: page,
+      docTypes: queryStringFromDocTypes(docTypes),
+    });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {
@@ -191,6 +200,7 @@ const App: NextPage = (props) => {
           handlePageChange={handlePageChange}
           isLoading={isLoading}
           rerouteType={rerouteType}
+          errorFetchingResults={errorFetchingResults}
         />
       </SearchWrapper>
     </Page>

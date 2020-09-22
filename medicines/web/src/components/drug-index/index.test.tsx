@@ -68,4 +68,26 @@ describe(DrugIndex, () => {
     );
     expect(component).toMatchSnapshot();
   });
+  it('should render error message', () => {
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={[]}
+        indexType={IndexType.ProductsIndex}
+        errorFetchingResults
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
+  it('should render loading message', () => {
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={[]}
+        indexType={IndexType.ProductsIndex}
+        isLoading
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
 });
