@@ -6,7 +6,7 @@ exports[`SearchWrapper should render 1`] = `
 >
   <styled.div>
     <div
-      className="sc-jSFkmK bHoRRE"
+      className="sc-gKAblj iLrieH"
     >
       <section
         className="search"
@@ -19,7 +19,7 @@ exports[`SearchWrapper should render 1`] = `
         >
           <styled.section>
             <section
-              className="sc-hKFyIo hYbAAN"
+              className="sc-eCApGN isOGvN"
             >
               <form
                 aria-label="Search for medicines"
@@ -46,7 +46,7 @@ exports[`SearchWrapper should render 1`] = `
                     value="Search"
                   >
                     <input
-                      className="sc-dlnjPT etAYzs"
+                      className="sc-hKFyIo gabOGu"
                       type="submit"
                       value="Search"
                     />
@@ -804,7 +804,7 @@ exports[`SearchWrapper should render 1`] = `
       <YellowCard>
         <styled.section>
           <section
-            className="sc-eCApGN cotwow"
+            className="sc-jSFkmK hIqes"
           >
             <div
               className="action-bar"

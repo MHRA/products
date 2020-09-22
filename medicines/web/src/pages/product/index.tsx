@@ -78,6 +78,7 @@ const App: NextPage = () => {
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -112,21 +113,29 @@ const App: NextPage = () => {
     setPageNumber(page);
     setDocTypes(docTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
-    (async () => {
-      const { documents, count } = await getProduct({
-        name: product,
-        page,
-        docTypes,
-      });
-      setDocuments(documents);
-      setCount(count);
-      setIsLoading(false);
-      Events.viewResultsForProduct({
-        productName: product,
-        pageNo: page,
-        docTypes: queryStringFromDocTypes(docTypes),
-      });
-    })();
+
+    setDocuments([]);
+    setCount(0);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
+
+    getProduct({
+      name: product,
+      page,
+      docTypes,
+    })
+      .then(({ documents, count }) => {
+        setDocuments(documents);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.viewResultsForProduct({
+      productName: product,
+      pageNo: page,
+      docTypes: queryStringFromDocTypes(docTypes),
+    });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
   useEffect(() => {
@@ -189,6 +198,7 @@ const App: NextPage = () => {
           handlePageChange={handlePageChange}
           isLoading={isLoading}
           rerouteType={rerouteType}
+          errorFetchingResults={errorFetchingResults}
         />
         <DrugStructuredData drugName={productName} />
       </SearchWrapper>

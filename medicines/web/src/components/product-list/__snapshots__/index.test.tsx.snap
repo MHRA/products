@@ -2,9 +2,9 @@
 
 exports[`ProductList should render 1`] = `
 <styled.nav>
-  <h3>
+  <h2>
     Coffee
-  </h3>
+  </h2>
   <ul>
     <li
       className="product-name"
@@ -83,6 +83,27 @@ exports[`ProductList should render 1`] = `
            files)
         </a>
       </Link>
+    </li>
+  </ul>
+</styled.nav>
+`;
+
+exports[`ProductList should render error message 1`] = `
+<styled.nav>
+  <styled.p>
+    Sorry - the site is experiencing technical issues right now. Please try again later.
+  </styled.p>
+</styled.nav>
+`;
+
+exports[`ProductList should render loading message 1`] = `
+<styled.nav>
+  <h2>
+    Coffee
+  </h2>
+  <ul>
+    <li>
+      Loading results...
     </li>
   </ul>
 </styled.nav>

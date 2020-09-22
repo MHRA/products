@@ -11,6 +11,8 @@ export const mhraGray30 = 'rgba(154, 155, 156, 0.3)';
 export const primaryColor = mhraBlue;
 export const anchorColour = '#1d70b8';
 
+export const errorRed = '#fef0f1';
+
 export const accessibleBackgroundBlue = '#F1F3F9';
 
 export const agency10 = '#e5f7f4';
