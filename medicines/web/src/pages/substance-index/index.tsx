@@ -51,7 +51,7 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
-      metaTitle={substanceIndex ? `Products | ${substanceIndex}` : 'Products'}
+      metaTitle="Products | Substance index"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
