@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { IBmgfDocument } from '../../../model/substance';
+import { IBmgfReport } from '../../../model/document';
 import { mhraBlue80, mhraGray10, white } from '../../../styles/colors';
 import {
   baseSpace,
@@ -194,7 +194,7 @@ function toSentenceCase(substance: string): string {
 }
 
 interface ISearchResultsProps {
-  reports: IBmgfDocument[];
+  reports: IBmgfReport[];
   page: number;
   pageSize: number;
   resultCount: number;

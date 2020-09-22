@@ -749,7 +749,7 @@ exports[`DrugIndex should render horizontal items 1`] = `
 
 exports[`DrugIndex should render substances 1`] = `
 <DrugIndex
-  indexType={2}
+  indexType={1}
   items={
     Array [
       Object {
@@ -781,10 +781,10 @@ exports[`DrugIndex should render substances 1`] = `
           key="Ibuprofen"
         >
           <Link
-            href="/product?product=Ibuprofen"
+            href="/substance?substance=Ibuprofen"
           >
             <a
-              href="/product?product=Ibuprofen"
+              href="/substance?substance=Ibuprofen"
               onClick={[Function]}
               onMouseEnter={[Function]}
             >
@@ -792,7 +792,9 @@ exports[`DrugIndex should render substances 1`] = `
                
               (
               1
-               files)
+               
+              file
+              )
             </a>
           </Link>
         </li>

@@ -1,29 +1,35 @@
 import { shallow } from 'enzyme';
 import React from 'react';
-import { RerouteType } from '../../model/rerouteType';
-import { DocType } from '../../services/azure-search';
+import { RerouteType } from '../../../model/rerouteType';
+import { DocType } from '../../../services/azure-search';
 import SearchResults from './index';
 
 const drugsMock = [
   {
-    activeSubstances: ['tea', 'coffee'],
-    context: 'string',
-    created: 'string',
-    docType: 'string',
-    fileSize: 'string',
-    name: 'string',
-    product: 'string',
-    url: 'string',
+    activeSubstances: ['substance 1', 'substance 2'],
+    context: 'context',
+    fileName: 'file name',
+    fileSize: 'file size',
+    fileUrl: 'file url',
+    title: 'title',
+    products: ['product 1', 'product 2'],
+    matrices: ['matrix 1', 'matrix 2'],
+    pbpkModels: ['model 1', 'model 2'],
+    summary: 'summary',
+    url: 'url',
   },
   {
-    activeSubstances: ['tea', 'coffee'],
-    context: 'string',
-    created: 'string',
-    docType: 'string',
-    fileSize: 'string',
-    name: 'string',
-    product: 'string',
-    url: 'string',
+    activeSubstances: ['substance 3', 'substance 4'],
+    context: 'context',
+    fileName: 'file name',
+    fileSize: 'file size',
+    fileUrl: 'file url',
+    title: 'title 2',
+    products: ['product 3', 'product 4'],
+    matrices: ['matrix 3', 'matrix 4'],
+    pbpkModels: ['model 3', 'model 4'],
+    summary: 'summary',
+    url: 'url',
   },
 ];
 
@@ -34,16 +40,12 @@ describe(SearchResults, () => {
   it('should render', () => {
     const component = shallow(
       <SearchResults
-        drugs={drugsMock}
+        reports={drugsMock}
         page={1}
         pageSize={20}
         resultCount={200}
         searchTerm={'Tea'}
         showingResultsForTerm={'Tea'}
-        disclaimerAgree
-        docTypes={[]}
-        updateDocTypes={updateDocType}
-        rerouteType={RerouteType.CheckboxSelected}
         handlePageChange={noFeedback}
         isLoading={false}
       />,
@@ -54,16 +56,12 @@ describe(SearchResults, () => {
   it('should render loading page', () => {
     const component = shallow(
       <SearchResults
-        drugs={drugsMock}
+        reports={drugsMock}
         page={1}
         pageSize={20}
         resultCount={200}
         searchTerm={'Tea'}
         showingResultsForTerm={'Tea'}
-        disclaimerAgree
-        docTypes={[]}
-        rerouteType={RerouteType.Other}
-        updateDocTypes={noFeedback}
         handlePageChange={noFeedback}
         isLoading
       />,

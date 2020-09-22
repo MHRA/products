@@ -14,18 +14,6 @@ exports[`SearchResults should render 1`] = `
       >
         1 to 2 of 200
       </p>
-      <p
-        className="ema-message"
-      >
-        If the product information you are seeking does not appear below, it is possible that the product holds a European licence and its information may be available at the 
-        <a
-          href="https://www.ema.europa.eu/en"
-          target="_new"
-        >
-          European Medicines Agency
-        </a>
-         website.
-      </p>
       <p>
         Before a medicine can be sold in the UK, a number of licences are essential. Products with a UK marketing authorisation have a licence number in the format ‘PL 12345/0001’. The first 2 characters are always the letters ‘PL’, and this can be found on the packaging of the product.
       </p>
@@ -39,15 +27,6 @@ exports[`SearchResults should render 1`] = `
     <div
       className="row"
     >
-      <div
-        className="column filter"
-      >
-        <SearchFilter
-          currentlyEnabledDocTypes={Array []}
-          rerouteType={0}
-          updateDocTypes={[Function]}
-        />
-      </div>
       <section
         className="column results"
       >
@@ -64,46 +43,33 @@ exports[`SearchResults should render 1`] = `
               <p
                 className="icon"
               >
-                STRING
+                PKIP
               </p>
             </dt>
             <dd
               className="right"
             >
               <a
-                className="doc-type-string"
-                href="string"
+                href="url"
               >
                 <p
                   className="title"
                 >
-                  string
-                </p>
-                <p
-                  className="subtitle"
-                >
-                  string
+                  title
                 </p>
               </a>
               <p
                 className="metadata"
               >
-                File size: 
-                string
-                 KB
-              </p>
-              <p
-                className="metadata"
-              >
                 Active substances:
                  
-                Tea, Coffee
+                Substance 1, Substance 2
               </p>
               <p
                 className="context"
                 dangerouslySetInnerHTML={
                   Object {
-                    "__html": "string",
+                    "__html": "context",
                   }
                 }
               />
@@ -118,46 +84,33 @@ exports[`SearchResults should render 1`] = `
               <p
                 className="icon"
               >
-                STRING
+                PKIP
               </p>
             </dt>
             <dd
               className="right"
             >
               <a
-                className="doc-type-string"
-                href="string"
+                href="url"
               >
                 <p
                   className="title"
                 >
-                  string
-                </p>
-                <p
-                  className="subtitle"
-                >
-                  string
+                  title 2
                 </p>
               </a>
               <p
                 className="metadata"
               >
-                File size: 
-                string
-                 KB
-              </p>
-              <p
-                className="metadata"
-              >
                 Active substances:
                  
-                Tea, Coffee
+                Substance 3, Substance 4
               </p>
               <p
                 className="context"
                 dangerouslySetInnerHTML={
                   Object {
-                    "__html": "string",
+                    "__html": "context",
                   }
                 }
               />
@@ -169,7 +122,6 @@ exports[`SearchResults should render 1`] = `
   </styled.div>
   <Pagination
     currentPage={1}
-    enabledDocTypes={Array []}
     handlePageChange={[Function]}
     pageSize={20}
     resultCount={200}

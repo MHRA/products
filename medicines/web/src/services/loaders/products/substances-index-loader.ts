@@ -17,13 +17,9 @@ const mapSubstance = ([key, facetResult]: [
     .filter((x) => x.value.startsWith(key))
     .forEach((f) => {
       const xs = f.value.replace(/\s+/g, ' ').split(', ', 3).slice(1);
-      if (xs.length > 0) {
+      if (xs.length === 1) {
         const s = xs[0];
         if (ss[s] === undefined) {
-          if (s !== key) {
-            ss[s] = { name: s, count: f.count, products: [] };
-          }
-        } else {
           ss[s].products?.push({ name: xs[1], count: f.count });
         }
       }
