@@ -8,9 +8,9 @@ import SearchWrapper from '../../components/search-wrapper';
 import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
+import { IDocument } from '../../model/document';
 import { docSearch, DocType } from '../../services/azure-search';
-import { documents } from '../../services/documents-loader';
+import { documents } from '../../services/loaders/products/product-loader';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
@@ -18,7 +18,7 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults } from '../../services/results-converter';
+import { convertResults } from '../../services/azure-results-converter';
 
 const pageSize = 10;
 const productPath = '/product';

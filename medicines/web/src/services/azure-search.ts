@@ -55,7 +55,7 @@ export interface IBmgfSearchResult {
 
 export interface IBmgfSearchResults {
   resultCount: number;
-  results: ISearchResult[];
+  results: IBmgfSearchResult[];
 }
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
@@ -92,8 +92,13 @@ const addFilterParameter = (url: URL, filters: ISearchFilters) => {
   }
 };
 
+interface IFacet {
+  count: number;
+  value: string;
+}
+
 export interface IFacetResult {
-  facets: Array<{ count: number; value: string }>;
+  facets: IFacet[];
 }
 
 const buildBaseUrl = (index: string): URL => {

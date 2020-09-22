@@ -48,7 +48,7 @@ fn format_index_search_results(results: FacetResults, facet_match: &str) -> Vec<
 #[cfg(test)]
 mod test {
     use super::*;
-    use search_client::models::{Facet, FacetResult, IndexResult};
+    use search_client::models::{Facet, FacetResult};
 
     #[test]
     fn formats_products_index_results() {

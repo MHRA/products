@@ -1,17 +1,23 @@
 import DataLoader from 'dataloader';
-import { IDocument } from '../model/substance';
-import { DocType } from './azure-search';
-import { graphqlRequest } from './graphql';
+import { IDocument } from '../../../model/document';
+import { DocType } from '../../azure-search';
+import { graphqlRequest } from '../../graphql';
+
+interface IEdge {
+  node: IDocumentResponse;
+}
 
 interface IDocuments {
   count: number;
-  edges: Array<{ node: IDocumentResponse }>;
+  edges: IEdge[];
 }
 
 interface IProductResponse {
-  product: {
-    name: string;
-    documents: IDocuments;
+  products: {
+    product: {
+      name: string;
+      documents: IDocuments;
+    };
   };
 }
 
@@ -28,20 +34,22 @@ interface IDocumentResponse {
 
 const query = `
 query ($productName: String!, $first: Int, $skip: Int, $docTypes: [DocumentType!]) {
-  product(name: $productName) {
-    name
-    documents(first: $first, offset: $skip, documentTypes: $docTypes) {
-      count: totalCount
-      edges {
-        node {
-          product: productName
-          activeSubstances
-          highlights
-          created
-          docType
-          fileBytes: fileSizeInBytes
-          title
-          url
+  products {
+    product(name: $productName) {
+      name
+      documents(first: $first, offset: $skip, documentTypes: $docTypes) {
+        count: totalCount
+        edges {
+          node {
+            product: productName
+            activeSubstances
+            highlights
+            created
+            docType
+            fileBytes: fileSizeInBytes
+            title
+            url
+          }
         }
       }
     }
@@ -55,9 +63,11 @@ interface IProduct {
 }
 
 const convertResponseToProduct = ({
-  product: {
-    name,
-    documents: { count, edges },
+  products: {
+    product: {
+      name,
+      documents: { count, edges },
+    },
   },
 }: IProductResponse): IProduct => {
   return {
@@ -94,15 +104,13 @@ const getDocumentsForProduct = async ({
     productName: name,
     first: pageSize,
     skip: calculatePageStartRecord(page, pageSize),
-    docTypes: docTypes.map(s => s.toUpperCase()),
+    docTypes: docTypes.map((s) => s.toUpperCase()),
   };
 
-  const { data } = await graphqlRequest<IProductResponse, typeof variables>({
+  return graphqlRequest<IProductResponse, typeof variables>({
     query,
     variables,
-  });
-
-  return convertResponseToProduct(data);
+  }).then((response) => convertResponseToProduct(response.data));
 };
 
 interface IProductPageInfo {
@@ -116,7 +124,7 @@ const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
 export const documents = new DataLoader<IProductPageInfo, IProduct>(
-  async productPages => {
+  async (productPages) => {
     return Promise.all(productPages.map(getDocumentsForProduct));
   },
 );

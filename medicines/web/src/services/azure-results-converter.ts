@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { IDocument, IBmgfDocument } from '../model/substance';
+import { IDocument, IBmgfReport } from '../model/document';
 import { ISearchResult, IBmgfSearchResult } from '../services/azure-search';
 
 const sanitizeTitle = (title: string | null): string => {
@@ -32,7 +32,7 @@ export const convertResults = (doc: ISearchResult): IDocument => {
   };
 };
 
-export const convertBmgfResults = (doc: IBmgfSearchResult): IBmgfDocument => {
+export const convertBmgfResults = (doc: IBmgfSearchResult): IBmgfReport => {
   return {
     activeSubstances: doc.active_substances,
     context: doc['@search.highlights']?.content.join(' … ') || '',

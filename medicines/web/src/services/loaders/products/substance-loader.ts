@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
-import { IProduct } from '../model/substance';
-import { graphqlRequest } from './graphql';
+import { IProduct } from '../../../model/product';
+import { graphqlRequest } from '../../graphql';
 
 interface IProductIndexItem {
   name: string;
@@ -8,14 +8,18 @@ interface IProductIndexItem {
 }
 
 interface IResponse {
-  productsIndex: IProductIndexItem[];
+  products: {
+    productsIndex: IProductIndexItem[];
+  };
 }
 
 const query = `
 query ($substance: String) {
-  productsIndex(substance: $substance) {
-    name
-    count
+  products {
+    productsIndex(substance: $substance) {
+      name
+      count
+    }
   }
 }`;
 
@@ -34,7 +38,7 @@ export const graphqlProductsLoader = new DataLoader<string, IProduct[]>(
           return [];
         }
 
-        return response.data.productsIndex;
+        return response.data.products.productsIndex;
       }),
     );
   },

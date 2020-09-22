@@ -1,6 +1,6 @@
 use crate::{
     azure_context::AzureContext,
-    pagination::{convert_after_to_offset, get_offset_or_default},
+    pagination::get_offset_or_default,
     query_objects::products::{
         document::{get_documents, Documents},
         product::{get_product, Product},

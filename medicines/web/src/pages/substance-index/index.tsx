@@ -11,7 +11,7 @@ import { ISubstance } from '../../model/substance';
 import Events from '../../services/events';
 import substanceLoader, {
   graphqlSubstanceLoader,
-} from '../../services/substance-loader';
+} from '../../services/loaders/products/substances-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(

@@ -7,7 +7,7 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
+import { IDocument } from '../../model/document';
 import { docSearch, DocType } from '../../services/azure-search';
 import Events from '../../services/events';
 import {
@@ -16,8 +16,8 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults } from '../../services/results-converter';
-import { searchResults } from '../../services/search-results-loader';
+import { convertResults } from '../../services/azure-results-converter';
+import { searchResults } from '../../services/loaders/products/search-results-loader';
 
 const pageSize = 10;
 const searchPath = '/search';
@@ -61,7 +61,7 @@ const graphQlSearchPageLoader = async ({
   return searchResults.load({ searchTerm, page, pageSize, docTypes });
 };
 
-const App: NextPage = props => {
+const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,

@@ -2,7 +2,7 @@ import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
+import { IDocument } from '../../model/document';
 import { DocType } from '../../services/azure-search';
 import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
@@ -198,10 +198,8 @@ const normalizeDescription = (description: string): string => {
 
 function toSentenceCase(substance: string): string {
   return (
-    (substance as string)
-      .toLowerCase()
-      .charAt(0)
-      .toUpperCase() + substance.slice(1)
+    (substance as string).toLowerCase().charAt(0).toUpperCase() +
+    substance.slice(1)
   );
 }
 
@@ -349,7 +347,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                             <p className="metadata">
                               Active substances:{' '}
                               {drug.activeSubstances
-                                .map(substance => toSentenceCase(substance))
+                                .map((substance) => toSentenceCase(substance))
                                 .join(', ')}
                             </p>
                           )}

@@ -37,24 +37,3 @@ export const getReportContent = async (
     }).then((response) => response.text());
   });
 };
-
-// const response = await fetch(
-//   `https://mhraproductsnonprod.blob.core.windows.net/bmgf-docs/example_report_references_exported_as_html.html`,
-// );
-// if (!response.ok) {
-//   return;
-// }
-// let body = await response.text();
-
-// export const getMarkdownDoc = async (url: string): Promise<any> => {
-//   const resp: Response = await fetch(url, {
-//     method: 'GET',
-//     // headers: {
-//     //   'Content-Type': 'text/markdown',
-//     // },
-//   });
-
-//   if (resp.ok) {
-//     return resp;
-//   }
-// };

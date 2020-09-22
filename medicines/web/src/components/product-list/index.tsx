@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct } from '../../model/substance';
+import { IProduct } from '../../model/product';
+import { pluralise } from '../../services/content-helpers';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledProductList = styled.nav`
@@ -59,7 +60,13 @@ const ProductList: React.FC<IIndex> = ({ title, products }) => {
             <li key={product.name} className="product-name">
               <Link href={searchLink(product.name)}>
                 <a>
-                  {product.name} {product.count && <>({product.count} files)</>}
+                  {product.name}{' '}
+                  {product.count && (
+                    <>
+                      ({product.count}{' '}
+                      {pluralise('file', 'files', product.count)})
+                    </>
+                  )}
                 </a>
               </Link>
             </li>

@@ -1,125 +1,123 @@
-use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
-
 use crate::{
     azure_context::AzureContext,
+    pagination::get_offset_or_default,
     query_objects::medicine_levels_in_pregnancy::query_root::MedicineLevelsInPregnancy,
-    query_objects::products::query_root::Products,
+    query_objects::{
+        products::{
+            document::{get_documents, Documents},
+            product::{get_product, Product},
+            products_index::{get_products_index, ProductIndex},
+            query_root::Products,
+            substance::{get_substance_with_products, Substance},
+        },
+        shared::substances_index::{get_substances_index, SubstanceIndex},
+    },
 };
+use anyhow::anyhow;
+use async_graphql::{Context, EmptyMutation, EmptySubscription, FieldResult, Object, Schema};
 use search_client::models::DocumentType;
 
 pub struct QueryRoot;
 
 #[Object(desc = "Query root")]
 impl QueryRoot {
-    // async fn substance(
-    //     &self,
-    //     context: &Context<'_>,
-    //     name: Option<String>,
-    // ) -> FieldResult<Substance> {
-    //     let context = context.data::<AzureContext>()?;
-    //     match name {
-    //         Some(name) => get_substance_with_products(&name, &context.client)
-    //             .await
-    //             .map_err(|e| {
-    //                 tracing::error!("Error fetching results from Azure search service: {:?}", e);
-    //                 e.into()
-    //             }),
-    //         None => Err(anyhow::anyhow!(
-    //             "Getting a substance without providing a substance name is not supported."
-    //         )
-    //         .into()),
-    //     }
-    // }
+    #[deprecated(note = "Please use `products::substance` instead")]
+    async fn substance(
+        &self,
+        context: &Context<'_>,
+        name: Option<String>,
+    ) -> FieldResult<Substance> {
+        let context = context.data::<AzureContext>()?;
+        match name {
+            Some(name) => get_substance_with_products(&name, &context.products_client)
+                .await
+                .map_err(|e| {
+                    tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                    anyhow!("Error retrieving results").into()
+                }),
+            None => Err(anyhow::anyhow!(
+                "Getting a substance without providing a substance name is not supported."
+            )
+            .into()),
+        }
+    }
 
-    // async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
-    //     get_product(name).await.map_err(|e| {
-    //         tracing::error!("Error fetching results from Azure search service: {:?}", e);
-    //         e.into()
-    //     })
-    // }
+    #[deprecated(note = "Please use `products::product` instead")]
+    async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
+        get_product(name).await.map_err(|e| {
+            tracing::error!("Error fetching results from Azure search service: {:?}", e);
+            anyhow!("Error retrieving results").into()
+        })
+    }
 
-    // async fn substances_index(
-    //     &self,
-    //     context: &Context<'_>,
-    //     letter: String,
-    // ) -> FieldResult<Vec<SubstanceIndex>> {
-    //     let context = context.data::<AzureContext>()?;
-    //     get_substances_index(&context.client, letter.chars().next().unwrap())
-    //         .await
-    //         .map_err(|e| {
-    //             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-    //             e.into()
-    //         })
-    // }
+    #[deprecated(note = "Please use `products::substances_index` instead")]
+    async fn substances_index(
+        &self,
+        context: &Context<'_>,
+        letter: String,
+    ) -> FieldResult<Vec<SubstanceIndex>> {
+        let context = context.data::<AzureContext>()?;
+        get_substances_index(&context.products_client, letter.chars().next().unwrap())
+            .await
+            .map_err(|e| {
+                tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                anyhow!("Error retrieving results").into()
+            })
+    }
 
-    // async fn products_index(
-    //     &self,
-    //     context: &Context<'_>,
-    //     substance: String,
-    // ) -> FieldResult<Vec<ProductIndex>> {
-    //     let context = context.data::<AzureContext>()?;
-    //     get_products_index(&context.client, &substance)
-    //         .await
-    //         .map_err(|e| {
-    //             tracing::error!("Error fetching results from Azure search service: {:?}", e);
-    //             e.into()
-    //         })
-    // }
+    #[deprecated(note = "Please use `products::products_index` instead")]
+    async fn products_index(
+        &self,
+        context: &Context<'_>,
+        substance: String,
+    ) -> FieldResult<Vec<ProductIndex>> {
+        let context = context.data::<AzureContext>()?;
+        get_products_index(&context.products_client, &substance)
+            .await
+            .map_err(|e| {
+                tracing::error!("Error fetching results from Azure search service: {:?}", e);
+                anyhow!("Error retrieving results").into()
+            })
+    }
 
-    // async fn documents(
-    //     &self,
-    //     context: &Context<'_>,
-    //     search: Option<String>,
-    //     first: Option<i32>,
-    //     skip: Option<i32>,
-    //     after: Option<String>,
-    //     document_types: Option<Vec<DocumentType>>,
-    // ) -> FieldResult<Documents> {
-    //     let context = context.data::<AzureContext>()?;
-    //     let offset = get_offset_or_default(skip, after, 0);
+    #[deprecated(note = "Please use `products::documents` instead")]
+    async fn documents(
+        &self,
+        context: &Context<'_>,
+        search: Option<String>,
+        first: Option<i32>,
+        skip: Option<i32>,
+        after: Option<String>,
+        document_types: Option<Vec<DocumentType>>,
+    ) -> FieldResult<Documents> {
+        let context = context.data::<AzureContext>()?;
+        let offset = get_offset_or_default(skip, after, 0);
 
-    //     get_documents(
-    //         &context.client,
-    //         search.as_deref().unwrap_or(" "),
-    //         first,
-    //         offset,
-    //         document_types,
-    //         None,
-    //     )
-    //     .await
-    //     .map(Into::into)
-    //     .map_err(|e| {
-    //         tracing::error!("Error fetching results from Azure search service: {:?}", e);
-    //         e.into()
-    //     })
-    // }
+        get_documents(
+            &context.products_client,
+            search.as_deref().unwrap_or(" "),
+            first,
+            offset,
+            document_types,
+            None,
+        )
+        .await
+        .map(Into::into)
+        .map_err(|e| {
+            tracing::error!("Error fetching results from Azure search service: {:?}", e);
+            anyhow!("Error retrieving results").into()
+        })
+    }
 
-    async fn products(&self, context: &Context<'_>) -> FieldResult<Products> {
+    async fn products(&self, _context: &Context<'_>) -> FieldResult<Products> {
         Ok(Products::new())
     }
     async fn medicine_levels_in_pregnancy(
         &self,
-        context: &Context<'_>,
+        _context: &Context<'_>,
     ) -> FieldResult<MedicineLevelsInPregnancy> {
         Ok(MedicineLevelsInPregnancy::new())
     }
-}
-
-fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
-    match (after, skip) {
-        (Some(encoded), _) => match convert_after_to_offset(encoded) {
-            Ok(a) => a,
-            _ => default,
-        },
-        (None, Some(offset)) => offset,
-        _ => default,
-    }
-}
-
-fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
-    let bytes = base64::decode(encoded)?;
-    let string = std::str::from_utf8(&bytes)?;
-    Ok(string.parse::<i32>()? + 1)
 }
 
 type QuerySchema = Schema<QueryRoot, EmptyMutation, EmptySubscription>;
@@ -140,6 +138,7 @@ impl ApiSchema {
 mod test {
     use super::*;
 
+    use crate::pagination::convert_after_to_offset;
     use test_case::test_case;
 
     #[test_case("LTE=".to_string(), 0; "for the first page of results")]

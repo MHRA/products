@@ -150,7 +150,6 @@ mod test {
     use async_trait::async_trait;
     use search_client::models::{FacetResults, ReportResults};
     use serde::de::DeserializeOwned;
-    use test_case::test_case;
     use tokio_test::block_on;
 
     struct TestAzureSearchClient {
@@ -273,15 +272,21 @@ mod test {
     }
 
     fn when_we_get_the_first_page_of_reports(search_client: impl Search) -> Reports {
-        block_on(get_reports(&search_client, "Search string", None, 0))
+        block_on(get_reports(&search_client, "Search string", None, 0, None))
             .unwrap()
             .into()
     }
 
     fn when_we_get_the_last_page_of_reports(search_client: impl Search) -> Reports {
-        block_on(get_reports(&search_client, "Search string", None, 1230))
-            .unwrap()
-            .into()
+        block_on(get_reports(
+            &search_client,
+            "Search string",
+            None,
+            1230,
+            None,
+        ))
+        .unwrap()
+        .into()
     }
 
     fn then_we_have_the_first_page(reports_response: &Reports) {

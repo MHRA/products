@@ -6,30 +6,23 @@ import Page from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../../hooks';
-import { IBmgfDocument } from '../../../model/substance';
+import { IBmgfReport, IBmgfReports } from '../../../model/document';
 import { bmgfDocSearch } from '../../../services/azure-search';
 import Events from '../../../services/events';
 import { parsePage } from '../../../services/querystring-interpreter';
-import { convertBmgfResults } from '../../../services/results-converter';
-import { searchResults } from '../../../services/search-results-loader';
+import { convertBmgfResults } from '../../../services/azure-results-converter';
+import {
+  reportsLoader,
+  ISearchInfo,
+} from '../../../services/loaders/medicine-levels-in-pregnancy/search-results-loader';
 
 const pageSize = 10;
 const searchPath = '/medicine-levels-in-pregnancy';
 
-interface ISearchResult {
-  count: number;
-  documents: IBmgfDocument[];
-}
-
-interface ISearchPageInfo {
-  searchTerm: string;
-  page: number;
-}
-
 const azureSearchPageLoader = async ({
   searchTerm,
   page,
-}: ISearchPageInfo): Promise<ISearchResult> => {
+}: ISearchInfo): Promise<IBmgfReports> => {
   const results = await bmgfDocSearch({
     query: searchTerm,
     page,
@@ -40,23 +33,23 @@ const azureSearchPageLoader = async ({
   });
   return {
     count: results.resultCount,
-    documents: results.results.map(convertBmgfResults),
+    reports: results.results.map(convertBmgfResults),
   };
 };
 
-// const graphQlSearchPageLoader = async ({
-//   searchTerm,
-//   page,
-// }: ISearchPageInfo): Promise<ISearchResult> => {
-//   return searchResults.load({ searchTerm, page, pageSize });
-// };
+const graphQlSearchPageLoader = async ({
+  searchTerm,
+  page,
+}: ISearchInfo): Promise<IBmgfReports> => {
+  return reportsLoader.load({ searchTerm, page, pageSize });
+};
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
-  const [documents, setDocuments] = React.useState<IBmgfDocument[]>([]);
+  const [reports, setReports] = React.useState<IBmgfReport[]>([]);
   const [query, setQuery] = React.useState('');
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -69,14 +62,13 @@ const App: NextPage = (props) => {
   } = router;
 
   const getSearchResults = async (
-    searchPageInfo: ISearchPageInfo,
-  ): Promise<ISearchResult> => {
-    // if (useGraphQl) {
-    //   return graphQlSearchPageLoader(searchPageInfo);
-    // } else {
-    //   return azureSearchPageLoader(searchPageInfo);
-    // }
-    return azureSearchPageLoader(searchPageInfo);
+    searchPageInfo: ISearchInfo,
+  ): Promise<IBmgfReports> => {
+    if (useGraphQl) {
+      return graphQlSearchPageLoader(searchPageInfo);
+    } else {
+      return azureSearchPageLoader(searchPageInfo);
+    }
   };
 
   useEffect(() => {
@@ -90,19 +82,20 @@ const App: NextPage = (props) => {
     setQuery(query);
     setPageNumber(page);
 
-    (async () => {
-      const { documents, count } = await getSearchResults({
-        searchTerm: query,
-        page,
-      });
-      setDocuments(documents);
-      setCount(count);
+    getSearchResults({
+      searchTerm: query,
+      page,
+      pageSize,
+    }).then((response) => {
+      setReports(response.reports);
+      setCount(response.count);
       setIsLoading(false);
-      // Events.searchForProductsMatchingKeywords({
-      //   searchTerm: query,
-      //   pageNo: page,
-      // });
-    })();
+    });
+
+    // Events.searchForProductsMatchingKeywords({
+    //   searchTerm: query,
+    //   pageNo: page,
+    // });
   }, [queryQS, pageQS, docQS]);
 
   useEffect(() => {
@@ -132,7 +125,7 @@ const App: NextPage = (props) => {
     >
       <SearchWrapper initialSearchValue={query}>
         <SearchResults
-          reports={documents}
+          reports={reports}
           showingResultsForTerm={query}
           resultCount={count}
           page={pageNumber}

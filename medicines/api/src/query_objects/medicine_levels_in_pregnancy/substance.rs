@@ -1,8 +1,11 @@
-use crate::query_objects::medicine_levels_in_pregnancy::report::{
-    get_reports, get_reports_graph_from_reports_vector, Report, Reports,
+use crate::{
+    azure_context::AzureContext,
+    query_objects::medicine_levels_in_pregnancy::report::{
+        get_reports, get_reports_graph_from_reports_vector, Report, Reports,
+    },
 };
 use anyhow::anyhow;
-use async_graphql::{FieldResult, Object};
+use async_graphql::{Context, FieldResult, Object};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct SubstanceReports {
@@ -14,14 +17,6 @@ impl SubstanceReports {
     pub fn new(name: String, reports: Option<Vec<Report>>) -> Self {
         Self { name, reports }
     }
-
-    pub fn add(&mut self, report: Report) {
-        if let Some(ref mut v) = self.reports {
-            v.push(report);
-        } else {
-            self.reports = Some(vec![report])
-        }
-    }
 }
 
 #[Object(desc = "An active ingredient found in medical products")]
@@ -32,7 +27,14 @@ impl SubstanceReports {
     }
 
     #[field(desc = "Reports related to active substance")]
-    async fn reports(&self, first: Option<i32>, offset: Option<i32>) -> FieldResult<Reports> {
+    async fn reports(
+        &self,
+        context: &Context<'_>,
+        first: Option<i32>,
+        offset: Option<i32>,
+    ) -> FieldResult<Reports> {
+        let context = context.data::<AzureContext>()?;
+
         let offset = match offset {
             Some(a) => a,
             None => 0,
@@ -52,19 +54,13 @@ impl SubstanceReports {
                 total_count,
             ))
         } else {
-            get_reports(
-                &search_client::AzureSearchClient::new_with_index("bmgf-index".to_string()),
-                "",
-                first,
-                offset,
-                Some(&self.name),
-            )
-            .await
-            .map(Into::into)
-            .map_err(|e| {
-                tracing::error!("Error fetching reeports from Azure search service: {:?}", e);
-                anyhow!("Error retrieving results").into()
-            })
+            get_reports(&context.bmgf_client, "", first, offset, Some(&self.name))
+                .await
+                .map(Into::into)
+                .map_err(|e| {
+                    tracing::error!("Error fetching reeports from Azure search service: {:?}", e);
+                    anyhow!("Error retrieving results").into()
+                })
         }
     }
 }
@@ -99,10 +95,10 @@ mod test {
 
     #[test]
     fn test_sort_substances() {
-        let mut substances = Vec::<Substance>::new();
-        substances.push(Substance::new("Ibuprofen".to_owned(), None));
-        substances.push(Substance::new("Paracetamol".to_owned(), None));
-        substances.push(Substance::new("Aspirin".to_owned(), None));
+        let mut substances = Vec::<SubstanceReports>::new();
+        substances.push(SubstanceReports::new("Ibuprofen".to_owned(), None));
+        substances.push(SubstanceReports::new("Paracetamol".to_owned(), None));
+        substances.push(SubstanceReports::new("Aspirin".to_owned(), None));
         substances.sort();
         assert_eq!(substances[0].name, "Aspirin");
         assert_eq!(substances[1].name, "Ibuprofen");

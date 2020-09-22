@@ -1,6 +1,6 @@
 use crate::{
     azure_context::AzureContext,
-    pagination::{convert_after_to_offset, get_offset_or_default},
+    pagination::get_offset_or_default,
     query_objects::medicine_levels_in_pregnancy::{
         report::{get_reports, Reports},
         substance::{get_substance, SubstanceReports},
@@ -31,7 +31,7 @@ impl MedicineLevelsInPregnancy {
     #[field(desc = "Retrieves all reports associated with the queried active substance")]
     async fn substance(
         &self,
-        context: &Context<'_>,
+        _context: &Context<'_>,
         name: Option<String>,
     ) -> FieldResult<SubstanceReports> {
         match name {

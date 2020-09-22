@@ -1,8 +1,11 @@
-use crate::query_objects::products::document::{
-    self, get_documents, get_documents_graph_from_documents_vector, Document,
+use crate::{
+    azure_context::AzureContext,
+    query_objects::products::document::{
+        self, get_documents, get_documents_graph_from_documents_vector, Document,
+    },
 };
 use anyhow::anyhow;
-use async_graphql::{FieldResult, Object};
+use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -35,10 +38,13 @@ impl Product {
     #[field(desc = "Documents related to product")]
     async fn documents(
         &self,
+        context: &Context<'_>,
         first: Option<i32>,
         offset: Option<i32>,
         document_types: Option<Vec<DocumentType>>,
     ) -> FieldResult<document::Documents> {
+        let context = context.data::<AzureContext>()?;
+
         let offset = match offset {
             Some(a) => a,
             None => 0,
@@ -67,7 +73,7 @@ impl Product {
             ))
         } else {
             get_documents(
-                &search_client::AzureSearchClient::new(),
+                &context.products_client,
                 "",
                 first,
                 offset,

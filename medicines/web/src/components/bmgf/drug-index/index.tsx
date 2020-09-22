@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct } from '../../../model/substance';
+import { ISubstanceIndex } from '../../../model/substance';
 import { mobileBreakpoint } from '../../../styles/dimensions';
+import { pluralise } from '../../../services/content-helpers';
 
 const StyledDrugIndex = styled.nav`
   h2 {
@@ -58,7 +59,7 @@ const StyledDrugIndex = styled.nav`
   }
 `;
 
-export const index: IProduct[] = [
+export const index: ISubstanceIndex[] = [
   { name: 'A' },
   { name: 'B' },
   { name: 'C' },
@@ -109,7 +110,7 @@ export enum IndexType {
 
 interface IIndex {
   title: string;
-  items: IProduct[];
+  items: ISubstanceIndex[];
   indexType: IndexType;
 }
 
@@ -145,7 +146,13 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
             >
               <Link href={searchLink(item.name)}>
                 <a>
-                  {item.name} {item.count && <>({item.count} reports)</>}
+                  {item.name}{' '}
+                  {item.count && (
+                    <>
+                      ({item.count} {pluralise('report', 'reports', item.count)}
+                      )
+                    </>
+                  )}
                 </a>
               </Link>
             </li>

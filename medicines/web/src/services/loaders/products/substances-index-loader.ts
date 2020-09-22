@@ -1,8 +1,8 @@
-import { facetSearch, bmgfFacetSearch, IFacetResult } from './azure-search';
+import { facetSearch, IFacetResult } from '../../azure-search';
 
 import DataLoader from 'dataloader';
-import { ISubstance } from '../model/substance';
-import { graphqlRequest } from './graphql';
+import { ISubstance, ISubstanceIndex } from '../../../model/substance';
+import { graphqlRequest } from '../../graphql';
 
 const substanceLoader = new DataLoader<string, ISubstance[]>(async (keys) => {
   return Promise.all(keys.map(facetSearch)).then((r) => r.map(mapSubstance));
@@ -31,32 +31,21 @@ const mapSubstance = ([key, facetResult]: [
   return Object.values(ss);
 };
 
-export const bmgfSubstanceLoader = new DataLoader<string, ISubstance[]>(
-  async (keys) => {
-    return Promise.all(keys.map(bmgfFacetSearch)).then((r) =>
-      r.map(mapSubstance),
-    );
-  },
-);
-
-interface ISubstanceIndexItem {
-  name: string;
-  count: number;
-}
-
 interface IResponse {
-  substancesIndex: ISubstanceIndexItem[];
+  products: { substancesIndex: ISubstanceIndex[] };
 }
 
 const query = `
 query ($letter: String!) {
-  substancesIndex(letter: $letter) {
-    name
-    count
+  products {
+    substancesIndex(letter: $letter) {
+      name
+      count
+    }
   }
 }`;
 
-export const graphqlSubstanceLoader = new DataLoader<string, ISubstance[]>(
+export const graphqlSubstanceLoader = new DataLoader<string, ISubstanceIndex[]>(
   async (keys) => {
     return Promise.all(
       // Could potentially batch the queries for all of the keys into one GraphQL request but there's never
@@ -69,7 +58,7 @@ export const graphqlSubstanceLoader = new DataLoader<string, ISubstance[]>(
           variables,
         });
 
-        return data.substancesIndex;
+        return data.products.substancesIndex;
       }),
     );
   },

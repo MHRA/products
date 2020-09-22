@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct, isIndex, isSubstance } from '../../model/substance';
+import { IProduct } from '../../model/product';
+import { pluralise } from '../../services/content-helpers';
 import { mobileBreakpoint } from '../../styles/dimensions';
 
 const StyledDrugIndex = styled.nav`
@@ -147,7 +148,12 @@ const DrugIndex: React.FC<IIndex> = ({ title, items, indexType }) => {
             >
               <Link href={searchLink(item.name)}>
                 <a>
-                  {item.name} {item.count && <>({item.count} files)</>}
+                  {item.name}{' '}
+                  {item.count && (
+                    <>
+                      ({item.count} {pluralise('file', 'files', item.count)})
+                    </>
+                  )}
                 </a>
               </Link>
             </li>

@@ -1,15 +1,21 @@
 import DataLoader from 'dataloader';
-import { IDocument } from '../model/substance';
-import { DocType } from './azure-search';
-import { graphqlRequest } from './graphql';
+import { IDocument } from '../../../model/document';
+import { DocType } from '../../azure-search';
+import { graphqlRequest } from '../../graphql';
+
+interface IEdge {
+  node: IDocumentResponse;
+}
 
 interface IDocuments {
   count: number;
-  edges: Array<{ node: IDocumentResponse }>;
+  edges: IEdge[];
 }
 
 interface ISearchPageResponse {
-  documents: IDocuments;
+  products: {
+    documents: IDocuments;
+  };
 }
 
 interface IDocumentResponse {
@@ -25,19 +31,21 @@ interface IDocumentResponse {
 
 const query = `
 query($searchTerm: String, $first: Int, $after: String, $documentTypes: [DocumentType!]) {
-  documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes) {
-    count: totalCount
-    edges {
-      cursor
-      node {
-        product: productName
-        activeSubstances
-        highlights
-        created
-        docType
-        fileBytes: fileSizeInBytes
-        title
-        url
+  products {
+    documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes) {
+      count: totalCount
+      edges {
+        cursor
+        node {
+          product: productName
+          activeSubstances
+          highlights
+          created
+          docType
+          fileBytes: fileSizeInBytes
+          title
+          url
+        }
       }
     }
   }
@@ -49,7 +57,9 @@ interface ISearchPage {
 }
 
 const convertResponseToSearchPage = ({
-  documents: { count, edges },
+  products: {
+    documents: { count, edges },
+  },
 }: ISearchPageResponse): ISearchPage => {
   return {
     count,
@@ -84,7 +94,7 @@ const getDocumentsForProduct = async ({
     searchTerm,
     first: pageSize,
     after: makeCursor(page, pageSize),
-    documentTypes: docTypes.map(s => s.toUpperCase()),
+    documentTypes: docTypes.map((s) => s.toUpperCase()),
   };
   const { data } = await graphqlRequest<ISearchPageResponse, typeof variables>({
     query,
@@ -111,7 +121,7 @@ const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
 export const searchResults = new DataLoader<ISearchPageInfo, ISearchPage>(
-  async productPages => {
+  async (productPages) => {
     return Promise.all(productPages.map(getDocumentsForProduct));
   },
 );
