@@ -19,6 +19,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Medicine levels in pregnancy"
+      metaTitle="Medicine levels in pregnancy"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

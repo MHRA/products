@@ -14,7 +14,7 @@ import {
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
-import Pagination from './pagination';
+import Pagination from '../pagination';
 
 const StyledDrugList = styled.div`
   .title {
@@ -398,7 +398,6 @@ const SearchResults = (props: ISearchResultsProps) => {
           pageSize={pageSize}
           resultCount={resultCount}
           searchTerm={searchTerm}
-          enabledDocTypes={docTypes}
           handlePageChange={props.handlePageChange}
         />
       ) : (

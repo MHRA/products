@@ -113,7 +113,6 @@ const App: NextPage = (props) => {
 
     setDocuments([]);
     setCount(0);
-    setIsLoading(true);
     setErrorFetchingResults(false);
 
     getSearchResults({

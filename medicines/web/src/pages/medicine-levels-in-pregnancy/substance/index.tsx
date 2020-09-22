@@ -58,6 +58,7 @@ const App: NextPage = () => {
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
 
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
@@ -84,16 +85,22 @@ const App: NextPage = () => {
     const page = pageQS ? parsePage(pageQS) : 1;
     setSubstanceName(substance);
     setPageNumber(page);
+    setReports([]);
+    setCount(0);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
 
     getSubstance({
       name: substance,
       page,
       pageSize,
-    }).then((response) => {
-      setReports(response.reports);
-      setCount(response.count);
-      setIsLoading(false);
-    });
+    })
+      .then(({ reports, count }) => {
+        setReports(reports);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
 
     // Events.viewResultsForProduct({
     //   productName: product,
@@ -126,6 +133,7 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Medicine levels in pregnancy | Substance results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
@@ -139,6 +147,7 @@ const App: NextPage = () => {
           searchTerm={substanceName}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
+          errorFetchingResults={errorFetchingResults}
         />
         <DrugStructuredData drugName={substanceName} />
       </SearchWrapper>

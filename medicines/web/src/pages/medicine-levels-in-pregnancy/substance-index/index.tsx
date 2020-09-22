@@ -23,6 +23,8 @@ const App: NextPage = () => {
   );
   const [results, setResults] = React.useState<ISubstanceIndex[]>([]);
   const [substanceIndex, setSubstanceIndex] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -37,14 +39,23 @@ const App: NextPage = () => {
     const index = queryQS.toString();
     setSubstanceIndex(index);
 
+    setErrorFetchingResults(false);
+    setIsLoading(true);
+    setResults([]);
+
     const loader = useGraphQl
       ? graphqlSubstancesIndexLoader
       : substancesIndexLoader;
 
-    loader.load(index).then((results) => {
-      results = results || [];
-      setResults(results);
-    });
+    loader
+      .load(index)
+      .then((results) => {
+        setResults(results);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setErrorFetchingResults(true);
+      });
 
     Events.viewSubstancesStartingWith(index);
   }, [queryQS]);
@@ -58,6 +69,7 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Medicine levels in pregnancy | Substance index"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
@@ -66,6 +78,8 @@ const App: NextPage = () => {
           title={`${substanceIndex || '...'}`}
           items={results}
           indexType={IndexType.SubstancesIndex}
+          errorFetchingResults={errorFetchingResults}
+          isLoading={isLoading}
         />
         <SubstanceListStructuredData
           substanceNames={results.map((substance) => substance.name)}

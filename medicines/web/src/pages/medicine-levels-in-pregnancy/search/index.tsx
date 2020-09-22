@@ -54,6 +54,7 @@ const App: NextPage = (props) => {
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = false; // process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -82,15 +83,21 @@ const App: NextPage = (props) => {
     setQuery(query);
     setPageNumber(page);
 
+    setReports([]);
+    setCount(0);
+    setErrorFetchingResults(false);
+
     getSearchResults({
       searchTerm: query,
       page,
       pageSize,
-    }).then((response) => {
-      setReports(response.reports);
-      setCount(response.count);
-      setIsLoading(false);
-    });
+    })
+      .then(({ reports, count }) => {
+        setReports(reports);
+        setCount(count);
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
 
     // Events.searchForProductsMatchingKeywords({
     //   searchTerm: query,
@@ -120,6 +127,7 @@ const App: NextPage = (props) => {
   return (
     <Page
       title="Products"
+      metaTitle="Medicine levels in pregnancy | Search results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
@@ -133,6 +141,7 @@ const App: NextPage = (props) => {
           searchTerm={query}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
+          errorFetchingResults={errorFetchingResults}
         />
       </SearchWrapper>
     </Page>

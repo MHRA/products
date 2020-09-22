@@ -1,7 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { IBmgfReport } from '../../../model/document';
-import { mhraBlue80, mhraGray10, white } from '../../../styles/colors';
+import {
+  mhraBlue80,
+  mhraGray10,
+  white,
+  errorRed,
+} from '../../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -9,19 +14,12 @@ import {
   tinyPaddingSizeCss,
 } from '../../../styles/dimensions';
 import { baseFontSize, h2FontSize } from '../../../styles/fonts';
-import SearchFilter from '../../search-filter';
-import Pagination from './pagination';
+import Pagination from '../../pagination';
 
 const StyledReportList = styled.div`
   .title {
     font-size: ${h2FontSize};
     padding: 0;
-    margin: 0;
-  }
-
-  .no-of-results {
-    padding-top: 0;
-    padding-bottom: 30px;
     margin: 0;
   }
 
@@ -37,7 +35,7 @@ const StyledReportList = styled.div`
     padding: 0;
   }
 
-  article {
+  div.search-result {
     display: flex;
     background-color: ${mhraGray10};
     padding: ${baseSpace};
@@ -143,6 +141,20 @@ const HiddenHeader = styled.h3`
   height: 0;
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
+const TitleAndCountContainer = styled.div`
+  margin-bottom: 30px;
+`;
+
+const Count = styled.p`
+  margin: 0 0 30px;
+  padding: 0;
+`;
+
 const searchResultsTitle = (
   showingResultsForTerm: string,
   noOfResults: number,
@@ -203,6 +215,7 @@ interface ISearchResultsProps {
 
   handlePageChange: (num: number) => void;
   isLoading: boolean;
+  errorFetchingResults?: boolean;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -217,29 +230,46 @@ const SearchResults = (props: ISearchResultsProps) => {
 
   const hasReports = reports.length > 0;
 
-  return props.isLoading ? (
-    <StyledReportList>
-      <h2 className="title">
-        {`Loading results for ${showingResultsForTerm}...`}
-      </h2>
-    </StyledReportList>
-  ) : (
+  if (props.errorFetchingResults) {
+    return (
+      <StyledReportList>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledReportList>
+    );
+  }
+
+  if (props.isLoading) {
+    return (
+      <StyledReportList>
+        <h2 className="title">
+          {`Loading results for ${showingResultsForTerm}...`}
+        </h2>
+      </StyledReportList>
+    );
+  }
+
+  return (
     <>
       <StyledReportList>
         <div>
-          <h2 className="title">
-            {searchResultsTitle(showingResultsForTerm, reports.length)}
-          </h2>
-          {hasReports && (
-            <p className="no-of-results">
-              {searchResultsNumberingInformation({
-                page,
-                pageSize,
-                shownResultCount: reports.length,
-                totalResultCount: resultCount,
-              })}
-            </p>
-          )}
+          <TitleAndCountContainer>
+            <h2 className="title">
+              {searchResultsTitle(showingResultsForTerm, reports.length)}
+            </h2>
+            {hasReports && (
+              <Count className="no-of-results">
+                {searchResultsNumberingInformation({
+                  page,
+                  pageSize,
+                  shownResultCount: reports.length,
+                  totalResultCount: resultCount,
+                })}
+              </Count>
+            )}
+          </TitleAndCountContainer>
           <p>
             Before a medicine can be sold in the UK, a number of licences are
             essential. Products with a UK marketing authorisation have a licence
@@ -264,7 +294,7 @@ const SearchResults = (props: ISearchResultsProps) => {
             <dl>
               {hasReports &&
                 reports.map((report, i) => (
-                  <article key={i}>
+                  <div key={i} className="search-result">
                     <dt className="left">
                       <p className="icon">PKIP</p>
                     </dt>
@@ -287,7 +317,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                         }}
                       />
                     </dd>
-                  </article>
+                  </div>
                 ))}
             </dl>
           </section>

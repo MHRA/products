@@ -25,22 +25,16 @@ const StyledSearchWrapper = styled.div`
   }
 `;
 
+const AccessibleSearchBoxHeading = styled.h2`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
 interface ISearchWrapperProps {
   initialSearchValue: string;
   children: React.ReactNode;
 }
-
-// const formatInitialSearchTerm = (searchTerm: string | string[]) => {
-//   if (searchTerm) {
-//     return searchTerm.toString();
-//   }
-//   return '';
-// };
-
-// const extractProductLicenseRegExp: RegExp = new RegExp(
-//   '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
-//   'ig',
-// );
 
 const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
 
@@ -87,6 +81,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
   return (
     <StyledSearchWrapper>
       <section className="search">
+        <AccessibleSearchBoxHeading>Search box</AccessibleSearchBoxHeading>
         <Search
           search={search}
           onSearchChange={handleSearchChange}

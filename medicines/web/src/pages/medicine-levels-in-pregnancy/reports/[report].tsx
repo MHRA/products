@@ -45,10 +45,21 @@ const updateImageTag = (imageNode, prefix) => {
   return imageNode;
 };
 
+const removeStyleAttribute(node) => {
+  for (let i = 0; i < node.attrs.length; i++) {
+    if (node.attrs[i].name === "style") {
+      node.attrs[i].value = '';
+      return node;
+    }
+  }
+  return node;
+}
+
 const recurseNodes = (node, prefix) => {
   if (node.tagName && node.tagName === 'img') {
     node = updateImageTag(node, prefix);
   }
+  node = removeStyleAttribute(node);
   if (!node.childNodes) {
     return node;
   }
