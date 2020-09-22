@@ -51,6 +51,13 @@ const StyledSearch = styled.section`
   }
 `;
 
+const AccessibleSearchInputHeading = styled.h3`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
+
 const labelString = 'Enter a product, active substance, or PL number:';
 
 interface ISearchProps {
@@ -60,8 +67,9 @@ interface ISearchProps {
   search: string;
 }
 
-const Search: React.FC<ISearchProps> = props => (
+const Search: React.FC<ISearchProps> = (props) => (
   <StyledSearch>
+    <AccessibleSearchInputHeading>Search by text</AccessibleSearchInputHeading>
     <form
       onSubmit={props.onSearchSubmit}
       role="search"

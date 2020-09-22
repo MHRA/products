@@ -10,7 +10,7 @@ exports[`Pdf should render 1`] = `
       <OutboundLink
         eventLabel="Help viewing PDF files"
         onClick={null}
-        target="_new"
+        target="_blank"
         to="https://helpx.adobe.com/support/acrobat.html"
         trackerNames={null}
       >
@@ -21,7 +21,7 @@ exports[`Pdf should render 1`] = `
       <OutboundLink
         eventLabel="Download Acrobat reader for free"
         onClick={null}
-        target="_new"
+        target="_blank"
         to="http://www.adobe.com/products/acrobat/readstep2.html"
         trackerNames={null}
       >
@@ -32,7 +32,7 @@ exports[`Pdf should render 1`] = `
       <OutboundLink
         eventLabel="Adobe text conversion tools"
         onClick={null}
-        target="_new"
+        target="_blank"
         to="http://www.adobe.com/products/acrobat/access_onlinetools.html"
         trackerNames={null}
       >

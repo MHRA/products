@@ -9,8 +9,8 @@ const StyledMipText = styled.section`
   ul li {
     font-size: ${baseFontSize};
     line-height: 1.47;
-    margin-block-start: 1em;
-    margin-block-end: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
   }
 
   p:first-of-type {

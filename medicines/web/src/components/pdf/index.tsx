@@ -34,7 +34,11 @@ const Pdf: React.FC = () => (
     <h2>{title}</h2>
     <ul>
       <li>
-        <ReactGA.OutboundLink eventLabel={helpLabel} to={helpUrl} target="_new">
+        <ReactGA.OutboundLink
+          eventLabel={helpLabel}
+          to={helpUrl}
+          target="_blank"
+        >
           {helpLabel}
         </ReactGA.OutboundLink>
       </li>
@@ -42,7 +46,7 @@ const Pdf: React.FC = () => (
         <ReactGA.OutboundLink
           eventLabel={downloadLabel}
           to={downloadUrl}
-          target="_new"
+          target="_blank"
         >
           {downloadLabel}
         </ReactGA.OutboundLink>
@@ -51,7 +55,7 @@ const Pdf: React.FC = () => (
         <ReactGA.OutboundLink
           eventLabel={toolsLabel}
           to={toolsUrl}
-          target="_new"
+          target="_blank"
         >
           {toolsLabel}
         </ReactGA.OutboundLink>

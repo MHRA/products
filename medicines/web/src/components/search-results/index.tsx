@@ -35,7 +35,7 @@ const StyledDrugList = styled.div`
     padding: 0;
   }
 
-  article {
+  div.search-result {
     display: flex;
     background-color: ${mhraGray10};
     padding: ${baseSpace};
@@ -156,7 +156,7 @@ const Count = styled.p`
 `;
 
 const emaWebsiteLink = () => (
-  <a href="https://www.ema.europa.eu/en" target="_new">
+  <a href="https://www.ema.europa.eu/en" target="_blank">
     European Medicines Agency
   </a>
 );
@@ -347,7 +347,7 @@ const SearchResults = (props: ISearchResultsProps) => {
               <dl>
                 {hasDrugs &&
                   drugs.map((drug, i) => (
-                    <article key={i}>
+                    <div key={i} className="search-result">
                       <dt className="left">
                         <p className="icon">{drug.docType.toUpperCase()}</p>
                       </dt>
@@ -384,7 +384,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                           }}
                         />
                       </dd>
-                    </article>
+                    </div>
                   ))}
               </dl>
             </section>

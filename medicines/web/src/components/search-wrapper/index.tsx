@@ -26,6 +26,13 @@ const StyledSearchWrapper = styled.div`
   }
 `;
 
+const AccessibleSearchBoxHeading = styled.h2`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
+
 interface ISearchWrapperProps {
   initialSearchValue: string | string[];
   children: React.ReactNode;
@@ -92,6 +99,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
   return (
     <StyledSearchWrapper>
       <section className="search">
+        <AccessibleSearchBoxHeading>Search box</AccessibleSearchBoxHeading>
         <Search
           search={search}
           onSearchChange={handleSearchChange}

@@ -181,6 +181,7 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | Product results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
