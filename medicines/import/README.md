@@ -34,7 +34,23 @@ You can find both of these in the [Azure portal](https://portal.azure.com). Navi
 
 ### Importing reports
 
-The expected file structure for reports to be imported is that there should be a top level directory that contains the metadata file and all report folders. Each report folder should contain a report in both PDF and HTML formats. There should also be a directory containing the HTML file assets, such as images and css files.
+The expected file structure for reports to be imported is that there should be a top level directory that contains the metadata file and all report folders. Each report folder should contain a report in both PDF and HTML formats. There should also be a directory containing the HTML file assets, such as images and CSS files.
+
+Expected structure:
+
+- metadata.xlsx (file)
+- report_name (dir)
+  - report.pdf (file)
+  - report.html (file)
+  - report.fld (dir)
+    - image1.jpg (file)
+    - styles.css (file)
+- report_name_2 (dir)
+  - report_2.pdf (file)
+  - report_2.html (file)
+  - report_2.fld (dir)
+    - image1.jpg (file)
+    - styles.css (file)
 
 The metadata file should have the following headed columns, in order:
 

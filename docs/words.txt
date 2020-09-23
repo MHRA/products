@@ -45,6 +45,7 @@ compliances
 config
 configmap
 crds
+CSS
 CSV
 Ctrl
 CVE
@@ -157,8 +158,11 @@ OtfjQ
 parameterise
 PAR
 PARs
+pbpk
+PBPK
 pdf
 PDFs
+pharmakokinetics
 PII
 PIL
 PILs
