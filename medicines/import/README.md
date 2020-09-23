@@ -1,6 +1,6 @@
 # Import
 
-The purpose of the import tool is to import SPC (Summary of Product Characteristics), PIL (Patient Information Leaflet), and PAR (Public Assessment Reports) documents to Azure blob storage and attach meaningful metadata to allow those documents to be indexed.
+The purpose of the import tool is to upload pharmakokinetics reports about medicine levels in pregnancy, as part of the Bill and Melinda Gates Foundation. The reports are uploaded to Azure blob storage, with meaningful metadata attached, to allow those reports to be indexed and searched.
 
 The Import tool is written in Rust, so in order to contribute to or run the Import tool, you'll need `rustc` and `cargo` installed ([installation instructions](https://doc.rust-lang.org/cargo/getting-started/installation.html)).
 
@@ -24,7 +24,7 @@ In order to run the automated testing suite, navigate to the correct directory a
 
 ### Setting the correct environment variables
 
-There are two environment variables which need to be set to run the Import tool:
+There are three environment variables which need to be set to run the Import tool:
 
 - `STORAGE_ACCOUNT` - The Azure blob storage account to upload documents to;
 - `STORAGE_CONTAINER` - This is the name of the Azure blob storage container to upload to;
@@ -32,24 +32,41 @@ There are two environment variables which need to be set to run the Import tool:
 
 You can find both of these in the [Azure portal](https://portal.azure.com). Navigate to your Storage Account, then choose Access Keys on the left navigation panel.
 
-### Importing SPCs & PILs
+### Importing reports
 
-All PDF files, along with a CSV file containing metadata about the PDFs, are expected to be in a single directory. For information about the keys which are uploaded to metadata, consult the [Record model](/medicines/import/src/model.rs).
+The expected file structure for reports to be imported is that there should be a top level directory that contains the metadata file and all report folders. Each report folder should contain a report in both PDF and HTML formats. There should also be a directory containing the HTML file assets, such as images and css files.
+
+The metadata file should have the following headed columns, in order:
+
+- Report name
+- File name
+- Summary
+- Active substances
+- Products
+- PL numbers
+- PBPK models
+- Pregnancy trimesters
+- Matrices
+
+The metadata attached to each PDF report file is as follows:
+
+- report_name
+- file_name
+- summary
+- active_substances
+- products
+- pl_numbers
+- pbpk_models
+- pregnancy_trimesters
+- matrices
+- facets
+
+Facets is a field calculated from the active substances and helps drive the hierarchical search on the website.
 
 Navigate to the correct directory and run the following command:
 
 ```sh
- cargo run spcpil -d /path/to/pdfs/
-```
-
-### Importing PARs
-
-All PDF files, along with a CSV file containing metadata about the PDFs, are expected to be in a single directory. For information about the keys which are uploaded to metadata, consult the [Record model](/medicines/import/src/model.rs).
-
-Navigate to the correct directory and run the following command:
-
-```sh
- cargo run par -d /path/to/pdfs/
+ cargo run bmgf -d /path/to/pdfs/
 ```
 
 ### Other Command Line Options

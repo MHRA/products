@@ -111,8 +111,7 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
         .expect("PL numbers should be in sixth column")
         .to_string();
     let pl_numbers = metadata::extract_product_licences(&metadata::sanitize(&pl_numbers));
-    let pl_numbers = metadata::to_array(&pl_numbers);
-    metadata.insert("pl_numbers".to_string(), metadata::to_json(pl_numbers));
+    metadata.insert("pl_numbers".to_string(), pl_numbers);
 
     let pbpk_models = row
         .get(6)
@@ -123,7 +122,17 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
 
     let matrices = row
         .get(7)
-        .expect("Matrices should be in eight column")
+        .expect("Pregnancy trimesters should be in eight column")
+        .to_string();
+    let matrices = metadata::to_array(&metadata::sanitize(&matrices));
+    metadata.insert(
+        "pregnancy_trimesters".to_string(),
+        metadata::to_json(matrices),
+    );
+
+    let matrices = row
+        .get(8)
+        .expect("Matrices should be in ninth column")
         .to_string();
     let matrices = metadata::to_array(&metadata::sanitize(&matrices));
     metadata.insert("matrices".to_string(), metadata::to_json(matrices));
@@ -144,6 +153,7 @@ mod test {
         let products = DataType::String(String::from("Product 1, Product 2"));
         let pl_numbers = DataType::String(String::from("PL 12345/1234, PL 23456/2345"));
         let pbpk_models = DataType::String(String::from("Model 1, Model 2"));
+        let pregnancy_trimesters = DataType::String(String::from("First, Second"));
         let matrices = DataType::String(String::from("Matrix 1, Matrix 2"));
 
         let row = [
@@ -154,6 +164,7 @@ mod test {
             products,
             pl_numbers,
             pbpk_models,
+            pregnancy_trimesters,
             matrices,
         ];
         let data = extract_file_data(&row);
@@ -175,6 +186,10 @@ mod test {
         assert_eq!(
             data.get("pbpk_models").unwrap(),
             "[\"Model 1\",\"Model 2\"]"
+        );
+        assert_eq!(
+            data.get("pregnancy_trimesters").unwrap(),
+            "[\"First\",\"Second\"]"
         );
         assert_eq!(data.get("matrices").unwrap(), "[\"Matrix 1\",\"Matrix 2\"]");
         assert_eq!(
