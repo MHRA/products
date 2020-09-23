@@ -74,23 +74,23 @@ fn get_reports_from_edges(edges: Vec<ReportEdge>, offset: i32, total_count: i32)
 }
 
 pub fn get_reports_graph_from_reports_vector(
-    docs: Vec<Report>,
+    reports: Vec<Report>,
     offset: i32,
     total_count: i32,
 ) -> Reports {
-    let edges = get_report_edges(docs, offset);
+    let edges = get_report_edges(reports, offset);
     get_reports_from_edges(edges, offset, total_count)
 }
 
 pub struct AzureReportResult {
-    docs: Vec<Report>,
+    reports: Vec<Report>,
     offset: i32,
     total_count: i32,
 }
 
 impl Into<Reports> for AzureReportResult {
     fn into(self) -> Reports {
-        get_reports_graph_from_reports_vector(self.docs, self.offset, self.total_count)
+        get_reports_graph_from_reports_vector(self.reports, self.offset, self.total_count)
     }
 }
 
@@ -115,19 +115,23 @@ pub async fn get_reports(
         )
         .await?;
 
-    let docs = azure_result
+    Ok(map_azure_result(azure_result, offset))
+}
+
+fn map_azure_result(result: ReportResults, offset: i32) -> AzureReportResult {
+    let reports = result
         .search_results
         .into_iter()
         .map(Report::from)
         .collect();
 
-    let total_count = azure_result.count.unwrap_or(0);
+    let total_count = result.count.unwrap_or(0);
 
-    Ok(AzureReportResult {
-        docs,
+    AzureReportResult {
+        reports,
         total_count,
         offset,
-    })
+    }
 }
 
 fn build_filter(substance_name: Option<&str>) -> Option<String> {
@@ -147,104 +151,42 @@ fn build_substance_name_filter(substance_name: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use async_trait::async_trait;
-    use search_client::models::{FacetResults, ReportResults};
-    use serde::de::DeserializeOwned;
-    use tokio_test::block_on;
+    use search_client::models::{AzureHighlight, ReportResults};
 
-    struct TestAzureSearchClient {
-        pub search_results: Vec<ReportResult>,
-    }
-
-    impl TestAzureSearchClient {
-        fn new(search_results: Vec<ReportResult>) -> Self {
-            Self { search_results }
-        }
-    }
-
-    #[async_trait]
-    impl Search for TestAzureSearchClient {
-        async fn search<T>(&self, _search_term: &str) -> Result<T, reqwest::Error>
-        where
-            T: DeserializeOwned,
-        {
-            unimplemented!()
-        }
-        async fn search_with_pagination<T>(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-        ) -> Result<T, reqwest::Error>
-        where
-            T: DeserializeOwned,
-        {
-            unimplemented!();
-        }
-        async fn search_with_pagination_and_filter<T>(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-            _filter: Option<&str>,
-        ) -> Result<T, reqwest::Error>
-        where
-            T: DeserializeOwned,
-        {
-            Ok(ReportResults {
-                search_results: self.search_results.clone(),
-                context: String::from(""),
-                count: Some(1234),
-            })
-        }
-        async fn search_by_facet_field(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<FacetResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn filter_by_collection_field<T>(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<T, reqwest::Error>
-        where
-            T: DeserializeOwned,
-        {
-            unimplemented!()
-        }
-        async fn filter_by_non_collection_field<T>(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<T, reqwest::Error>
-        where
-            T: DeserializeOwned,
-        {
-            unimplemented!()
-        }
-    }
-
-    fn given_a_search_result(product_name: &str) -> ReportResult {
+    fn given_a_search_result(report_name: &str) -> ReportResult {
         ReportResult {
             products: Some(vec!["product".to_string()]),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),
             active_substances: vec!["substance".to_string()],
-            report_name: "title".to_string(),
+            report_name: report_name.to_string(),
             file_name: "file name".to_string(),
             matrices: Some(vec!["matrix".to_string()]),
             pbpk_models: Some(vec!["pbpk model".to_string()]),
             summary: "summary".to_string(),
             metadata_storage_size: 300,
             score: 1.0,
-            highlights: None,
+            highlights: Some(AzureHighlight {
+                content: vec![String::from("highlight")],
+            }),
         }
     }
 
-    fn given_first_page_of_search_results() -> Vec<ReportResult> {
-        vec![
+    fn given_azure_search_results(reports: Vec<ReportResult>, count: i32) -> ReportResults {
+        ReportResults {
+            search_results: reports,
+            context: String::default(),
+            count: Some(count),
+        }
+    }
+
+    fn given_a_single_search_result() -> ReportResults {
+        let results = vec![given_a_search_result("first")];
+        given_azure_search_results(results, 1234)
+    }
+
+    fn given_search_results() -> ReportResults {
+        let results = vec![
             given_a_search_result("first"),
             given_a_search_result("second"),
             given_a_search_result("third"),
@@ -255,94 +197,63 @@ mod test {
             given_a_search_result("eighth"),
             given_a_search_result("ninth"),
             given_a_search_result("tenth"),
-        ]
+        ];
+        given_azure_search_results(results, 1234)
     }
 
-    fn given_last_page_of_search_results() -> Vec<ReportResult> {
-        vec![
-            given_a_search_result("fourth last"),
-            given_a_search_result("third last"),
-            given_a_search_result("second last"),
-            given_a_search_result("last"),
-        ]
+    fn when_we_map_the_results(results: ReportResults) -> AzureReportResult {
+        map_azure_result(results, 0)
     }
 
-    fn given_a_search_client(search_results: &[ReportResult]) -> TestAzureSearchClient {
-        TestAzureSearchClient::new(search_results.to_owned())
+    fn then_all_fields_map_correctly(reports_response: AzureReportResult) {
+        let first_result = reports_response.reports[0].clone();
+        assert_eq!(first_result.products.unwrap().first().unwrap(), "product");
+        assert_eq!(
+            first_result.active_substances.unwrap().first().unwrap(),
+            "substance"
+        );
+        assert_eq!(first_result.title.unwrap(), "first");
+        assert_eq!(first_result.file_size_in_bytes.unwrap(), 300);
+        assert_eq!(first_result.file_name.unwrap(), "file name");
+        assert_eq!(first_result.file_url.unwrap(), "test/path");
+        assert_eq!(first_result.summary.unwrap(), "summary");
+        assert_eq!(first_result.matrices.unwrap().first().unwrap(), "matrix");
+        assert_eq!(
+            first_result.pbpk_models.unwrap().first().unwrap(),
+            "pbpk model"
+        );
+        assert_eq!(
+            first_result.highlights.unwrap().first().unwrap(),
+            "highlight"
+        );
     }
 
-    fn when_we_get_the_first_page_of_reports(search_client: impl Search) -> Reports {
-        block_on(get_reports(&search_client, "Search string", None, 0, None))
-            .unwrap()
-            .into()
-    }
-
-    fn when_we_get_the_last_page_of_reports(search_client: impl Search) -> Reports {
-        block_on(get_reports(
-            &search_client,
-            "Search string",
-            None,
-            1230,
-            None,
-        ))
-        .unwrap()
-        .into()
-    }
-
-    fn then_we_have_the_first_page(reports_response: &Reports) {
+    fn then_we_have_the_expected_output(reports_response: AzureReportResult) {
         let expected_names = vec![
             "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
             "tenth",
         ];
-        let edges = &reports_response.edges;
-        let actual_names = edges
+        let actual_names = reports_response
+            .reports
             .iter()
-            .map(|edge| edge.node.product_name.as_ref().unwrap());
-        assert!(actual_names.eq(expected_names));
+            .filter_map(|report| report.title.clone())
+            .collect::<Vec<String>>();
+        assert!(actual_names.eq(&expected_names));
 
         assert_eq!(1234, reports_response.total_count);
-
-        let expected_page_info = PageInfo {
-            has_previous_page: false,
-            has_next_page: true,
-            start_cursor: base64::encode("0"),
-            end_cursor: base64::encode("9"),
-        };
-        assert_eq!(expected_page_info, reports_response.page_info);
-    }
-
-    fn then_we_have_the_last_page(reports_response: &Reports) {
-        let expected_names = vec!["fourth last", "third last", "second last", "last"];
-        let edges = &reports_response.edges;
-        let actual_names = edges
-            .iter()
-            .map(|edge| edge.node.product_name.as_ref().unwrap());
-
-        assert!(actual_names.eq(expected_names));
-
-        assert_eq!(1234, reports_response.total_count);
-        let expected_page_info = PageInfo {
-            has_previous_page: true,
-            has_next_page: false,
-            start_cursor: base64::encode("1230"),
-            end_cursor: base64::encode("1233"),
-        };
-        assert_eq!(expected_page_info, reports_response.page_info);
     }
 
     #[test]
-    fn test_get_reports_first_page() {
-        let search_results = given_first_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_first_page_of_reports(search_client);
-        then_we_have_the_first_page(&response);
+    fn test_map_result() {
+        let search_results = given_a_single_search_result();
+        let response = when_we_map_the_results(search_results);
+        then_all_fields_map_correctly(response);
     }
 
     #[test]
-    fn test_get_reports_last_page() {
-        let search_results = given_last_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_last_page_of_reports(search_client);
-        then_we_have_the_last_page(&response);
+    fn test_map_results() {
+        let search_results = given_search_results();
+        let response = when_we_map_the_results(search_results);
+        then_we_have_the_expected_output(response);
     }
 }

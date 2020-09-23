@@ -21,7 +21,7 @@ pub struct QueryRoot;
 
 #[Object(desc = "Query root")]
 impl QueryRoot {
-    #[deprecated(note = "Please use `products::substance` instead")]
+    #[field(deprecation = "Please use `products::substance` instead")]
     async fn substance(
         &self,
         context: &Context<'_>,
@@ -41,8 +41,7 @@ impl QueryRoot {
             .into()),
         }
     }
-
-    #[deprecated(note = "Please use `products::product` instead")]
+    #[field(deprecation = "Please use `products::product` instead")]
     async fn product(&self, _context: &Context<'_>, name: String) -> FieldResult<Product> {
         get_product(name).await.map_err(|e| {
             tracing::error!("Error fetching results from Azure search service: {:?}", e);
@@ -50,7 +49,7 @@ impl QueryRoot {
         })
     }
 
-    #[deprecated(note = "Please use `products::substances_index` instead")]
+    #[field(deprecation = "Please use `products::substances_index` instead")]
     async fn substances_index(
         &self,
         context: &Context<'_>,
@@ -65,7 +64,7 @@ impl QueryRoot {
             })
     }
 
-    #[deprecated(note = "Please use `products::products_index` instead")]
+    #[field(deprecation = "Please use `products::products_index` instead")]
     async fn products_index(
         &self,
         context: &Context<'_>,
@@ -80,7 +79,7 @@ impl QueryRoot {
             })
     }
 
-    #[deprecated(note = "Please use `products::documents` instead")]
+    #[field(deprecation = "Please use `products::documents` instead")]
     async fn documents(
         &self,
         context: &Context<'_>,
@@ -110,13 +109,13 @@ impl QueryRoot {
     }
 
     async fn products(&self, _context: &Context<'_>) -> FieldResult<Products> {
-        Ok(Products::new())
+        Ok(Products {})
     }
     async fn medicine_levels_in_pregnancy(
         &self,
         _context: &Context<'_>,
     ) -> FieldResult<MedicineLevelsInPregnancy> {
-        Ok(MedicineLevelsInPregnancy::new())
+        Ok(MedicineLevelsInPregnancy {})
     }
 }
 

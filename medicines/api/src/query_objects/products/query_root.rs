@@ -13,25 +13,7 @@ use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
 use search_client::models::DocumentType;
 
-pub struct Products {
-    substance: Option<Substance>,
-    product: Option<Product>,
-    substances_index: Option<Vec<SubstanceIndex>>,
-    products_index: Option<Vec<ProductIndex>>,
-    documents: Option<Documents>,
-}
-
-impl Products {
-    pub fn new() -> Self {
-        Self {
-            substance: None,
-            product: None,
-            substances_index: None,
-            products_index: None,
-            documents: None,
-        }
-    }
-}
+pub struct Products {}
 
 #[Object(desc = "Entrypoint for products, where you can find associated SPCs, PILs and PARs")]
 impl Products {

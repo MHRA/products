@@ -72,26 +72,6 @@ pub async fn get_substance(substance_name: String) -> Result<SubstanceReports, r
 #[cfg(test)]
 mod test {
     use super::*;
-    use search_client::models::ReportResult;
-
-    fn azure_result_factory(product_name: Option<String>) -> Report {
-        let result = ReportResult {
-            products: Some(vec!["product".to_string()]),
-            metadata_storage_name: "storage_name".to_string(),
-            metadata_storage_path: "test/path".to_string(),
-            active_substances: vec!["substance".to_string()],
-            report_name: "title".to_string(),
-            file_name: "file name".to_string(),
-            matrices: Some(vec!["matrix".to_string()]),
-            pbpk_models: Some(vec!["pbpk model".to_string()]),
-            summary: "summary".to_string(),
-            metadata_storage_size: 300,
-            score: 1.0,
-            highlights: None,
-        };
-
-        result.into()
-    }
 
     #[test]
     fn test_sort_substances() {

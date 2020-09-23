@@ -10,21 +10,7 @@ use crate::{
 use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
 
-pub struct MedicineLevelsInPregnancy {
-    substance: Option<SubstanceReports>,
-    substances_index: Option<Vec<SubstanceIndex>>,
-    reports: Option<Reports>,
-}
-
-impl MedicineLevelsInPregnancy {
-    pub fn new() -> Self {
-        Self {
-            substance: None,
-            substances_index: None,
-            reports: None,
-        }
-    }
-}
+pub struct MedicineLevelsInPregnancy {}
 
 #[Object(desc = "Entrypoint for reports related to medicine levels in pregnancy")]
 impl MedicineLevelsInPregnancy {
