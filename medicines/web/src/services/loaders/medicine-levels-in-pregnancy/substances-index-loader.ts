@@ -8,20 +8,17 @@ const mapSubstance = ([letter, facetResult]: [
   string,
   IFacetResult,
 ]): ISubstanceIndex[] => {
-  const substances: { [id: string]: ISubstanceIndex } = {};
+  const indexResults: { [id: string]: ISubstanceIndex } = {};
   facetResult.facets
     .filter((x) => x.value.startsWith(letter))
     .forEach((f) => {
-      const substancePart = f.value
-        .replace(/\s+/g, ' ')
-        .split(', ', 3)
-        .slice(1);
-      if (substancePart.length > 0) {
-        const substance = substancePart[0];
-        substances[substance] = { name: substance, count: f.count };
+      const [substance] = f.value.replace(/\s+/g, ' ').split(', ', 3).slice(1);
+
+      if (substance) {
+        indexResults[substance] = { name: substance, count: f.count };
       }
     });
-  return Object.values(substances);
+  return Object.values(indexResults);
 };
 
 export const substancesIndexLoader = new DataLoader<string, ISubstanceIndex[]>(

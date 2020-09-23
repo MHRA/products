@@ -4,27 +4,49 @@ import DataLoader from 'dataloader';
 import { ISubstance, ISubstanceIndex } from '../../../model/substance';
 import { graphqlRequest } from '../../graphql';
 
-const substanceLoader = new DataLoader<string, ISubstance[]>(async (keys) => {
-  return Promise.all(keys.map(facetSearch)).then((r) => r.map(mapSubstance));
-});
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<string, ISubstance[]> => {
+  return useGraphQL ? graphqlSubstancesIndexLoader : azureSubstancesIndexLoader;
+};
 
-const mapSubstance = ([key, facetResult]: [
+export const azureSubstancesIndexLoader = new DataLoader<string, ISubstance[]>(
+  async (keys) => {
+    return Promise.all(keys.map(facetSearch)).then((r) => r.map(mapSubstance));
+  },
+);
+
+const mapSubstance = ([keyToLoad, facetResult]: [
   string,
   IFacetResult,
 ]): ISubstance[] => {
-  const ss: { [id: string]: ISubstance } = {};
+  const indexResults: { [id: string]: ISubstance } = {};
   facetResult.facets
-    .filter((x) => x.value.startsWith(key))
-    .forEach((f) => {
-      const xs = f.value.replace(/\s+/g, ' ').split(', ', 3).slice(1);
-      if (xs.length === 1) {
-        const s = xs[0];
-        if (ss[s] === undefined) {
-          ss[s].products?.push({ name: xs[1], count: f.count });
+    .filter((facet) => facet.value.startsWith(keyToLoad))
+    .forEach((facet) => {
+      const [substance, product] = facet.value
+        .replace(/\s+/g, ' ')
+        .split(', ', 3)
+        .slice(1);
+      if (substance) {
+        const substanceIsInResults = indexResults[substance] !== undefined;
+        const substanceShouldBeInResults = substance !== keyToLoad;
+
+        if (substanceIsInResults) {
+          indexResults[substance].products?.push({
+            name: product,
+            count: facet.count,
+          });
+        } else if (substanceShouldBeInResults) {
+          indexResults[substance] = {
+            name: substance,
+            count: facet.count,
+            products: [],
+          };
         }
       }
     });
-  return Object.values(ss);
+  return Object.values(indexResults);
 };
 
 interface IResponse {
@@ -41,23 +63,22 @@ query ($letter: String!) {
   }
 }`;
 
-export const graphqlSubstanceLoader = new DataLoader<string, ISubstanceIndex[]>(
-  async (keys) => {
-    return Promise.all(
-      // Could potentially batch the queries for all of the keys into one GraphQL request but there's never
-      // actually a request for more than one at a time yet so no point in implementing that yet
-      keys.map(async (letter) => {
-        const variables = { letter };
+export const graphqlSubstancesIndexLoader = new DataLoader<
+  string,
+  ISubstanceIndex[]
+>(async (keys) => {
+  return Promise.all(
+    // Could potentially batch the queries for all of the keys into one GraphQL request but there's never
+    // actually a request for more than one at a time yet so no point in implementing that yet
+    keys.map(async (letter) => {
+      const variables = { letter };
 
-        const { data } = await graphqlRequest<IResponse, typeof variables>({
-          query,
-          variables,
-        });
+      const { data } = await graphqlRequest<IResponse, typeof variables>({
+        query,
+        variables,
+      });
 
-        return data.products.substancesIndex;
-      }),
-    );
-  },
-);
-
-export default substanceLoader;
+      return data.products.substancesIndex;
+    }),
+  );
+});

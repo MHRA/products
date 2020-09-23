@@ -1,6 +1,7 @@
 import DataLoader from 'dataloader';
 import { IProduct } from '../../../model/product';
 import { graphqlRequest } from '../../graphql';
+import { azureSubstancesIndexLoader } from './substances-index-loader';
 
 interface IProductIndexItem {
   name: string;
@@ -23,23 +24,50 @@ query ($substance: String) {
   }
 }`;
 
-export const graphqlProductsLoader = new DataLoader<string, IProduct[]>(
-  async (substanceNames) => {
-    return Promise.all(
-      substanceNames.map(async (substanceName: string) => {
-        const variables = { substance: substanceName };
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<string, IProductIndexItem[]> => {
+  return useGraphQL ? graphqlProductsIndexLoader : azureProductsIndexLoader;
+};
 
-        const response = await graphqlRequest<IResponse, typeof variables>({
-          query,
-          variables,
-        });
+export const azureProductsIndexLoader = new DataLoader<
+  string,
+  IProductIndexItem[]
+>(async (substanceNames) => {
+  return Promise.all(
+    substanceNames.map(async (substanceName: string) => {
+      const substancesIndex = await azureSubstancesIndexLoader.load(
+        substanceName.charAt(0),
+      );
+      const substanceMatch = substancesIndex.find(
+        (substance) => substance.name === substanceName,
+      );
+      if (substanceMatch && substanceMatch.products?.length) {
+        return substanceMatch.products as IProductIndexItem[];
+      }
+      return [];
+    }),
+  );
+});
 
-        if (!response.data) {
-          return [];
-        }
+export const graphqlProductsIndexLoader = new DataLoader<
+  string,
+  IProductIndexItem[]
+>(async (substanceNames) => {
+  return Promise.all(
+    substanceNames.map(async (substanceName: string) => {
+      const variables = { substance: substanceName };
 
-        return response.data.products.productsIndex;
-      }),
-    );
-  },
-);
+      const response = await graphqlRequest<IResponse, typeof variables>({
+        query,
+        variables,
+      });
+
+      if (!response.data) {
+        return [];
+      }
+
+      return response.data.products.productsIndex;
+    }),
+  );
+});

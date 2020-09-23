@@ -11,22 +11,7 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/product';
 import Events from '../../services/events';
-import substanceLoader from '../../services/loaders/products/substances-index-loader';
-import { graphqlProductsLoader } from '../../services/loaders/products/substance-loader';
-
-const azureProductsLoader = async (substance: string) => {
-  const firstLetter = substance.charAt(0);
-  const substanceIndex = await substanceLoader.load(firstLetter);
-  const substanceMatch = substanceIndex.find((s) => s.name === substance);
-  if (substanceMatch) {
-    return substanceMatch.products;
-  }
-  return [];
-};
-
-const graphQlProductsLoader = async (substance: string) => {
-  return graphqlProductsLoader.load(substance);
-};
+import { getLoader } from '../../services/loaders/products/substance-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -54,11 +39,10 @@ const App: NextPage = () => {
     setIsLoading(true);
     setErrorFetchingResults(false);
 
-    const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
-      ? graphQlProductsLoader
-      : azureProductsLoader;
+    const loader = getLoader(useGraphQl);
 
-    loader(substanceName)
+    loader
+      .load(substanceName)
       .then((products) => {
         setProducts(products);
         setIsLoading(false);
