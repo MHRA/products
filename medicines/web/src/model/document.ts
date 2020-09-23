@@ -26,6 +26,8 @@ export interface IBmgfReport {
   pbpkModels: string[];
   summary: string;
   url: string;
+  pregnancyTrimesters: string[];
+  plNumbers: string[];
 }
 
 export interface IBmgfReports {

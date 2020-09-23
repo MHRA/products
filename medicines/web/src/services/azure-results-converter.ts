@@ -47,5 +47,7 @@ export const convertBmgfResults = (doc: IBmgfSearchResult): IBmgfReport => {
       (doc.metadata_storage_size ? doc.metadata_storage_size : 0) / 1000,
     ).toLocaleString('en-GB'),
     url: `/medicine-levels-in-pregnancy/reports/${doc.report_name}`,
+    plNumbers: doc.pl_numbers,
+    pregnancyTrimesters: doc.pregnancy_trimesters,
   };
 };

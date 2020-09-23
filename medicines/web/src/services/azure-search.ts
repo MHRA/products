@@ -53,6 +53,7 @@ export interface IBmgfSearchResult {
   matrices: string[];
   pl_numbers: string[];
   report_name: string | null;
+  pregnancy_trimesters: string[];
 }
 
 export interface IBmgfSearchResults {

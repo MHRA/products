@@ -13,6 +13,8 @@ interface IReportResponse {
   summary: string;
   matrices: string[];
   pbpkModels: string[];
+  pregnancyTrimesters: string[];
+  plNumbers: string[];
 }
 
 export interface IEdge {
@@ -106,6 +108,8 @@ export const convertReportResponseToReport = ({
     title: report.title,
     fileSize: Math.ceil(report.fileSizeInBytes / 1000).toLocaleString('en-GB'),
     url: `/medicine-levels-in-pregnancy/reports/${report.title}`,
+    pregnancyTrimesters: report.pregnancyTrimesters,
+    plNumbers: report.plNumbers,
   };
 };
 
