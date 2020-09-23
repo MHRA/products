@@ -43,7 +43,7 @@ pub struct IndexResults {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ReportResult {
-    pub active_substances: Vec<String>,
+    pub active_substances: Option<Vec<String>>,
     #[serde(rename = "@search.highlights")]
     pub highlights: Option<AzureHighlight>,
     #[serde(rename = "@search.score")]
@@ -57,6 +57,8 @@ pub struct ReportResult {
     pub metadata_storage_name: String,
     pub report_name: String,
     pub metadata_storage_size: i32,
+    pub pregnancy_trimesters: Option<Vec<String>>,
+    pub pl_numbers: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -26,6 +26,10 @@ pub struct Report {
     pub summary: Option<String>,
     #[field(desc = "Matrices")]
     pub matrices: Option<Vec<String>>,
+    #[field(desc = "PL numbers")]
+    pub pl_numbers: Option<Vec<String>>,
+    #[field(desc = "Pregnancy trimesters")]
+    pub pregnancy_trimesters: Option<Vec<String>>,
     #[field(desc = "PBPK models")]
     pub pbpk_models: Option<Vec<String>>,
 }
@@ -34,7 +38,7 @@ impl From<ReportResult> for Report {
     fn from(r: ReportResult) -> Self {
         Self {
             products: r.products,
-            active_substances: Some(r.active_substances),
+            active_substances: r.active_substances,
             title: Some(r.report_name),
             file_size_in_bytes: Some(r.metadata_storage_size),
             file_name: Some(r.file_name),
@@ -42,6 +46,8 @@ impl From<ReportResult> for Report {
             summary: Some(r.summary),
             matrices: r.matrices,
             pbpk_models: r.pbpk_models,
+            pregnancy_trimesters: r.pregnancy_trimesters,
+            pl_numbers: r.pl_numbers,
             highlights: match r.highlights {
                 Some(a) => Some(a.content),
                 _ => None,
@@ -158,7 +164,7 @@ mod test {
             products: Some(vec!["product".to_string()]),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),
-            active_substances: vec!["substance".to_string()],
+            active_substances: Some(vec!["substance".to_string()]),
             report_name: report_name.to_string(),
             file_name: "file name".to_string(),
             matrices: Some(vec!["matrix".to_string()]),
@@ -169,6 +175,8 @@ mod test {
             highlights: Some(AzureHighlight {
                 content: vec![String::from("highlight")],
             }),
+            pl_numbers: Some(vec!["PL123451234".to_string()]),
+            pregnancy_trimesters: Some(vec!["first".to_string()]),
         }
     }
 
@@ -221,6 +229,14 @@ mod test {
         assert_eq!(
             first_result.pbpk_models.unwrap().first().unwrap(),
             "pbpk model"
+        );
+        assert_eq!(
+            first_result.pregnancy_trimesters.unwrap().first().unwrap(),
+            "first"
+        );
+        assert_eq!(
+            first_result.pl_numbers.unwrap().first().unwrap(),
+            "PL123451234"
         );
         assert_eq!(
             first_result.highlights.unwrap().first().unwrap(),
