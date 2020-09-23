@@ -34,6 +34,10 @@
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
     },
     {
+      "sourceFieldName": "pregnancy_trimesters",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
       "sourceFieldName": "facets",
       "mappingFunction": { "name": "jsonArrayToStringCollection" }
     }

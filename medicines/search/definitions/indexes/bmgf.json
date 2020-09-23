@@ -251,6 +251,21 @@
       "fields": []
     },
     {
+      "name": "pregnancy_trimesters",
+      "type": "Collection(Edm.String)",
+      "facetable": false,
+      "filterable": true,
+      "key": false,
+      "retrievable": true,
+      "searchable": true,
+      "sortable": false,
+      "analyzer": "standard.lucene",
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "file_name",
       "type": "Edm.String",
       "facetable": false,
