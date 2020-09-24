@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import homepage from '../../copy/homepage.md';
+import homepageWithBmgf from '../../copy/homepage-including-bmgf.md';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { baseFontSize } from '../../styles/fonts';
 
@@ -17,6 +18,10 @@ const StyledMipText = styled.section`
     margin-top: 0;
   }
 
+  h3 {
+    margin-top: 28px;
+  }
+
   @media ${mobileBreakpoint} {
     p,
     ul li {
@@ -26,8 +31,11 @@ const StyledMipText = styled.section`
   }
 `;
 
+const showBmgf = process.env.SHOW_BMGF === 'true';
+const contentToShow = showBmgf ? homepageWithBmgf : homepage;
+
 const MipText: React.FC = () => (
-  <StyledMipText dangerouslySetInnerHTML={{ __html: homepage }} />
+  <StyledMipText dangerouslySetInnerHTML={{ __html: contentToShow }} />
 );
 
 export default MipText;

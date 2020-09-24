@@ -3,7 +3,10 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { IBmgfReport } from '../../../model/document';
 import {
+  mhraBlue,
+  mhraBlue10,
   mhraBlue80,
+  mhraBlue90,
   mhraGray10,
   white,
   errorRed,
@@ -58,20 +61,6 @@ const StyledReportList = styled.div`
     text-decoration: none;
   }
 
-  dt.left {
-    flex: 1;
-  }
-
-  dt.left .icon {
-    background-color: ${mhraBlue80};
-    color: ${white};
-    font-size: ${h2FontSize};
-    font-weight: bold;
-    padding: 10px 0;
-    text-align: center;
-    width: 70px;
-  }
-
   dd.right {
     flex: 12;
     margin-left: 0;
@@ -96,13 +85,13 @@ const StyledReportList = styled.div`
   }
 
   dd.right .metadata {
-    font-size: ${baseFontSize};
+    font-size: 1em;
     min-width: 1%;
     padding-bottom: 0.1rem;
     word-wrap: break-word;
   }
 
-  dd.right .context {
+  dd.right .summary {
     font-size: ${h2FontSize};
     min-width: 1%;
     padding-top: ${largePaddingSizeCss};
@@ -252,6 +241,47 @@ const SearchResults = (props: ISearchResultsProps) => {
     );
   }
 
+  const SearchResultsExplanation = (
+    <>
+      <p>
+        If you’re looking for other information on medicines, you can search for
+        information about medicines including patient information leaflets
+        (PILs), details on how the medicine can be used (SmPCs) and scientific
+        reports (PARs).
+      </p>
+      <p>
+        <Link href="/">
+          <a>Go to Products website to find information on medicines</a>
+        </Link>
+      </p>
+    </>
+  );
+
+  const NoSearchResultsExplanation = (
+    <>
+      <p>
+        If the product information you are seeking does not appear below, please
+        refer to the{' '}
+        <Link href="/">
+          <a>
+            Summaries of Product Characteristics (SPCs) and Patient Information
+            Leaflet (PILs)
+          </a>
+        </Link>{' '}
+        for recommendation about the use of this medicines in pregnancy.
+      </p>
+      <p>
+        <Link href="/">
+          <a>Go to Products website to find information on medicines</a>
+        </Link>
+      </p>
+      <p>
+        The information about the medicine levels in pregnancy will be updated
+        when new evidence becomes available.
+      </p>
+    </>
+  );
+
   return (
     <>
       <StyledReportList>
@@ -271,17 +301,7 @@ const SearchResults = (props: ISearchResultsProps) => {
               </Count>
             )}
           </TitleAndCountContainer>
-          <p>
-            If you’re looking for other information on medicines, you can search
-            for information about medicines including patient information
-            leaflets (PILs), details on how the medicine can be used (SmPCs) and
-            scientific reports (PARs).
-          </p>
-          <p>
-            <Link href="/">
-              <a>Go to Products website to find information on medicines</a>
-            </Link>
-          </p>
+          {hasReports ? SearchResultsExplanation : NoSearchResultsExplanation}
         </div>
 
         <div className="row">
@@ -291,9 +311,6 @@ const SearchResults = (props: ISearchResultsProps) => {
               {hasReports &&
                 reports.map((report, i) => (
                   <div key={i} className="search-result">
-                    <dt className="left">
-                      <p className="icon">PKIP</p>
-                    </dt>
                     <dd className="right">
                       <a href={report.url}>
                         <p className="title">{report.title}</p>
@@ -305,13 +322,9 @@ const SearchResults = (props: ISearchResultsProps) => {
                           .map((substance) => toSentenceCase(substance))
                           .join(', ')}
                       </p>
-
-                      <p
-                        className="context"
-                        dangerouslySetInnerHTML={{
-                          __html: normalizeDescription(report.context),
-                        }}
-                      />
+                      {report.summary && (
+                        <p className="summary">{report.summary}</p>
+                      )}
                     </dd>
                   </div>
                 ))}

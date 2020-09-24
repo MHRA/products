@@ -227,6 +227,7 @@ mod test {
         },
         Search,
     };
+    use serde::de::DeserializeOwned;
     use std::env;
     use storage_client::test::TestAzureStorageClient;
     use tokio_test::block_on;
@@ -683,7 +684,8 @@ mod test {
 
     #[async_trait]
     impl Search for TestAzureSearchClient {
-        async fn search(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        async fn search<T>(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> where
+        T: DeserializeOwned {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
                 context: String::from(""),
@@ -707,7 +709,7 @@ mod test {
         ) -> Result<IndexResults, reqwest::Error> {
             unimplemented!()
         }
-        async fn search_by_facet_field(
+        async fn search_by_facet_field:<T>(
             &self,
             _field_name: &str,
             _field_value: &str,
@@ -715,11 +717,11 @@ mod test {
             unimplemented!()
         }
 
-        async fn filter_by_collection_field(
+        async fn filter_by_collection_field:<T>(
             &self,
             _field_name: &str,
             _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
+        ) -> Result<IndexResults, reqwest::Error> where T: DeserializeOwned {
             unimplemented!()
         }
         async fn filter_by_non_collection_field(

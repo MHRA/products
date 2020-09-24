@@ -6,6 +6,7 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import about from '../copy/about.md';
+import aboutWithBmgf from '../copy/about-including-bmgf.md';
 import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
@@ -23,6 +24,9 @@ const StyledMain = styled.div`
   }
 `;
 
+const showBmgf = process.env.SHOW_BMGF === 'true';
+const contentToShow = showBmgf ? aboutWithBmgf : about;
+
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -37,7 +41,7 @@ const App: React.FC = () => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
+      <StyledMain dangerouslySetInnerHTML={{ __html: contentToShow }} />
     </Page>
   );
 };

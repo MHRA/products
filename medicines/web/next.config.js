@@ -17,6 +17,7 @@ module.exports = {
     USE_GRAPHQL: process.env.USE_GRAPHQL,
     BMGF_AZURE_SEARCH_INDEX: process.env.BMGF_AZURE_SEARCH_INDEX,
     AZURE_STORAGE_ACCOUNT: process.env.AZURE_STORAGE_ACCOUNT,
+    SHOW_BMGF: process.env.SHOW_BMGF,
   },
   webpack: (config) => {
     config.module.rules.push({
