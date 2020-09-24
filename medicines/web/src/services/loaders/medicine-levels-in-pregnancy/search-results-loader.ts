@@ -1,6 +1,36 @@
 import DataLoader from 'dataloader';
 import { IBmgfReport, IBmgfReports } from '../../../model/document';
 import { graphqlRequest } from '../../graphql';
+import { bmgfDocSearch } from '../../azure-search';
+import { convertBmgfResults } from '../../azure-results-converter';
+
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<ISearchInfo, IBmgfReports> => {
+  return useGraphQL ? graphqlSearchLoader : azureSearchLoader;
+};
+
+export const azureSearchLoader = new DataLoader<ISearchInfo, IBmgfReports>(
+  async (searchParameterArray) => {
+    return Promise.all(
+      searchParameterArray.map(async (searchParameters: ISearchInfo) => {
+        const results = await bmgfDocSearch({
+          query: searchParameters.searchTerm,
+          page: searchParameters.page,
+          pageSize: searchParameters.pageSize,
+          filters: {
+            sortOrder: 'a-z',
+          },
+        });
+
+        return {
+          count: results.resultCount,
+          reports: results.results.map(convertBmgfResults),
+        };
+      }),
+    );
+  },
+);
 
 interface IReportResponse {
   products: string[];
@@ -56,7 +86,7 @@ query($searchTerm: String, $first: Int, $after: String) {
   }
 }`;
 
-export const reportsLoader = new DataLoader<ISearchInfo, IBmgfReports>(
+export const graphqlSearchLoader = new DataLoader<ISearchInfo, IBmgfReports>(
   async (searchTerms) => {
     return Promise.all(searchTerms.map(getReportsForSearch));
   },

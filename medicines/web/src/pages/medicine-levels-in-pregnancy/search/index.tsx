@@ -6,43 +6,13 @@ import Page from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../../hooks';
-import { IBmgfReport, IBmgfReports } from '../../../model/document';
-import { bmgfDocSearch } from '../../../services/azure-search';
+import { IBmgfReport } from '../../../model/document';
 import Events from '../../../services/events';
 import { parsePage } from '../../../services/querystring-interpreter';
-import { convertBmgfResults } from '../../../services/azure-results-converter';
-import {
-  reportsLoader,
-  ISearchInfo,
-} from '../../../services/loaders/medicine-levels-in-pregnancy/search-results-loader';
+import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnancy/search-results-loader';
 
 const pageSize = 10;
 const searchPath = '/medicine-levels-in-pregnancy';
-
-const azureSearchPageLoader = async ({
-  searchTerm,
-  page,
-}: ISearchInfo): Promise<IBmgfReports> => {
-  const results = await bmgfDocSearch({
-    query: searchTerm,
-    page,
-    pageSize,
-    filters: {
-      sortOrder: 'a-z',
-    },
-  });
-  return {
-    count: results.resultCount,
-    reports: results.results.map(convertBmgfResults),
-  };
-};
-
-const graphQlSearchPageLoader = async ({
-  searchTerm,
-  page,
-}: ISearchInfo): Promise<IBmgfReports> => {
-  return reportsLoader.load({ searchTerm, page, pageSize });
-};
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -62,16 +32,6 @@ const App: NextPage = (props) => {
     query: { search: queryQS, page: pageQS, doc: docQS },
   } = router;
 
-  const getSearchResults = async (
-    searchPageInfo: ISearchInfo,
-  ): Promise<IBmgfReports> => {
-    if (useGraphQl) {
-      return graphQlSearchPageLoader(searchPageInfo);
-    } else {
-      return azureSearchPageLoader(searchPageInfo);
-    }
-  };
-
   useEffect(() => {
     setIsLoading(true);
     if (!queryQS) {
@@ -87,11 +47,12 @@ const App: NextPage = (props) => {
     setCount(0);
     setErrorFetchingResults(false);
 
-    getSearchResults({
-      searchTerm: query,
-      page,
-      pageSize,
-    })
+    getLoader(useGraphQl)
+      .load({
+        searchTerm: query,
+        page,
+        pageSize,
+      })
       .then(({ reports, count }) => {
         setReports(reports);
         setCount(count);

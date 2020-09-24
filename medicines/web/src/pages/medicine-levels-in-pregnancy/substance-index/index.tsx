@@ -11,10 +11,7 @@ import { SubstanceListStructuredData } from '../../../components/structured-data
 import { useLocalStorage } from '../../../hooks';
 import { IFacet } from '../../../model/facet';
 import Events from '../../../services/events';
-import {
-  substancesIndexLoader,
-  graphqlSubstancesIndexLoader,
-} from '../../../services/loaders/medicine-levels-in-pregnancy/substances-index-loader';
+import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnancy/substances-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -43,11 +40,7 @@ const App: NextPage = () => {
     setIsLoading(true);
     setResults([]);
 
-    const loader = useGraphQl
-      ? graphqlSubstancesIndexLoader
-      : substancesIndexLoader;
-
-    loader
+    getLoader(useGraphQl)
       .load(index)
       .then((results) => {
         setResults(results);

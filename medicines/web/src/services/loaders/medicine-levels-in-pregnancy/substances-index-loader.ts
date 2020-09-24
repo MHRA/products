@@ -5,7 +5,13 @@ import { IFacet } from '../../../model/facet';
 import { graphqlRequest } from '../../graphql';
 import { mapSubstancesIndex } from '../../azure-results-converter';
 
-export const substancesIndexLoader = new DataLoader<string, IFacet[]>(
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<string, IFacet[]> => {
+  return useGraphQL ? graphqlSubstancesIndexLoader : azureSubstancesIndexLoader;
+};
+
+export const azureSubstancesIndexLoader = new DataLoader<string, IFacet[]>(
   async (substanceLetters) => {
     return Promise.all(substanceLetters.map(bmgfFacetSearch)).then((r) =>
       r.map(mapSubstancesIndex),

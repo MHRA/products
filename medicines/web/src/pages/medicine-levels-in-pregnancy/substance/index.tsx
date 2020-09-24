@@ -8,45 +8,12 @@ import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { DrugStructuredData } from '../../../components/structured-data';
 import { useLocalStorage } from '../../../hooks';
 import { IBmgfReport } from '../../../model/document';
-import { bmgfDocSearch } from '../../../services/azure-search';
-import {
-  substanceLoader,
-  ISubstanceInfo,
-  ISubstance,
-} from '../../../services/loaders/medicine-levels-in-pregnancy/substance-loader';
+import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnancy/substance-loader';
 import Events from '../../../services/events';
 import { parsePage } from '../../../services/querystring-interpreter';
-import { convertBmgfResults } from '../../../services/azure-results-converter';
 
 const pageSize = 10;
 const substancePath = '/substance';
-
-const azureDocumentsLoader = async ({
-  name,
-  page,
-}: ISubstanceInfo): Promise<ISubstance> => {
-  const results = await bmgfDocSearch({
-    query: '',
-    page,
-    pageSize,
-    filters: {
-      sortOrder: 'a-z',
-      substanceName: name,
-    },
-  });
-  return {
-    count: results.resultCount,
-    name,
-    reports: results.results.map(convertBmgfResults),
-  };
-};
-
-const graphQlProductLoader = async ({
-  name,
-  page,
-}: ISubstanceInfo): Promise<ISubstance> => {
-  return substanceLoader.load({ name, page, pageSize });
-};
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -67,16 +34,6 @@ const App: NextPage = () => {
     query: { substance: substanceQS, page: pageQS },
   } = router;
 
-  const getSubstance = async (
-    substancePageInfo: ISubstanceInfo,
-  ): Promise<ISubstance> => {
-    if (useGraphQl) {
-      return graphQlProductLoader(substancePageInfo);
-    } else {
-      return azureDocumentsLoader(substancePageInfo);
-    }
-  };
-
   useEffect(() => {
     if (!substanceQS) {
       return;
@@ -90,11 +47,12 @@ const App: NextPage = () => {
     setIsLoading(true);
     setErrorFetchingResults(false);
 
-    getSubstance({
-      name: substance,
-      page,
-      pageSize,
-    })
+    getLoader(useGraphQl)
+      .load({
+        name: substance,
+        page,
+        pageSize,
+      })
       .then(({ reports, count }) => {
         setReports(reports);
         setCount(count);
