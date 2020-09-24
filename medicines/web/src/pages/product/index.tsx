@@ -9,8 +9,8 @@ import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/document';
-import { docSearch, DocType } from '../../services/azure-search';
-import { documents } from '../../services/loaders/products/product-loader';
+import { DocType } from '../../services/azure-search';
+import { getLoader } from '../../services/loaders/products/product-loader';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
@@ -18,52 +18,9 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults } from '../../services/azure-results-converter';
 
 const pageSize = 10;
 const productPath = '/product';
-
-interface IProductResult {
-  name: string;
-  count: number;
-  documents: IDocument[];
-}
-
-interface IProductPageInfo {
-  name: string;
-  page: number;
-  docTypes: DocType[];
-}
-
-const azureDocumentsLoader = async ({
-  name,
-  page,
-  docTypes,
-}: IProductPageInfo): Promise<IProductResult> => {
-  const results = await docSearch({
-    query: '',
-    page,
-    pageSize,
-    filters: {
-      docType: docTypes,
-      sortOrder: 'a-z',
-      productName: name,
-    },
-  });
-  return {
-    count: results.resultCount,
-    name,
-    documents: results.results.map(convertResults),
-  };
-};
-
-const graphQlProductLoader = async ({
-  name,
-  page,
-  docTypes,
-}: IProductPageInfo): Promise<IProductResult> => {
-  return documents.load({ name, page, pageSize, docTypes });
-};
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -92,16 +49,6 @@ const App: NextPage = () => {
     },
   } = router;
 
-  const getProduct = async (
-    productPageInfo: IProductPageInfo,
-  ): Promise<IProductResult> => {
-    if (useGraphQl) {
-      return graphQlProductLoader(productPageInfo);
-    } else {
-      return azureDocumentsLoader(productPageInfo);
-    }
-  };
-
   useEffect(() => {
     if (!queryQS) {
       return;
@@ -119,11 +66,8 @@ const App: NextPage = () => {
     setIsLoading(true);
     setErrorFetchingResults(false);
 
-    getProduct({
-      name: product,
-      page,
-      docTypes,
-    })
+    getLoader(useGraphQl)
+      .load({ name: product, page, pageSize, docTypes })
       .then(({ documents, count }) => {
         setDocuments(documents);
         setCount(count);

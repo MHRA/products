@@ -39,8 +39,7 @@ const App: NextPage = () => {
     setIsLoading(true);
     setResults([]);
 
-    const loader = getLoader(useGraphQl);
-    loader
+    getLoader(useGraphQl)
       .load(index)
       .then((results) => {
         setResults(results);

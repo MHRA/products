@@ -1,22 +1,48 @@
 import DataLoader from 'dataloader';
-import { IDocument } from '../../../model/document';
-import { DocType } from '../../azure-search';
+import { IDocument, IDocuments } from '../../../model/document';
+import { DocType, docSearch } from '../../azure-search';
 import { graphqlRequest } from '../../graphql';
+import { convertResults } from '../../azure-results-converter';
+
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<IProductInfo, IDocuments> => {
+  return useGraphQL ? graphqlProductsLoader : azureProductsLoader;
+};
+
+export const azureProductsLoader = new DataLoader<IProductInfo, IDocuments>(
+  async (searchParameterArray) => {
+    return Promise.all(
+      searchParameterArray.map(async (searchParameters: IProductInfo) => {
+        const results = await docSearch({
+          query: '',
+          page: searchParameters.page,
+          pageSize: searchParameters.pageSize,
+          filters: {
+            docType: searchParameters.docTypes,
+            sortOrder: 'a-z',
+            productName: searchParameters.name,
+          },
+        });
+
+        return {
+          count: results.resultCount,
+          documents: results.results.map(convertResults),
+        };
+      }),
+    );
+  },
+);
 
 interface IEdge {
   node: IDocumentResponse;
-}
-
-interface IDocuments {
-  count: number;
-  edges: IEdge[];
 }
 
 interface IProductResponse {
   products: {
     product: {
       name: string;
-      documents: IDocuments;
+      documents: { count: number; edges: IEdge[] };
     };
   };
 }
@@ -99,7 +125,7 @@ const getDocumentsForProduct = async ({
   page,
   pageSize,
   docTypes,
-}: IProductPageInfo) => {
+}: IProductInfo) => {
   const variables = {
     productName: name,
     first: pageSize,
@@ -113,7 +139,7 @@ const getDocumentsForProduct = async ({
   }).then((response) => convertResponseToProduct(response.data));
 };
 
-interface IProductPageInfo {
+interface IProductInfo {
   name: string;
   page: number;
   pageSize: number;
@@ -123,7 +149,7 @@ interface IProductPageInfo {
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-export const documents = new DataLoader<IProductPageInfo, IProduct>(
+export const graphqlProductsLoader = new DataLoader<IProductInfo, IProduct>(
   async (productPages) => {
     return Promise.all(productPages.map(getDocumentsForProduct));
   },
