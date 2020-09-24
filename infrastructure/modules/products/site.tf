@@ -22,6 +22,12 @@ resource "azurerm_storage_container" "docs" {
   container_access_type = "blob"
 }
 
+resource "azurerm_storage_container" "bmgf-docs" {
+  name                  = "bmgf-docs"
+  storage_account_name  = azurerm_storage_account.products.name
+  container_access_type = "blob"
+}
+
 resource "azurerm_storage_container" "temporary-docs" {
   name                  = "temporary-docs"
   storage_account_name  = azurerm_storage_account.products.name
