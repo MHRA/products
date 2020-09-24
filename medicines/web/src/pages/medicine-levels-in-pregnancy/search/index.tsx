@@ -25,7 +25,7 @@ const App: NextPage = (props) => {
   const [pageNumber, setPageNumber] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
   const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
-  const useGraphQl: boolean = false; // process.env.USE_GRAPHQL === 'true';
+  const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
   const {

@@ -66,7 +66,7 @@ export interface ISearchInfo {
 const query = `
 query($searchTerm: String, $first: Int, $after: String) {
   medicineLevelsInPregnancy {
-    reports(first: $first, offset: $skip) {
+    reports(search: $searchTerm, first: $first, after: $after) {
       count: totalCount
       edges {
         node {
