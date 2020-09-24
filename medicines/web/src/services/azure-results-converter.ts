@@ -1,7 +1,12 @@
 import moment from 'moment';
 
 import { IDocument, IBmgfReport } from '../model/document';
-import { ISearchResult, IBmgfSearchResult } from '../services/azure-search';
+import { IFacet } from '../model/facet';
+import {
+  IFacetResult,
+  ISearchResult,
+  IBmgfSearchResult,
+} from '../services/azure-search';
 
 const sanitizeTitle = (title: string | null): string => {
   let name: string;
@@ -50,4 +55,41 @@ export const convertBmgfResults = (doc: IBmgfSearchResult): IBmgfReport => {
     plNumbers: doc.pl_numbers,
     pregnancyTrimesters: doc.pregnancy_trimesters,
   };
+};
+
+export const mapSubstancesIndex = ([letter, facetResult]: [
+  string,
+  IFacetResult,
+]): IFacet[] => {
+  const indexResults: { [id: string]: IFacet } = {};
+  facetResult.facets
+    .filter((x) => x.value.startsWith(letter))
+    .forEach((f) => {
+      const [substance, product] = f.value
+        .replace(/\s+/g, ' ')
+        .split(', ', 3)
+        .slice(1);
+
+      if (substance && !product) {
+        indexResults[substance] = { name: substance, count: f.count };
+      }
+    });
+  return Object.values(indexResults).sort((a, b) => (a.name < b.name ? -1 : 1));
+};
+
+export const mapProductsIndex = ([letterAndSubstance, facetResult]: [
+  string,
+  IFacetResult,
+]): IFacet[] => {
+  const indexResults: { [id: string]: IFacet } = {};
+  facetResult.facets
+    .filter((x) => x.value.startsWith(`${letterAndSubstance},`))
+    .forEach((f) => {
+      const [product] = f.value.replace(/\s+/g, ' ').split(', ', 3).slice(2);
+
+      if (product) {
+        indexResults[product] = { name: product, count: f.count };
+      }
+    });
+  return Object.values(indexResults).sort((a, b) => (a.name < b.name ? -1 : 1));
 };

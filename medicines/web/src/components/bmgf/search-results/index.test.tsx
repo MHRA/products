@@ -17,6 +17,8 @@ const drugsMock = [
     pbpkModels: ['model 1', 'model 2'],
     summary: 'summary',
     url: 'url',
+    pregnancyTrimesters: ['first', 'second'],
+    plNumbers: ['PL123451234', 'PL234562345'],
   },
   {
     activeSubstances: ['substance 3', 'substance 4'],
@@ -30,6 +32,8 @@ const drugsMock = [
     pbpkModels: ['model 3', 'model 4'],
     summary: 'summary',
     url: 'url',
+    pregnancyTrimesters: ['third'],
+    plNumbers: [],
   },
 ];
 

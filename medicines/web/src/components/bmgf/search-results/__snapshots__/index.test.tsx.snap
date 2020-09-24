@@ -4,16 +4,18 @@ exports[`SearchResults should render 1`] = `
 <Fragment>
   <styled.div>
     <div>
-      <h2
-        className="title"
-      >
-        Showing results for Tea
-      </h2>
-      <p
-        className="no-of-results"
-      >
-        1 to 2 of 200
-      </p>
+      <styled.div>
+        <h2
+          className="title"
+        >
+          Showing results for Tea
+        </h2>
+        <styled.p
+          className="no-of-results"
+        >
+          1 to 2 of 200
+        </styled.p>
+      </styled.div>
       <p>
         Before a medicine can be sold in the UK, a number of licences are essential. Products with a UK marketing authorisation have a licence number in the format ‘PL 12345/0001’. The first 2 characters are always the letters ‘PL’, and this can be found on the packaging of the product.
       </p>
@@ -34,7 +36,8 @@ exports[`SearchResults should render 1`] = `
           Search results
         </styled.h3>
         <dl>
-          <article
+          <div
+            className="search-result"
             key="0"
           >
             <dt
@@ -74,8 +77,9 @@ exports[`SearchResults should render 1`] = `
                 }
               />
             </dd>
-          </article>
-          <article
+          </div>
+          <div
+            className="search-result"
             key="1"
           >
             <dt
@@ -115,7 +119,7 @@ exports[`SearchResults should render 1`] = `
                 }
               />
             </dd>
-          </article>
+          </div>
         </dl>
       </section>
     </div>

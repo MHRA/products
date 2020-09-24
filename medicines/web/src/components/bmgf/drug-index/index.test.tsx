@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 import React from 'react';
-import { ISubstanceIndex } from '../../../model/substance';
+import { IFacet } from '../../../model/facet';
 import DrugIndex, { IndexType } from './index';
 
 describe(DrugIndex, () => {
@@ -52,7 +52,7 @@ describe(DrugIndex, () => {
     expect(component).toMatchSnapshot();
   });
   it('should render substances', () => {
-    const substance: ISubstanceIndex = {
+    const substance: IFacet = {
       name: 'Ibuprofen',
       count: 1,
     };

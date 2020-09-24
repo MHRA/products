@@ -120,7 +120,7 @@ export const makeCursor = (page: number, pageSize: number): string => {
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-export const searchResults = new DataLoader<ISearchPageInfo, ISearchPage>(
+export const graphqlSearchLoader = new DataLoader<ISearchPageInfo, ISearchPage>(
   async (productPages) => {
     return Promise.all(productPages.map(getDocumentsForProduct));
   },

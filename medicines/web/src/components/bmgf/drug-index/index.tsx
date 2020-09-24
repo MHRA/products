@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { ISubstanceIndex } from '../../../model/substance';
+import { IFacet } from '../../../model/facet';
 import { mobileBreakpoint } from '../../../styles/dimensions';
 import { pluralise } from '../../../services/content-helpers';
 import { errorRed } from '../../../styles/colors';
@@ -65,7 +65,7 @@ const TechnicalErrorMessage = styled.p`
   padding: 20px;
 `;
 
-export const index: ISubstanceIndex[] = [
+export const index: IFacet[] = [
   { name: 'A' },
   { name: 'B' },
   { name: 'C' },
@@ -111,7 +111,7 @@ export enum IndexType {
 
 interface IIndex {
   title: string;
-  items: ISubstanceIndex[];
+  items: IFacet[];
   indexType: IndexType;
   isLoading?: boolean;
   errorFetchingResults?: boolean;

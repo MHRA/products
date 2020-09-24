@@ -11,7 +11,7 @@ import {
 import { useLocalStorage } from '../../hooks';
 import { IProduct } from '../../model/product';
 import Events from '../../services/events';
-import { getLoader } from '../../services/loaders/products/substance-loader';
+import { getLoader } from '../../services/loaders/products/products-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(

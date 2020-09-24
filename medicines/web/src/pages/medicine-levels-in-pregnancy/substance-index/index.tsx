@@ -9,7 +9,7 @@ import Page from '../../../components/page';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { SubstanceListStructuredData } from '../../../components/structured-data';
 import { useLocalStorage } from '../../../hooks';
-import { ISubstanceIndex } from '../../../model/substance';
+import { IFacet } from '../../../model/facet';
 import Events from '../../../services/events';
 import {
   substancesIndexLoader,
@@ -21,7 +21,7 @@ const App: NextPage = () => {
     'allowStorage',
     false,
   );
-  const [results, setResults] = React.useState<ISubstanceIndex[]>([]);
+  const [results, setResults] = React.useState<IFacet[]>([]);
   const [substanceIndex, setSubstanceIndex] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);

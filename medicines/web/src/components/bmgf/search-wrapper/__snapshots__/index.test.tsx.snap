@@ -6,11 +6,18 @@ exports[`SearchWrapper should render 1`] = `
 >
   <styled.div>
     <div
-      className="sc-eCApGN jjrFiw"
+      className="sc-gKAblj iLrieH"
     >
       <section
         className="search"
       >
+        <styled.h2>
+          <h2
+            className="sc-iCoHVE cVjpUi"
+          >
+            Search box
+          </h2>
+        </styled.h2>
         <Search
           onSearchBlur={[Function]}
           onSearchChange={[Function]}
@@ -19,8 +26,15 @@ exports[`SearchWrapper should render 1`] = `
         >
           <styled.section>
             <section
-              className="sc-hKFyIo hYbAAN"
+              className="sc-eCApGN isOGvN"
             >
+              <styled.h3>
+                <h3
+                  className="sc-jSFkmK bDfivy"
+                >
+                  Search by text
+                </h3>
+              </styled.h3>
               <form
                 aria-label="Search for medicines"
                 onSubmit={[Function]}
@@ -46,7 +60,7 @@ exports[`SearchWrapper should render 1`] = `
                     value="Search"
                   >
                     <input
-                      className="sc-dlnjPT etAYzs"
+                      className="sc-hKFyIo gabOGu"
                       type="submit"
                       value="Search"
                     />
