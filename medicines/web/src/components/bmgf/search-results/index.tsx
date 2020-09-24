@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { IBmgfReport } from '../../../model/document';
 import {
@@ -271,20 +272,15 @@ const SearchResults = (props: ISearchResultsProps) => {
             )}
           </TitleAndCountContainer>
           <p>
-            Before a medicine can be sold in the UK, a number of licences are
-            essential. Products with a UK marketing authorisation have a licence
-            number in the format ‘PL 12345/0001’. The first 2 characters are
-            always the letters ‘PL’, and this can be found on the packaging of
-            the product.
+            If you’re looking for other information on medicines, you can search
+            for information about medicines including patient information
+            leaflets (PILs), details on how the medicine can be used (SmPCs) and
+            scientific reports (PARs).
           </p>
           <p>
-            You can identify the product in the list below using the PL number.
-          </p>
-          <p>
-            The information about a medicine will be updated when new evidence
-            becomes available. This may mean that there are differences between
-            the information in the pack and the information here. The most
-            up-to-date information will be available on this site.
+            <Link href="/">
+              <a>Go to Products website to find information on medicines</a>
+            </Link>
           </p>
         </div>
 

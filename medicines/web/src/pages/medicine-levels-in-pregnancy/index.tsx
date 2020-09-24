@@ -1,10 +1,21 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 
-import MipText from '../../components/mip-text';
+import MedicineLevelsInPregnancyHomeText from '../../components/bmgf/home-text';
 import Page from '../../components/page';
 import SearchWrapper from '../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import Events from '../../services/events';
+import { mhraPharma10 } from '../../styles/colors';
+
+const StyledHomeTextWrapper = styled.div`
+  section:last-child {
+    p:last-child {
+      background-color: ${mhraPharma10};
+      padding: 14px 16px;
+    }
+  }
+`;
 
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -24,7 +35,9 @@ const App: React.FC = () => {
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <MipText />
+        <StyledHomeTextWrapper>
+          <MedicineLevelsInPregnancyHomeText />
+        </StyledHomeTextWrapper>
       </SearchWrapper>
     </Page>
   );

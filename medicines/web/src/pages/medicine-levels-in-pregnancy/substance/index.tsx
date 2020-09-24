@@ -90,7 +90,7 @@ const App: NextPage = () => {
 
   return (
     <Page
-      title="Products"
+      title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Substance results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
