@@ -71,7 +71,11 @@ export const mapSubstancesIndex = ([letter, facetResult]: [
         .slice(1);
 
       if (substance && !product) {
-        indexResults[substance] = { name: substance, count: f.count };
+        const currentSubstanceCount = indexResults[substance]?.count ?? 0;
+        indexResults[substance] = {
+          name: substance,
+          count: currentSubstanceCount + f.count,
+        };
       }
     });
   return Object.values(indexResults).sort((a, b) => (a.name < b.name ? -1 : 1));
@@ -82,14 +86,22 @@ export const mapProductsIndex = ([letterAndSubstance, facetResult]: [
   IFacetResult,
 ]): IFacet[] => {
   const indexResults: { [id: string]: IFacet } = {};
-  facetResult.facets
-    .filter((x) => x.value.startsWith(`${letterAndSubstance},`))
-    .forEach((f) => {
-      const [product] = f.value.replace(/\s+/g, ' ').split(', ', 3).slice(2);
+  const requiredFacetPrefix = `${letterAndSubstance},`;
+  facetResult.facets.forEach((f) => {
+    const sanitizedFacet = f.value.replace(/\s+/g, ' ');
+    if (!sanitizedFacet.startsWith(requiredFacetPrefix)) {
+      return;
+    }
 
-      if (product) {
-        indexResults[product] = { name: product, count: f.count };
-      }
-    });
+    const [product] = sanitizedFacet.split(', ', 3).slice(2);
+
+    if (product) {
+      const currentProductCount = indexResults[product]?.count ?? 0;
+      indexResults[product] = {
+        name: product,
+        count: currentProductCount + f.count,
+      };
+    }
+  });
   return Object.values(indexResults).sort((a, b) => (a.name < b.name ? -1 : 1));
 };

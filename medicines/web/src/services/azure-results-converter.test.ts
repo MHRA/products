@@ -93,8 +93,9 @@ describe(mapSubstancesIndex, () => {
       facets: [
         { count: 20, value: 'A' },
         { count: 12, value: 'A, ACTIVE SUBSTANCE2' },
-        { count: 10, value: 'A, ACTIVE SUBSTANCE' },
+        { count: 12, value: 'A, ACTIVE SUBSTANCE' },
         { count: 8, value: 'A, ACTIVE SUBSTANCE, PRODUCT1' },
+        { count: 2, value: 'A, ACTIVE  SUBSTANCE, PRODUCT1' },
         { count: 2, value: 'A, ACTIVE SUBSTANCE, PRODUCT2' },
         { count: 6, value: 'A, ACTIVE SUBSTANCE, PRODUCT3' },
         { count: 1, value: 'A, ACTIVE SUBSTANCE2, PRODUCT1' },
@@ -108,7 +109,7 @@ describe(mapSubstancesIndex, () => {
     const results = mapSubstancesIndex(['A', facetResult]);
     expect(results.length).toBe(2);
     expect(results[0].name).toBe('ACTIVE SUBSTANCE');
-    expect(results[0].count).toBe(10);
+    expect(results[0].count).toBe(12);
     expect(results[1].name).toBe('ACTIVE SUBSTANCE2');
     expect(results[1].count).toBe(12);
   });

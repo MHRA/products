@@ -1,20 +1,52 @@
 import DataLoader from 'dataloader';
-import { IDocument } from '../../../model/document';
-import { DocType } from '../../azure-search';
+import { IDocument, IDocuments } from '../../../model/document';
+import { DocType, docSearch } from '../../azure-search';
 import { graphqlRequest } from '../../graphql';
+import { convertResults } from '../../azure-results-converter';
+
+export const getLoader = (
+  useGraphQL: boolean,
+): DataLoader<ISearchInfo, IDocuments> => {
+  return useGraphQL ? graphqlSearchLoader : azureSearchLoader;
+};
+
+export const azureSearchLoader = new DataLoader<ISearchInfo, IDocuments>(
+  async (searchParameterArray) => {
+    return Promise.all(
+      searchParameterArray.map(async (searchParameters: ISearchInfo) => {
+        const results = await docSearch({
+          query: searchParameters.searchTerm,
+          page: searchParameters.page,
+          pageSize: searchParameters.pageSize,
+          filters: {
+            docType: searchParameters.docTypes,
+            sortOrder: 'a-z',
+          },
+        });
+
+        return {
+          count: results.resultCount,
+          documents: results.results.map(convertResults),
+        };
+      }),
+    );
+  },
+);
+
+interface ISearchInfo {
+  searchTerm: string;
+  page: number;
+  pageSize: number;
+  docTypes: DocType[];
+}
 
 interface IEdge {
   node: IDocumentResponse;
 }
 
-interface IDocuments {
-  count: number;
-  edges: IEdge[];
-}
-
-interface ISearchPageResponse {
+interface ISearchResponse {
   products: {
-    documents: IDocuments;
+    documents: { count: number; edges: IEdge[] };
   };
 }
 
@@ -51,16 +83,11 @@ query($searchTerm: String, $first: Int, $after: String, $documentTypes: [Documen
   }
 }`;
 
-interface ISearchPage {
-  count: number;
-  documents: IDocument[];
-}
-
 const convertResponseToSearchPage = ({
   products: {
     documents: { count, edges },
   },
-}: ISearchPageResponse): ISearchPage => {
+}: ISearchResponse): IDocuments => {
   return {
     count,
     documents: edges.map(convertDocumentResponseToDocument),
@@ -84,32 +111,25 @@ const convertDocumentResponseToDocument = ({
   };
 };
 
-const getDocumentsForProduct = async ({
+const getDocumentsForSearch = async ({
   searchTerm,
   page,
   pageSize,
   docTypes,
-}: ISearchPageInfo) => {
+}: ISearchInfo) => {
   const variables = {
     searchTerm,
     first: pageSize,
     after: makeCursor(page, pageSize),
     documentTypes: docTypes.map((s) => s.toUpperCase()),
   };
-  const { data } = await graphqlRequest<ISearchPageResponse, typeof variables>({
+  const { data } = await graphqlRequest<ISearchResponse, typeof variables>({
     query,
     variables,
   });
 
   return convertResponseToSearchPage(data);
 };
-
-interface ISearchPageInfo {
-  searchTerm: string;
-  page: number;
-  pageSize: number;
-  docTypes: DocType[];
-}
 
 export const makeCursor = (page: number, pageSize: number): string => {
   const skip = calculatePageStartRecord(page, pageSize);
@@ -120,8 +140,8 @@ export const makeCursor = (page: number, pageSize: number): string => {
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
-export const graphqlSearchLoader = new DataLoader<ISearchPageInfo, ISearchPage>(
-  async (productPages) => {
-    return Promise.all(productPages.map(getDocumentsForProduct));
+export const graphqlSearchLoader = new DataLoader<ISearchInfo, IDocuments>(
+  async (searchTerms) => {
+    return Promise.all(searchTerms.map(getDocumentsForSearch));
   },
 );
