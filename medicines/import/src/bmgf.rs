@@ -26,7 +26,7 @@ pub async fn import(
         match storage::upload_report(&client, path, &metadata, verbosity, dry_run).await {
             Ok(()) => {
                 let azure_html_path = format!(
-                    "{}/{}.html\n",
+                    "{}/{}\n",
                     metadata.get("report_name").unwrap(),
                     metadata.get("file_name").unwrap()
                 );
