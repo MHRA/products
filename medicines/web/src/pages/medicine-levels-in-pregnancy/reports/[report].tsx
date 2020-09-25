@@ -14,6 +14,23 @@ import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
 
 const ReportBody = styled.div`
   padding: 0 10px 0 20px;
+  table {
+    border-collapse: collapse;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
+
+  td {
+    padding: 10px;
+  }
 `;
 
 const DownloadButtonContainer = styled.section`
@@ -92,7 +109,7 @@ const updateImageTag = (imageNode, prefix) => {
   return imageNode;
 };
 
-const updateAnchorName = (node) => {
+const updateAnchorNameToId = (node) => {
   for (let i = 0; i < node.attrs.length; i++) {
     if (node.attrs[i].name === 'name') {
       node.attrs[i].name = 'id';
@@ -103,6 +120,10 @@ const updateAnchorName = (node) => {
 };
 
 const removeUnwantedTableAttributes = (node) => {
+  if (!node.attrs) {
+    return node;
+  }
+
   const unwantedAttributes = [
     'style',
     'v:shapes',
@@ -112,16 +133,22 @@ const removeUnwantedTableAttributes = (node) => {
     'width',
     'valign',
   ];
+
   for (let i = 0; i < node.attrs.length; i++) {
     if (unwantedAttributes.includes(node.attrs[i].name)) {
       node.attrs.splice(i, 1);
       i--;
     }
   }
+
   return node;
 };
 
 const removeUnwantedAttributes = (node) => {
+  if (!node.attrs) {
+    return node;
+  }
+
   const unwantedAttributes = ['style', 'align'];
   for (let i = 0; i < node.attrs.length; i++) {
     if (unwantedAttributes.includes(node.attrs[i].name)) {
@@ -132,31 +159,25 @@ const removeUnwantedAttributes = (node) => {
   return node;
 };
 
+const tagShouldBeRemoved = (tagName: string) => {
+  return ['h1', 'o:p', 'w:sdt'].includes(tagName);
+};
+
 const recurseNodes = (node, prefix) => {
-  if (
-    node.tagName === 'h1' ||
-    node.tagName === 'o:p' ||
-    node.tagName === 'w:sdt'
-  ) {
+  if (tagShouldBeRemoved(node.tagName)) {
     return;
   }
-  if (node.tagName && node.tagName === 'img') {
+  if (node.tagName === 'img') {
     node = updateImageTag(node, prefix);
-  } else if (
-    (node.tagName === 'td' || node.tagName === 'table') &&
-    node.attrs
-  ) {
+  } else if (node.tagName === 'td' || node.tagName === 'table') {
     node = removeUnwantedTableAttributes(node);
   } else if (node.tagName === 'a') {
-    node = updateAnchorName(node);
-  } else if (node.attrs) {
+    node = updateAnchorNameToId(node);
+  } else {
     node = removeUnwantedAttributes(node);
   }
 
-  if (!node.childNodes) {
-    return node;
-  }
-  for (let i = 0; i < node.childNodes.length; i++) {
+  for (let i = 0; i < node.childNodes?.length ?? 0; i++) {
     let returnedNode = recurseNodes(node.childNodes[i], prefix);
     if (returnedNode) {
       node.childNodes[i] = returnedNode;
@@ -180,14 +201,14 @@ const getHtmlBody = (htmlDoc) => {
 export const getStaticProps = async (context) => {
   const reportName = context.params.report;
 
-  const reportUrl = await getReportUrl(reportName);
+  const { reportDirUrl, reportUrl } = await getReportUrl(reportName);
   console.log(`REPORT URL: ${reportUrl}`);
   const reportContent = await getReportHtmlContent(reportUrl);
   console.log(`REPORT CONTENT: ${reportContent}`);
   const htmlDocument = parse5.parse(reportContent, { scriptingEnabled: false });
   let htmlBody = getHtmlBody(htmlDocument);
 
-  const assetsUrl = `${reportUrl}/assets/`;
+  const assetsUrl = `${reportDirUrl}/assets/`;
   htmlBody = recurseNodes(htmlBody, assetsUrl);
 
   const pdfUrl = `${reportUrl}.pdf`;

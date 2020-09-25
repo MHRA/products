@@ -18,7 +18,12 @@ export const getReportUrl = async (reportToGet: string): Promise<any> => {
     .then((reports) => {
       return reports.find((report) => report.startsWith(reportToGet));
     })
-    .then((report) => `${containerUrl}/${report}`);
+    .then((report) => {
+      return {
+        reportDirUrl: `${containerUrl}/${reportToGet}`,
+        reportUrl: `${containerUrl}/${report}`,
+      };
+    });
 };
 
 export const getReportHtmlContent = async (
