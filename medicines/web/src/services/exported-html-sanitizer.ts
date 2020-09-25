@@ -1,4 +1,4 @@
-const updateImageTag = (imageNode, prefix) => {
+const updateImageTag = (imageNode: any, prefix: string): any => {
   for (let i = 0; i < imageNode.attrs.length; i++) {
     if (imageNode.attrs[i].name === 'src') {
       const imageName = imageNode.attrs[i].value.split('/').pop();
@@ -11,7 +11,7 @@ const updateImageTag = (imageNode, prefix) => {
   return imageNode;
 };
 
-const updateAnchorNameToId = (node) => {
+const updateAnchorNameToId = (node: any): any => {
   for (const attribute of node.attrs) {
     if (attribute.name === 'name') {
       attribute.name = 'id';
@@ -21,7 +21,7 @@ const updateAnchorNameToId = (node) => {
   return node;
 };
 
-const removeUnwantedTableAttributes = (node) => {
+const removeUnwantedTableAttributes = (node: any) => {
   if (!node.attrs) {
     return node;
   }
@@ -47,7 +47,7 @@ const removeUnwantedTableAttributes = (node) => {
   return node;
 };
 
-const removeUnwantedAttributes = (node) => {
+const removeUnwantedAttributes = (node: any): any => {
   if (!node.attrs) {
     return node;
   }
@@ -62,11 +62,11 @@ const removeUnwantedAttributes = (node) => {
   return node;
 };
 
-const tagShouldBeRemoved = (tagName) => {
+const tagShouldBeRemoved = (tagName: string) => {
   return ['h1', 'o:p', 'w:sdt'].includes(tagName);
 };
 
-export const recurseNodes = (node, prefix) => {
+export const recurseNodes = (node: any, prefix: string): any => {
   if (tagShouldBeRemoved(node.tagName)) {
     return;
   }
@@ -92,11 +92,11 @@ export const recurseNodes = (node, prefix) => {
   return node;
 };
 
-export const cleanUpHtml = (htmlBody, assetPrefix) => {
+export const cleanUpHtml = (htmlBody: any, assetPrefix: string): any => {
   return recurseNodes(htmlBody, assetPrefix);
 };
 
-export const getHtmlBody = (htmlDoc) => {
+export const getHtmlBody = (htmlDoc: any): any => {
   const html = htmlDoc.childNodes[0];
   for (const node of html.childNodes) {
     if (node.tagName === 'body') {

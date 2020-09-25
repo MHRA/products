@@ -82,176 +82,176 @@ const mockIbuprofenSpcPilResults = () =>
 
 const longerTimeout = 20000;
 
-// describe('Search', function () {
-//   it('can search for Paracetamol', function () {
-//     cy.server();
-//     mockParacetamolResults();
-//     mockParacetamolResultsPage2();
-//     cy.visit('/');
-//     cy.get("input[type='search']").type('paracetamol');
-//     cy.get('.searchbar').contains('Search').click();
-//     cy.contains('I have read and understand the disclaimer', {
-//       timeout: longerTimeout,
-//     }).click();
-//     cy.contains('Agree').click();
-//     cy.contains('Next').click();
-//     cy.get("a[href='https://example.com/my-cool-document.pdf']");
-//   });
+describe('Search', function () {
+  it('can search for Paracetamol', function () {
+    cy.server();
+    mockParacetamolResults();
+    mockParacetamolResultsPage2();
+    cy.visit('/');
+    cy.get("input[type='search']").type('paracetamol');
+    cy.get('.searchbar').contains('Search').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
 
-//   it('can filter for SPCs', function () {
-//     cy.server();
-//     mockIbuprofenResults();
-//     mockIbuprofenSpcResults();
-//     cy.visit('/');
-//     cy.get("input[type='search']").type('ibuprofen');
-//     cy.get('.searchbar').contains('Search').click();
-//     cy.contains('I have read and understand the disclaimer', {
-//       timeout: longerTimeout,
-//     }).click();
-//     cy.contains('Agree').click();
-//     cy.contains('Summary of Product Characteristics (SPC)').click();
-//     cy.contains('Submit').click();
-//     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
-//   });
+  it('can filter for SPCs', function () {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.get('.searchbar').contains('Search').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+  });
 
-//   it('can filter for SPCs and PILs together', function () {
-//     cy.server();
-//     mockIbuprofenResults();
-//     mockIbuprofenSpcResults();
-//     mockIbuprofenSpcPilResults();
-//     cy.visit('/');
-//     cy.get("input[type='search']").type('ibuprofen');
-//     cy.get('.searchbar').contains('Search').click();
-//     cy.contains('I have read and understand the disclaimer', {
-//       timeout: longerTimeout,
-//     }).click();
-//     cy.contains('Agree').click();
-//     cy.contains('Summary of Product Characteristics (SPC)').click();
-//     cy.contains('Patient Information Leaflet (PIL)').click();
-//     cy.contains('Submit').click();
-//     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
-//     cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
-//   });
+  it('can filter for SPCs and PILs together', function () {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcPilResults();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.get('.searchbar').contains('Search').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Patient Information Leaflet (PIL)').click();
+    cy.contains('Submit').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/my-cool-document-pil.pdf']");
+  });
 
-//   it('can filter SPCs then go to next page to see 2nd page filtered documents', function () {
-//     cy.server();
-//     mockIbuprofenResults();
-//     mockIbuprofenSpcResults();
-//     mockIbuprofenSpcResultsPage2();
-//     cy.visit('/');
-//     cy.get("input[type='search']").type('ibuprofen');
-//     cy.get('.searchbar').contains('Search').click();
-//     cy.contains('I have read and understand the disclaimer', {
-//       timeout: longerTimeout,
-//     }).click();
-//     cy.contains('Agree').click();
-//     cy.contains('Summary of Product Characteristics (SPC)').click();
-//     cy.contains('Submit').click();
-//     cy.get("a[href='https://example.com/an-example-par.pdf']").should(
-//       'not.exist',
-//     );
-//     cy.contains('Next').click();
-//     cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
-//     cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
-//   });
+  it('can filter SPCs then go to next page to see 2nd page filtered documents', function () {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenSpcResults();
+    mockIbuprofenSpcResultsPage2();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.get('.searchbar').contains('Search').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
+    cy.get("a[href='https://example.com/an-example-par.pdf']").should(
+      'not.exist',
+    );
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc-page2.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc-page-2.pdf']");
+  });
 
-//   it('can go to next page then filter SPCs to see 1st page filtered documents', function () {
-//     cy.server();
-//     mockIbuprofenResults();
-//     mockIbuprofenResults();
-//     mockIbuprofenResultsPage2();
-//     mockIbuprofenSpcResults();
-//     cy.visit('/');
-//     cy.get("input[type='search']").type('ibuprofen');
-//     cy.get('.searchbar').contains('Search').click();
-//     cy.contains('I have read and understand the disclaimer', {
-//       timeout: longerTimeout,
-//     }).click();
-//     cy.contains('Agree').click();
-//     cy.contains('Next').click();
-//     cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
-//     cy.contains('Summary of Product Characteristics (SPC)').click();
-//     cy.contains('Submit').click();
-//     cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
-//     cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
-//   });
-// });
+  it('can go to next page then filter SPCs to see 1st page filtered documents', function () {
+    cy.server();
+    mockIbuprofenResults();
+    mockIbuprofenResults();
+    mockIbuprofenResultsPage2();
+    mockIbuprofenSpcResults();
+    cy.visit('/');
+    cy.get("input[type='search']").type('ibuprofen');
+    cy.get('.searchbar').contains('Search').click();
+    cy.contains('I have read and understand the disclaimer', {
+      timeout: longerTimeout,
+    }).click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/dad-jokes-page-2.pdf']");
+    cy.contains('Summary of Product Characteristics (SPC)').click();
+    cy.contains('Submit').click();
+    cy.get("a[href='https://example.com/my-cool-document-spc.pdf']");
+    cy.get("a[href='https://example.com/dad-jokes-spc.pdf']");
+  });
+});
 
-// describe('A-Z Index', function () {
-//   it('can navigate to Paracetamol via A-Z index', function () {
-//     cy.server();
-//     // Mock out list of substances.
-//     cy.route(
-//       `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
-//       'fixture:facets.json',
-//     );
+describe('A-Z Index', function () {
+  it('can navigate to Paracetamol via A-Z index', function () {
+    cy.server();
+    // Mock out list of substances.
+    cy.route(
+      `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
+      'fixture:facets.json',
+    );
 
-//     // Mock out first page of search results.
-//     cy.route(
-//       `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
-//       'fixture:search_results.json',
-//     );
-//     // Mock out second page of search results.
-//     cy.route(
-//       `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
-//       'fixture:search_results.json',
-//     );
+    // Mock out first page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
+      'fixture:search_results.json',
+    );
+    // Mock out second page of search results.
+    cy.route(
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
+      'fixture:search_results.json',
+    );
 
-//     cy.visit('/');
-//     cy.get('nav').contains('P').click();
-//     cy.contains('PARACETAMOL').click();
-//     cy.contains('PARACETAMOL TABLETS').click();
-//     cy.contains('I have read and understand the disclaimer').click();
-//     cy.contains('Agree').click();
-//     cy.contains('Next').click();
-//     cy.get("a[href='https://example.com/my-cool-document.pdf']");
-//   });
-// });
+    cy.visit('/');
+    cy.get('nav').contains('P').click();
+    cy.contains('PARACETAMOL').click();
+    cy.contains('PARACETAMOL TABLETS').click();
+    cy.contains('I have read and understand the disclaimer').click();
+    cy.contains('Agree').click();
+    cy.contains('Next').click();
+    cy.get("a[href='https://example.com/my-cool-document.pdf']");
+  });
+});
 
-// describe('Cookies', function () {
-//   const cookie_banner_text =
-//     'MHRA does not collect any data that would identify you directly. ' +
-//     'We would like to use Google Analytics to help us improve our services.';
+describe('Cookies', function () {
+  const cookie_banner_text =
+    'MHRA does not collect any data that would identify you directly. ' +
+    'We would like to use Google Analytics to help us improve our services.';
 
-//   it("Cookies aren't accepted by default", function () {
-//     cy.visit('/');
-//     cy.contains(cookie_banner_text);
-//     cy.contains('Cookie Policy').click();
-//     cy.contains('label', 'Off').find('input').should('be.checked');
-//     cy.contains('label', 'On').find('input').should('not.be.checked');
-//   });
+  it("Cookies aren't accepted by default", function () {
+    cy.visit('/');
+    cy.contains(cookie_banner_text);
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'Off').find('input').should('be.checked');
+    cy.contains('label', 'On').find('input').should('not.be.checked');
+  });
 
-//   it('Accept cookies via the banner', function () {
-//     cy.visit('/');
-//     cy.contains('Accept all cookies').click();
-//     cy.contains(cookie_banner_text).should('not.exist');
-//   });
+  it('Accept cookies via the banner', function () {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains(cookie_banner_text).should('not.exist');
+  });
 
-//   it('Accept cookies via the cookie policy form', function () {
-//     cy.visit('/');
-//     cy.contains('Cookie Policy').click();
-//     cy.contains('label', 'On').click();
-//     cy.contains('Save your preferences').click();
-//     cy.contains(cookie_banner_text).should('not.exist');
-//   });
+  it('Accept cookies via the cookie policy form', function () {
+    cy.visit('/');
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'On').click();
+    cy.contains('Save your preferences').click();
+    cy.contains(cookie_banner_text).should('not.exist');
+  });
 
-//   it('Accepting cookies is reflected in cookie policy form', function () {
-//     cy.visit('/');
-//     cy.contains('Accept all cookies').click();
-//     cy.contains('Cookie Policy').click();
-//     cy.contains('label', 'On').find('input').should('be.checked');
-//     cy.contains('label', 'Off').find('input').should('not.be.checked');
-//   });
+  it('Accepting cookies is reflected in cookie policy form', function () {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'On').find('input').should('be.checked');
+    cy.contains('label', 'Off').find('input').should('not.be.checked');
+  });
 
-//   it('Decline cookies via the cookie policy form', function () {
-//     cy.visit('/');
-//     cy.contains('Accept all cookies').click();
-//     cy.contains('Cookie Policy').click();
-//     cy.contains('label', 'Off').click();
-//     cy.contains('Save your preferences').click();
-//     cy.contains(cookie_banner_text);
-//   });
-// });
+  it('Decline cookies via the cookie policy form', function () {
+    cy.visit('/');
+    cy.contains('Accept all cookies').click();
+    cy.contains('Cookie Policy').click();
+    cy.contains('label', 'Off').click();
+    cy.contains('Save your preferences').click();
+    cy.contains(cookie_banner_text);
+  });
+});
 
 const bmgfBaseUrl = `https://${Cypress.env(
   'AZURE_SEARCH_SERVICE',

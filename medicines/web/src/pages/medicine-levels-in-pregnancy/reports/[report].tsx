@@ -11,6 +11,10 @@ import {
 
 import { useLocalStorage } from '../../../hooks';
 import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
+import {
+  getHtmlBody,
+  cleanUpHtml,
+} from '../../../services/exported-html-sanitizer';
 
 const ReportBody = styled.div`
   padding: 0 10px 0 20px;
@@ -50,6 +54,7 @@ const DownloadButtonContainer = styled.section`
 
     &:hover:enabled {
       background-color: ${mhra70};
+      color: ${mhraWhite};
     }
   }
 `;
@@ -107,7 +112,7 @@ export const getStaticProps = async (context) => {
   let htmlBody = getHtmlBody(htmlDocument);
 
   const assetsUrl = `${reportDirUrl}/assets/`;
-  htmlBody = recurseNodes(htmlBody, assetsUrl);
+  htmlBody = cleanUpHtml(htmlBody, assetsUrl);
 
   const pdfUrl = `${reportUrl}.pdf`;
 
