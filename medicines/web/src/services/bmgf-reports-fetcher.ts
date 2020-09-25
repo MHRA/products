@@ -1,6 +1,6 @@
-export const getReportList = async (
-  containerUrl: string,
-): Promise<string[]> => {
+const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/bmgf-docs`;
+
+export const getReportList = async (): Promise<string[]> => {
   return fetch(`${containerUrl}/upload-index.txt`, {
     method: 'GET',
     headers: {
@@ -13,27 +13,21 @@ export const getReportList = async (
     });
 };
 
-const getReportUrl = async (
-  reportToGet: string,
-  containerUrl: string,
-): Promise<any> => {
-  return getReportList(containerUrl)
+export const getReportUrl = async (reportToGet: string): Promise<any> => {
+  return getReportList()
     .then((reports) => {
       return reports.find((report) => report.startsWith(reportToGet));
     })
     .then((report) => `${containerUrl}/${report}`);
 };
 
-export const getReportContent = async (
-  report: string,
-  containerUrl: string,
+export const getReportHtmlContent = async (
+  reportUrl: string,
 ): Promise<string> => {
-  return getReportUrl(report, containerUrl).then((reportUrl) => {
-    return fetch(reportUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'text/html',
-      },
-    }).then((response) => response.text());
-  });
+  return fetch(`${reportUrl}.html`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  }).then((response) => response.text());
 };

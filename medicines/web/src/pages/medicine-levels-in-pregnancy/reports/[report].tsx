@@ -1,17 +1,37 @@
 import React from 'react';
-import glob from 'glob';
 import parse5 from 'parse5';
-import fetch, { Response } from 'node-fetch';
+import styled from 'styled-components';
 
 import Page from '../../../components/page';
 import {
   getReportList,
-  getReportContent,
+  getReportUrl,
+  getReportHtmlContent,
 } from '../../../services/bmgf-reports-fetcher';
 
 import { useLocalStorage } from '../../../hooks';
+import { mhraWhite, primaryColor, mhra70 } from '../../../styles/colors';
 
-const Report = ({ htmlBody }) => {
+const DownloadButton = styled.a`
+  display: block;
+  cursor: pointer;
+  color: ${mhraWhite};
+  background-color: ${primaryColor};
+  align-self: flex-end;
+  max-width: 50%;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  appearance: none;
+  border: solid 1px ${mhra70};
+  padding: 0.5em 1em;
+  margin-top: 1em;
+
+  &:hover:enabled {
+    background-color: ${mhra70};
+  }
+`;
+
+const Report = ({ reportName, htmlBody, pdfUrl }) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
@@ -19,10 +39,14 @@ const Report = ({ htmlBody }) => {
 
   return (
     <Page
-      title="Products"
+      title={reportName}
+      metaTitle={reportName}
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
+      <div>
+        <DownloadButton href={pdfUrl}>Download report (PDF)</DownloadButton>
+      </div>
       <div
         dangerouslySetInnerHTML={{
           __html: htmlBody,
@@ -62,6 +86,9 @@ const recurseNodes = (node, prefix) => {
   if (node.attrs) {
     node = removeStyleAttribute(node);
   }
+  if (node.tagName === 'h1') {
+    return;
+  }
   if (!node.childNodes) {
     return node;
   }
@@ -82,26 +109,29 @@ const getHtmlBody = (htmlDoc) => {
 
 export const getStaticProps = async (context) => {
   const reportName = context.params.report;
-  const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/bmgf-docs`;
 
-  let reportContent = await getReportContent(reportName, containerUrl);
+  const reportUrl = await getReportUrl(reportName);
+  const reportContent = await getReportHtmlContent(reportUrl);
 
   const htmlDocument = parse5.parse(reportContent, { scriptingEnabled: false });
   let htmlBody = getHtmlBody(htmlDocument);
 
-  let assetsUrl = `${containerUrl}/${reportName}/assets/`;
+  const assetsUrl = `${reportUrl}/assets/`;
   htmlBody = recurseNodes(htmlBody, assetsUrl);
+
+  const pdfUrl = `${reportUrl}.pdf`;
 
   return {
     props: {
       htmlBody: parse5.serialize(htmlBody),
+      reportName,
+      pdfUrl,
     },
   };
 };
 
 export const getStaticPaths = async () => {
-  const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/bmgf-docs`;
-  let reports = await getReportList(containerUrl).then((reportPaths) =>
+  const reports = await getReportList().then((reportPaths) =>
     reportPaths.map(
       (reportPath) =>
         `/medicine-levels-in-pregnancy/reports/${reportPath.split('/')[0]}`,
