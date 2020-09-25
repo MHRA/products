@@ -163,6 +163,7 @@ PAR
 PARs
 pdf
 PDFs
+pharmacokinetic
 pharmacokinetics
 PII
 PIL
