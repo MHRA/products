@@ -1,6 +1,6 @@
 use crate::{
     audit_logger::{AuditLogger, LogTransaction},
-    models::{DeleteMessage, JobStatus, UniqueDocumentIdentifier},
+    models::{DeleteMessage, JobStatus, SearchIndex, UniqueDocumentIdentifier},
     service_bus_client::{
         delete_factory, ProcessMessageError, ProcessRetrievalError, RemovableMessage,
         RetrievedMessage,
@@ -12,7 +12,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use search_client::{
     models::{IndexEntry, IndexResult},
-    CreateIndexEntry, DeleteIndexEntry, Search,
+    AzureSearchClient, CreateIndexEntry, DeleteIndexEntry,
 };
 use std::time::Duration;
 use storage_client::{AzureBlobStorage, DeleteBlob};
@@ -108,7 +108,7 @@ where
 pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMessageError> {
     tracing::info!("Message received: {:?} ", message);
 
-    let search_client = search_client::factory();
+    let search_client = AzureSearchClient::new();
     let storage_client = AzureBlobStorage::permanent();
 
     process_delete_message(message, storage_client, search_client, AuditLogger {}).await
@@ -117,7 +117,7 @@ pub async fn process_message(message: DeleteMessage) -> Result<Uuid, ProcessMess
 async fn process_delete_message(
     message: DeleteMessage,
     mut storage_client: impl DeleteBlob,
-    search_client: impl Search + DeleteIndexEntry + CreateIndexEntry,
+    search_client: impl SearchIndex + DeleteIndexEntry + CreateIndexEntry,
     transaction_logger: impl LogTransaction,
 ) -> Result<Uuid, ProcessMessageError> {
     let message_for_log = message.clone();
@@ -168,7 +168,7 @@ async fn process_delete_message(
 
 pub async fn get_index_record_from_unique_identifier(
     unique_document_identifier: &UniqueDocumentIdentifier,
-    search_client: &impl Search,
+    search_client: &impl SearchIndex,
 ) -> Result<IndexResult, ProcessMessageError> {
     match unique_document_identifier {
         UniqueDocumentIdentifier::ContentId(content_id) => {
@@ -182,9 +182,9 @@ pub async fn get_index_record_from_unique_identifier(
 
 pub async fn get_index_record_from_content_id(
     content_id: &str,
-    search_client: &impl Search,
+    search_client: &impl SearchIndex,
 ) -> Result<IndexResult, ProcessMessageError> {
-    let search_results = search_client.search(content_id).await?;
+    let search_results = search_client.search_index(content_id).await?;
     for result in search_results.search_results {
         if result.file_name == content_id {
             return Ok(result);
@@ -197,9 +197,9 @@ pub async fn get_index_record_from_content_id(
 
 pub async fn get_index_record_from_metadata_storage_name(
     metadata_storage_name: &str,
-    search_client: &impl Search,
+    search_client: &impl SearchIndex,
 ) -> Result<IndexResult, ProcessMessageError> {
-    let search_results = search_client.search(metadata_storage_name).await?;
+    let search_results = search_client.search_index(metadata_storage_name).await?;
     for result in search_results.search_results {
         if result.metadata_storage_name == metadata_storage_name {
             return Ok(result);
@@ -220,14 +220,10 @@ mod test {
         service_bus_client::test::TestRemovableMessage,
         state_manager::test::TestJobStatusClient,
     };
-    use search_client::{
-        models::{
-            AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, FacetResults,
-            IndexResult, IndexResults,
-        },
-        Search,
+    use search_client::models::{
+        AzureIndexChangedResult, AzureIndexChangedResults, DocumentType, IndexResult, IndexResults,
     };
-    use serde::de::DeserializeOwned;
+
     use std::env;
     use storage_client::test::TestAzureStorageClient;
     use tokio_test::block_on;
@@ -596,7 +592,7 @@ mod test {
         then_document_not_found_in_index_error_is_raised(result);
     }
 
-    fn given_a_search_client_that_returns_no_results() -> impl Search {
+    fn given_a_search_client_that_returns_no_results() -> impl SearchIndex {
         TestAzureSearchClient {
             can_insert_index: true,
             can_delete_index: true,
@@ -605,7 +601,7 @@ mod test {
     }
 
     fn given_a_search_client_that_returns_results(
-    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+    ) -> impl SearchIndex + CreateIndexEntry + DeleteIndexEntry {
         TestAzureSearchClient {
             can_insert_index: true,
             can_delete_index: true,
@@ -614,7 +610,7 @@ mod test {
     }
 
     fn given_a_search_client_that_cannot_restore_index(
-    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+    ) -> impl SearchIndex + CreateIndexEntry + DeleteIndexEntry {
         TestAzureSearchClient {
             can_insert_index: false,
             can_delete_index: true,
@@ -623,7 +619,7 @@ mod test {
     }
 
     fn given_a_search_client_that_cannot_delete_index(
-    ) -> impl Search + CreateIndexEntry + DeleteIndexEntry {
+    ) -> impl SearchIndex + CreateIndexEntry + DeleteIndexEntry {
         TestAzureSearchClient {
             can_insert_index: true,
             can_delete_index: false,
@@ -644,13 +640,13 @@ mod test {
     }
 
     fn when_getting_blob_name_from_content_id(
-        search_client: impl Search,
+        search_client: impl SearchIndex,
     ) -> Result<String, ProcessMessageError> {
         Ok(when_getting_index_record_from_content_id(search_client)?.metadata_storage_name)
     }
 
     fn when_getting_index_record_from_content_id(
-        search_client: impl Search,
+        search_client: impl SearchIndex,
     ) -> Result<IndexResult, ProcessMessageError> {
         block_on(get_index_record_from_content_id(
             "non existent content id",
@@ -664,11 +660,7 @@ mod test {
         assert_eq!(result.is_err(), true);
 
         assert!(
-            if let Err(ProcessMessageError::DocumentNotFoundInIndex(_)) = result {
-                true
-            } else {
-                false
-            },
+            matches!(result, Err(ProcessMessageError::DocumentNotFoundInIndex(_))),
             format!(
                 "Should have been an error with type: DocumentNotFoundInIndex, but was {:?}",
                 result
@@ -683,53 +675,13 @@ mod test {
     }
 
     #[async_trait]
-    impl Search for TestAzureSearchClient {
-        async fn search<T>(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> where
-        T: DeserializeOwned {
+    impl SearchIndex for TestAzureSearchClient {
+        async fn search_index(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
             Ok(IndexResults {
                 search_results: self.search_results.clone(),
                 context: String::from(""),
                 count: None,
             })
-        }
-        async fn search_with_pagination(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn search_with_pagination_and_filter(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-            _filter: Option<&str>,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn search_by_facet_field:<T>(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<FacetResults, reqwest::Error> {
-            unimplemented!()
-        }
-
-        async fn filter_by_collection_field:<T>(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> where T: DeserializeOwned {
-            unimplemented!()
-        }
-        async fn filter_by_non_collection_field(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
         }
     }
 

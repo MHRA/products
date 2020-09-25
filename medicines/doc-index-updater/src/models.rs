@@ -1,7 +1,10 @@
 use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
 use regex::Regex;
-use search_client::models::DocumentType;
+use search_client::{
+    models::{DocumentType, IndexResults},
+    AzureSearchClient, Search,
+};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -247,6 +250,18 @@ impl Message for DeleteMessage {
 
     async fn process(self) -> std::result::Result<uuid::Uuid, ProcessMessageError> {
         crate::delete_manager::process_message(self.clone()).await
+    }
+}
+
+#[async_trait]
+pub trait SearchIndex {
+    async fn search_index(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
+}
+
+#[async_trait]
+impl SearchIndex for AzureSearchClient {
+    async fn search_index(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
+        self.search::<IndexResults>(search_term).await
     }
 }
 
