@@ -10,25 +10,38 @@ import {
 } from '../../../services/bmgf-reports-fetcher';
 
 import { useLocalStorage } from '../../../hooks';
-import { mhraWhite, primaryColor, mhra70 } from '../../../styles/colors';
+import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
 
-const DownloadButton = styled.a`
-  display: block;
-  cursor: pointer;
-  color: ${mhraWhite};
-  background-color: ${primaryColor};
-  align-self: flex-end;
-  max-width: 50%;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  appearance: none;
-  border: solid 1px ${mhra70};
-  padding: 0.5em 1em;
-  margin-top: 1em;
+const ReportBody = styled.div`
+  padding: 0 10px 0 20px;
+`;
 
-  &:hover:enabled {
-    background-color: ${mhra70};
+const DownloadButtonContainer = styled.section`
+  text-align: right;
+
+  & > a {
+    appearance: none;
+    color: ${mhraWhite};
+    background-color: ${primaryColor};
+    border-radius: 5px;
+    border: 1px solid ${mhra};
+    padding: 8px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin: 12px 0 4px;
+
+    &:hover:enabled {
+      background-color: ${mhra70};
+    }
   }
+`;
+
+const AccessibleHeading = styled.h2`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
 `;
 
 const Report = ({ reportName, htmlBody, pdfUrl }) => {
@@ -44,14 +57,22 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <div>
-        <DownloadButton href={pdfUrl}>Download report (PDF)</DownloadButton>
-      </div>
-      <div
-        dangerouslySetInnerHTML={{
-          __html: htmlBody,
-        }}
-      ></div>
+      <ReportBody>
+        <DownloadButtonContainer>
+          <AccessibleHeading>Download PDF version of report</AccessibleHeading>
+          <a href={encodeURI(pdfUrl)} download={reportName}>
+            Download report (PDF)
+          </a>
+        </DownloadButtonContainer>
+        <section>
+          <AccessibleHeading>Report content</AccessibleHeading>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: htmlBody,
+            }}
+          ></div>
+        </section>
+      </ReportBody>
     </Page>
   );
 };
@@ -62,38 +83,87 @@ const updateImageTag = (imageNode, prefix) => {
   for (let i = 0; i < imageNode.attrs.length; i++) {
     if (imageNode.attrs[i].name === 'src') {
       let imageName = imageNode.attrs[i].value.split('/').pop();
-      imageNode.attrs[i].value = `${prefix}${imageName}`;
-      return imageNode;
+      imageNode.attrs[i].value = encodeURI(`${prefix}${imageName}`);
+    } else if (imageNode.attrs[i].name === 'v:shapes') {
+      imageNode.attrs.splice(i, 1);
+      i--;
     }
   }
   return imageNode;
 };
 
-const removeStyleAttribute = (node) => {
+const updateAnchorName = (node) => {
   for (let i = 0; i < node.attrs.length; i++) {
-    if (node.attrs[i].name === 'style') {
-      node.attrs[i].value = '';
+    if (node.attrs[i].name === 'name') {
+      node.attrs[i].name = 'id';
       return node;
     }
   }
   return node;
 };
 
+const removeUnwantedTableAttributes = (node) => {
+  const unwantedAttributes = [
+    'style',
+    'v:shapes',
+    'cellspacing',
+    'cellpadding',
+    'border',
+    'width',
+    'valign',
+  ];
+  for (let i = 0; i < node.attrs.length; i++) {
+    if (unwantedAttributes.includes(node.attrs[i].name)) {
+      node.attrs.splice(i, 1);
+      i--;
+    }
+  }
+  return node;
+};
+
+const removeUnwantedAttributes = (node) => {
+  const unwantedAttributes = ['style', 'align'];
+  for (let i = 0; i < node.attrs.length; i++) {
+    if (unwantedAttributes.includes(node.attrs[i].name)) {
+      node.attrs.splice(i, 1);
+      i--;
+    }
+  }
+  return node;
+};
+
 const recurseNodes = (node, prefix) => {
-  if (node.tagName && node.tagName === 'img') {
-    node = updateImageTag(node, prefix);
-  }
-  if (node.attrs) {
-    node = removeStyleAttribute(node);
-  }
-  if (node.tagName === 'h1') {
+  if (
+    node.tagName === 'h1' ||
+    node.tagName === 'o:p' ||
+    node.tagName === 'w:sdt'
+  ) {
     return;
   }
+  if (node.tagName && node.tagName === 'img') {
+    node = updateImageTag(node, prefix);
+  } else if (
+    (node.tagName === 'td' || node.tagName === 'table') &&
+    node.attrs
+  ) {
+    node = removeUnwantedTableAttributes(node);
+  } else if (node.tagName === 'a') {
+    node = updateAnchorName(node);
+  } else if (node.attrs) {
+    node = removeUnwantedAttributes(node);
+  }
+
   if (!node.childNodes) {
     return node;
   }
   for (let i = 0; i < node.childNodes.length; i++) {
-    node.childNodes[i] = recurseNodes(node.childNodes[i], prefix);
+    let returnedNode = recurseNodes(node.childNodes[i], prefix);
+    if (returnedNode) {
+      node.childNodes[i] = returnedNode;
+    } else {
+      node.childNodes.splice(i, 1);
+      i--;
+    }
   }
   return node;
 };
@@ -111,8 +181,9 @@ export const getStaticProps = async (context) => {
   const reportName = context.params.report;
 
   const reportUrl = await getReportUrl(reportName);
+  console.log(`REPORT URL: ${reportUrl}`);
   const reportContent = await getReportHtmlContent(reportUrl);
-
+  console.log(`REPORT CONTENT: ${reportContent}`);
   const htmlDocument = parse5.parse(reportContent, { scriptingEnabled: false });
   let htmlBody = getHtmlBody(htmlDocument);
 
