@@ -50,7 +50,7 @@ const App: NextPage = () => {
         setErrorFetchingResults(true);
       });
 
-    Events.viewSubstancesStartingWith(index);
+    Events.viewPbpkSubstancesStartingWith(index);
   }, [queryQS]);
 
   useEffect(() => {

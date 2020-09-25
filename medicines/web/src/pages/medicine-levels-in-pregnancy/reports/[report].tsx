@@ -52,7 +52,7 @@ const DownloadButtonContainer = styled.section`
     display: inline-block;
     margin: 12px 0 4px;
 
-    &:hover:enabled {
+    &:hover {
       background-color: ${mhra70};
       color: ${mhraWhite};
     }

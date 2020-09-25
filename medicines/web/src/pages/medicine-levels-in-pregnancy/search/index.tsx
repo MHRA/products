@@ -60,10 +60,10 @@ const App: NextPage = (props) => {
       })
       .catch((e) => setErrorFetchingResults(true));
 
-    // Events.searchForProductsMatchingKeywords({
-    //   searchTerm: query,
-    //   pageNo: page,
-    // });
+    Events.searchForPbpkReportsMatchingKeywords({
+      searchTerm: query,
+      pageNo: page,
+    });
   }, [queryQS, pageQS, docQS]);
 
   useEffect(() => {
