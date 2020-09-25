@@ -6,7 +6,7 @@ This data will be used to support benefit-risk decision in clinical practice but
 
 With input from UK clinical experts, we have identified over 200 medicines commonly used in pregnancy, and we have collected available pharmacokinetic data on over 100 medicines so far. This data is being used to qualify and validate PBPK models and give a good assessment of their potential to replace clinical data or inform clinical trial design.
 
-Further information on this project are available on the [MHRA MedRegs Blog](https://medregs.blog.gov.uk/).
+Further information on this project is available on the [MHRA MedRegs Blog](https://medregs.blog.gov.uk/category/medicines-in-pregnancy/).
 
 ## Medicine information
 

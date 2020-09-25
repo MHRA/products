@@ -5,7 +5,7 @@
 Patient information leaflet (PILs) are found in every medicine pack,
 and provide information on how a medicine should be used safely.
 
-Summaries of Product Characteristics (SPCs) are a description of a
+Summaries of Product Characteristics (SPCs) are descriptions of a
 medicinal product’s properties and the conditions attached to its use.
 A PIL will be based on an SPC.
 
@@ -64,7 +64,7 @@ details of significant safety changes to a marketing authorisation.
 
 ### Medicine levels in pregnancy reports
 
-This includes summaries of pregnancy pharmacokinetics data available in the literature and evaluations of a pregnancy mathematical modelling technique known as physiologically based pharmacokinetics (PBPK) modelling to be used by healthcare professionals to predict drug exposure in pregnant women.
+This includes summaries of pregnancy pharmacokinetics data available in the literature and evaluations of a pregnancy mathematical modelling technique known as physiologically based pharmacokinetics (PBPK) modelling that is used by healthcare professionals to predict drug exposure in pregnant women.
 
 [ema]: https://www.ema.europa.eu/en/medicines
 [customer services]: https://www.gov.uk/guidance/contact-mhra#customer-services

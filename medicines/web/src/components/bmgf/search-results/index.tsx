@@ -2,15 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { IBmgfReport } from '../../../model/document';
-import {
-  mhraBlue,
-  mhraBlue10,
-  mhraBlue80,
-  mhraBlue90,
-  mhraGray10,
-  white,
-  errorRed,
-} from '../../../styles/colors';
+import { mhraGray10, errorRed } from '../../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -171,23 +163,6 @@ const searchResultsNumberingInformation = (
   return `${one} to ${last} of ${numbering.totalResultCount}`;
 };
 
-const normalizeDescription = (description: string): string => {
-  if (!description || typeof description !== 'string') {
-    return description;
-  }
-
-  const normalized = description
-    .substr(0, 300) // Cut to 300 characters.
-    .replace(/[^\w<>/\s…]/gi, '') // Remove non-word characters other than ellipsis & tags.
-    .replace(/\s+/, ''); // Replace multi-spaces with one.
-
-  if (/^\S/.test(description.substr(300))) {
-    return normalized.replace(/\s+\S*$/, '') + '…'; // Add ellipsis.
-  }
-
-  return normalized;
-};
-
 function toSentenceCase(substance: string): string {
   return (
     (substance as string).toLowerCase().charAt(0).toUpperCase() +
@@ -261,14 +236,9 @@ const SearchResults = (props: ISearchResultsProps) => {
     <>
       <p>
         If the product information you are seeking does not appear below, please
-        refer to the{' '}
-        <Link href="/">
-          <a>
-            Summaries of Product Characteristics (SPCs) and Patient Information
-            Leaflet (PILs)
-          </a>
-        </Link>{' '}
-        for recommendation about the use of this medicines in pregnancy.
+        refer to the Summaries of Product Characteristics (SPCs) and Patient
+        Information Leaflet (PILs) for recommendation about the use of this
+        medicines in pregnancy.
       </p>
       <p>
         <Link href="/">
