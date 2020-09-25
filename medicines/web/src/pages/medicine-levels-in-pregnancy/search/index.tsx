@@ -12,7 +12,7 @@ import { parsePage } from '../../../services/querystring-interpreter';
 import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnancy/search-results-loader';
 
 const pageSize = 10;
-const searchPath = '/medicine-levels-in-pregnancy';
+const searchPath = '/medicine-levels-in-pregnancy/search';
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(

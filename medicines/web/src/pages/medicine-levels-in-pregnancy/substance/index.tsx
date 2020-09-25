@@ -13,7 +13,7 @@ import Events from '../../../services/events';
 import { parsePage } from '../../../services/querystring-interpreter';
 
 const pageSize = 10;
-const substancePath = '/substance';
+const substancePath = '/medicine-levels-in-pregnancy/substance';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(

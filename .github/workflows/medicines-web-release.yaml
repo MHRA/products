@@ -19,6 +19,7 @@ env:
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines.api.mhra.gov.uk/graphql
   USE_GRAPHQL: true
+  SHOW_BMGF: false
 
 jobs:
   build:

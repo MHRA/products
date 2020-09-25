@@ -12,12 +12,12 @@
       "products": ["PRODUCT 1", "PRODUCT 2"],
       "summary": "A really great example report",
       "pl_numbers": ["PL123451234", "PL234562345"],
-      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
       "pbpk_models": ["Model 1", "Model 2"],
       "matrices": ["Matrix 1", "Matrix 2"],
       "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
       "file_name": "example_report",
-      "report_name": "Paracetamol - study one"
+      "report_name": "Example report 4"
     },
     {
       "@search.score": 0.030727647,
@@ -29,12 +29,12 @@
       "products": ["PRODUCT 1", "PRODUCT 2"],
       "summary": "A really great example report",
       "pl_numbers": ["PL123451234", "PL234562345"],
-      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
       "pbpk_models": ["Model 1", "Model 2"],
       "matrices": ["Matrix 1", "Matrix 2"],
       "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
       "file_name": "example_report",
-      "report_name": "Paracetamol - study three"
+      "report_name": "Example report 5"
     },
     {
       "@search.score": 0.030727647,
@@ -46,12 +46,12 @@
       "products": ["PRODUCT 1", "PRODUCT 2"],
       "summary": "A really great example report",
       "pl_numbers": ["PL123451234", "PL234562345"],
-      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
       "pbpk_models": ["Model 1", "Model 2"],
       "matrices": ["Matrix 1", "Matrix 2"],
       "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
       "file_name": "example_report",
-      "report_name": "Paracetamol - study two"
+      "report_name": "Example report 6"
     }
   ]
 }
