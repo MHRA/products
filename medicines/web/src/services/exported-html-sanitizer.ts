@@ -1,3 +1,6 @@
+import parse5 from 'parse5';
+import htmlparser2Adapter from 'parse5-htmlparser2-tree-adapter';
+
 const updateImageTag = (imageNode: any, prefix: string): any => {
   for (let i = 0; i < imageNode.attrs.length; i++) {
     if (imageNode.attrs[i].name === 'src') {
@@ -103,4 +106,22 @@ export const getHtmlBody = (htmlDoc: any): any => {
       return node;
     }
   }
+};
+
+export const getCleanedHtml = (rawHtml: string): string => {
+  const htmlparser2Adapter = require('parse5-htmlparser2-tree-adapter');
+  let html = parse5.parse(rawHtml, {
+    scriptingEnabled: false,
+    treeAdapter: htmlparser2Adapter,
+  });
+  console.log(html);
+  for (let node of htmlparser2Adapter.getChildNodes(html)[0].children) {
+    if (node.tagName === 'head') {
+      htmlparser2Adapter.detachNode(node);
+    }
+  }
+  for (let node of htmlparser2Adapter.getChildNodes(html)[0].children) {
+    console.log(node);
+  }
+  return 'ha';
 };
