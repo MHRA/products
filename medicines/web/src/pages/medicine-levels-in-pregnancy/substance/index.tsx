@@ -60,11 +60,10 @@ const App: NextPage = () => {
       })
       .catch((e) => setErrorFetchingResults(true));
 
-    // Events.viewResultsForProduct({
-    //   productName: product,
-    //   pageNo: page,
-    //   docTypes: queryStringFromDocTypes(docTypes),
-    // });
+    Events.viewPbpkResultsForSubstance({
+      substance,
+      pageNo: page,
+    });
   }, [substanceQS, pageQS]);
 
   useEffect(() => {
