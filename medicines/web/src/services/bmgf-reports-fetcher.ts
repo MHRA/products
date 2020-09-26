@@ -13,15 +13,18 @@ export const getReportList = async (): Promise<string[]> => {
     });
 };
 
-export const getReportUrl = async (reportToGet: string): Promise<any> => {
+export const getReportUrls = async (reportName: string): Promise<any> => {
   return getReportList()
-    .then((reports) => {
-      return reports.find((report) => report.startsWith(reportToGet));
+    .then((reportNamesAndFileNames) => {
+      return reportNamesAndFileNames.find((reportNameAndFileName) =>
+        reportNameAndFileName.startsWith(reportName),
+      );
     })
-    .then((report) => {
+    .then((reportNameAndFileName) => {
       return {
-        reportDirUrl: `${containerUrl}/${reportToGet}`,
-        reportUrl: `${containerUrl}/${report}`,
+        reportPdfUrl: `${containerUrl}/${reportNameAndFileName}.pdf`,
+        reportHtmlUrl: `${containerUrl}/${reportNameAndFileName}.pdf`,
+        reportAssetsUrl: `${containerUrl}/${reportName}/assets/`,
       };
     });
 };
@@ -29,10 +32,10 @@ export const getReportUrl = async (reportToGet: string): Promise<any> => {
 export const getReportHtmlContent = async (
   reportUrl: string,
 ): Promise<string> => {
-  return fetch(`${reportUrl}.html`, {
+  return fetch(`${reportUrl}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'text/html',
     },
-  }).then((response) => response.text());
+  }).then((response) => (response.ok ? response.text() : ''));
 };

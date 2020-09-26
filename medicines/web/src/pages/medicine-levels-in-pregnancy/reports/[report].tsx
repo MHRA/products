@@ -5,16 +5,13 @@ import styled from 'styled-components';
 import Page from '../../../components/page';
 import {
   getReportList,
-  getReportUrl,
+  getReportUrls,
   getReportHtmlContent,
 } from '../../../services/bmgf-reports-fetcher';
 
 import { useLocalStorage } from '../../../hooks';
 import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
-import {
-  getHtmlBody,
-  cleanUpHtml,
-} from '../../../services/exported-html-sanitizer';
+import { getCleanedHtml } from '../../../services/exported-html-sanitizer';
 
 const ReportBody = styled.div`
   padding: 0 10px 0 20px;
@@ -66,6 +63,10 @@ const AccessibleHeading = styled.h2`
   margin: 0;
 `;
 
+const ReportNotAvailable = () => (
+  <div>Sorry - this report is currently unavailable.</div>
+);
+
 const Report = ({ reportName, htmlBody, pdfUrl }) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -88,11 +89,15 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
         </DownloadButtonContainer>
         <section>
           <AccessibleHeading>Report content</AccessibleHeading>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: htmlBody,
-            }}
-          ></div>
+          {htmlBody ? (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: htmlBody,
+              }}
+            ></div>
+          ) : (
+            <ReportNotAvailable />
+          )}
         </section>
       </ReportBody>
     </Page>
@@ -104,21 +109,20 @@ export default Report;
 export const getStaticProps = async (context) => {
   const reportName = context.params.report;
 
-  const { reportDirUrl, reportUrl } = await getReportUrl(reportName);
-  console.log(`REPORT URL: ${reportUrl}`);
-  const reportContent = await getReportHtmlContent(reportUrl);
-  console.log(`REPORT CONTENT: ${reportContent}`);
-  const htmlDocument = parse5.parse(reportContent, { scriptingEnabled: false });
-  let htmlBody = getHtmlBody(htmlDocument);
-
-  const assetsUrl = `${reportDirUrl}/assets/`;
-  htmlBody = cleanUpHtml(htmlBody, assetsUrl);
-
-  const pdfUrl = `${reportUrl}.pdf`;
+  let pdfUrl;
+  let assetsUrl;
+  const htmlBody = await getReportUrls(reportName)
+    .then(({ reportPdfUrl, reportHtmlUrl, reportAssetsUrl }) => {
+      pdfUrl = reportPdfUrl;
+      assetsUrl = reportAssetsUrl;
+      return getReportHtmlContent(reportHtmlUrl);
+    })
+    .then((reportContent) => getCleanedHtml(reportContent, assetsUrl))
+    .catch(() => '');
 
   return {
     props: {
-      htmlBody: parse5.serialize(htmlBody),
+      htmlBody: htmlBody,
       reportName,
       pdfUrl,
     },

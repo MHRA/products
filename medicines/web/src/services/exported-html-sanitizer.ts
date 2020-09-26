@@ -1,5 +1,4 @@
 import parse5 from 'parse5';
-import htmlparser2Adapter from 'parse5-htmlparser2-tree-adapter';
 
 const updateImageTag = (imageNode: any, prefix: string): any => {
   for (let i = 0; i < imageNode.attrs.length; i++) {
@@ -24,7 +23,7 @@ const updateAnchorNameToId = (node: any): any => {
   return node;
 };
 
-const removeUnwantedTableAttributes = (node: any) => {
+const removeUnwantedTableAttributes = (node: any): any => {
   if (!node.attrs) {
     return node;
   }
@@ -65,8 +64,8 @@ const removeUnwantedAttributes = (node: any): any => {
   return node;
 };
 
-const tagShouldBeRemoved = (tagName: string) => {
-  return ['h1', 'o:p', 'w:sdt'].includes(tagName);
+const tagShouldBeRemoved = (tagName: string): boolean => {
+  return ['h1', 'o:p', 'w:sdt', 'script'].includes(tagName);
 };
 
 export const recurseNodes = (node: any, prefix: string): any => {
@@ -95,33 +94,36 @@ export const recurseNodes = (node: any, prefix: string): any => {
   return node;
 };
 
-export const cleanUpHtml = (htmlBody: any, assetPrefix: string): any => {
-  return recurseNodes(htmlBody, assetPrefix);
-};
-
 export const getHtmlBody = (htmlDoc: any): any => {
-  const html = htmlDoc.childNodes[0];
-  for (const node of html.childNodes) {
-    if (node.tagName === 'body') {
-      return node;
+  for (const node of htmlDoc.childNodes) {
+    if (!node.childNodes) {
+      continue;
+    }
+    for (const childNode of node.childNodes) {
+      if (childNode.tagName === 'body') {
+        return childNode;
+      }
     }
   }
 };
 
-export const getCleanedHtml = (rawHtml: string): string => {
-  const htmlparser2Adapter = require('parse5-htmlparser2-tree-adapter');
-  let html = parse5.parse(rawHtml, {
-    scriptingEnabled: false,
-    treeAdapter: htmlparser2Adapter,
-  });
-  console.log(html);
-  for (let node of htmlparser2Adapter.getChildNodes(html)[0].children) {
-    if (node.tagName === 'head') {
-      htmlparser2Adapter.detachNode(node);
-    }
+export const getCleanedHtml = (
+  rawHtml: string,
+  assetPrefix: string,
+): string | undefined => {
+  const html = parse5.parse(rawHtml);
+
+  const htmlBody = getHtmlBody(html);
+
+  if (!htmlBody) {
+    return;
   }
-  for (let node of htmlparser2Adapter.getChildNodes(html)[0].children) {
-    console.log(node);
+
+  const cleanedHtml = recurseNodes(htmlBody, assetPrefix);
+
+  if (!cleanedHtml) {
+    return;
   }
-  return 'ha';
+
+  return parse5.serialize(cleanedHtml);
 };
