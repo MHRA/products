@@ -27,7 +27,12 @@ pub fn to_json(words: Vec<String>) -> String {
 }
 
 pub fn to_id(s: &str) -> String {
-    s.replace(" ", "-")
+    lazy_static! {
+        static ref RE_ILLEGAL_CHARACTERS: Regex = Regex::new(r"[^a-zA-Z0-9_\-\s]+").unwrap();
+        static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+)").unwrap();
+    }
+    let s = RE_ILLEGAL_CHARACTERS.replace_all(s, "").to_string();
+    RE_WHITESPACE.replace_all(&s, "-").to_string()
 }
 
 pub fn create_facets_by_active_substance(active_substances: Vec<String>) -> Vec<String> {
@@ -93,7 +98,10 @@ mod test {
     }
     #[test]
     fn to_id_replaces_spaces() {
-        assert_eq!(to_id("test report with spaces"), "test-report-with-spaces");
+        assert_eq!(
+            to_id("test report with spaces and % characters"),
+            "test-report-with-spaces-and-characters"
+        );
     }
     #[test]
     fn jsonify_keywords() {
