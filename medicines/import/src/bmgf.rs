@@ -41,10 +41,14 @@ pub async fn import(
     let _ = storage::upload_index_file(&uploaded_html_files_index, &client, dry_run).await?;
     progress_bar.finish();
 
-    println!(
-        "Uploading BMGF reports finished in {}",
-        HumanDuration(started.elapsed())
-    );
+    if dry_run {
+        println!("Dry run completed successfully. No files were uploaded.");
+    } else {
+        println!(
+            "Uploading BMGF reports finished in {}",
+            HumanDuration(started.elapsed())
+        );
+    }
 
     Ok(())
 }
