@@ -4,8 +4,6 @@ pub async fn make_post_request_with_body(
     api_key: &str,
 ) -> Result<(), reqwest::Error> {
     let client = reqwest::Client::new();
-    println!("{}", url);
-    println!("{}", definition);
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
@@ -15,7 +13,6 @@ pub async fn make_post_request_with_body(
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }
 
@@ -30,7 +27,6 @@ pub async fn make_post_request(url: &str, api_key: &str) -> Result<(), reqwest::
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }
 
@@ -44,6 +40,5 @@ pub async fn make_delete_request(url: &str, api_key: &str) -> Result<(), reqwest
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }
