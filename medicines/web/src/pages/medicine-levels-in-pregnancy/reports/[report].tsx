@@ -32,6 +32,10 @@ const ReportBody = styled.div`
   td {
     padding: 10px;
   }
+
+  img {
+    margin: 20px auto 30px;
+  }
 `;
 
 const DownloadButtonContainer = styled.section`

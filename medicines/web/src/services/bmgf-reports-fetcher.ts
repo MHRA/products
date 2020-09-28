@@ -23,7 +23,7 @@ export const getReportUrls = async (reportName: string): Promise<any> => {
     .then((reportNameAndFileName) => {
       return {
         reportPdfUrl: `${containerUrl}/${reportNameAndFileName}.pdf`,
-        reportHtmlUrl: `${containerUrl}/${reportNameAndFileName}.pdf`,
+        reportHtmlUrl: `${containerUrl}/${reportNameAndFileName}.html`,
         reportAssetsUrl: `${containerUrl}/${reportName}/assets/`,
       };
     });
