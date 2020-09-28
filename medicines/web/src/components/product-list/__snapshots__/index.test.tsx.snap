@@ -32,7 +32,9 @@ exports[`ProductList should render 1`] = `
            
           (
           1
-           files)
+           
+          file
+          )
         </a>
       </Link>
     </li>
@@ -48,7 +50,9 @@ exports[`ProductList should render 1`] = `
            
           (
           -1
-           files)
+           
+          files
+          )
         </a>
       </Link>
     </li>
@@ -64,7 +68,9 @@ exports[`ProductList should render 1`] = `
            
           (
           9999999
-           files)
+           
+          files
+          )
         </a>
       </Link>
     </li>
@@ -80,7 +86,9 @@ exports[`ProductList should render 1`] = `
            
           (
           -9999999
-           files)
+           
+          files
+          )
         </a>
       </Link>
     </li>

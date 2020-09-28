@@ -1,7 +1,7 @@
 import { makeCursor } from './search-results-loader';
 
 describe(makeCursor, () => {
-  it.each([2, 4, 5, 10, 15, 20])('offsets first result by -1', pageSize => {
+  it.each([2, 4, 5, 10, 15, 20])('offsets first result by -1', (pageSize) => {
     const cursor = makeCursor(1, pageSize);
     expect(cursor).toBe('LTE=');
   });

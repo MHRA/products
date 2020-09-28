@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { IProduct } from '../../model/substance';
+import { IProduct } from '../../model/product';
+import { pluralise } from '../../services/content-helpers';
 import { mobileBreakpoint } from '../../styles/dimensions';
 import { errorRed } from '../../styles/colors';
 
@@ -159,7 +160,12 @@ const DrugIndex: React.FC<IIndex> = ({
               >
                 <Link href={searchLink(item.name)}>
                   <a>
-                    {item.name} {item.count && <>({item.count} files)</>}
+                    {item.name}{' '}
+                    {item.count && (
+                      <>
+                        ({item.count} {pluralise('file', 'files', item.count)})
+                      </>
+                    )}
                   </a>
                 </Link>
               </li>

@@ -1,8 +1,6 @@
-import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
-import { DocType } from '../../services/azure-search';
-import { queryStringFromDocTypes } from '../../services/querystring-interpreter';
+
 import {
   mhra,
   mhra70,
@@ -85,7 +83,6 @@ interface IPaginationProps {
   resultCount: number;
   pageSize: number;
   currentPage: number;
-  enabledDocTypes: DocType[];
   handlePageChange: (num: number) => void;
 }
 

@@ -27,6 +27,23 @@ impl PageInfo {
     }
 }
 
+pub fn get_offset_or_default(skip: Option<i32>, after: Option<String>, default: i32) -> i32 {
+    match (after, skip) {
+        (Some(encoded), _) => match convert_after_to_offset(encoded) {
+            Ok(a) => a,
+            _ => default,
+        },
+        (None, Some(offset)) => offset,
+        _ => default,
+    }
+}
+
+pub fn convert_after_to_offset(encoded: String) -> Result<i32, anyhow::Error> {
+    let bytes = base64::decode(encoded)?;
+    let string = std::str::from_utf8(&bytes)?;
+    Ok(string.parse::<i32>()? + 1)
+}
+
 #[macro_export]
 macro_rules! pagination {
     ($name:ident, $edgename:ident, $type:ty) => {

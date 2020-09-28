@@ -59,13 +59,18 @@ const initializeTrackingScripts = () => {
 interface ISearchEvent {
   searchTerm: string;
   pageNo: number;
-  docTypes: string;
+  docTypes?: string;
 }
 
 interface IProductSearchEvent {
   productName: string;
   pageNo: number;
   docTypes: string;
+}
+
+interface IPbpkSubstanceSearchEvent {
+  substance: string;
+  pageNo: number;
 }
 
 export default {
@@ -85,6 +90,18 @@ export default {
   },
   viewResultsForProduct: (productSearch: IProductSearchEvent) => {
     pushToDataLayer({ event: 'product', ...productSearch });
+  },
+  viewPbpkResultsForSubstance: (substance: IPbpkSubstanceSearchEvent) => {
+    pushToDataLayer({ event: 'substance-pbpk', ...substance });
+  },
+  viewPbpkSubstancesStartingWith: (letter: string) => {
+    pushToDataLayer({ event: 'substance-index-pbpk', letter });
+  },
+  searchForPbpkReportsMatchingKeywords: (searchEvent: ISearchEvent) => {
+    pushToDataLayer({
+      event: 'search-pbpk',
+      ...searchEvent,
+    });
   },
   viewPage: (pageName: string) => {
     pushToDataLayer({ event: pageName });

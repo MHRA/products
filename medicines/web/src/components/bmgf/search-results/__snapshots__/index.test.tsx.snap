@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SearchResults should render 1`] = `
+<Fragment>
+  <styled.div>
+    <div>
+      <styled.div>
+        <h2
+          className="title"
+        >
+          Showing results for Tea
+        </h2>
+        <styled.p
+          className="no-of-results"
+        >
+          1 to 2 of 200
+        </styled.p>
+      </styled.div>
+      <p>
+        If you’re looking for other information on medicines, you can search for information about medicines including patient information leaflets (PILs), details on how the medicine can be used (SPCs) and scientific reports (PARs).
+      </p>
+      <p>
+        <Link
+          href="/"
+        >
+          <a>
+            Go to Products website to find information on medicines
+          </a>
+        </Link>
+      </p>
+    </div>
+    <div
+      className="row"
+    >
+      <section
+        className="column results"
+      >
+        <styled.h3>
+          Search results
+        </styled.h3>
+        <dl>
+          <div
+            className="search-result"
+            key="0"
+          >
+            <dd
+              className="right"
+            >
+              <a
+                href="url"
+              >
+                <p
+                  className="title"
+                >
+                  title
+                </p>
+              </a>
+              <p
+                className="metadata"
+              >
+                Active substances:
+                 
+                Substance 1, Substance 2
+              </p>
+              <p
+                className="summary"
+              >
+                summary
+              </p>
+            </dd>
+          </div>
+          <div
+            className="search-result"
+            key="1"
+          >
+            <dd
+              className="right"
+            >
+              <a
+                href="url"
+              >
+                <p
+                  className="title"
+                >
+                  title 2
+                </p>
+              </a>
+              <p
+                className="metadata"
+              >
+                Active substances:
+                 
+                Substance 3, Substance 4
+              </p>
+              <p
+                className="summary"
+              >
+                summary
+              </p>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+  </styled.div>
+  <Pagination
+    currentPage={1}
+    handlePageChange={[Function]}
+    pageSize={20}
+    resultCount={200}
+    searchTerm="Tea"
+  />
+</Fragment>
+`;
+
+exports[`SearchResults should render loading page 1`] = `
+<styled.div>
+  <h2
+    className="title"
+  >
+    Loading results for Tea...
+  </h2>
+</styled.div>
+`;

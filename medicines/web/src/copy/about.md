@@ -5,7 +5,7 @@
 Patient information leaflet (PILs) are found in every medicine pack,
 and provide information on how a medicine should be used safely.
 
-Summaries of Product Characteristics (SPCs) are a description of a
+Summaries of Product Characteristics (SPCs) are descriptions of a
 medicinal product’s properties and the conditions attached to its use.
 A PIL will be based on an SPC.
 

@@ -1,15 +1,7 @@
-use crate::product::Product;
 use async_graphql::SimpleObject;
 use search_client::{models::FacetResults, Search};
 
-#[SimpleObject(desc = "An active ingredient found in medical products")]
-#[derive(Debug, PartialEq)]
-pub struct Substance {
-    name: String,
-    products: Vec<Product>,
-}
-
-#[SimpleObject(desc = "An active ingredient found in medical products")]
+#[SimpleObject(desc = "The number of documents associated with an active substance")]
 #[derive(Debug, PartialEq)]
 pub struct SubstanceIndex {
     name: String,
@@ -19,12 +11,6 @@ pub struct SubstanceIndex {
 impl SubstanceIndex {
     pub fn new(name: String, count: i32) -> Self {
         Self { name, count }
-    }
-}
-
-impl Substance {
-    pub fn new(name: String, products: Vec<Product>) -> Self {
-        Self { name, products }
     }
 }
 
@@ -43,9 +29,6 @@ pub async fn get_substances_index(
 
 #[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
 struct SubstanceName(String);
-
-#[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
-struct ProductName(String);
 
 #[derive(Debug, Clone, Hash, Ord, PartialOrd, Eq, PartialEq)]
 struct DocumentCount(i32);

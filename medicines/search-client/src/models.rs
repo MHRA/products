@@ -42,6 +42,36 @@ pub struct IndexResults {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+pub struct ReportResult {
+    pub active_substances: Option<Vec<String>>,
+    #[serde(rename = "@search.highlights")]
+    pub highlights: Option<AzureHighlight>,
+    #[serde(rename = "@search.score")]
+    pub score: f32,
+    pub file_name: String,
+    pub metadata_storage_path: String,
+    pub products: Option<Vec<String>>,
+    pub summary: String,
+    pub pbpk_models: Option<Vec<String>>,
+    pub matrices: Option<Vec<String>>,
+    pub metadata_storage_name: String,
+    pub report_name: String,
+    pub metadata_storage_size: i32,
+    pub pregnancy_trimesters: Option<Vec<String>>,
+    pub pl_numbers: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ReportResults {
+    #[serde(rename = "value")]
+    pub search_results: Vec<ReportResult>,
+    #[serde(rename = "@odata.context")]
+    pub context: String,
+    #[serde(rename = "@odata.count")]
+    pub count: Option<i32>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
 pub struct Facet {
     pub count: i32,
     pub value: String,

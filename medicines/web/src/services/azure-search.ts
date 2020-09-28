@@ -3,7 +3,8 @@ import { requestTimeout } from './request-helper';
 import { buildFuzzyQuery } from './search-query-normalizer';
 
 const searchApiVersion = process.env.AZURE_SEARCH_API_VERSION;
-const searchIndex = process.env.AZURE_SEARCH_INDEX;
+const productsSearchIndex = process.env.AZURE_SEARCH_INDEX || '';
+const bmgfSearchIndex = process.env.BMGF_AZURE_SEARCH_INDEX || '';
 const searchKey = process.env.AZURE_SEARCH_KEY;
 const searchScoringProfile = process.env.AZURE_SEARCH_SCORING_PROFILE;
 const searchService = process.env.AZURE_SEARCH_SERVICE;
@@ -38,6 +39,28 @@ export interface ISearchResults {
   results: ISearchResult[];
 }
 
+export interface IBmgfSearchResult {
+  '@search.highlights': { content: string[] };
+  '@search.score': number;
+  file_name: string | null;
+  metadata_storage_name: string;
+  metadata_storage_path: string;
+  metadata_storage_size: number;
+  products: string[];
+  active_substances: string[];
+  summary: string;
+  pbpk_models: string[];
+  matrices: string[];
+  pl_numbers: string[];
+  report_name: string | null;
+  pregnancy_trimesters: string[];
+}
+
+export interface IBmgfSearchResults {
+  resultCount: number;
+  results: IBmgfSearchResult[];
+}
+
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
   pageSize * (page - 1);
 
@@ -45,9 +68,10 @@ const buildSearchUrl = (
   query: string,
   page: number,
   pageSize: number,
+  index: string,
   filters: ISearchFilters,
 ): string => {
-  const url = buildBaseUrl();
+  const url = buildBaseUrl(index);
   url.searchParams.append('highlight', 'content');
   url.searchParams.append('queryType', 'full');
   url.searchParams.append('$count', 'true');
@@ -80,9 +104,9 @@ export interface IFacetResult {
   facets: IFacet[];
 }
 
-const buildBaseUrl = () => {
+const buildBaseUrl = (index: string): URL => {
   const url = new URL(
-    `https://${searchService}.search.windows.net/indexes/${searchIndex}/docs`,
+    `https://${searchService}.search.windows.net/indexes/${index}/docs`,
   );
 
   url.searchParams.append('api-key', searchKey as string);
@@ -90,8 +114,8 @@ const buildBaseUrl = () => {
   return url;
 };
 
-const buildFacetUrl = (query: string): string => {
-  const url = buildBaseUrl();
+const buildFacetUrl = (query: string, index: string): string => {
+  const url = buildBaseUrl(index);
   url.searchParams.append('facet', 'facets,count:50000,sort:value');
   url.searchParams.append('$filter', `facets/any(f: f eq '${query}')`);
   url.searchParams.append('$top', '0');
@@ -117,7 +141,7 @@ const getJson = async (url: string): Promise<any> => {
 };
 
 export interface ISearchFilters {
-  docType: DocType[];
+  docType?: DocType[];
   substanceName?: string;
   productName?: string;
   sortOrder: string;
@@ -138,6 +162,25 @@ export const docSearch = async (
       buildFuzzyQuery(query.query),
       query.page,
       query.pageSize,
+      productsSearchIndex,
+      query.filters,
+    ),
+  );
+  return {
+    resultCount: body['@odata.count'],
+    results: body.value,
+  };
+};
+
+export const bmgfDocSearch = async (
+  query: ISearchQuery,
+): Promise<IBmgfSearchResults> => {
+  const body = await getJson(
+    buildSearchUrl(
+      buildFuzzyQuery(query.query),
+      query.page,
+      query.pageSize,
+      bmgfSearchIndex,
       query.filters,
     ),
   );
@@ -150,13 +193,20 @@ export const docSearch = async (
 export const facetSearch = async (
   query: string,
 ): Promise<[string, IFacetResult]> => {
-  const body = await getJson(buildFacetUrl(query));
+  const body = await getJson(buildFacetUrl(query, productsSearchIndex));
+  return [query, body['@search.facets']];
+};
+
+export const bmgfFacetSearch = async (
+  query: string,
+): Promise<[string, IFacetResult]> => {
+  const body = await getJson(buildFacetUrl(query, bmgfSearchIndex));
   return [query, body['@search.facets']];
 };
 
 const createFilter = (filters: ISearchFilters) => {
   const filterParams: string[] = [];
-  if (filters.docType.length > 0) {
+  if (filters.docType && filters.docType.length > 0) {
     const docTypeFilters = [];
     for (const docType of filters.docType) {
       docTypeFilters.push(`doc_type eq '${docType}'`);
@@ -165,7 +215,7 @@ const createFilter = (filters: ISearchFilters) => {
   }
   if (filters.substanceName) {
     filterParams.push(
-      `substance_name/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
+      `active_substances/any(substance: substance eq '${filters.substanceName.toUpperCase()}')`,
     );
   }
   if (filters.productName) {

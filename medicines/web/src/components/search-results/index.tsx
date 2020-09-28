@@ -2,7 +2,7 @@ import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
+import { IDocument } from '../../model/document';
 import { DocType } from '../../services/azure-search';
 import { errorRed, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
@@ -14,7 +14,7 @@ import {
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
-import Pagination from './pagination';
+import Pagination from '../pagination';
 
 const StyledDrugList = styled.div`
   .title {
@@ -398,7 +398,6 @@ const SearchResults = (props: ISearchResultsProps) => {
           pageSize={pageSize}
           resultCount={resultCount}
           searchTerm={searchTerm}
-          enabledDocTypes={docTypes}
           handlePageChange={props.handlePageChange}
         />
       ) : (

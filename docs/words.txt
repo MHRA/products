@@ -126,6 +126,7 @@ localhost
 localsftpuser
 MakeUpSomeName
 mdxp
+MedRegs
 Mesos
 mhra
 MHRA
@@ -136,6 +137,7 @@ mhraproductsnonprodregistry
 microservice
 microservices
 middleware
+modelling
 monorepo
 mQo
 mTLS
@@ -155,10 +157,14 @@ organisations
 os
 OtfjQ
 parameterise
+pbpk
+PBPK
 PAR
 PARs
 pdf
 PDFs
+pharmacokinetic
+pharmacokinetics
 PII
 PIL
 PILs
@@ -197,6 +203,7 @@ spc
 SPC
 spcpil
 SPCs
+SmPCs
 src
 SSL
 SSO

@@ -1,10 +1,12 @@
 {
   "data": {
-    "substancesIndex": [
-      {
-        "name": "PARACETAMOL",
-        "count": 1438
-      }
-    ]
+    "products": {
+      "substancesIndex": [
+        {
+          "name": "PARACETAMOL",
+          "count": 1438
+        }
+      ]
+    }
   }
 }

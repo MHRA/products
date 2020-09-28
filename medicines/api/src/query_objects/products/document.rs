@@ -1,30 +1,30 @@
 use crate::{pagination, pagination::PageInfo};
 use async_graphql::SimpleObject;
 use search_client::{
-    models::{DocumentType, IndexResult},
+    models::{DocumentType, IndexResult, IndexResults},
     Search,
 };
 
-#[SimpleObject(desc = "A document")]
+#[SimpleObject(desc = "An SPC, PIL or PAR document")]
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Document {
-    #[field(desc = "product name")]
+    #[field(desc = "Product associated with document")]
     pub product_name: Option<String>,
-    #[field(desc = "active substances")]
+    #[field(desc = "Active substances associated with document")]
     pub active_substances: Option<Vec<String>>,
-    #[field(desc = "title")]
+    #[field(desc = "Title")]
     pub title: Option<String>,
-    #[field(desc = "highlights")]
+    #[field(desc = "Highlights")]
     pub highlights: Option<Vec<String>>,
-    #[field(desc = "created")]
+    #[field(desc = "Created date")]
     pub created: Option<String>,
-    #[field(desc = "doc type")]
+    #[field(desc = "Document type")]
     pub doc_type: Option<DocumentType>,
-    #[field(desc = "file size")]
+    #[field(desc = "File size")]
     pub file_size_in_bytes: Option<i32>,
-    #[field(desc = "name")]
+    #[field(desc = "PDF file name")]
     pub name: Option<String>,
-    #[field(desc = "url")]
+    #[field(desc = "PDF file url")]
     pub url: Option<String>,
 }
 
@@ -107,7 +107,7 @@ pub async fn get_documents(
     let result_count = first.unwrap_or(10);
 
     let azure_result = client
-        .search_with_pagination_and_filter(
+        .search_with_pagination_and_filter::<IndexResults>(
             &search,
             search_client::AzurePagination {
                 result_count,
@@ -118,19 +118,23 @@ pub async fn get_documents(
         )
         .await?;
 
-    let docs = azure_result
+    Ok(map_azure_result(azure_result, offset))
+}
+
+fn map_azure_result(result: IndexResults, offset: i32) -> AzureDocumentResult {
+    let docs = result
         .search_results
         .into_iter()
         .map(Document::from)
         .collect();
 
-    let total_count = azure_result.count.unwrap_or(0);
+    let total_count = result.count.unwrap_or(0);
 
-    Ok(AzureDocumentResult {
+    AzureDocumentResult {
         docs,
         total_count,
         offset,
-    })
+    }
 }
 
 fn build_filter(
@@ -171,69 +175,8 @@ fn build_product_name_filter(product_name: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use async_trait::async_trait;
-    use search_client::models::{FacetResults, IndexResults};
+    use search_client::models::{AzureHighlight, IndexResult};
     use test_case::test_case;
-    use tokio_test::block_on;
-
-    struct TestAzureSearchClient {
-        pub search_results: Vec<IndexResult>,
-    }
-
-    impl TestAzureSearchClient {
-        fn new(search_results: Vec<IndexResult>) -> Self {
-            Self { search_results }
-        }
-    }
-
-    #[async_trait]
-    impl Search for TestAzureSearchClient {
-        async fn search(&self, _search_term: &str) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn search_with_pagination(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!();
-        }
-        async fn search_with_pagination_and_filter(
-            &self,
-            _search_term: &str,
-            _pagination: search_client::AzurePagination,
-            _include_count: bool,
-            _filter: Option<&str>,
-        ) -> Result<IndexResults, reqwest::Error> {
-            Ok(IndexResults {
-                search_results: self.search_results.clone(),
-                context: String::from(""),
-                count: Some(1234),
-            })
-        }
-        async fn search_by_facet_field(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<FacetResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn filter_by_collection_field(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
-        }
-        async fn filter_by_non_collection_field(
-            &self,
-            _field_name: &str,
-            _field_value: &str,
-        ) -> Result<IndexResults, reqwest::Error> {
-            unimplemented!()
-        }
-    }
 
     fn given_a_search_result(product_name: &str) -> IndexResult {
         IndexResult {
@@ -244,7 +187,7 @@ mod test {
             metadata_storage_path: "test/path".to_string(),
             substance_name: vec!["substance".to_string()],
             title: "title".to_string(),
-            created: None,
+            created: Some("created".to_string()),
             facets: vec!["facet".to_string()],
             keywords: None,
             metadata_storage_size: 300,
@@ -252,12 +195,27 @@ mod test {
             rev_label: None,
             suggestions: vec!["suggestion".to_string()],
             score: 1.0,
-            highlights: None,
+            highlights: Some(AzureHighlight {
+                content: vec![String::from("highlight")],
+            }),
         }
     }
 
-    fn given_first_page_of_search_results() -> Vec<IndexResult> {
-        vec![
+    fn given_azure_search_results(reports: Vec<IndexResult>, count: i32) -> IndexResults {
+        IndexResults {
+            search_results: reports,
+            context: String::default(),
+            count: Some(count),
+        }
+    }
+
+    fn given_a_single_search_result() -> IndexResults {
+        let results = vec![given_a_search_result("first")];
+        given_azure_search_results(results, 1234)
+    }
+
+    fn given_search_results() -> IndexResults {
+        let results = vec![
             given_a_search_result("first"),
             given_a_search_result("second"),
             given_a_search_result("third"),
@@ -268,103 +226,60 @@ mod test {
             given_a_search_result("eighth"),
             given_a_search_result("ninth"),
             given_a_search_result("tenth"),
-        ]
+        ];
+        given_azure_search_results(results, 1234)
     }
 
-    fn given_last_page_of_search_results() -> Vec<IndexResult> {
-        vec![
-            given_a_search_result("fourth last"),
-            given_a_search_result("third last"),
-            given_a_search_result("second last"),
-            given_a_search_result("last"),
-        ]
+    fn when_we_map_the_results(results: IndexResults) -> AzureDocumentResult {
+        map_azure_result(results, 0)
     }
 
-    fn given_a_search_client(search_results: &[IndexResult]) -> TestAzureSearchClient {
-        TestAzureSearchClient::new(search_results.to_owned())
+    fn then_all_fields_map_correctly(reports_response: AzureDocumentResult) {
+        let first_result = reports_response.docs[0].clone();
+        assert_eq!(first_result.product_name.unwrap(), "first");
+        assert_eq!(
+            first_result.active_substances.unwrap().first().unwrap(),
+            "substance"
+        );
+        assert_eq!(first_result.title.unwrap(), "title");
+        assert_eq!(first_result.file_size_in_bytes.unwrap(), 300);
+        assert_eq!(first_result.created.unwrap(), "created");
+        assert_eq!(first_result.doc_type.unwrap(), DocumentType::Spc);
+        assert_eq!(first_result.name.unwrap(), "our_id");
+        assert_eq!(first_result.url.unwrap(), "test/path");
+        assert_eq!(
+            first_result.highlights.unwrap().first().unwrap(),
+            "highlight"
+        );
     }
 
-    fn when_we_get_the_first_page_of_documents(search_client: impl Search) -> Documents {
-        block_on(get_documents(
-            &search_client,
-            "Search string",
-            None,
-            0,
-            None,
-            None,
-        ))
-        .unwrap()
-        .into()
-    }
-
-    fn when_we_get_the_last_page_of_documents(search_client: impl Search) -> Documents {
-        block_on(get_documents(
-            &search_client,
-            "Search string",
-            None,
-            1230,
-            None,
-            None,
-        ))
-        .unwrap()
-        .into()
-    }
-
-    fn then_we_have_the_first_page(documents_response: &Documents) {
+    fn then_we_have_the_expected_output(documents_response: AzureDocumentResult) {
         let expected_names = vec![
             "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
             "tenth",
         ];
-        let edges = &documents_response.edges;
-        let actual_names = edges
+        let actual_names = documents_response
+            .docs
             .iter()
-            .map(|edge| edge.node.product_name.as_ref().unwrap());
-        assert!(actual_names.eq(expected_names));
+            .filter_map(|document| document.product_name.clone())
+            .collect::<Vec<String>>();
+        assert!(actual_names.eq(&expected_names));
 
         assert_eq!(1234, documents_response.total_count);
-
-        let expected_page_info = PageInfo {
-            has_previous_page: false,
-            has_next_page: true,
-            start_cursor: base64::encode("0"),
-            end_cursor: base64::encode("9"),
-        };
-        assert_eq!(expected_page_info, documents_response.page_info);
-    }
-
-    fn then_we_have_the_last_page(documents_response: &Documents) {
-        let expected_names = vec!["fourth last", "third last", "second last", "last"];
-        let edges = &documents_response.edges;
-        let actual_names = edges
-            .iter()
-            .map(|edge| edge.node.product_name.as_ref().unwrap());
-
-        assert!(actual_names.eq(expected_names));
-
-        assert_eq!(1234, documents_response.total_count);
-        let expected_page_info = PageInfo {
-            has_previous_page: true,
-            has_next_page: false,
-            start_cursor: base64::encode("1230"),
-            end_cursor: base64::encode("1233"),
-        };
-        assert_eq!(expected_page_info, documents_response.page_info);
     }
 
     #[test]
-    fn test_get_documents_first_page() {
-        let search_results = given_first_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_first_page_of_documents(search_client);
-        then_we_have_the_first_page(&response);
+    fn test_map_result() {
+        let search_results = given_a_single_search_result();
+        let response = when_we_map_the_results(search_results);
+        then_all_fields_map_correctly(response);
     }
 
     #[test]
-    fn test_get_documents_last_page() {
-        let search_results = given_last_page_of_search_results();
-        let search_client = given_a_search_client(&search_results);
-        let response = when_we_get_the_last_page_of_documents(search_client);
-        then_we_have_the_last_page(&response);
+    fn test_map_results() {
+        let search_results = given_search_results();
+        let response = when_we_map_the_results(search_results);
+        then_we_have_the_expected_output(response);
     }
 
     #[test_case(None, None, None)]

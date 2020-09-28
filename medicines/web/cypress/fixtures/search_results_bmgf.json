@@ -1,0 +1,57 @@
+{
+  "@odata.context": "https://mhraproductsnonprod.search.windows.net/indexes('bmgf-index')/$metadata#docs(*)",
+  "@odata.count": 1000,
+  "value": [
+    {
+      "@search.score": 0.030727647,
+      "metadata_storage_path": "https://mhraproductsnonprod.blob.core.windows.net/bmgf-docs/Example%20report%20name2/example_report.pdf",
+      "created": null,
+      "metadata_storage_size": 341876,
+      "metadata_storage_content_md5": "ZTRpXNxjshk179Bc2VjNbQ==",
+      "metadata_storage_name": "example_report.pdf",
+      "products": ["PRODUCT 1", "PRODUCT 2"],
+      "summary": "A really great example report",
+      "pl_numbers": ["PL123451234", "PL234562345"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
+      "pbpk_models": ["Model 1", "Model 2"],
+      "matrices": ["Matrix 1", "Matrix 2"],
+      "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
+      "file_name": "example_report",
+      "report_name": "Example report 1"
+    },
+    {
+      "@search.score": 0.030727647,
+      "metadata_storage_path": "https://mhraproductsnonprod.blob.core.windows.net/bmgf-docs/Example%20report%20name2/example_report.pdf",
+      "created": null,
+      "metadata_storage_size": 341876,
+      "metadata_storage_content_md5": "ZTRpXNxjshk179Bc2VjNbQ==",
+      "metadata_storage_name": "example_report.pdf",
+      "products": ["PRODUCT 1", "PRODUCT 2"],
+      "summary": "A really great example report",
+      "pl_numbers": ["PL123451234", "PL234562345"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
+      "pbpk_models": ["Model 1", "Model 2"],
+      "matrices": ["Matrix 1", "Matrix 2"],
+      "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
+      "file_name": "example_report",
+      "report_name": "Example report 2"
+    },
+    {
+      "@search.score": 0.030727647,
+      "metadata_storage_path": "https://mhraproductsnonprod.blob.core.windows.net/bmgf-docs/Example%20report%20name2/example_report.pdf",
+      "created": null,
+      "metadata_storage_size": 341876,
+      "metadata_storage_content_md5": "ZTRpXNxjshk179Bc2VjNbQ==",
+      "metadata_storage_name": "example_report.pdf",
+      "products": ["PRODUCT 1", "PRODUCT 2"],
+      "summary": "A really great example report",
+      "pl_numbers": ["PL123451234", "PL234562345"],
+      "active_substances": ["SUBSTANCE 1", "SUBSTANCE 2", "PARACETAMOL"],
+      "pbpk_models": ["Model 1", "Model 2"],
+      "matrices": ["Matrix 1", "Matrix 2"],
+      "pregnancy_trimesters": ["Trimester 1", "Trimester 2"],
+      "file_name": "example_report",
+      "report_name": "Example report 3"
+    }
+  ]
+}

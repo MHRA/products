@@ -6,3 +6,6 @@ out/
 cypress/videos/
 cypress/screenshots/
 coverage/
+!.env.development
+!.env.test
+!.env.production

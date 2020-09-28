@@ -7,8 +7,8 @@ import SearchResults from '../../components/search-results';
 import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
-import { docSearch, DocType } from '../../services/azure-search';
+import { IDocument } from '../../model/document';
+import { DocType } from '../../services/azure-search';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
@@ -16,50 +16,10 @@ import {
   parsePage,
   queryStringFromDocTypes,
 } from '../../services/querystring-interpreter';
-import { convertResults } from '../../services/results-converter';
-import { searchResults } from '../../services/search-results-loader';
+import { getLoader } from '../../services/loaders/products/search-results-loader';
 
 const pageSize = 10;
 const searchPath = '/search';
-
-interface ISearchResult {
-  count: number;
-  documents: IDocument[];
-}
-
-interface ISearchPageInfo {
-  searchTerm: string;
-  page: number;
-  docTypes: DocType[];
-}
-
-const azureSearchPageLoader = async ({
-  searchTerm,
-  page,
-  docTypes,
-}: ISearchPageInfo): Promise<ISearchResult> => {
-  const results = await docSearch({
-    query: searchTerm,
-    page,
-    pageSize,
-    filters: {
-      docType: docTypes,
-      sortOrder: 'a-z',
-    },
-  });
-  return {
-    count: results.resultCount,
-    documents: results.results.map(convertResults),
-  };
-};
-
-const graphQlSearchPageLoader = async ({
-  searchTerm,
-  page,
-  docTypes,
-}: ISearchPageInfo): Promise<ISearchResult> => {
-  return searchResults.load({ searchTerm, page, pageSize, docTypes });
-};
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -88,16 +48,6 @@ const App: NextPage = (props) => {
     },
   } = router;
 
-  const getSearchResults = async (
-    searchPageInfo: ISearchPageInfo,
-  ): Promise<ISearchResult> => {
-    if (useGraphQl) {
-      return graphQlSearchPageLoader(searchPageInfo);
-    } else {
-      return azureSearchPageLoader(searchPageInfo);
-    }
-  };
-
   useEffect(() => {
     setIsLoading(true);
     if (!queryQS) {
@@ -113,14 +63,10 @@ const App: NextPage = (props) => {
 
     setDocuments([]);
     setCount(0);
-    setIsLoading(true);
     setErrorFetchingResults(false);
 
-    getSearchResults({
-      searchTerm: query,
-      page,
-      docTypes,
-    })
+    getLoader(useGraphQl)
+      .load({ searchTerm: query, page, pageSize, docTypes })
       .then(({ documents, count }) => {
         setDocuments(documents);
         setCount(count);

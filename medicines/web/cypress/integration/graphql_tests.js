@@ -72,3 +72,37 @@ describe('A-Z Index', function () {
     cy.get("a[href='https://example.com/my-cool-document.pdf']");
   });
 });
+
+const mockParacetamolResultsForMedicineLevelsInPregnancyGraphQl = () =>
+  cy.route('POST', graphQlUrl, 'fixture:graphql-search-results-bmgf.json');
+
+describe('Search medicine levels in pregnancy docs using GraphQl', function () {
+  it('can search for Paracetamol', function () {
+    cy.server();
+    mockParacetamolResultsForMedicineLevelsInPregnancyGraphQl();
+    cy.visit('/medicine-levels-in-pregnancy/search?search=paracetamol&page=1');
+    cy.get(
+      "a[href='/medicine-levels-in-pregnancy/reports/Example report name2']",
+    );
+  });
+});
+
+describe('A-Z Index for medicine levels in pregnancy', function () {
+  it('can navigate to Paracetamol Tablets with GraphQL feature on', function () {
+    cy.server();
+    // Mock out GraphQL response.
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substances-index-bmgf.json');
+
+    cy.visit('/medicine-levels-in-pregnancy');
+    cy.get('nav').contains('P').click();
+    cy.contains('PARACETAMOL');
+
+    cy.route('POST', graphQlUrl, 'fixture:graphql-substance-results-bmgf.json');
+
+    cy.contains('PARACETAMOL').click();
+
+    cy.get(
+      "a[href='/medicine-levels-in-pregnancy/reports/Example report name2']",
+    );
+  });
+});

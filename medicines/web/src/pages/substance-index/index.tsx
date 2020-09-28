@@ -9,9 +9,7 @@ import { SubstanceListStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { ISubstance } from '../../model/substance';
 import Events from '../../services/events';
-import substanceLoader, {
-  graphqlSubstanceLoader,
-} from '../../services/substance-loader';
+import { getLoader } from '../../services/loaders/products/substances-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -41,8 +39,7 @@ const App: NextPage = () => {
     setIsLoading(true);
     setResults([]);
 
-    const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
-    loader
+    getLoader(useGraphQl)
       .load(index)
       .then((results) => {
         setResults(results);
