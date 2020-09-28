@@ -69,7 +69,9 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
         .get(0)
         .expect("Report name should be in first column")
         .to_string();
+    let report_name = metadata::sanitize(&report_name);
     metadata.insert("report_name".to_string(), metadata::sanitize(&report_name));
+    metadata.insert("id".to_string(), metadata::to_id(&report_name));
 
     let file_name = row
         .get(1)
@@ -169,6 +171,7 @@ mod test {
         ];
         let data = extract_file_data(&row);
         assert_eq!(data.get("report_name").unwrap(), "Example report");
+        assert_eq!(data.get("id").unwrap(), "Example-report");
         assert_eq!(data.get("file_name").unwrap(), "Example file name");
         assert_eq!(data.get("summary").unwrap(), "An example summary");
         assert_eq!(

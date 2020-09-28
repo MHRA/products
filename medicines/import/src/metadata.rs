@@ -26,6 +26,10 @@ pub fn to_json(words: Vec<String>) -> String {
     serde_json::to_string(&words).expect("Couldn't create JSON array.")
 }
 
+pub fn to_id(s: &str) -> String {
+    s.replace(" ", "-")
+}
+
 pub fn create_facets_by_active_substance(active_substances: Vec<String>) -> Vec<String> {
     let mut facets: Vec<String> = active_substances
         .iter()
@@ -87,7 +91,10 @@ mod test {
     fn sanitize_trim() {
         assert_eq!(sanitize(" test "), "test");
     }
-
+    #[test]
+    fn to_id_replaces_spaces() {
+        assert_eq!(to_id("test report with spaces"), "test-report-with-spaces");
+    }
     #[test]
     fn jsonify_keywords() {
         let s = "ukpar, public assessment report, par, national procedure,Ibuprofen, Phenylephrine Hydrochloride";
