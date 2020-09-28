@@ -6,13 +6,11 @@ import Page from '../../components/page';
 import SearchWrapper from '../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import Events from '../../services/events';
-import { mhraPharma10 } from '../../styles/colors';
 
 const StyledHomeTextWrapper = styled.div`
   section:last-child {
     p:last-child {
-      background-color: ${mhraPharma10};
-      padding: 14px 16px;
+      padding: 14px 0;
     }
   }
 `;

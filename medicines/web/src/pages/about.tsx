@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
@@ -24,14 +25,23 @@ const StyledMain = styled.div`
   }
 `;
 
-const showBmgf = process.env.SHOW_BMGF === 'true';
-const contentToShow = showBmgf ? aboutWithBmgf : about;
-
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
     false,
   );
+  const [showPkpr, setShowPkpr] = React.useState(
+    process.env.SHOW_BMGF === 'true',
+  );
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!showPkpr && router?.query?.showPkpr === 'true') {
+      setShowPkpr(true);
+    }
+  }, [router]);
+
   useEffect(() => Events.viewPage('about'));
 
   return (
@@ -41,7 +51,11 @@ const App: React.FC = () => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <StyledMain dangerouslySetInnerHTML={{ __html: contentToShow }} />
+      {showPkpr ? (
+        <StyledMain dangerouslySetInnerHTML={{ __html: aboutWithBmgf }} />
+      ) : (
+        <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
+      )}
     </Page>
   );
 };
