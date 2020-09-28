@@ -1,6 +1,6 @@
 # Import
 
-The purpose of the import tool is to upload pharmakokinetics reports about medicine levels in pregnancy, as part of the Bill and Melinda Gates Foundation. The reports are uploaded to Azure blob storage, with meaningful metadata attached, to allow those reports to be indexed and searched.
+The purpose of the import tool is to upload pharmacokinetics reports about medicine levels in pregnancy, as part of the Bill and Melinda Gates Foundation. The reports are uploaded to Azure blob storage, with meaningful metadata attached, to allow those reports to be indexed and searched.
 
 The Import tool is written in Rust, so in order to contribute to or run the Import tool, you'll need `rustc` and `cargo` installed ([installation instructions](https://doc.rust-lang.org/cargo/getting-started/installation.html)).
 
