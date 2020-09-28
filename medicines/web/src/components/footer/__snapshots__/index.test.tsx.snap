@@ -5,9 +5,9 @@ exports[`Footer should render 1`] = `
   <div
     className="wrapper"
   >
-    <picture>
+    <styled.div>
       <SvgAgencyDigitalLogo />
-    </picture>
+    </styled.div>
     <nav>
       <ul>
         <li>

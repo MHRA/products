@@ -28,6 +28,25 @@ const ButtonContainer = styled.div`
   padding-top: 10px;
 `;
 
+const Fieldset = styled.fieldset`
+  border: 0;
+  padding: 0;
+`;
+
+const Legend = styled.legend`
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 19px 0;
+`;
+
+const AccessibleHeading = styled.h3`
+  visibility: hidden;
+  width: 0;
+  height: 0;
+  margin: 0;
+`;
+
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
   updateDocTypes: (d: DocType[]) => void;
@@ -41,7 +60,7 @@ interface IDocTypeCheckboxProps {
   currentlyEnabledDocTypes: DocType[];
 }
 
-const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
+const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = (props) => {
   const {
     docTypeForThisCheckbox,
     name,
@@ -72,7 +91,7 @@ const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = props => {
   );
 };
 
-const SearchFilter: React.FC<ISearchFilterProps> = props => {
+const SearchFilter: React.FC<ISearchFilterProps> = (props) => {
   const [checkedFilters, setCheckedFilters] = React.useState(
     props.currentlyEnabledDocTypes,
   );
@@ -88,7 +107,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
     />
   );
 
-  const toggleDocType = docTypeToToggle => {
+  const toggleDocType = (docTypeToToggle) => {
     const enabledDocTypes = Array.from(checkedFilters);
     if (enabledDocTypes.includes(docTypeToToggle)) {
       const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
@@ -99,7 +118,7 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
     setCheckedFilters(enabledDocTypes);
   };
 
-  const submit = e => {
+  const submit = (e) => {
     e.preventDefault();
     props.updateDocTypes(checkedFilters);
   };
@@ -116,18 +135,21 @@ const SearchFilter: React.FC<ISearchFilterProps> = props => {
 
   return (
     <StyledSearchFilter>
-      <h3 ref={filterHeader}>Filter documents by</h3>
-      {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
-      {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
-      {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
-      <ButtonContainer>
-        <Button
-          type="submit"
-          onClick={submit}
-          value="Submit"
-          ref={submitButton}
-        />
-      </ButtonContainer>
+      <AccessibleHeading>Documents filter</AccessibleHeading>
+      <Fieldset>
+        <Legend ref={filterHeader}>Filter documents by</Legend>
+        {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
+        {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
+        {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
+        <ButtonContainer>
+          <Button
+            type="submit"
+            onClick={submit}
+            value="Submit"
+            ref={submitButton}
+          />
+        </ButtonContainer>
+      </Fieldset>
     </StyledSearchFilter>
   );
 };

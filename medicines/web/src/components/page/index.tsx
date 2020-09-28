@@ -53,11 +53,12 @@ const Wrapper = styled.main`
 interface IPageProps {
   children: React.ReactNode;
   title: string;
+  metaTitle: string;
   storageAllowed: boolean;
   setStorageAllowed: any;
 }
 
-const App: React.FC<IPageProps> = props => {
+const App: React.FC<IPageProps> = (props) => {
   useEffect(() => {
     if (props.storageAllowed) {
       Events.initializeTrackingScripts();
@@ -67,11 +68,7 @@ const App: React.FC<IPageProps> = props => {
   return (
     <>
       <Head>
-        <title>MHRA {props.title}</title>
-        <meta
-          httpEquiv="Content-Security-Policy-Report-Only"
-          content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
-        />
+        <title>MHRA {props.metaTitle}</title>
       </Head>
       <WithStyles>
         <Normalize />

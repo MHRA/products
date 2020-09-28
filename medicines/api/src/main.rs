@@ -15,11 +15,9 @@ use warp::{
 };
 
 mod azure_context;
-mod document;
 mod pagination;
-mod product;
+mod query_objects;
 mod schema;
-mod substance;
 
 const PORT: u16 = 8000;
 
@@ -40,7 +38,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let log = warp::log("medicines-api");
 
-    let schema = schema::ApiSchema::new(create_context());
+    let products_index = get_env_or_default("AZURE_SEARCH_INDEX", "products-index".to_string());
+    let bmgf_index = get_env_or_default("BMGF_AZURE_SEARCH_INDEX", "bmgf-index".to_string());
+    let schema = schema::ApiSchema::new(create_context(products_index, bmgf_index));
 
     let cors = warp::cors()
         .allow_methods(vec![Method::GET, Method::POST])

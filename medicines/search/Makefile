@@ -28,6 +28,21 @@ set-env-non-prod: ## Replaces the keyvault value for non-prod with your current 
 	--name search-index-creator-non-prod-env \
 	--file .env
 
+.PHONY: get-env-production
+get-env-production: ## Gets the non-prod environment variables from azure keyvault into .env file
+	az keyvault secret show \
+	--vault-name mhraproducts4853 \
+	--name search-index-creator-env \
+	--query value \
+	--output tsv > .env
+
+.PHONY: set-env-production
+set-env-production: ## Replaces the keyvault value for non-prod with your current .env file
+	az keyvault secret set \
+	--vault-name mhraproducts4853 \
+	--name search-index-creator-env \
+	--file .env
+
 .PHONY: help
 help: ## Display this help screen
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

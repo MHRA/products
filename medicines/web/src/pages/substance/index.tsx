@@ -9,24 +9,9 @@ import {
   SubstanceStructuredData,
 } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
-import { IProduct } from '../../model/substance';
+import { IProduct } from '../../model/product';
 import Events from '../../services/events';
-import substanceLoader from '../../services/substance-loader';
-import { graphqlProductsLoader } from '../../services/products-loader';
-
-const azureProductsLoader = async (substance: string) => {
-  const firstLetter = substance.charAt(0);
-  const substanceIndex = await substanceLoader.load(firstLetter);
-  const substanceMatch = substanceIndex.find((s) => s.name === substance);
-  if (substanceMatch) {
-    return substanceMatch.products;
-  }
-  return [];
-};
-
-const graphQlProductsLoader = async (substance: string) => {
-  return graphqlProductsLoader.load(substance);
-};
+import { getLoader } from '../../services/loaders/products/products-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -35,6 +20,8 @@ const App: NextPage = () => {
   );
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [substanceName, setSubstanceName] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
   const router = useRouter();
   const {
@@ -45,18 +32,24 @@ const App: NextPage = () => {
     if (!queryQS) {
       return;
     }
-    (async () => {
-      const substanceName = queryQS.toString();
-      const loader: (substance: string) => Promise<IProduct[]> = useGraphQl
-        ? graphQlProductsLoader
-        : azureProductsLoader;
+    const substanceName = queryQS.toString();
+    setSubstanceName(substanceName);
 
-      loader(substanceName).then((products) => {
+    setProducts([]);
+    setIsLoading(true);
+    setErrorFetchingResults(false);
+
+    const loader = getLoader(useGraphQl);
+
+    loader
+      .load(substanceName)
+      .then((products) => {
         setProducts(products);
-        setSubstanceName(substanceName);
-        Events.viewProductsForSubstance(substanceName);
-      });
-    })();
+        setIsLoading(false);
+      })
+      .catch((e) => setErrorFetchingResults(true));
+
+    Events.viewProductsForSubstance(substanceName);
   }, [queryQS]);
 
   useEffect(() => {
@@ -68,11 +61,17 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | Substance"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
       <SearchWrapper initialSearchValue="">
-        <ProductList title={substanceName} products={products} />
+        <ProductList
+          title={substanceName}
+          products={products}
+          errorFetchingResults={errorFetchingResults}
+          isLoading={isLoading}
+        />
         <SubstanceStructuredData substanceName={substanceName} />
         {products && products.length ? (
           <DrugListStructuredData

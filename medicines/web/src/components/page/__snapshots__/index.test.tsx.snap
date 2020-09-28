@@ -5,15 +5,11 @@ exports[`App should render 1`] = `
   <Head>
     <title>
       MHRA 
-      MHRA
+      MHRA meta title
     </title>
-    <meta
-      content="base-uri 'self'; default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; form-action 'self'; font-src 'self'; connect-src 'self'; img-src 'self';"
-      httpEquiv="Content-Security-Policy-Report-Only"
-    />
   </Head>
   <styled.div>
-    <Memo(GlobalStyleComponent) />
+    <Memo(l) />
     <CookieBanner
       setStorageAllowed={[Function]}
       storageAllowed={true}

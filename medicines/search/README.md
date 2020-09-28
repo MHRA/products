@@ -35,7 +35,7 @@ You can also target dev by pulling dev environment variables via `make get-env-d
 
 The environment variables which need to be set to run the Search tool are as follows.
 
-- `API_ADMIN_KEY` - This is an admin key for your Azure Search service account;
+- `SEARCH_API_ADMIN_KEY` - This is an admin key for your Azure Search service account;
 - `DATASOURCE_NAME` - This is the name of the Azure Search datasource you want to perform operations on;
 - `INDEX_NAME` - This is the name of the Azure Search index you want to perform operations on;
 - `INDEXER_NAME` - This is the name of the Azure Search indexer you want to perform operations on;
@@ -44,7 +44,7 @@ The environment variables which need to be set to run the Search tool are as fol
 - `STORAGE_CONTAINER` - This is the name of the Azure blob container that holds the source documents;
 - `STORAGE_MASTER_KEY` - This is a write access key to your Azure Storage account.
 
-If these are out of sync, you can find these in the [Azure portal](https://portal.azure.com). For `STORAGE_ACCOUNT` and `STORAGE_MASTER_KEY`, navigate to your Storage Account, then choose Access Keys on the left navigation panel. `SEARCH_SERVICE` is just the name of your Search service. For `API_ADMIN_KEY`, navigate to your Search Service and then Keys on the left navigation panel.
+If these are out of sync, you can find these in the [Azure portal](https://portal.azure.com). For `STORAGE_ACCOUNT` and `STORAGE_MASTER_KEY`, navigate to your Storage Account, then choose Access Keys on the left navigation panel. `SEARCH_SERVICE` is just the name of your Search service. For `SEARCH_API_ADMIN_KEY`, navigate to your Search Service and then Keys on the left navigation panel.
 
 Run `make set-env-dev` or `make set-env-non-prod` to update the environment variables for that environment.
 
@@ -73,8 +73,10 @@ cargo run delete_datasource
 First check the definition is correct in `definitions/indexes/azureblob-index.json`, then run the following command:
 
 ```sh
-cargo run create_index
+cargo run create_index -i bmgf
 ```
+
+The `-i` argument is optional and can be used to target an index definition other than `default`.
 
 #### Deleting an Index
 
@@ -91,8 +93,10 @@ cargo run delete_index
 First check the definition is correct in `definitions/indexes/azureblob-indexer.json`, then run the following command:
 
 ```sh
-cargo run create_indexer
+cargo run create_indexer -i bmgf
 ```
+
+The `-i` argument is optional and can be used to target an indexer definition other than `default`.
 
 #### Deleting an Indexer
 

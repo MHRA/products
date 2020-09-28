@@ -70,4 +70,25 @@ describe(SearchResults, () => {
     );
     expect(component).toMatchSnapshot();
   });
+
+  it('should render error message', () => {
+    const component = shallow(
+      <SearchResults
+        drugs={drugsMock}
+        page={1}
+        pageSize={20}
+        resultCount={200}
+        searchTerm={'Tea'}
+        showingResultsForTerm={'Tea'}
+        disclaimerAgree
+        docTypes={[]}
+        rerouteType={RerouteType.Other}
+        updateDocTypes={noFeedback}
+        handlePageChange={noFeedback}
+        isLoading
+        errorFetchingResults
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
 });

@@ -19,10 +19,6 @@ const StyledFooter = styled.footer`
     max-width: ${desktopMaxWidth};
   }
 
-  picture {
-    max-width: 250px;
-  }
-
   ul {
     margin: 0;
     padding: 0;
@@ -51,12 +47,16 @@ const StyledFooter = styled.footer`
   }
 `;
 
+const LogoContainer = styled.div`
+  max-width: 250px;
+`;
+
 const Footer: React.FC = () => (
   <StyledFooter>
     <div className="wrapper">
-      <picture>
+      <LogoContainer>
         <SvgAgencyDigitalLogo />
-      </picture>
+      </LogoContainer>
       <nav>
         <ul>
           <li>

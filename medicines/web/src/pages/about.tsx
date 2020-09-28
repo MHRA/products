@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Page from '../components/page';
 import { mhra70 } from '../styles/colors';
@@ -6,10 +7,11 @@ import { baseSpace } from '../styles/dimensions';
 
 // @ts-ignore
 import about from '../copy/about.md';
+import aboutWithBmgf from '../copy/about-including-bmgf.md';
 import { useLocalStorage } from '../hooks';
 import Events from '../services/events';
 
-const StyledMain = styled.main`
+const StyledMain = styled.div`
   padding: ${baseSpace};
   font-size: 19px;
   line-height: 28px;
@@ -28,15 +30,32 @@ const App: React.FC = () => {
     'allowStorage',
     false,
   );
+  const [showPkpr, setShowPkpr] = React.useState(
+    process.env.SHOW_BMGF === 'true',
+  );
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!showPkpr && router?.query?.showPkpr === 'true') {
+      setShowPkpr(true);
+    }
+  }, [router]);
+
   useEffect(() => Events.viewPage('about'));
 
   return (
     <Page
       title="Products"
+      metaTitle="Products | About"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
+      {showPkpr ? (
+        <StyledMain dangerouslySetInnerHTML={{ __html: aboutWithBmgf }} />
+      ) : (
+        <StyledMain dangerouslySetInnerHTML={{ __html: about }} />
+      )}
     </Page>
   );
 };

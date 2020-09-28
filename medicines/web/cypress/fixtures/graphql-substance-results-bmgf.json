@@ -1,0 +1,28 @@
+{
+  "data": {
+    "medicineLevelsInPregnancy": {
+      "substance": {
+        "name": "SUBSTANCE 1",
+        "reports": {
+          "count": 1,
+          "edges": [
+            {
+              "node": {
+                "products": ["PRODUCT 1", "PRODUCT 2"],
+                "activeSubstances": ["SUBSTANCE 1", "SUBSTANCE 2"],
+                "title": "Example report name2",
+                "highlights": null,
+                "fileSizeInBytes": 341876,
+                "fileName": "example_report",
+                "fileUrl": "https://mhraproductsnonprod.blob.core.windows.net/bmgf-docs/Example%20report%20name2/example_report.pdf",
+                "summary": "A really great example report",
+                "matrices": ["Matrix 1", "Matrix 2"],
+                "pbpkModels": ["Model 1", "Model 2"]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

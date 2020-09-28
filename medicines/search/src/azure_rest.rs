@@ -13,7 +13,6 @@ pub async fn make_post_request_with_body(
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }
 
@@ -28,7 +27,6 @@ pub async fn make_post_request(url: &str, api_key: &str) -> Result<(), reqwest::
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }
 
@@ -42,6 +40,5 @@ pub async fn make_delete_request(url: &str, api_key: &str) -> Result<(), reqwest
         .await?
         .error_for_status();
 
-    println!("{:#?}", response);
     Ok(())
 }

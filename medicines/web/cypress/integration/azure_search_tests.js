@@ -89,7 +89,7 @@ describe('Search', function () {
     mockParacetamolResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('paracetamol');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -104,7 +104,7 @@ describe('Search', function () {
     mockIbuprofenSpcResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -121,7 +121,7 @@ describe('Search', function () {
     mockIbuprofenSpcPilResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -140,7 +140,7 @@ describe('Search', function () {
     mockIbuprofenSpcResultsPage2();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -163,7 +163,7 @@ describe('Search', function () {
     mockIbuprofenSpcResults();
     cy.visit('/');
     cy.get("input[type='search']").type('ibuprofen');
-    cy.contains('Search').click();
+    cy.get('.searchbar').contains('Search').click();
     cy.contains('I have read and understand the disclaimer', {
       timeout: longerTimeout,
     }).click();
@@ -193,7 +193,7 @@ describe('A-Z Index', function () {
     );
     // Mock out second page of search results.
     cy.route(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS`,
+      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
       'fixture:search_results.json',
     );
 
@@ -250,5 +250,64 @@ describe('Cookies', function () {
     cy.contains('label', 'Off').click();
     cy.contains('Save your preferences').click();
     cy.contains(cookie_banner_text);
+  });
+});
+
+const bmgfBaseUrl = `https://${Cypress.env(
+  'AZURE_SEARCH_SERVICE',
+)}.search.windows.net/indexes/${Cypress.env('BMGF_AZURE_SEARCH_INDEX')}/docs`;
+const mockBmgfParacetamolResults = () =>
+  cy.route(
+    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results_bmgf.json',
+  );
+
+const mockBmgfParacetamolResultsPage2 = () =>
+  cy.route(
+    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
+    'fixture:search_results_bmgf.page2.json',
+  );
+
+describe('Search for medicine levels in pregnancy', function () {
+  it('can search for Paracetamol', function () {
+    cy.server();
+    mockBmgfParacetamolResults();
+    mockBmgfParacetamolResultsPage2();
+    cy.visit('/medicine-levels-in-pregnancy');
+    cy.get("input[type='search']").type('paracetamol');
+    cy.get('.searchbar').contains('Search').click();
+    cy.get("a[href='/medicine-levels-in-pregnancy/reports/Example report 1']");
+    cy.contains('Next').click();
+    cy.get("a[href='/medicine-levels-in-pregnancy/reports/Example report 4']");
+  });
+});
+
+describe('A-Z Index for medicine levels in pregnancy', function () {
+  it('can navigate to Paracetamol via A-Z index', function () {
+    cy.server();
+    // Mock out list of substances.
+    cy.route(
+      `${bmgfBaseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
+      'fixture:facets.json',
+    );
+
+    // Mock out first page of search results.
+    cy.route(
+      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=active_substances/any(substance:+substance+eq+'PARACETAMOL')`,
+      'fixture:search_results_bmgf.json',
+    );
+
+    // Mock out second page of search results.
+    cy.route(
+      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=active_substances/any(substance:+substance+eq+'PARACETAMOL')`,
+      'fixture:search_results_bmgf.page2.json',
+    );
+
+    cy.visit('/medicine-levels-in-pregnancy');
+    cy.get('nav').contains('P').click();
+    cy.contains('PARACETAMOL').click();
+    cy.get("a[href='/medicine-levels-in-pregnancy/reports/Example report 1']");
+    cy.contains('Next').click();
+    cy.get("a[href='/medicine-levels-in-pregnancy/reports/Example report 4']");
   });
 });

@@ -8,176 +8,193 @@ exports[`SearchFilter should render search filter 1`] = `
 >
   <styled.section>
     <section
-      className="sc-AxiKw bbPljN"
+      className="sc-dlnjPT ldjroq"
     >
-      <h3>
-        Filter documents by
-      </h3>
-      <DocTypeCheckbox
-        currentlyEnabledDocTypes={Array []}
-        docTypeForThisCheckbox="Spc"
-        name="Summary of Product Characteristics"
-        toggleDocType={[Function]}
-      >
-        <div
-          className="checkbox-row"
+      <styled.h3>
+        <h3
+          className="sc-gKAblj gHUsfJ"
         >
-          <div
-            className="checkbox"
-          >
-            <Component
-              checked={false}
-              id="filter-spc"
-              name="doc"
-              onChange={[Function]}
-              value="Spc"
+          Documents filter
+        </h3>
+      </styled.h3>
+      <styled.fieldset>
+        <fieldset
+          className="sc-eCApGN RCFDc"
+        >
+          <styled.legend>
+            <legend
+              className="sc-jSFkmK dXYUNp"
             >
-              <styled.input
-                checked={false}
-                id="filter-spc"
-                name="doc"
-                onChange={[Function]}
-                type="checkbox"
-                value="Spc"
+              Filter documents by
+            </legend>
+          </styled.legend>
+          <DocTypeCheckbox
+            currentlyEnabledDocTypes={Array []}
+            docTypeForThisCheckbox="Spc"
+            name="Summary of Product Characteristics"
+            toggleDocType={[Function]}
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
               >
-                <input
+                <Component
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
                   id="filter-spc"
                   name="doc"
                   onChange={[Function]}
-                  type="checkbox"
                   value="Spc"
-                />
-              </styled.input>
-            </Component>
-          </div>
-          <label
-            htmlFor="filter-spc"
-          >
-            Summary of Product Characteristics
-             (
-            SPC
-            )
-          </label>
-        </div>
-      </DocTypeCheckbox>
-      <DocTypeCheckbox
-        currentlyEnabledDocTypes={Array []}
-        docTypeForThisCheckbox="Pil"
-        name="Patient Information Leaflet"
-        toggleDocType={[Function]}
-      >
-        <div
-          className="checkbox-row"
-        >
-          <div
-            className="checkbox"
-          >
-            <Component
-              checked={false}
-              id="filter-pil"
-              name="doc"
-              onChange={[Function]}
-              value="Pil"
-            >
-              <styled.input
-                checked={false}
-                id="filter-pil"
-                name="doc"
-                onChange={[Function]}
-                type="checkbox"
-                value="Pil"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-spc"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Spc"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdnylx dUVSoV"
+                      id="filter-spc"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Spc"
+                    />
+                  </styled.input>
+                </Component>
+              </div>
+              <label
+                htmlFor="filter-spc"
               >
-                <input
+                Summary of Product Characteristics
+                 (
+                SPC
+                )
+              </label>
+            </div>
+          </DocTypeCheckbox>
+          <DocTypeCheckbox
+            currentlyEnabledDocTypes={Array []}
+            docTypeForThisCheckbox="Pil"
+            name="Patient Information Leaflet"
+            toggleDocType={[Function]}
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <Component
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
                   id="filter-pil"
                   name="doc"
                   onChange={[Function]}
-                  type="checkbox"
                   value="Pil"
-                />
-              </styled.input>
-            </Component>
-          </div>
-          <label
-            htmlFor="filter-pil"
-          >
-            Patient Information Leaflet
-             (
-            PIL
-            )
-          </label>
-        </div>
-      </DocTypeCheckbox>
-      <DocTypeCheckbox
-        currentlyEnabledDocTypes={Array []}
-        docTypeForThisCheckbox="Par"
-        name="Public Assessment Reports"
-        toggleDocType={[Function]}
-      >
-        <div
-          className="checkbox-row"
-        >
-          <div
-            className="checkbox"
-          >
-            <Component
-              checked={false}
-              id="filter-par"
-              name="doc"
-              onChange={[Function]}
-              value="Par"
-            >
-              <styled.input
-                checked={false}
-                id="filter-par"
-                name="doc"
-                onChange={[Function]}
-                type="checkbox"
-                value="Par"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-pil"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Pil"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdnylx dUVSoV"
+                      id="filter-pil"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Pil"
+                    />
+                  </styled.input>
+                </Component>
+              </div>
+              <label
+                htmlFor="filter-pil"
               >
-                <input
+                Patient Information Leaflet
+                 (
+                PIL
+                )
+              </label>
+            </div>
+          </DocTypeCheckbox>
+          <DocTypeCheckbox
+            currentlyEnabledDocTypes={Array []}
+            docTypeForThisCheckbox="Par"
+            name="Public Assessment Reports"
+            toggleDocType={[Function]}
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <Component
                   checked={false}
-                  className="sc-AxjAm dxNUGQ"
                   id="filter-par"
                   name="doc"
                   onChange={[Function]}
-                  type="checkbox"
                   value="Par"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-par"
+                    name="doc"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="Par"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdnylx dUVSoV"
+                      id="filter-par"
+                      name="doc"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="Par"
+                    />
+                  </styled.input>
+                </Component>
+              </div>
+              <label
+                htmlFor="filter-par"
+              >
+                Public Assessment Reports
+                 (
+                PAR
+                )
+              </label>
+            </div>
+          </DocTypeCheckbox>
+          <styled.div>
+            <div
+              className="sc-hKFyIo hodwMc"
+            >
+              <styled.input
+                onClick={[Function]}
+                type="submit"
+                value="Submit"
+              >
+                <input
+                  className="sc-gtssRu elyfng"
+                  onClick={[Function]}
+                  type="submit"
+                  value="Submit"
                 />
               </styled.input>
-            </Component>
-          </div>
-          <label
-            htmlFor="filter-par"
-          >
-            Public Assessment Reports
-             (
-            PAR
-            )
-          </label>
-        </div>
-      </DocTypeCheckbox>
-      <styled.div>
-        <div
-          className="sc-AxhCb jDrcYF"
-        >
-          <styled.input
-            onClick={[Function]}
-            type="submit"
-            value="Submit"
-          >
-            <input
-              className="sc-AxirZ fdlzyX"
-              onClick={[Function]}
-              type="submit"
-              value="Submit"
-            />
-          </styled.input>
-        </div>
-      </styled.div>
+            </div>
+          </styled.div>
+        </fieldset>
+      </styled.fieldset>
     </section>
   </styled.section>
 </SearchFilter>

@@ -5,13 +5,14 @@ mod query_normalizer;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::models::{AzureIndexChangedResults, FacetResults, IndexEntry, IndexResults};
+use crate::models::{AzureIndexChangedResults, FacetResults, IndexEntry};
 use crate::query_normalizer::{
     escape_special_characters, escape_special_words, extract_normalized_product_licences,
     prefer_exact_match_but_support_fuzzy_match,
 };
 use async_trait::async_trait;
 use core::fmt::Debug;
+use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use std::collections::HashMap;
 
@@ -47,8 +48,13 @@ impl AzureSearchClient {
     //
     // There might be a way around this but I think it would probably take a fair bit of effort so in the interests of time we're just having `AzureContext` depend on `AzureSearchClient` directly in api/src/azure_search.rs.
     pub fn new() -> Self {
+        let default_index = get_env("AZURE_SEARCH_INDEX");
+        AzureSearchClient::new_with_index(default_index)
+    }
+
+    pub fn new_with_index(index: String) -> Self {
         let api_key = get_env("AZURE_API_ADMIN_KEY");
-        let search_index = get_env("AZURE_SEARCH_INDEX");
+        let search_index = index;
         let search_service = get_env("SEARCH_SERVICE");
         let api_version = get_env("AZURE_SEARCH_API_VERSION");
 
@@ -86,22 +92,28 @@ pub fn factory() -> impl Search + DeleteIndexEntry + CreateIndexEntry {
 
 #[async_trait]
 pub trait Search {
-    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error>;
+    async fn search<T>(&self, search_term: &str) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned;
 
-    async fn search_with_pagination(
+    async fn search_with_pagination<T>(
         &self,
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-    ) -> Result<IndexResults, reqwest::Error>;
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned;
 
-    async fn search_with_pagination_and_filter(
+    async fn search_with_pagination_and_filter<T>(
         &self,
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
         filter: Option<&str>,
-    ) -> Result<IndexResults, reqwest::Error>;
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned;
 
     async fn search_by_facet_field(
         &self,
@@ -109,32 +121,42 @@ pub trait Search {
         field_value: &str,
     ) -> Result<FacetResults, reqwest::Error>;
 
-    async fn filter_by_collection_field(
+    async fn filter_by_collection_field<T>(
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<IndexResults, reqwest::Error>;
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned;
 
-    async fn filter_by_non_collection_field(
+    async fn filter_by_non_collection_field<T>(
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<IndexResults, reqwest::Error>;
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned;
 }
 
 #[async_trait]
 impl Search for AzureSearchClient {
-    async fn search(&self, search_term: &str) -> Result<IndexResults, reqwest::Error> {
-        search(search_term, None, None, None, &self.client, &self.config).await
+    async fn search<T>(&self, search_term: &str) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned,
+    {
+        search::<T>(search_term, None, None, None, &self.client, &self.config).await
     }
 
-    async fn search_with_pagination(
+    async fn search_with_pagination<T>(
         &self,
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
-    ) -> Result<IndexResults, reqwest::Error> {
-        search(
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned,
+    {
+        search::<T>(
             search_term,
             Some(pagination),
             Some(include_count),
@@ -145,14 +167,17 @@ impl Search for AzureSearchClient {
         .await
     }
 
-    async fn search_with_pagination_and_filter(
+    async fn search_with_pagination_and_filter<T>(
         &self,
         search_term: &str,
         pagination: AzurePagination,
         include_count: bool,
         filter: Option<&str>,
-    ) -> Result<IndexResults, reqwest::Error> {
-        search(
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned,
+    {
+        search::<T>(
             search_term,
             Some(pagination),
             Some(include_count),
@@ -180,11 +205,14 @@ impl Search for AzureSearchClient {
             .await
     }
 
-    async fn filter_by_collection_field(
+    async fn filter_by_collection_field<T>(
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<IndexResults, reqwest::Error> {
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned,
+    {
         let request = build_filter_by_collection_request(
             field_name,
             field_value,
@@ -198,15 +226,18 @@ impl Search for AzureSearchClient {
             .execute(request)
             .await?
             .error_for_status()?
-            .json::<IndexResults>()
+            .json::<T>()
             .await
     }
 
-    async fn filter_by_non_collection_field(
+    async fn filter_by_non_collection_field<T>(
         &self,
         field_name: &str,
         field_value: &str,
-    ) -> Result<IndexResults, reqwest::Error> {
+    ) -> Result<T, reqwest::Error>
+    where
+        T: DeserializeOwned,
+    {
         let request = build_filter_by_field_request(
             field_name,
             field_value,
@@ -219,7 +250,7 @@ impl Search for AzureSearchClient {
             .execute(request)
             .await?
             .error_for_status()?
-            .json::<IndexResults>()
+            .json::<T>()
             .await
     }
 }
@@ -428,14 +459,17 @@ impl CreateIndexEntry for AzureSearchClient {
     }
 }
 
-async fn search(
+async fn search<T>(
     search_term: &str,
     pagination: Option<AzurePagination>,
     include_count: Option<bool>,
     filter: Option<&str>,
     client: &reqwest::Client,
     config: &AzureConfig,
-) -> Result<IndexResults, reqwest::Error> {
+) -> Result<T, reqwest::Error>
+where
+    T: DeserializeOwned,
+{
     let req = build_search(
         search_term,
         pagination,
@@ -450,7 +484,7 @@ async fn search(
         .execute(req)
         .await?
         .error_for_status()?
-        .json::<IndexResults>()
+        .json::<T>()
         .await
 }
 

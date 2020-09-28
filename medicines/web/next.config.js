@@ -15,8 +15,11 @@ module.exports = {
     ROOT_URL_DOMAIN: process.env.ROOT_URL_DOMAIN,
     GRAPHQL_URL: process.env.GRAPHQL_URL,
     USE_GRAPHQL: process.env.USE_GRAPHQL,
+    BMGF_AZURE_SEARCH_INDEX: process.env.BMGF_AZURE_SEARCH_INDEX,
+    AZURE_STORAGE_ACCOUNT: process.env.AZURE_STORAGE_ACCOUNT,
+    SHOW_BMGF: process.env.SHOW_BMGF,
   },
-  webpack: config => {
+  webpack: (config) => {
     config.module.rules.push({
       test: /\.(md)$/,
       use: [
@@ -33,5 +36,5 @@ module.exports = {
     process.env.ASSET_PREFIX === undefined
       ? ''
       : `/${process.env.ASSET_PREFIX}`,
-  exportTrailingSlash: true,
+  trailingSlash: true,
 };

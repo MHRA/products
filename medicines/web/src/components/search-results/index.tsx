@@ -2,9 +2,9 @@ import React, { MouseEvent } from 'react';
 import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
-import { IDocument } from '../../model/substance';
+import { IDocument } from '../../model/document';
 import { DocType } from '../../services/azure-search';
-import { mhraBlue80, mhraGray10, white } from '../../styles/colors';
+import { errorRed, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
   largePaddingSizeCss,
@@ -14,18 +14,12 @@ import {
 import { baseFontSize, h2FontSize } from '../../styles/fonts';
 import Disclaimer from '../disclaimer';
 import SearchFilter from '../search-filter';
-import Pagination from './pagination';
+import Pagination from '../pagination';
 
 const StyledDrugList = styled.div`
   .title {
     font-size: ${h2FontSize};
     padding: 0;
-    margin: 0;
-  }
-
-  .no-of-results {
-    padding-top: 0;
-    padding-bottom: 30px;
     margin: 0;
   }
 
@@ -41,7 +35,7 @@ const StyledDrugList = styled.div`
     padding: 0;
   }
 
-  article {
+  div.search-result {
     display: flex;
     background-color: ${mhraGray10};
     padding: ${baseSpace};
@@ -147,8 +141,22 @@ const HiddenHeader = styled.h3`
   height: 0;
 `;
 
+const TechnicalErrorMessage = styled.p`
+  background-color: ${errorRed};
+  padding: 20px;
+`;
+
+const TitleAndCountContainer = styled.div`
+  margin-bottom: 30px;
+`;
+
+const Count = styled.p`
+  margin: 0 0 30px;
+  padding: 0;
+`;
+
 const emaWebsiteLink = () => (
-  <a href="https://www.ema.europa.eu/en" target="_new">
+  <a href="https://www.ema.europa.eu/en" target="_blank">
     European Medicines Agency
   </a>
 );
@@ -198,10 +206,8 @@ const normalizeDescription = (description: string): string => {
 
 function toSentenceCase(substance: string): string {
   return (
-    (substance as string)
-      .toLowerCase()
-      .charAt(0)
-      .toUpperCase() + substance.slice(1)
+    (substance as string).toLowerCase().charAt(0).toUpperCase() +
+    substance.slice(1)
   );
 }
 
@@ -218,6 +224,7 @@ interface ISearchResultsProps {
   handlePageChange: (num: number) => void;
   isLoading: boolean;
   rerouteType: RerouteType;
+  errorFetchingResults?: boolean;
 }
 
 const SearchResults = (props: ISearchResultsProps) => {
@@ -259,29 +266,46 @@ const SearchResults = (props: ISearchResultsProps) => {
     setShowDisclaimerWarning(false);
   };
 
-  return props.isLoading ? (
-    <StyledDrugList>
-      <h2 className="title">
-        {`Loading results for ${showingResultsForTerm}...`}
-      </h2>
-    </StyledDrugList>
-  ) : (
+  if (props.errorFetchingResults) {
+    return (
+      <StyledDrugList>
+        <TechnicalErrorMessage>
+          Sorry - the site is experiencing technical issues right now. Please
+          try again later.
+        </TechnicalErrorMessage>
+      </StyledDrugList>
+    );
+  }
+
+  if (props.isLoading) {
+    return (
+      <StyledDrugList>
+        <h2 className="title">
+          {`Loading results for ${showingResultsForTerm}...`}
+        </h2>
+      </StyledDrugList>
+    );
+  }
+
+  return (
     <>
       <StyledDrugList>
         <div>
-          <h2 className="title">
-            {searchResultsTitle(showingResultsForTerm, drugs.length)}
-          </h2>
-          {hasDrugs && (
-            <p className="no-of-results">
-              {searchResultsNumberingInformation({
-                page,
-                pageSize,
-                shownResultCount: drugs.length,
-                totalResultCount: resultCount,
-              })}
-            </p>
-          )}
+          <TitleAndCountContainer>
+            <h2 className="title">
+              {searchResultsTitle(showingResultsForTerm, drugs.length)}
+            </h2>
+            {hasDrugs && (
+              <Count className="no-of-results">
+                {searchResultsNumberingInformation({
+                  page,
+                  pageSize,
+                  shownResultCount: drugs.length,
+                  totalResultCount: resultCount,
+                })}
+              </Count>
+            )}
+          </TitleAndCountContainer>
           <p className="ema-message">
             If the product information you are seeking does not appear below, it
             is possible that the product holds a European licence and its
@@ -323,7 +347,7 @@ const SearchResults = (props: ISearchResultsProps) => {
               <dl>
                 {hasDrugs &&
                   drugs.map((drug, i) => (
-                    <article key={i}>
+                    <div key={i} className="search-result">
                       <dt className="left">
                         <p className="icon">{drug.docType.toUpperCase()}</p>
                       </dt>
@@ -349,7 +373,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                             <p className="metadata">
                               Active substances:{' '}
                               {drug.activeSubstances
-                                .map(substance => toSentenceCase(substance))
+                                .map((substance) => toSentenceCase(substance))
                                 .join(', ')}
                             </p>
                           )}
@@ -360,7 +384,7 @@ const SearchResults = (props: ISearchResultsProps) => {
                           }}
                         />
                       </dd>
-                    </article>
+                    </div>
                   ))}
               </dl>
             </section>
@@ -374,7 +398,6 @@ const SearchResults = (props: ISearchResultsProps) => {
           pageSize={pageSize}
           resultCount={resultCount}
           searchTerm={searchTerm}
-          enabledDocTypes={docTypes}
           handlePageChange={props.handlePageChange}
         />
       ) : (

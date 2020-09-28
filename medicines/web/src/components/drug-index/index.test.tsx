@@ -1,6 +1,7 @@
 import { mount } from 'enzyme';
 import React from 'react';
-import { IProduct, ISubstance } from '../../model/substance';
+import { ISubstance } from '../../model/substance';
+import { IProduct } from '../../model/product';
 import DrugIndex, { IndexType } from './index';
 
 describe(DrugIndex, () => {
@@ -63,7 +64,29 @@ describe(DrugIndex, () => {
       <DrugIndex
         title={'Coffee'}
         items={substances}
+        indexType={IndexType.SubstancesIndex}
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
+  it('should render error message', () => {
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={[]}
         indexType={IndexType.ProductsIndex}
+        errorFetchingResults
+      />,
+    );
+    expect(component).toMatchSnapshot();
+  });
+  it('should render loading message', () => {
+    const component = mount(
+      <DrugIndex
+        title={'Coffee'}
+        items={[]}
+        indexType={IndexType.ProductsIndex}
+        isLoading
       />,
     );
     expect(component).toMatchSnapshot();

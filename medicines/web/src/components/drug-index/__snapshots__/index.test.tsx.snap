@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DrugIndex should render error message 1`] = `
+<DrugIndex
+  errorFetchingResults={true}
+  indexType={2}
+  items={Array []}
+  title="Coffee"
+>
+  <styled.nav>
+    <nav
+      className="sc-bdnylx iZXMvu"
+    >
+      <styled.p>
+        <p
+          className="sc-gtssRu cxxuwU"
+        >
+          Sorry - the site is experiencing technical issues right now. Please try again later.
+        </p>
+      </styled.p>
+    </nav>
+  </styled.nav>
+</DrugIndex>
+`;
+
 exports[`DrugIndex should render horizontal items 1`] = `
 <DrugIndex
   indexType={0}
@@ -119,7 +142,7 @@ exports[`DrugIndex should render horizontal items 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-AxjAm jJjbyf"
+      className="sc-bdnylx iZXMvu"
     >
       <p
         className="horizontal"
@@ -747,9 +770,35 @@ exports[`DrugIndex should render horizontal items 1`] = `
 </DrugIndex>
 `;
 
-exports[`DrugIndex should render substances 1`] = `
+exports[`DrugIndex should render loading message 1`] = `
 <DrugIndex
   indexType={2}
+  isLoading={true}
+  items={Array []}
+  title="Coffee"
+>
+  <styled.nav>
+    <nav
+      className="sc-bdnylx iZXMvu"
+    >
+      <h2>
+        Coffee
+      </h2>
+      <ul
+        className=""
+      >
+        <li>
+          Loading results...
+        </li>
+      </ul>
+    </nav>
+  </styled.nav>
+</DrugIndex>
+`;
+
+exports[`DrugIndex should render substances 1`] = `
+<DrugIndex
+  indexType={1}
   items={
     Array [
       Object {
@@ -768,7 +817,7 @@ exports[`DrugIndex should render substances 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-AxjAm jJjbyf"
+      className="sc-bdnylx iZXMvu"
     >
       <h2>
         Coffee
@@ -781,10 +830,10 @@ exports[`DrugIndex should render substances 1`] = `
           key="Ibuprofen"
         >
           <Link
-            href="/product?product=Ibuprofen"
+            href="/substance?substance=Ibuprofen"
           >
             <a
-              href="/product?product=Ibuprofen"
+              href="/substance?substance=Ibuprofen"
               onClick={[Function]}
               onMouseEnter={[Function]}
             >
@@ -792,7 +841,9 @@ exports[`DrugIndex should render substances 1`] = `
                
               (
               1
-               files)
+               
+              file
+              )
             </a>
           </Link>
         </li>

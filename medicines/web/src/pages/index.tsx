@@ -67,6 +67,7 @@ const App: React.FC = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | Home"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >

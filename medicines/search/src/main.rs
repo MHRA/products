@@ -16,13 +16,21 @@ async fn main() {
         ("delete_datasource", Some(_m)) => datasource::delete_datasource()
             .await
             .expect("Failed to delete datasource"),
-        ("create_index", Some(_m)) => index::create_index().await.expect("Failed to create index"),
+        ("create_index", Some(m)) => {
+            let index_definition = m.value_of("index").unwrap_or("default");
+            index::create_index(index_definition)
+                .await
+                .expect("Failed to create index")
+        }
         ("delete_index", Some(_m)) => index::delete_index()
             .await
             .expect("Failed to delete index."),
-        ("create_indexer", Some(_m)) => indexer::create_indexer()
-            .await
-            .expect("Failed to create indexer"),
+        ("create_indexer", Some(m)) => {
+            let indexer_definition = m.value_of("indexer").unwrap_or("default");
+            indexer::create_indexer(indexer_definition)
+                .await
+                .expect("Failed to create indexer")
+        }
         ("delete_indexer", Some(_m)) => indexer::delete_indexer()
             .await
             .expect("Failed to delete indexer."),

@@ -4,23 +4,25 @@ exports[`SearchResults should render 1`] = `
 <Fragment>
   <styled.div>
     <div>
-      <h2
-        className="title"
-      >
-        Showing results for Tea
-      </h2>
-      <p
-        className="no-of-results"
-      >
-        1 to 2 of 200
-      </p>
+      <styled.div>
+        <h2
+          className="title"
+        >
+          Showing results for Tea
+        </h2>
+        <styled.p
+          className="no-of-results"
+        >
+          1 to 2 of 200
+        </styled.p>
+      </styled.div>
       <p
         className="ema-message"
       >
         If the product information you are seeking does not appear below, it is possible that the product holds a European licence and its information may be available at the 
         <a
           href="https://www.ema.europa.eu/en"
-          target="_new"
+          target="_blank"
         >
           European Medicines Agency
         </a>
@@ -55,7 +57,8 @@ exports[`SearchResults should render 1`] = `
           Search results
         </styled.h3>
         <dl>
-          <article
+          <div
+            className="search-result"
             key="0"
           >
             <dt
@@ -108,8 +111,9 @@ exports[`SearchResults should render 1`] = `
                 }
               />
             </dd>
-          </article>
-          <article
+          </div>
+          <div
+            className="search-result"
             key="1"
           >
             <dt
@@ -162,20 +166,27 @@ exports[`SearchResults should render 1`] = `
                 }
               />
             </dd>
-          </article>
+          </div>
         </dl>
       </section>
     </div>
   </styled.div>
   <Pagination
     currentPage={1}
-    enabledDocTypes={Array []}
     handlePageChange={[Function]}
     pageSize={20}
     resultCount={200}
     searchTerm="Tea"
   />
 </Fragment>
+`;
+
+exports[`SearchResults should render error message 1`] = `
+<styled.div>
+  <styled.p>
+    Sorry - the site is experiencing technical issues right now. Please try again later.
+  </styled.p>
+</styled.div>
 `;
 
 exports[`SearchResults should render loading page 1`] = `

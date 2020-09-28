@@ -22,6 +22,8 @@ env:
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines-api.non-prod.mhra.gov.uk/graphql
   USE_GRAPHQL: true
+  SHOW_BMGF: true
+  BMGF_AZURE_SEARCH_INDEX: bmgf-index
 
 jobs:
   build:
@@ -56,6 +58,7 @@ jobs:
             echo "AZURE_SEARCH_INDEX=\"$AZURE_SEARCH_INDEX\""
             echo "AZURE_SEARCH_KEY=\"$AZURE_SEARCH_KEY\""
             echo "GRAPHQL_URL=\"$GRAPHQL_URL\""
+            echo "BMGF_AZURE_SEARCH_INDEX=\"$BMGF_AZURE_SEARCH_INDEX\""
           } > .env
 
       - name: Run cypress end-to-end tests

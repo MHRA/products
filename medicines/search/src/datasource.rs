@@ -1,14 +1,14 @@
 use crate::{
     azure_rest,
     env::{
-        get_from_env, API_ADMIN_KEY, DATASOURCE_NAME, SEARCH_SERVICE, STORAGE_ACCOUNT,
+        get_from_env, DATASOURCE_NAME, SEARCH_API_ADMIN_KEY, SEARCH_SERVICE, STORAGE_ACCOUNT,
         STORAGE_CONTAINER, STORAGE_MASTER_KEY,
     },
 };
 
 pub async fn create_datasource() -> Result<(), reqwest::Error> {
     let search_service = get_from_env(SEARCH_SERVICE);
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
     let storage_account = get_from_env(STORAGE_ACCOUNT);
     let storage_container = get_from_env(STORAGE_CONTAINER);
@@ -27,7 +27,7 @@ pub async fn create_datasource() -> Result<(), reqwest::Error> {
 }
 
 pub async fn delete_datasource() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let datasource_name = get_from_env(DATASOURCE_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &datasource_name);

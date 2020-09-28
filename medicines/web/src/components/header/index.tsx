@@ -47,20 +47,30 @@ const Header = styled.header`
   }
 `;
 
+const LogoContainer = styled.div`
+  max-width: 224px;
+  margin-bottom: 115px;
+
+  @media ${mobileBreakpoint} {
+    max-width: 200px;
+    margin-bottom: 50px;
+  }
+`;
+
 interface IHeaderProps {
   title: string;
 }
 
-const header: React.FC<IHeaderProps> = props => (
+const header: React.FC<IHeaderProps> = (props) => (
   <Header>
     <div className="wrapper">
-      <picture>
+      <LogoContainer>
         <Link href="/">
           <a>
             <SvgMhraLogo />
           </a>
         </Link>
-      </picture>
+      </LogoContainer>
       <h1>{props.title}</h1>
     </div>
   </Header>

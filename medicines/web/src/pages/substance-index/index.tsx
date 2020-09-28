@@ -9,9 +9,7 @@ import { SubstanceListStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { ISubstance } from '../../model/substance';
 import Events from '../../services/events';
-import substanceLoader, {
-  graphqlSubstanceLoader,
-} from '../../services/substance-loader';
+import { getLoader } from '../../services/loaders/products/substances-index-loader';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -20,6 +18,8 @@ const App: NextPage = () => {
   );
   const [results, setResults] = React.useState<ISubstance[]>([]);
   const [substanceIndex, setSubstanceIndex] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [errorFetchingResults, setErrorFetchingResults] = React.useState(false);
   const useGraphQl: boolean = process.env.USE_GRAPHQL === 'true';
 
   const router = useRouter();
@@ -31,15 +31,25 @@ const App: NextPage = () => {
     if (!queryQS) {
       return;
     }
-    (async () => {
-      const index = queryQS.toString();
 
-      const loader = useGraphQl ? graphqlSubstanceLoader : substanceLoader;
+    const index = queryQS.toString();
+    setSubstanceIndex(index);
 
-      setResults(await loader.load(index));
-      setSubstanceIndex(index);
-      Events.viewSubstancesStartingWith(index);
-    })();
+    setErrorFetchingResults(false);
+    setIsLoading(true);
+    setResults([]);
+
+    getLoader(useGraphQl)
+      .load(index)
+      .then((results) => {
+        setResults(results);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setErrorFetchingResults(true);
+      });
+
+    Events.viewSubstancesStartingWith(index);
   }, [queryQS]);
 
   useEffect(() => {
@@ -51,6 +61,7 @@ const App: NextPage = () => {
   return (
     <Page
       title="Products"
+      metaTitle="Products | Substance index"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
@@ -59,6 +70,8 @@ const App: NextPage = () => {
           title={`${substanceIndex || '...'}`}
           items={results}
           indexType={IndexType.SubstancesIndex}
+          errorFetchingResults={errorFetchingResults}
+          isLoading={isLoading}
         />
         <SubstanceListStructuredData
           substanceNames={results.map((substance) => substance.name)}

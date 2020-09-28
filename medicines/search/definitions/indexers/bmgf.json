@@ -1,0 +1,45 @@
+{
+  "name": "INDEXER_NAME_PLACEHOLDER",
+  "dataSourceName": "DATASOURCE_NAME_PLACEHOLDER",
+  "targetIndexName": "INDEX_NAME_PLACEHOLDER",
+  "schedule": {
+    "interval": "P1D",
+    "startTime": "2020-01-01T00:00:00Z"
+  },
+  "parameters": {
+    "configuration": {
+      "indexStorageMetadataOnlyForOversizedDocuments": true,
+      "indexedFileNameExtensions": ".pdf"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "products",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "pl_numbers",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "active_substances",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "pbpk_models",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "matrices",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "pregnancy_trimesters",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    },
+    {
+      "sourceFieldName": "facets",
+      "mappingFunction": { "name": "jsonArrayToStringCollection" }
+    }
+  ]
+}
