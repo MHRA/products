@@ -17,7 +17,7 @@ describe(getCleanedHtml, () => {
   });
   it('removes unwanted tags', () => {
     const output = getCleanedHtml(
-      '<!DOCTYPE html><html><head></head><body><div><h1>title</h1><o:p></o:p><w:sdt><w:std><script>some dangerous javascript</script><</div></body></html>',
+      '<!DOCTYPE html><html><head></head><body><div><h1>title</h1><o:p></o:p><script>some dangerous javascript</script></div></body></html>',
       'https://report-assets/',
     );
     expect(output).toBe('<div></div>');
@@ -42,5 +42,12 @@ describe(getCleanedHtml, () => {
       'https://report-assets/',
     );
     expect(output).toBe('<a id="link" href="/link">Link text</a>');
+  });
+  it('replaces w:sdt tags with divs', () => {
+    const output = getCleanedHtml(
+      '<!DOCTYPE html><html><head></head><body><w:sdt><div><w:sdtpr></w:sdtpr>Content</div></w:sdt></body></html>',
+      'https://report-assets/',
+    );
+    expect(output).toBe('<div><div><div></div>Content</div></div>');
   });
 });

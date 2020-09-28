@@ -65,13 +65,21 @@ const removeUnwantedAttributes = (node: any): any => {
 };
 
 const tagShouldBeRemoved = (tagName: string): boolean => {
-  return ['h1', 'o:p', 'w:sdt', 'script'].includes(tagName);
+  return ['h1', 'o:p', 'script'].includes(tagName);
+};
+
+const replaceWsdtTags = (node: any): any => {
+  if (node.tagName?.startsWith('w:sdt')) {
+    node.tagName = 'div';
+  }
+  return node;
 };
 
 export const recurseNodes = (node: any, prefix: string): any => {
   if (tagShouldBeRemoved(node.tagName)) {
     return;
   }
+  replaceWsdtTags(node);
   if (node.tagName === 'img') {
     node = updateImageTag(node, prefix);
   } else if (node.tagName === 'td' || node.tagName === 'table') {

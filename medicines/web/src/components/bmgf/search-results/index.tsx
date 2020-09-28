@@ -221,7 +221,7 @@ const SearchResults = (props: ISearchResultsProps) => {
       <p>
         If you’re looking for other information on medicines, you can search for
         information about medicines including patient information leaflets
-        (PILs), details on how the medicine can be used (SmPCs) and scientific
+        (PILs), details on how the medicine can be used (SPCs) and scientific
         reports (PARs).
       </p>
       <p>

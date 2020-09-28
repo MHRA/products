@@ -10,6 +10,6 @@ Further information on this project is available on the [MHRA MedRegs Blog](http
 
 ## Medicine information
 
-Search for information about medicines including patient information leaflets (PILs), details on how the medicine can be used (SmPCs) and scientific reports (PARs).
+Search for information about medicines including patient information leaflets (PILs), details on how the medicine can be used (SPCs) and scientific reports (PARs).
 
 [Go to Products website to find information on medicines](/)
