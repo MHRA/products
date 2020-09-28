@@ -13,10 +13,22 @@ subcommands:
       about: Delete a datasource.
   - create_index:
       about: Create an index from a definition.
+      args:
+        - index:
+            short: i
+            required: false
+            takes_value: true
+            help: name of index definition to use
   - delete_index:
       about: Delete an index.
   - create_indexer:
       about: Create an indexer from a definition.
+      args:
+        - indexer:
+            short: i
+            required: false
+            takes_value: true
+            help: name of index definition to use
   - delete_indexer:
       about: Delete an indexer.
   - reset_indexer:

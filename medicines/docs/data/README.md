@@ -16,6 +16,8 @@ Consider checking out the [architecture of the site](../architecture#progress) a
 
 ## Storage
 
+### Products
+
 All SPC, PIL and PAR files are stored as blobs in an Azure blob container along with associated metadata fields, including:
 
 - Substance name - e.g. "CLOPIDOGREL BESILATE"
@@ -31,6 +33,21 @@ All SPC, PIL and PAR files are stored as blobs in an Azure blob container along 
   This index is defined in [code](https://github.com/MHRA/products/blob/master/medicines/search/src/index.rs).
 
 Each file is stored as a blob with a name that is a hash of the file contents, e.g. `000f6ec9a52b3230d5f880e55fb33a405a1c83d3` and has a unique URI through which it can be accessed.
+
+### BMGF
+
+All BMGF files are also stored as blobs in an Azure blob container, both in PDF format (to which the following metadata is attached) and HTML format (for the creation of accessible web content):
+
+- report_name - the name of the report, e.g. "Study on the effects of Ibuprofen"
+- file_name - the name of both the PDF and HTML files, e.g. "Ibuprofen report"
+- summary - a short summary of the report that will be shown on the website, e.g. "A study into the effects of..."
+- active_substances - any active substances associated with the report, stored as an array, e.g. ["IBUPROFEN", "PARACETAMOL"]
+- products - any products associated with the report, stored as an array, e.g. ["IBUPROFEN TABLETS", "IBUPROFEN GEL"]
+- pl_numbers - any product licence numbers associated with the report, stored as an array, e.g. ["PL123451234", "PL234562345"]
+- pbpk_models - any PBPK models associated with the report, stored as an array
+- pregnancy_trimesters - any specific pregnancy trimesters associated with the report, stored as an array, e.g. ["first", "second"]
+- matrices - any matrices associated with the report, stored as an array
+- facets - calculated from the active substances, used to drive hierarchical navigation on the products site, e.g. ["I", "I, IBUPROFEN", "P", "P, PARACETAMOL"]
 
 ## Updates
 

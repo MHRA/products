@@ -1,20 +1,25 @@
 use crate::{
     azure_rest,
-    env::{get_from_env, API_ADMIN_KEY, INDEX_NAME, SEARCH_SERVICE},
+    env::{get_from_env, INDEX_NAME, SEARCH_API_ADMIN_KEY, SEARCH_SERVICE},
 };
 
-pub async fn create_index() -> Result<(), reqwest::Error> {
+pub async fn create_index(index_definition: &str) -> Result<(), reqwest::Error> {
     let search_service = get_from_env(SEARCH_SERVICE);
     let index_name = get_from_env(INDEX_NAME);
-    let api_key = get_from_env(API_ADMIN_KEY);
-    let index_definition = get_index_definition(get_raw_index_definition(), &index_name);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
+    let raw_index_definition;
+    match index_definition {
+        "bmgf" => raw_index_definition = get_bmgf_raw_index_definition(),
+        _ => raw_index_definition = get_default_raw_index_definition(),
+    }
+    let index_definition = get_index_definition(raw_index_definition, &index_name);
     let url = get_base_url(&search_service);
 
     azure_rest::make_post_request_with_body(index_definition, &url, &api_key).await
 }
 
 pub async fn delete_index() -> Result<(), reqwest::Error> {
-    let api_key = get_from_env(API_ADMIN_KEY);
+    let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
     let index_name = get_from_env(INDEX_NAME);
     let search_service = get_from_env(SEARCH_SERVICE);
     let url = get_resource_url(&search_service, &index_name);
@@ -33,8 +38,12 @@ fn get_resource_url(search_service: &str, index_name: &str) -> String {
         .replace("INDEX_NAME_PLACEHOLDER", index_name)
 }
 
-fn get_raw_index_definition() -> String {
+fn get_default_raw_index_definition() -> String {
     include_str!("../definitions/indexes/default.json").to_string()
+}
+
+fn get_bmgf_raw_index_definition() -> String {
+    include_str!("../definitions/indexes/bmgf.json").to_string()
 }
 
 fn get_index_definition(raw_index_definition: String, index_name: &str) -> String {
