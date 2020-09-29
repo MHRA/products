@@ -1,13 +1,7 @@
 import React from 'react';
-import parse5 from 'parse5';
 import styled from 'styled-components';
 
 import Page from '../../../components/page';
-import {
-  getReportList,
-  getReportUrls,
-  getReportHtmlContent,
-} from '../../../services/bmgf-reports-fetcher';
 
 import { useLocalStorage } from '../../../hooks';
 import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
@@ -111,11 +105,20 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
 export default Report;
 
 export const getStaticProps = async (context) => {
+  const {
+    getReportUrls,
+    getReportHtmlContent,
+  } = require('../../../services/bmgf-reports-fetcher');
+  const fs = require('fs');
+
   const reportName = context.params.report;
+
+  let htmlFilePaths = fs.readFileSync('./reports.json', 'utf8', (e) => {});
+  htmlFilePaths = JSON.parse(htmlFilePaths);
 
   let pdfUrl;
   let assetsUrl;
-  const htmlBody = await getReportUrls(reportName)
+  const htmlBody = await getReportUrls(reportName, htmlFilePaths)
     .then(({ reportPdfUrl, reportHtmlUrl, reportAssetsUrl }) => {
       pdfUrl = reportPdfUrl;
       assetsUrl = reportAssetsUrl;
@@ -134,15 +137,19 @@ export const getStaticProps = async (context) => {
 };
 
 export const getStaticPaths = async () => {
-  const reports = await getReportList().then((reportPaths) =>
-    reportPaths.map(
-      (reportPath) =>
-        `/medicine-levels-in-pregnancy/reports/${reportPath.split('/')[0]}`,
-    ),
+  const { getReportList } = require('../../../services/bmgf-reports-fetcher');
+  const fs = require('fs');
+
+  const htmlFilePaths = await getReportList();
+  const staticPageNames = htmlFilePaths.map(
+    (reportFilePath) =>
+      `/medicine-levels-in-pregnancy/reports/${reportFilePath.split('/')[0]}`,
   );
 
+  fs.writeFile('./reports.json', JSON.stringify(htmlFilePaths), (e) => {});
+
   return {
-    paths: reports,
+    paths: staticPageNames,
     fallback: false,
   };
 };

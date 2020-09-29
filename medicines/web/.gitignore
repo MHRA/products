@@ -9,3 +9,4 @@ coverage/
 !.env.development
 !.env.test
 !.env.production
+reports.json

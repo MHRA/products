@@ -24,6 +24,8 @@ env:
   USE_GRAPHQL: true
   SHOW_BMGF: true
   BMGF_AZURE_SEARCH_INDEX: bmgf-index
+  AZURE_STORAGE_ACCOUNT: mhraproductsnonprod
+  AZURE_STORAGE_KEY: ${{ secrets.PRODUCTS_STORAGE_MASTER_KEY_NONPROD }}
 
 jobs:
   build:
