@@ -65,11 +65,16 @@ pub async fn upload_report(
     )
     .await?;
 
-    let html_assets_dir = format!("{}{}.fld/", &report_dir, &file_name,);
-    let report_images = fs::read_dir(&html_assets_dir)
+    let html_assets_dir_mac = format!("{}{}.fld/", &report_dir, &file_name,);
+    let html_assets_dir_word = format!("{}{}_files/", &report_dir, &file_name,);
+    let report_images = fs::read_dir(&html_assets_dir_mac)
+        .map_err(|e| fs::read_dir(&html_assets_dir_word))
         .map_err(|e| ImportError::FileOpenError(e.to_string()))?
         .filter_map(Result::ok)
-        .filter(|entry| entry.path().extension().unwrap_or_default() == "jpg")
+        .filter(|entry| {
+            let extension = entry.path().extension().unwrap_or_default();
+            extension == "jpg" || extension == "png"
+        })
         .collect::<Vec<fs::DirEntry>>();
 
     for image in report_images {
