@@ -45,7 +45,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.6",
     "jest": "^26.4.0",
-    "pa11y-ci": "^2.3.0",
+    "pa11y-ci": "^2.4.0",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.13.1",
     "wait-on": "^5.2.0"
