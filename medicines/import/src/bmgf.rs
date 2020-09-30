@@ -73,24 +73,18 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
         .to_string();
     let report_name = metadata::sanitize(&report_name);
     metadata.insert("report_name".to_string(), metadata::sanitize(&report_name));
+    metadata.insert("file_name".to_string(), metadata::sanitize(&report_name));
     metadata.insert("id".to_string(), metadata::to_id(&report_name));
 
-    let file_name = row
-        .get(1)
-        .expect("File name should be in second column")
-        .to_string();
-    metadata.insert("file_name".to_string(), metadata::sanitize(&file_name));
-    // let pdf_file_path = path.parent();
-
     let summary = row
-        .get(2)
-        .expect("Summary should be in third column")
+        .get(1)
+        .expect("Summary should be in second column")
         .to_string();
     metadata.insert("summary".to_string(), summary);
 
     let active_substances = row
-        .get(3)
-        .expect("Active substances should be in fourth column")
+        .get(2)
+        .expect("Active substances should be in third column")
         .to_string()
         .to_uppercase();
     let active_substances = metadata::to_array(&metadata::sanitize(&active_substances));
@@ -103,30 +97,30 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
     metadata.insert("facets".to_string(), metadata::to_json(facets));
 
     let products = row
-        .get(4)
-        .expect("Products should be in fifth column")
+        .get(3)
+        .expect("Products should be in fourth column")
         .to_string()
         .to_uppercase();
     let products = metadata::to_array(&metadata::sanitize(&products));
     metadata.insert("products".to_string(), metadata::to_json(products));
 
     let pl_numbers = row
-        .get(5)
-        .expect("PL numbers should be in sixth column")
+        .get(4)
+        .expect("PL numbers should be in fifth column")
         .to_string();
     let pl_numbers = metadata::extract_product_licences(&metadata::sanitize(&pl_numbers));
     metadata.insert("pl_numbers".to_string(), pl_numbers);
 
     let pbpk_models = row
-        .get(6)
-        .expect("PBPK models should be in seventh column")
+        .get(5)
+        .expect("PBPK models should be in sixth column")
         .to_string();
     let pbpk_models = metadata::to_array(&metadata::sanitize(&pbpk_models));
     metadata.insert("pbpk_models".to_string(), metadata::to_json(pbpk_models));
 
     let matrices = row
-        .get(7)
-        .expect("Pregnancy trimesters should be in eight column")
+        .get(6)
+        .expect("Pregnancy trimesters should be in seventh column")
         .to_string();
     let matrices = metadata::to_array(&metadata::sanitize(&matrices));
     metadata.insert(
@@ -135,8 +129,8 @@ pub fn extract_file_data(row: &[DataType]) -> HashMap<String, String> {
     );
 
     let matrices = row
-        .get(8)
-        .expect("Matrices should be in ninth column")
+        .get(7)
+        .expect("Matrices should be in eight column")
         .to_string();
     let matrices = metadata::to_array(&metadata::sanitize(&matrices));
     metadata.insert("matrices".to_string(), metadata::to_json(matrices));
@@ -151,7 +145,6 @@ mod test {
     #[test]
     fn extract_data_from_row() {
         let report_name = DataType::String(String::from("Example report"));
-        let file_name = DataType::String(String::from("Example file name"));
         let summary = DataType::String(String::from("An example summary"));
         let active_substances = DataType::String(String::from("Substance 1, Substance 2"));
         let products = DataType::String(String::from("Product 1, Product 2"));
@@ -162,7 +155,6 @@ mod test {
 
         let row = [
             report_name,
-            file_name,
             summary,
             active_substances,
             products,
@@ -174,7 +166,7 @@ mod test {
         let data = extract_file_data(&row);
         assert_eq!(data.get("report_name").unwrap(), "Example report");
         assert_eq!(data.get("id").unwrap(), "Example-report");
-        assert_eq!(data.get("file_name").unwrap(), "Example file name");
+        assert_eq!(data.get("file_name").unwrap(), "Example report");
         assert_eq!(data.get("summary").unwrap(), "An example summary");
         assert_eq!(
             data.get("active_substances").unwrap(),

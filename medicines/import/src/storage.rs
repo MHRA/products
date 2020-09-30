@@ -5,7 +5,7 @@ use azure_sdk_core::{
 };
 use azure_sdk_storage_blob::Blob;
 use azure_sdk_storage_core::prelude::*;
-use std::{collections::HashMap, fs, path::Path};
+use std::{collections::HashMap, fs, path::Path, path::PathBuf};
 
 pub async fn upload_report(
     client: &Box<dyn Client>,
@@ -35,20 +35,16 @@ pub async fn upload_report(
         &report_name,
     );
 
-    let report_file_name = metadata.get("file_name").unwrap();
-    let mut pdf_file_path =
-        Path::new(&format!("{}{}.pdf", &report_dir, &report_file_name)).to_owned();
-    let mut html_file_path =
-        Path::new(&format!("{}{}.html", &report_dir, &report_file_name)).to_owned();
-    let mut asset_dir =
-        Path::new(&format!("{}{}_files/", &report_dir, &report_file_name,)).to_owned();
+    let mut pdf_file_path: Option<PathBuf> = None;
+    let mut html_file_path: Option<PathBuf> = None;
+    let mut asset_dir: Option<PathBuf> = None;
 
     let dir_entries = fs::read_dir(&report_dir)
         .map_err(|e| ImportError::FileOpenError(e.to_string()))?
         .filter_map(Result::ok);
     for entry in dir_entries {
         if entry.file_type().unwrap().is_dir() {
-            asset_dir = entry.path();
+            asset_dir = Some(entry.path());
             continue;
         }
 
@@ -60,34 +56,72 @@ pub async fn upload_report(
             .to_string();
 
         if entry_file_name.ends_with("pdf") {
-            pdf_file_path = entry.path();
+            pdf_file_path = Some(entry.path());
         } else if entry_file_name.ends_with("html") {
-            html_file_path = entry.path();
+            html_file_path = Some(entry.path());
         }
     }
 
-    let _ = upload_file(
-        &pdf_file_path,
-        &format!("{}/{}.pdf", &report_name, &report_name),
-        &"application/pdf",
-        &metadata_ref,
-        client,
-        &container_name,
-        dry_run,
-    )
-    .await?;
+    match pdf_file_path {
+        Some(path) => {
+            upload_file(
+                &path,
+                &format!("{}/{}.pdf", &report_name, &report_name),
+                &"application/pdf",
+                &metadata_ref,
+                client,
+                &container_name,
+                dry_run,
+            )
+            .await?;
+        }
+        None => return Err(ImportError::FileOpenError("PDF file not found".to_string())),
+    }
 
-    let _ = upload_file(
-        &html_file_path,
-        &format!("{}/{}.html", &report_name, &report_name),
-        &"text/html",
-        &empty_metadata,
-        client,
-        &container_name,
-        dry_run,
-    )
-    .await?;
+    match html_file_path {
+        Some(path) => {
+            upload_file(
+                &path,
+                &format!("{}/{}.html", &report_name, &report_name),
+                &"text/html",
+                &empty_metadata,
+                client,
+                &container_name,
+                dry_run,
+            )
+            .await?;
+        }
+        None => {
+            return Err(ImportError::FileOpenError(
+                "HTML file not found".to_string(),
+            ))
+        }
+    }
 
+    if let Some(path) = asset_dir {
+        let _ = upload_asset_files(
+            &path,
+            &report_name,
+            &empty_metadata,
+            client,
+            &container_name,
+            dry_run,
+        )
+        .await?;
+    }
+
+    trace!("created {}", report_name);
+    Ok(())
+}
+
+async fn upload_asset_files(
+    asset_dir: &Path,
+    report_name: &str,
+    metadata: &HashMap<&str, &str>,
+    client: &Box<dyn Client>,
+    container_name: &str,
+    dry_run: bool,
+) -> Result<(), ImportError> {
     let assets = fs::read_dir(&asset_dir)
         .map_err(|e| ImportError::FileOpenError(e.to_string()))?
         .filter_map(Result::ok)
@@ -106,7 +140,7 @@ pub async fn upload_report(
                     asset.file_name().as_os_str().to_str().unwrap_or_default()
                 ),
                 &get_content_type_from_extension(&extension),
-                &empty_metadata,
+                &metadata,
                 &client,
                 &container_name,
                 dry_run,
@@ -115,7 +149,6 @@ pub async fn upload_report(
         }
     }
 
-    trace!("created {}", report_name);
     Ok(())
 }
 
