@@ -42,20 +42,19 @@ Expected structure:
 - report_name (dir)
   - report.pdf (file)
   - report.html (file)
-  - report.fld (dir)
+  - report_files (dir)
     - image1.jpg (file)
     - styles.css (file)
 - report_name_2 (dir)
   - report_2.pdf (file)
   - report_2.html (file)
-  - report_2.fld (dir)
+  - report_2_files (dir)
     - image1.jpg (file)
     - styles.css (file)
 
 The metadata file should have the following headed columns, in order:
 
 - Report name
-- File name
 - Summary
 - Active substances
 - Products
@@ -64,7 +63,7 @@ The metadata file should have the following headed columns, in order:
 - Pregnancy trimesters
 - Matrices
 
-The metadata attached to each PDF report file is as follows:
+The metadata automatically attached to each PDF report file is as follows:
 
 - report_name
 - file_name
