@@ -28,8 +28,6 @@ pub async fn upload_report(
         metadata_ref.insert(&key, &val);
     }
 
-    let file_name = metadata.get("file_name").unwrap();
-
     let report_name = metadata.get("report_name").unwrap();
     let report_dir = format!(
         "{}/{}/",
@@ -37,13 +35,41 @@ pub async fn upload_report(
         &report_name,
     );
 
-    let pdf_file_name = format!("{}.pdf", &file_name);
+    let report_file_name = metadata.get("file_name").unwrap();
+    let mut pdf_file_path =
+        Path::new(&format!("{}{}.pdf", &report_dir, &report_file_name)).to_owned();
+    let mut html_file_path =
+        Path::new(&format!("{}{}.html", &report_dir, &report_file_name)).to_owned();
+    let mut asset_dir =
+        Path::new(&format!("{}{}_files/", &report_dir, &report_file_name,)).to_owned();
+
+    let dir_entries = fs::read_dir(&report_dir)
+        .map_err(|e| ImportError::FileOpenError(e.to_string()))?
+        .filter_map(Result::ok);
+    for entry in dir_entries {
+        if entry.file_type().unwrap().is_dir() {
+            asset_dir = entry.path();
+            continue;
+        }
+
+        let entry_file_name = entry
+            .file_name()
+            .as_os_str()
+            .to_str()
+            .unwrap_or_default()
+            .to_string();
+
+        if entry_file_name.ends_with("pdf") {
+            pdf_file_path = entry.path();
+        } else if entry_file_name.ends_with("html") {
+            html_file_path = entry.path();
+        }
+    }
+
     let _ = upload_file(
-        &pdf_file_name,
+        &pdf_file_path,
+        &format!("{}/{}.pdf", &report_name, &report_name),
         &"application/pdf",
-        &report_name,
-        &report_dir,
-        &"",
         &metadata_ref,
         client,
         &container_name,
@@ -51,13 +77,10 @@ pub async fn upload_report(
     )
     .await?;
 
-    let html_file_name = format!("{}.html", &file_name);
     let _ = upload_file(
-        &html_file_name,
+        &html_file_path,
+        &format!("{}/{}.html", &report_name, &report_name),
         &"text/html",
-        &report_name,
-        &report_dir,
-        &"",
         &empty_metadata,
         client,
         &container_name,
@@ -65,54 +88,47 @@ pub async fn upload_report(
     )
     .await?;
 
-    let html_assets_dir_mac = format!("{}{}.fld/", &report_dir, &file_name,);
-    let html_assets_dir_word = format!("{}{}_files/", &report_dir, &file_name,);
-    let report_images = fs::read_dir(&html_assets_dir_mac)
-        .map_err(|e| fs::read_dir(&html_assets_dir_word))
-        .map_err(|e| ImportError::FileOpenError(e.to_string()))?
-        .filter_map(Result::ok)
-        .filter(|entry| {
-            let extension = entry.path().extension().unwrap_or_default();
-            extension == "jpg" || extension == "png"
-        })
-        .collect::<Vec<fs::DirEntry>>();
+    // let report_images = fs::read_dir(&asset_dir)
+    //     .map_err(|e| ImportError::FileOpenError(e.to_string()))?
+    //     .filter_map(Result::ok)
+    //     .filter(|entry| {
+    //         let path = entry.path();
+    //         let extension = path.extension().unwrap_or_default();
+    //         extension == "jpg" || extension == "png" || extension == "gif"
+    //     })
+    //     .collect::<Vec<fs::DirEntry>>();
 
-    for image in report_images {
-        upload_file(
-            image.path().file_name().unwrap().to_str().unwrap(),
-            &"image/jpeg",
-            &report_name,
-            &html_assets_dir,
-            &"assets/",
-            &empty_metadata,
-            &client,
-            &container_name,
-            dry_run,
-        )
-        .await?;
-    }
+    // for image in report_images {
+    //     upload_file(
+    //         image.path().file_name().unwrap().to_str().unwrap(),
+    //         &"image/jpeg",
+    //         &report_name,
+    //         &asset_dir,
+    //         &"assets/",
+    //         &empty_metadata,
+    //         &client,
+    //         &container_name,
+    //         dry_run,
+    //     )
+    //     .await?;
+    // }
 
     trace!("created {}", report_name);
     Ok(())
 }
 
 async fn upload_file(
-    file_name: &str,
+    local_file_path: &Path,
+    azure_storage_name: &str,
     content_type: &str,
-    report_name: &str,
-    local_dir_path: &str,
-    azure_storage_prefix: &str,
     metadata: &HashMap<&str, &str>,
     client: &Box<dyn Client>,
     container_name: &str,
     dry_run: bool,
 ) -> Result<(), ImportError> {
-    let local_file_path = format!("{}{}", &local_dir_path, &file_name,);
     let file_contents =
         fs::read(local_file_path).map_err(|e| ImportError::FileOpenError(e.to_string()))?;
     let file_digest = md5::compute(&file_contents[..]);
-    let file_azure_storage_name =
-        format!("{}/{}{}", &report_name, &azure_storage_prefix, &file_name);
 
     if dry_run {
         return Ok(());
@@ -121,37 +137,10 @@ async fn upload_file(
     client
         .put_block_blob()
         .with_container_name(&container_name)
-        .with_blob_name(&file_azure_storage_name)
+        .with_blob_name(&azure_storage_name)
         .with_content_type(content_type)
         .with_metadata(&metadata)
         .with_body(&file_contents)
-        .with_content_md5(&file_digest[..])
-        .finalize()
-        .await
-        .map_err(ImportError::AzureError)?;
-
-    Ok(())
-}
-
-pub async fn upload_index_file(
-    file_contents: &[u8],
-    client: &Box<dyn Client>,
-    dry_run: bool,
-) -> Result<(), ImportError> {
-    let container_name =
-        std::env::var("STORAGE_CONTAINER").expect("Set env variable STORAGE_CONTAINER first!");
-    let file_digest = md5::compute(&file_contents[..]);
-
-    if dry_run {
-        return Ok(());
-    }
-
-    client
-        .put_block_blob()
-        .with_container_name(&container_name)
-        .with_blob_name(&"upload-index.txt")
-        .with_content_type("text/text")
-        .with_body(file_contents)
         .with_content_md5(&file_digest[..])
         .finalize()
         .await

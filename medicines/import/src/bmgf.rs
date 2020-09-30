@@ -19,35 +19,33 @@ pub async fn import(
 
     let progress_bar = ProgressBar::new((range.rows().count() as u64) - 1);
 
-    let mut uploaded_html_files: Vec<Vec<u8>> = vec![];
+    let mut errored_uploads: Vec<String> = vec![];
 
     for row in range.rows().skip(1) {
         let metadata = extract_file_data(row);
-        match storage::upload_report(&client, path, &metadata, verbosity, dry_run).await {
-            Ok(()) => {
-                let azure_html_path = format!(
-                    "{}/{}\n",
-                    metadata.get("report_name").unwrap(),
-                    metadata.get("file_name").unwrap()
-                );
-                uploaded_html_files.push(azure_html_path.as_bytes().to_owned());
-            }
-            Err(e) => eprint!("Error uploading report: {}", e.to_string()),
+        if let Err(e) = storage::upload_report(&client, path, &metadata, verbosity, dry_run).await {
+            errored_uploads.push(format!(
+                "Error uploading report {}: {}",
+                metadata.get("report_name").unwrap(),
+                e.to_string()
+            ));
         }
         progress_bar.inc(1);
     }
 
-    let uploaded_html_files_index: Vec<u8> = uploaded_html_files.into_iter().flatten().collect();
-    let _ = storage::upload_index_file(&uploaded_html_files_index, &client, dry_run).await?;
     progress_bar.finish();
 
     if dry_run {
-        println!("Dry run completed successfully. No files were uploaded.");
+        println!("Dry run completed. No files were uploaded.");
     } else {
         println!(
             "Uploading BMGF reports finished in {}",
             HumanDuration(started.elapsed())
         );
+    }
+
+    for error in errored_uploads {
+        eprint!("{}", error);
     }
 
     Ok(())
