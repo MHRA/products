@@ -7,6 +7,7 @@ This site allows users to find:
 - The leaflets which are provided with medicines
 - The description of the medicinal product’s properties and how it can be used
 - Scientific reports about marketing authorisations for medicines
+- Reports related to medicine levels in pregnancy
 
 ## Overview
 
@@ -17,7 +18,7 @@ This site allows users to find:
 
 - [api](./api) - code for the public-facing Medicines API that exposes medicines data
 - [doc-index-updater](./doc-index-updater) - API for creating and deleting files on the site
-- [import](./import) - importer to update files
+- [import](./import) - importer to upload files related to medicine levels in pregnancy
 - [pars-upload](./pars-upload) - internal portal allowing medical writers to upload PAR documents
 - [search](./search) - provision or delete resources related to the search service, which holds a searchable index for all public files served by the site
 - [search-client](./search-client) - rust library for interacting with the search service
