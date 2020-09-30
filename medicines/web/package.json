@@ -21,6 +21,7 @@
   },
   "description": "MHRA Medicine Products Portal",
   "devDependencies": {
+    "@azure/storage-blob": "^12.2.1",
     "@babel/plugin-proposal-optional-chaining": "^7.10.4",
     "@svgr/cli": "^5.4.0",
     "@types/enzyme": "^3.10.4",
