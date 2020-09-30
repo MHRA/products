@@ -88,33 +88,43 @@ pub async fn upload_report(
     )
     .await?;
 
-    // let report_images = fs::read_dir(&asset_dir)
-    //     .map_err(|e| ImportError::FileOpenError(e.to_string()))?
-    //     .filter_map(Result::ok)
-    //     .filter(|entry| {
-    //         let path = entry.path();
-    //         let extension = path.extension().unwrap_or_default();
-    //         extension == "jpg" || extension == "png" || extension == "gif"
-    //     })
-    //     .collect::<Vec<fs::DirEntry>>();
+    let assets = fs::read_dir(&asset_dir)
+        .map_err(|e| ImportError::FileOpenError(e.to_string()))?
+        .filter_map(Result::ok)
+        .collect::<Vec<fs::DirEntry>>();
 
-    // for image in report_images {
-    //     upload_file(
-    //         image.path().file_name().unwrap().to_str().unwrap(),
-    //         &"image/jpeg",
-    //         &report_name,
-    //         &asset_dir,
-    //         &"assets/",
-    //         &empty_metadata,
-    //         &client,
-    //         &container_name,
-    //         dry_run,
-    //     )
-    //     .await?;
-    // }
+    for asset in assets {
+        let path = asset.path();
+        let extension = path.extension().unwrap_or_default().to_os_string();
+        let extension = extension.to_string_lossy().to_owned();
+        if extension == "jpg" || extension == "png" || extension == "gif" {
+            upload_file(
+                &path,
+                &format!(
+                    "{}/assets/{}",
+                    &report_name,
+                    asset.file_name().as_os_str().to_str().unwrap_or_default()
+                ),
+                &get_content_type_from_extension(&extension),
+                &empty_metadata,
+                &client,
+                &container_name,
+                dry_run,
+            )
+            .await?;
+        }
+    }
 
     trace!("created {}", report_name);
     Ok(())
+}
+
+fn get_content_type_from_extension(extension: &str) -> String {
+    match extension {
+        "png" => "image/png".to_string(),
+        "gif" => "image/gif".to_string(),
+        _ => "image/jpeg".to_string(),
+    }
 }
 
 async fn upload_file(
