@@ -159,7 +159,8 @@ export const Products = ({
         <Button
           secondary
           type="button"
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault()
             setSubstanceIds((ids) => [...ids, getNextId()])
           }}
         >
