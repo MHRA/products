@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -13,6 +14,8 @@ import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnanc
 
 const pageSize = 10;
 const searchPath = '/medicine-levels-in-pregnancy/search';
+
+const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -86,26 +89,35 @@ const App: NextPage = (props) => {
   };
 
   return (
-    <Page
-      title="Medicine levels in pregnancy"
-      metaTitle="Medicine levels in pregnancy | Search results"
-      storageAllowed={storageAllowed}
-      setStorageAllowed={setStorageAllowed}
-    >
-      <SearchWrapper initialSearchValue={query}>
-        <SearchResults
-          reports={reports}
-          showingResultsForTerm={query}
-          resultCount={count}
-          page={pageNumber}
-          pageSize={pageSize}
-          searchTerm={query}
-          handlePageChange={handlePageChange}
-          isLoading={isLoading}
-          errorFetchingResults={errorFetchingResults}
-        />
-      </SearchWrapper>
-    </Page>
+    <>
+      {showPkpr ? (
+        <></>
+      ) : (
+        <Head>
+          <meta name="robots" content="noindex, no follow" />
+        </Head>
+      )}
+      <Page
+        title="Medicine levels in pregnancy"
+        metaTitle="Medicine levels in pregnancy | Search results"
+        storageAllowed={storageAllowed}
+        setStorageAllowed={setStorageAllowed}
+      >
+        <SearchWrapper initialSearchValue={query}>
+          <SearchResults
+            reports={reports}
+            showingResultsForTerm={query}
+            resultCount={count}
+            page={pageNumber}
+            pageSize={pageSize}
+            searchTerm={query}
+            handlePageChange={handlePageChange}
+            isLoading={isLoading}
+            errorFetchingResults={errorFetchingResults}
+          />
+        </SearchWrapper>
+      </Page>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Head from 'next/head';
 import styled from 'styled-components';
 
 import MedicineLevelsInPregnancyHomeText from '../../components/bmgf/home-text';
@@ -15,6 +16,8 @@ const StyledHomeTextWrapper = styled.div`
   }
 `;
 
+const showPkpr = process.env.SHOW_BMGF === 'true';
+
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -26,18 +29,27 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Page
-      title="Medicine levels in pregnancy"
-      metaTitle="Medicine levels in pregnancy"
-      storageAllowed={storageAllowed}
-      setStorageAllowed={setStorageAllowed}
-    >
-      <SearchWrapper initialSearchValue="">
-        <StyledHomeTextWrapper>
-          <MedicineLevelsInPregnancyHomeText />
-        </StyledHomeTextWrapper>
-      </SearchWrapper>
-    </Page>
+    <>
+      {showPkpr ? (
+        <></>
+      ) : (
+        <Head>
+          <meta name="robots" content="noindex, no follow" />
+        </Head>
+      )}
+      <Page
+        title="Medicine levels in pregnancy"
+        metaTitle="Medicine levels in pregnancy"
+        storageAllowed={storageAllowed}
+        setStorageAllowed={setStorageAllowed}
+      >
+        <SearchWrapper initialSearchValue="">
+          <StyledHomeTextWrapper>
+            <MedicineLevelsInPregnancyHomeText />
+          </StyledHomeTextWrapper>
+        </SearchWrapper>
+      </Page>
+    </>
   );
 };
 

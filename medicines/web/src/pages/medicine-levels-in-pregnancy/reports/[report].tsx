@@ -1,4 +1,5 @@
 import React from 'react';
+import Head from 'next/head';
 import styled from 'styled-components';
 
 import Page from '../../../components/page';
@@ -65,6 +66,8 @@ const ReportNotAvailable = () => (
   <div>Sorry - this report is currently unavailable.</div>
 );
 
+const showPkpr = process.env.SHOW_BMGF === 'true';
+
 const Report = ({ reportName, htmlBody, pdfUrl }) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -72,33 +75,44 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
   );
 
   return (
-    <Page
-      title={reportName}
-      metaTitle={reportName}
-      storageAllowed={storageAllowed}
-      setStorageAllowed={setStorageAllowed}
-    >
-      <ReportBody>
-        <DownloadButtonContainer>
-          <AccessibleHeading>Download PDF version of report</AccessibleHeading>
-          <a href={encodeURI(pdfUrl)} download={reportName}>
-            Download report (PDF)
-          </a>
-        </DownloadButtonContainer>
-        <section>
-          <AccessibleHeading>Report content</AccessibleHeading>
-          {htmlBody ? (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: htmlBody,
-              }}
-            ></div>
-          ) : (
-            <ReportNotAvailable />
-          )}
-        </section>
-      </ReportBody>
-    </Page>
+    <>
+      {showPkpr ? (
+        <></>
+      ) : (
+        <Head>
+          <meta name="robots" content="noindex, no follow"></meta>
+        </Head>
+      )}
+      <Page
+        title={reportName}
+        metaTitle={reportName}
+        storageAllowed={storageAllowed}
+        setStorageAllowed={setStorageAllowed}
+      >
+        <ReportBody>
+          <DownloadButtonContainer>
+            <AccessibleHeading>
+              Download PDF version of report
+            </AccessibleHeading>
+            <a href={encodeURI(pdfUrl)} download={reportName}>
+              Download report (PDF)
+            </a>
+          </DownloadButtonContainer>
+          <section>
+            <AccessibleHeading>Report content</AccessibleHeading>
+            {htmlBody ? (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: htmlBody,
+                }}
+              ></div>
+            ) : (
+              <ReportNotAvailable />
+            )}
+          </section>
+        </ReportBody>
+      </Page>
+    </>
   );
 };
 
