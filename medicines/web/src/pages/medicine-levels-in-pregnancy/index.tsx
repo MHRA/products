@@ -29,7 +29,12 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <Page
+      title="Medicine levels in pregnancy"
+      metaTitle="Medicine levels in pregnancy"
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       {showPkpr ? (
         <></>
       ) : (
@@ -37,19 +42,12 @@ const App: React.FC = () => {
           <meta name="robots" content="noindex, no follow" />
         </Head>
       )}
-      <Page
-        title="Medicine levels in pregnancy"
-        metaTitle="Medicine levels in pregnancy"
-        storageAllowed={storageAllowed}
-        setStorageAllowed={setStorageAllowed}
-      >
-        <SearchWrapper initialSearchValue="">
-          <StyledHomeTextWrapper>
-            <MedicineLevelsInPregnancyHomeText />
-          </StyledHomeTextWrapper>
-        </SearchWrapper>
-      </Page>
-    </>
+      <SearchWrapper initialSearchValue="">
+        <StyledHomeTextWrapper>
+          <MedicineLevelsInPregnancyHomeText />
+        </StyledHomeTextWrapper>
+      </SearchWrapper>
+    </Page>
   );
 };
 

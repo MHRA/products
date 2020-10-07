@@ -14,7 +14,6 @@ import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnanc
 
 const pageSize = 10;
 const searchPath = '/medicine-levels-in-pregnancy/search';
-
 const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = (props) => {
@@ -89,7 +88,12 @@ const App: NextPage = (props) => {
   };
 
   return (
-    <>
+    <Page
+      title="Medicine levels in pregnancy"
+      metaTitle="Medicine levels in pregnancy | Search results"
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       {showPkpr ? (
         <></>
       ) : (
@@ -97,27 +101,20 @@ const App: NextPage = (props) => {
           <meta name="robots" content="noindex, no follow" />
         </Head>
       )}
-      <Page
-        title="Medicine levels in pregnancy"
-        metaTitle="Medicine levels in pregnancy | Search results"
-        storageAllowed={storageAllowed}
-        setStorageAllowed={setStorageAllowed}
-      >
-        <SearchWrapper initialSearchValue={query}>
-          <SearchResults
-            reports={reports}
-            showingResultsForTerm={query}
-            resultCount={count}
-            page={pageNumber}
-            pageSize={pageSize}
-            searchTerm={query}
-            handlePageChange={handlePageChange}
-            isLoading={isLoading}
-            errorFetchingResults={errorFetchingResults}
-          />
-        </SearchWrapper>
-      </Page>
-    </>
+      <SearchWrapper initialSearchValue={query}>
+        <SearchResults
+          reports={reports}
+          showingResultsForTerm={query}
+          resultCount={count}
+          page={pageNumber}
+          pageSize={pageSize}
+          searchTerm={query}
+          handlePageChange={handlePageChange}
+          isLoading={isLoading}
+          errorFetchingResults={errorFetchingResults}
+        />
+      </SearchWrapper>
+    </Page>
   );
 };
 

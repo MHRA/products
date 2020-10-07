@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -14,6 +15,7 @@ import { parsePage } from '../../../services/querystring-interpreter';
 
 const pageSize = 10;
 const substancePath = '/medicine-levels-in-pregnancy/substance';
+const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -94,6 +96,13 @@ const App: NextPage = () => {
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
+      {showPkpr ? (
+        <></>
+      ) : (
+        <Head>
+          <meta name="robots" content="noindex, no follow" />
+        </Head>
+      )}
       <SearchWrapper initialSearchValue="">
         <SearchResults
           reports={reports}

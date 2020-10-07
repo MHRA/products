@@ -58,6 +58,8 @@ interface IPageProps {
   setStorageAllowed: any;
 }
 
+const IS_PRODUCTION = process.env.ENV === 'production';
+
 const App: React.FC<IPageProps> = (props) => {
   useEffect(() => {
     if (props.storageAllowed) {
@@ -69,6 +71,11 @@ const App: React.FC<IPageProps> = (props) => {
     <>
       <Head>
         <title>MHRA {props.metaTitle}</title>
+        {IS_PRODUCTION ? (
+          <></>
+        ) : (
+          <meta name="robots" content="noindex, no follow" />
+        )}
       </Head>
       <WithStyles>
         <Normalize />

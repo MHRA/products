@@ -75,44 +75,40 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
   );
 
   return (
-    <>
+    <Page
+      title={reportName}
+      metaTitle={reportName}
+      storageAllowed={storageAllowed}
+      setStorageAllowed={setStorageAllowed}
+    >
       {showPkpr ? (
         <></>
       ) : (
         <Head>
-          <meta name="robots" content="noindex, no follow"></meta>
+          <meta name="robots" content="noindex, no follow" />
         </Head>
       )}
-      <Page
-        title={reportName}
-        metaTitle={reportName}
-        storageAllowed={storageAllowed}
-        setStorageAllowed={setStorageAllowed}
-      >
-        <ReportBody>
-          <DownloadButtonContainer>
-            <AccessibleHeading>
-              Download PDF version of report
-            </AccessibleHeading>
-            <a href={encodeURI(pdfUrl)} download={reportName}>
-              Download report (PDF)
-            </a>
-          </DownloadButtonContainer>
-          <section>
-            <AccessibleHeading>Report content</AccessibleHeading>
-            {htmlBody ? (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: htmlBody,
-                }}
-              ></div>
-            ) : (
-              <ReportNotAvailable />
-            )}
-          </section>
-        </ReportBody>
-      </Page>
-    </>
+      <ReportBody>
+        <DownloadButtonContainer>
+          <AccessibleHeading>Download PDF version of report</AccessibleHeading>
+          <a href={encodeURI(pdfUrl)} download={reportName}>
+            Download report (PDF)
+          </a>
+        </DownloadButtonContainer>
+        <section>
+          <AccessibleHeading>Report content</AccessibleHeading>
+          {htmlBody ? (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: htmlBody,
+              }}
+            ></div>
+          ) : (
+            <ReportNotAvailable />
+          )}
+        </section>
+      </ReportBody>
+    </Page>
   );
 };
 
@@ -160,7 +156,9 @@ export const getStaticPaths = async () => {
       `/medicine-levels-in-pregnancy/reports/${reportFilePath.split('/')[0]}`,
   );
 
-  fs.writeFile('./reports.json', JSON.stringify(htmlFilePaths), (e) => {});
+  fs.writeFile('./reports.json', JSON.stringify(htmlFilePaths), (e) => {
+    console.log(`Error writing report to disk: ${e}`);
+  });
 
   return {
     paths: staticPageNames,
