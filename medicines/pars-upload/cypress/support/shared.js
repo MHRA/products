@@ -222,7 +222,6 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
 
   cy.findByText('Add another active substance').click()
   cy.findAllByLabelText('Active substance(s)')
-    .should('have.length', 2)
     .last()
     .type(uploadData.substances[1])
 
