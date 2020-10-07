@@ -83,6 +83,12 @@ export const Products = ({
     }
   }
 
+  const onAddAnotherSubstance = (event) => {
+    event.preventDefault()
+    setSubstanceIds((ids) => [...ids, getNextId()])
+    onAddAnotherSubstance
+  }
+
   const goToPage = (newPageIndex) => {
     savePageState(getFormData())
 
@@ -156,14 +162,7 @@ export const Products = ({
             />
           </FormGroup>
         ))}
-        <Button
-          secondary
-          type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            setSubstanceIds((ids) => [...ids, getNextId()])
-          }}
-        >
+        <Button secondary type="button" onClick={onAddAnotherSubstance}>
           Add another active substance
         </Button>
         <LicenceNumber
@@ -173,7 +172,7 @@ export const Products = ({
         <Button secondary type="button" onClick={onAddAnotherProduct}>
           Add another product
         </Button>{' '}
-        <Button>Continue</Button>
+        <Button type="submit">Continue</Button>
       </form>
     </Layout>
   )
@@ -207,6 +206,7 @@ const PreviousProductsSummary = ({
             </dt>
             <dd className="govuk-summary-list__actions">
               <ButtonWithLinkStyles
+                type="button"
                 style={
                   showRemoveButton
                     ? {
