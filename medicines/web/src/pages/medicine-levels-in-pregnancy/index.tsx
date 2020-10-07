@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Head from 'next/head';
 import styled from 'styled-components';
 
 import MedicineLevelsInPregnancyHomeText from '../../components/bmgf/home-text';
