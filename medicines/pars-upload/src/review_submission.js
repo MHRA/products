@@ -72,7 +72,8 @@ export const ReviewSubmission = ({
 
       <Button
         type="button"
-        onClick={() => {
+        onClick={(event) => {
+          event.preventDefault()
           submit(null)
         }}
       >
