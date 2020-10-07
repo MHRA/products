@@ -19,7 +19,8 @@ export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
     submit(formData)
   }
 
-  const onContinue = () => {
+  const onContinue = (event) => {
+    event.preventDefault()
     submit(currentStepData)
   }
 
@@ -66,7 +67,7 @@ export const UploadPdf = ({ currentStepData, goBack, submit, flowName }) => {
             onInput={checkFileType}
           />
         </FormGroup>
-        <Button>Continue</Button>
+        <Button type="submit">Continue</Button>
       </form>
     </Layout>
   )
