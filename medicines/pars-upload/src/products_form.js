@@ -86,7 +86,6 @@ export const Products = ({
   const onAddAnotherSubstance = (event) => {
     event.preventDefault()
     setSubstanceIds((ids) => [...ids, getNextId()])
-    onAddAnotherSubstance
   }
 
   const goToPage = (newPageIndex) => {
