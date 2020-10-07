@@ -220,12 +220,11 @@ export const completeUploadForm = (uploadData, expectedTitle) => {
 
   cy.findByLabelText('Active substance(s)').type(uploadData.substances[0])
 
-  for (let i = 1; i < uploadData.substances.length; i++) {
-    cy.findByText('Add another active substance').click()
-    cy.findAllByLabelText('Active substance(s)')
-      .last()
-      .type(uploadData.substances[i])
-  }
+  cy.findByText('Add another active substance').click()
+  cy.findAllByLabelText('Active substance(s)')
+    .should('have.length', 2)
+    .last()
+    .type(uploadData.substances[1])
 
   cy.findByText('Licence number')
     .parent()
