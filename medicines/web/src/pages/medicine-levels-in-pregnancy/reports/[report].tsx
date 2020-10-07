@@ -2,7 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 
 import { useLocalStorage } from '../../../hooks';
 import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
@@ -66,8 +66,6 @@ const ReportNotAvailable = () => (
   <div>Sorry - this report is currently unavailable.</div>
 );
 
-const showPkpr = process.env.SHOW_BMGF === 'true';
-
 const Report = ({ reportName, htmlBody, pdfUrl }) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -75,19 +73,12 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
   );
 
   return (
-    <Page
+    <BmgfPage
       title={reportName}
       metaTitle={reportName}
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      {showPkpr ? (
-        <></>
-      ) : (
-        <Head>
-          <meta name="robots" content="noindex, no follow" />
-        </Head>
-      )}
       <ReportBody>
         <DownloadButtonContainer>
           <AccessibleHeading>Download PDF version of report</AccessibleHeading>
@@ -108,7 +99,7 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
           )}
         </section>
       </ReportBody>
-    </Page>
+    </BmgfPage>
   );
 };
 

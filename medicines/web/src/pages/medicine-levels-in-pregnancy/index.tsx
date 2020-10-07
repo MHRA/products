@@ -3,7 +3,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 
 import MedicineLevelsInPregnancyHomeText from '../../components/bmgf/home-text';
-import Page from '../../components/page';
+import { BmgfPage } from '../../components/page';
 import SearchWrapper from '../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import Events from '../../services/events';
@@ -16,8 +16,6 @@ const StyledHomeTextWrapper = styled.div`
   }
 `;
 
-const showPkpr = process.env.SHOW_BMGF === 'true';
-
 const App: React.FC = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
     'allowStorage',
@@ -29,25 +27,18 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      {showPkpr ? (
-        <></>
-      ) : (
-        <Head>
-          <meta name="robots" content="noindex, no follow" />
-        </Head>
-      )}
       <SearchWrapper initialSearchValue="">
         <StyledHomeTextWrapper>
           <MedicineLevelsInPregnancyHomeText />
         </StyledHomeTextWrapper>
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

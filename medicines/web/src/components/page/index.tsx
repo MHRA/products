@@ -59,6 +59,7 @@ interface IPageProps {
 }
 
 const IS_PRODUCTION = process.env.ENV === 'production';
+const SHOW_BMGF = process.env.SHOW_BMGF === 'true';
 
 const App: React.FC<IPageProps> = (props) => {
   useEffect(() => {
@@ -90,5 +91,14 @@ const App: React.FC<IPageProps> = (props) => {
     </>
   );
 };
+
+export const BmgfPage: React.FC<IPageProps> = (props) => (
+  <>
+    <Head>
+      {SHOW_BMGF ? <></> : <meta name="robots" content="noindex, no follow" />}
+    </Head>
+    <App {...props} />
+  </>
+);
 
 export default App;

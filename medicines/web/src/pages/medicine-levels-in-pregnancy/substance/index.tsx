@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { DrugStructuredData } from '../../../components/structured-data';
@@ -15,7 +15,6 @@ import { parsePage } from '../../../services/querystring-interpreter';
 
 const pageSize = 10;
 const substancePath = '/medicine-levels-in-pregnancy/substance';
-const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -90,19 +89,12 @@ const App: NextPage = () => {
   };
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Substance results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      {showPkpr ? (
-        <></>
-      ) : (
-        <Head>
-          <meta name="robots" content="noindex, no follow" />
-        </Head>
-      )}
       <SearchWrapper initialSearchValue="">
         <SearchResults
           reports={reports}
@@ -117,7 +109,7 @@ const App: NextPage = () => {
         />
         <DrugStructuredData drugName={substanceName} />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

@@ -6,15 +6,13 @@ import React, { useEffect } from 'react';
 import DrugIndex, {
   IndexType,
 } from '../../../components/bmgf/drug-index/index';
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { SubstanceListStructuredData } from '../../../components/structured-data';
 import { useLocalStorage } from '../../../hooks';
 import { IFacet } from '../../../model/facet';
 import Events from '../../../services/events';
 import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnancy/substances-index-loader';
-
-const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = () => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -63,19 +61,12 @@ const App: NextPage = () => {
   }, []);
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Substance index"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      {showPkpr ? (
-        <></>
-      ) : (
-        <Head>
-          <meta name="robots" content="noindex, no follow" />
-        </Head>
-      )}
       <SearchWrapper initialSearchValue="">
         <DrugIndex
           title={`${substanceIndex || '...'}`}
@@ -88,7 +79,7 @@ const App: NextPage = () => {
           substanceNames={results.map((substance) => substance.name)}
         />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

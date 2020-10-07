@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../../hooks';
@@ -14,7 +14,6 @@ import { getLoader } from '../../../services/loaders/medicine-levels-in-pregnanc
 
 const pageSize = 10;
 const searchPath = '/medicine-levels-in-pregnancy/search';
-const showPkpr = process.env.SHOW_BMGF === 'true';
 
 const App: NextPage = (props) => {
   const [storageAllowed, setStorageAllowed] = useLocalStorage(
@@ -88,19 +87,12 @@ const App: NextPage = (props) => {
   };
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Search results"
       storageAllowed={storageAllowed}
       setStorageAllowed={setStorageAllowed}
     >
-      {showPkpr ? (
-        <></>
-      ) : (
-        <Head>
-          <meta name="robots" content="noindex, no follow" />
-        </Head>
-      )}
       <SearchWrapper initialSearchValue={query}>
         <SearchResults
           reports={reports}
@@ -114,7 +106,7 @@ const App: NextPage = (props) => {
           errorFetchingResults={errorFetchingResults}
         />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 
