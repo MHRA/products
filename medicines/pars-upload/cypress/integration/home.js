@@ -8,8 +8,6 @@ setUp()
 
 describe('Home page', () => {
   it('can get to the upload new form page', () => {
-    cy.server()
-
     cy.visit('/')
 
     cy.findAllByText('What are you doing today?').should('exist')
@@ -23,8 +21,6 @@ describe('Home page', () => {
       .should('have.length', 1)
   }),
     it('can get to the update PAR form page', () => {
-      cy.server()
-
       cy.visit('/')
 
       cy.findAllByText('What are you doing today?').should('exist')
