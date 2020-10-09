@@ -48,7 +48,7 @@ const Index = () => {
           onChange={onChange}
         />
 
-        <Button>Continue</Button>
+        <Button type="submit">Continue</Button>
       </form>
     </Layout>
   )
