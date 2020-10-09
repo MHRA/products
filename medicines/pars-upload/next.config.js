@@ -5,7 +5,7 @@ const withCSS = require('@zeit/next-css')
 // As suggested: https://dev.to/harveyjones282/the-simplest-way-to-configure-next-js-with-sass-3en
 module.exports = withCSS(
   withSass({
-    webpack(config, options) {
+    webpack(config) {
       config.module.rules.push({
         test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
         use: {
