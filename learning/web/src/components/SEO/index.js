@@ -3,6 +3,8 @@ import PropTypes from "prop-types"
 import Helmet from "react-helmet"
 import { useStaticQuery, graphql } from "gatsby"
 
+const IS_PRODUCTION = process.env.ENV === "production"
+
 function SEO({ description, lang, meta, title }) {
   const { site } = useStaticQuery(
     graphql`
@@ -20,6 +22,10 @@ function SEO({ description, lang, meta, title }) {
 
   const metaDescription = description || site.siteMetadata.description
   const metaAuthor = site.siteMetadata.author
+
+  if (!IS_PRODUCTION) {
+    meta.push({ name: "robots", content: "noindex, no follow" })
+  }
 
   return (
     <Helmet

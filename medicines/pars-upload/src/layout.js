@@ -4,6 +4,7 @@ export const Layout = ({ title, intro = null, children }) => (
   <div className="govuk-width-container">
     <Head>
       <title>{title}</title>
+      <meta name="robots" content="noindex, no follow" />
     </Head>
 
     {intro}

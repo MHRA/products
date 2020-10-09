@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { DrugStructuredData } from '../../../components/structured-data';
@@ -88,7 +88,7 @@ const App: NextPage = () => {
   };
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Substance results"
       storageAllowed={storageAllowed}
@@ -108,7 +108,7 @@ const App: NextPage = () => {
         />
         <DrugStructuredData drugName={substanceName} />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

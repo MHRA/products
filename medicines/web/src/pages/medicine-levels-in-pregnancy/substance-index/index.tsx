@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import DrugIndex, {
   IndexType,
 } from '../../../components/bmgf/drug-index/index';
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { SubstanceListStructuredData } from '../../../components/structured-data';
 import { useLocalStorage } from '../../../hooks';
@@ -60,7 +60,7 @@ const App: NextPage = () => {
   }, []);
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Substance index"
       storageAllowed={storageAllowed}
@@ -78,7 +78,7 @@ const App: NextPage = () => {
           substanceNames={results.map((substance) => substance.name)}
         />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

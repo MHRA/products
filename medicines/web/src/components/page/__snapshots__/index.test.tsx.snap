@@ -7,6 +7,10 @@ exports[`App should render 1`] = `
       MHRA 
       MHRA meta title
     </title>
+    <meta
+      content="noindex, no follow"
+      name="robots"
+    />
   </Head>
   <styled.div>
     <Memo(l) />

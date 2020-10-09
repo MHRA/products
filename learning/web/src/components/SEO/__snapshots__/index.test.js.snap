@@ -31,6 +31,10 @@ exports[`SEO should render 1`] = `
         "content": "website",
         "property": "og:type",
       },
+      Object {
+        "content": "noindex, no follow",
+        "name": "robots",
+      },
     ]
   }
   title="😀"

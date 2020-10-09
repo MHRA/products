@@ -19,8 +19,21 @@ const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
 describe('Update PARs', () => {
+  beforeEach(() => {
+    cy.visit('/')
+
+    cy.findAllByText('What are you doing today?').should('exist')
+
+    cy.findByText('Update an existing document').click()
+
+    cy.findByText('Continue').click()
+
+    cy.findAllByText('Search for an existing Public Assessment Report')
+      .not('title')
+      .should('have.length', 1)
+  })
+
   it('can add and delete multiple substances', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -36,7 +49,6 @@ describe('Update PARs', () => {
   })
 
   it('can add and delete multiple products', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -52,7 +64,6 @@ describe('Update PARs', () => {
   })
 
   it('duplicate licence numbers are not allowed', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -66,7 +77,6 @@ describe('Update PARs', () => {
     addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
   })
   it('upload field only accepts PDFs', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -90,7 +100,6 @@ describe('Update PARs', () => {
     })
   })
   it('review page shows the correct information', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -173,7 +182,6 @@ describe('Update PARs', () => {
     )
   })
   it('shows the uploaded file when going back to upload file page', () => {
-    cy.visit('/update-par')
     completeFindParToUpdateStep('https://blob.net/docs/aso1901290udkldf901')
 
     let uploadData = {
@@ -218,8 +226,6 @@ describe('Update PARs', () => {
 
       mockSuccessfulSubmission(baseUrl, `${parsUrl}/${parToUpdateId}`)
     }
-
-    cy.visit('/update-par')
 
     completeFindParToUpdateStep(`https://blob.net/docs/${parToUpdateId}`)
 

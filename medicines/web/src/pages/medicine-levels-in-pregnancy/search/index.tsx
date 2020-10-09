@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 import SearchResults from '../../../components/bmgf/search-results';
 import SearchWrapper from '../../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../../hooks';
@@ -86,7 +86,7 @@ const App: NextPage = (props) => {
   };
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy | Search results"
       storageAllowed={storageAllowed}
@@ -105,7 +105,7 @@ const App: NextPage = (props) => {
           errorFetchingResults={errorFetchingResults}
         />
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

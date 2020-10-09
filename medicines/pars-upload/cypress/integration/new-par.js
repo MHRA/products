@@ -18,9 +18,21 @@ const parsUrl = Cypress.env('PARS_UPLOAD_URL')
 const baseUrl = Cypress.config().baseUrl
 
 describe('New PARs upload', () => {
-  it('can add and delete multiple substances', () => {
-    cy.visit('/new-par')
+  beforeEach(() => {
+    cy.visit('/')
 
+    cy.findAllByText('What are you doing today?').should('exist')
+
+    cy.findByText('Upload a new document').click()
+
+    cy.findByText('Continue').click()
+
+    cy.findAllByText('New Public Assessment Report')
+      .not('title')
+      .should('have.length', 1)
+  })
+
+  it('can add and delete multiple substances', () => {
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -34,8 +46,6 @@ describe('New PARs upload', () => {
   })
 
   it('can add and delete multiple products', () => {
-    cy.visit('/new-par')
-
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -48,8 +58,6 @@ describe('New PARs upload', () => {
     addAndDeleteProducts(uploadData, uploadPageTitle)
   })
   it('upload field only accepts PDFs', () => {
-    cy.visit('/new-par')
-
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -71,8 +79,6 @@ describe('New PARs upload', () => {
     })
   })
   it('duplicate licence numbers are not allowed', () => {
-    cy.visit('/new-par')
-
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -84,7 +90,6 @@ describe('New PARs upload', () => {
     addDuplicateLicenceNumbers(uploadData, uploadPageTitle)
   })
   it('review page shows the correct information', () => {
-    cy.visit('/new-par')
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -165,7 +170,6 @@ describe('New PARs upload', () => {
     )
   })
   it('shows the uploaded file when going back to upload file page', () => {
-    cy.visit('/new-par')
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -206,8 +210,6 @@ describe('New PARs upload', () => {
 
       mockSuccessfulSubmission(baseUrl, parsUrl)
     }
-
-    cy.visit('/new-par')
 
     let uploadData = {
       brand: 'Ibuprofen pills',

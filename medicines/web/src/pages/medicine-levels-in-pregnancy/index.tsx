@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import MedicineLevelsInPregnancyHomeText from '../../components/bmgf/home-text';
-import Page from '../../components/page';
+import { BmgfPage } from '../../components/page';
 import SearchWrapper from '../../components/bmgf/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import Events from '../../services/events';
@@ -26,7 +26,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Page
+    <BmgfPage
       title="Medicine levels in pregnancy"
       metaTitle="Medicine levels in pregnancy"
       storageAllowed={storageAllowed}
@@ -37,7 +37,7 @@ const App: React.FC = () => {
           <MedicineLevelsInPregnancyHomeText />
         </StyledHomeTextWrapper>
       </SearchWrapper>
-    </Page>
+    </BmgfPage>
   );
 };
 

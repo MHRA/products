@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Page from '../../../components/page';
+import { BmgfPage } from '../../../components/page';
 
 import { useLocalStorage } from '../../../hooks';
 import { mhraWhite, primaryColor, mhra70, mhra } from '../../../styles/colors';
@@ -72,7 +72,7 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
   );
 
   return (
-    <Page
+    <BmgfPage
       title={reportName}
       metaTitle={reportName}
       storageAllowed={storageAllowed}
@@ -98,7 +98,7 @@ const Report = ({ reportName, htmlBody, pdfUrl }) => {
           )}
         </section>
       </ReportBody>
-    </Page>
+    </BmgfPage>
   );
 };
 
@@ -146,7 +146,9 @@ export const getStaticPaths = async () => {
       `/medicine-levels-in-pregnancy/reports/${reportFilePath.split('/')[0]}`,
   );
 
-  fs.writeFile('./reports.json', JSON.stringify(htmlFilePaths), (e) => {});
+  fs.writeFile('./reports.json', JSON.stringify(htmlFilePaths), (e) => {
+    console.log(`Error writing report to disk: ${e}`);
+  });
 
   return {
     paths: staticPageNames,
