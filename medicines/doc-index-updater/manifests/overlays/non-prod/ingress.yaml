@@ -1,0 +1,29 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: doc-index-updater
+  namespace: doc-index-updater
+spec:
+  hosts:
+    - doc-index-updater.non-prod.mhra.gov.uk
+    - doc-index-updater.test.mhra.gov.uk
+  gateways:
+    - istio-system/doc-index-updater-ingressgateway
+  http:
+    - route:
+        - destination:
+            port:
+              number: 80
+            host: doc-index-updater
+      corsPolicy:
+        allowOrigins:
+          - prefix: https://mhraparsnonprod.azureedge.net
+          - prefix: https://mhraparsnonprod.z33.web.core.windows.net
+          - prefix: http://localhost:3000
+        allowMethods:
+          - POST
+        allowCredentials: false
+        allowHeaders:
+          - Authorization
+          - username
+        maxAge: "24h"

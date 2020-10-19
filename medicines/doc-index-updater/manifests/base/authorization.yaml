@@ -1,0 +1,31 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: doc-index-updater
+  namespace: doc-index-updater
+spec:
+  selector:
+    matchLabels:
+      app: doc-index-updater
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            notPaths:
+              - "/pars"
+              - "/pars/*"
+    - to:
+        - operation:
+            paths:
+              - "/pars"
+              - "/pars/*"
+            methods: ["OPTIONS"]
+    - to:
+        - operation:
+            paths:
+              - "/pars"
+              - "/pars/*"
+      from:
+        - source:
+            requestPrincipals:
+              - "*"
