@@ -69,7 +69,8 @@ jobs:
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
-            git diff-index --quiet HEAD || git commit -am "CI: Update image for $TAG"
+            git add --all
+            git diff-index --quiet HEAD || git commit -m "CI: Update image for $TAG"
             declare -i n
             n=0
             until [ $n -ge 5 ]
