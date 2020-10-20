@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-index-updater
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doc-index-updater
+  template:
+    metadata:
+      labels:
+        app: doc-index-updater
+    spec:
+      serviceAccountName: doc-index-updater
+      containers:
+        - name: doc-index-updater
+          image: doc-index-updater
+          volumeMounts:
+            - name: sftp-keys
+              mountPath: "/etc/.ssh"
+              readOnly: true
+          env:
+            - name: REDIS_SERVER
+              value: doc-index-updater-dev.redis.cache.windows.net
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: redis-creds
+                  key: key
+            - name: AZURE_SEARCH_INDEX
+              value: products-index
+            - name: AZURE_API_ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: search-creds
+                  key: api_key
+            - name: AZURE_SEARCH_API_VERSION
+              value: "2019-05-06"
+            - name: SEARCH_SERVICE
+              value: mhraproductsdevelopment
+            - name: AZURE_SEARCH_WORD_FUZZINESS
+              value: "0"
+            - name: AZURE_SEARCH_EXACTNESS_BOOST
+              value: "4"
+            - name: SENTINEL_SFTP_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-creds
+                  key: server
+            - name: SENTINEL_SFTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-creds
+                  key: user
+            - name: SENTINEL_PRIVATE_KEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-creds
+                  key: private_key_password
+            - name: SENTINEL_PUBLIC_KEY_PATH
+              value: /etc/.ssh/id_rsa.pub
+            - name: SENTINEL_PRIVATE_KEY_PATH
+              value: /etc/.ssh/id_rsa
+            - name: SERVICE_BUS_NAMESPACE
+              value: doc-index-updater-dev
+            - name: CREATE_QUEUE_NAME
+              value: doc-index-updater-create-queue
+            - name: CREATE_QUEUE_POLICY_NAME
+              value: doc-index-updater-create-auth
+            - name: CREATE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-bus-creds
+                  key: create_key
+            - name: DELETE_QUEUE_NAME
+              value: doc-index-updater-delete-queue
+            - name: DELETE_QUEUE_POLICY_NAME
+              value: doc-index-updater-delete-auth
+            - name: DELETE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-bus-creds
+                  key: delete_key
+            - name: STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: storage-creds
+                  key: account
+            - name: CREATE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-bus-creds
+                  key: create_key
+            - name: DELETE_QUEUE_POLICY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: service-bus-creds
+                  key: delete_key
+            - name: STORAGE_CONTAINER
+              valueFrom:
+                secretKeyRef:
+                  name: storage-creds
+                  key: container
+            - name: STORAGE_CONTAINER_TEMPORARY
+              valueFrom:
+                secretKeyRef:
+                  name: storage-creds
+                  key: container_temporary
+            - name: STORAGE_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: storage-creds
+                  key: key
+            - name: BASIC_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: basic-auth-creds
+                  key: username
+            - name: BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: basic-auth-creds
+                  key: password
+            - name: LOG_STORAGE_CONTAINER
+              valueFrom:
+                secretKeyRef:
+                  name: logs-storage-creds
+                  key: container
+            - name: LOG_STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: logs-storage-creds
+                  key: account
+            - name: LOG_STORAGE_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: logs-storage-creds
+                  key: key
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 30
+      volumes:
+        - name: sftp-keys
+          secret:
+            secretName: sentinel-creds
+            items:
+              - key: public_key
+                path: id_rsa.pub
+              - key: private_key
+                path: id_rsa

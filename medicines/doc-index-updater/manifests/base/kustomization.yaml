@@ -1,0 +1,10 @@
+namespace: doc-index-updater
+
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - authentication.yaml
+  - authorization.yaml
