@@ -1,0 +1,12 @@
+apiVersion: azure.microsoft.com/v1alpha1
+kind: StorageAccount
+metadata:
+  name: mhramedicinesnonprod
+spec:
+  location: uksouth
+  resourceGroup: adazr-rg-1001
+  sku:
+    name: Standard_RAGRS
+  kind: StorageV2
+  accessTier: Hot
+  supportsHttpsTrafficOnly: true

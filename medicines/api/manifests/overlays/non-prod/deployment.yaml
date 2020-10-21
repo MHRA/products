@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medicines-api
+  namespace: medicines-api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/proxyCPU: 50m
+    spec:
+      containers:
+        - name: medicines-api
+          image: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
+          env:
+            - name: SEARCH_SERVICE
+              value: mhraproductsnonprod
+            - name: RUST_LOG
+              value: api=debug,info
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
