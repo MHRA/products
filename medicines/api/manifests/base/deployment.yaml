@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medicines-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medicines-api
+  template:
+    metadata:
+      labels:
+        app: medicines-api
+    spec:
+      serviceAccountName: medicines-api
+      containers:
+        - name: medicines-api
+          image: medicines-api
+          env:
+            - name: PORT
+              value: "8000"
+            - name: AZURE_SEARCH_INDEX
+              value: products-index
+            - name: AZURE_API_ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: search-creds
+                  key: api_key
+            - name: SEARCH_SERVICE
+              value: mhraproductsnonprod
+            - name: AZURE_SEARCH_API_VERSION
+              value: "2017-11-11"
+            - name: AZURE_SEARCH_WORD_FUZZINESS
+              value: "1"
+            - name: AZURE_SEARCH_EXACTNESS_BOOST
+              value: "4"
+            - name: BMGF_AZURE_SEARCH_INDEX
+              value: "bmgf-index"
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 30

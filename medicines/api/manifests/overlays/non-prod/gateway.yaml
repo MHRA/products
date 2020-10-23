@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: medicines-api-ingressgateway
+  namespace: istio-system
+spec:
+  servers:
+    - port:
+        number: 443
+        name: https-443-medicines-api
+        protocol: HTTPS
+      hosts:
+        - medicines-api.non-prod.mhra.gov.uk
+      tls:
+        mode: SIMPLE
+        credentialName: cert-medicines-api
