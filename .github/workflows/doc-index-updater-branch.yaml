@@ -17,11 +17,10 @@ jobs:
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
+    container: ubuntu-latest
     services:
       redis:
         image: redis
-        ports:
-          - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
@@ -73,8 +72,8 @@ jobs:
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo ::set-env name=TAG::$TAG
-          echo ::set-env name=DIGEST::$DIGEST
+          echo "TAG=$TAG" >>$GITHUB_ENV
+          echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
