@@ -56,6 +56,7 @@ jobs:
         working-directory: products/medicines/doc-index-updater
         run: |
           set -e
+          set -a && source .env.base && set +a
           cargo clippy --release -- -D warnings
           cargo build --release
           cargo test --release
