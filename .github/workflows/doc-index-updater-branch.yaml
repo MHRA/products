@@ -5,6 +5,7 @@ on:
     branches:
       - "master"
     paths:
+      - rust-toolchain
       - medicines/doc-index-updater/**
       - medicines/search-client/**
       - .github/workflows/doc-index-updater-branch.yaml
@@ -29,6 +30,9 @@ jobs:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.DEVELOPMENT_REGISTRY_PASSWORD }}
+
+      - name: Make toolchain version available in current directory
+        run: cp products/rust-toolchain .
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -80,7 +84,7 @@ jobs:
             kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
-            
+
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
