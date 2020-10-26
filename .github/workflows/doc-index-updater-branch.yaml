@@ -42,6 +42,9 @@ jobs:
       - name: Make toolchain version available in current directory
         run: cp products/rust-toolchain .
 
+      - name: curl
+        uses: wei/curl@master
+
       - uses: actions-rs/toolchain@v1
         with:
           components: clippy
