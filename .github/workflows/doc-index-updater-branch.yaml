@@ -17,7 +17,16 @@ jobs:
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
-
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Clone Repo
         uses: actions/checkout@v2
@@ -49,6 +58,9 @@ jobs:
 
       - name: Build and test doc-index-updater service
         working-directory: products/medicines/doc-index-updater
+        env:
+          REDIS_SERVER: redis
+          REDIS_PORT: 6379
         run: |
           set -e
           cargo clippy --release -- -D warnings
