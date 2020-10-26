@@ -30,14 +30,29 @@ jobs:
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.DEVELOPMENT_REGISTRY_PASSWORD }}
 
-      - name: Set .env.build
-        working-directory: ./products/medicines/doc-index-updater
-        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
-        env:
-          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: clippy
 
-      - name: Build, test and push Docker image
-        working-directory: ./products/medicines/doc-index-updater
+      - name: Cache cargo
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            products/medicines/doc-index-updater/target
+          key: cargo-${{ hashFiles('products/medicines/doc-index-updater/Cargo.lock') }}-1
+
+      - name: Build and test doc-index-updater service
+        working-directory: products/medicines/doc-index-updater
+        run: |
+          set -e
+          cargo clippy --release -- -D warnings
+          cargo build --release
+          cargo test --release
+
+      - name: Build and push Docker image
+        working-directory: products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG image=$IMAGE
