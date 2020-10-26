@@ -67,8 +67,6 @@ ci-master: ci-branch docker-push ## Build master in CI
 
 .PHONY: docker-build
 docker-build: ## Build and tag Docker image (with search-client create as dependency)
-	set -euo pipefail && \
-	export $$(cat .env.build 2> /dev/null | xargs) && \
 	tar cv Dockerfile ./target/release/doc_index_updater | \
 		DOCKER_BUILDKIT=1 docker build - \
 			--progress plain \
