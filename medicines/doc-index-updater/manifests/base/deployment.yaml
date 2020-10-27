@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: doc-index-updater
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: doc-index-updater
