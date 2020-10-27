@@ -24,22 +24,35 @@ jobs:
         with:
           path: products
 
+      - uses: dorny/paths-filter@v2.2.1
+        id: filter
+        with:
+          filters: |
+            src:
+              - rust-toolchain
+              - medicines/doc-index-updater/**
+              - medicines/search-client/**
+
       - name: Docker login
         uses: azure/docker-login@v1
+        if: steps.filter.outputs.src == "true"
         with:
           login-server: mhraproductsdevelopmentregistry.azurecr.io
           username: mhraproductsdevelopmentregistry
           password: ${{ secrets.DEVELOPMENT_REGISTRY_PASSWORD }}
 
       - name: Make toolchain version available in current directory
+        if: steps.filter.outputs.src == "true"
         run: cp products/rust-toolchain .
 
       - uses: actions-rs/toolchain@v1
+        if: steps.filter.outputs.src == "true"
         with:
           components: clippy
 
       - name: Cache cargo
         uses: actions/cache@v2
+        if: steps.filter.outputs.src == "true"
         with:
           path: |
             ~/.cargo/registry
@@ -49,10 +62,12 @@ jobs:
 
       - name: Install redis
         uses: shogo82148/actions-setup-redis@v1
+        if: steps.filter.outputs.src == "true"
         with:
           auto-start: "false"
 
       - name: Build and test doc-index-updater service
+        if: steps.filter.outputs.src == "true"
         working-directory: products/medicines/doc-index-updater
         run: |
           set -e
@@ -62,6 +77,7 @@ jobs:
           cargo test --release
 
       - name: Build and push Docker image
+        if: steps.filter.outputs.src == "true"
         working-directory: products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
@@ -87,7 +103,7 @@ jobs:
             DEST="${PWD}/deployments/doc-index-updater/dev"
 
             cd $SOURCE 
-            kustomize edit set image $DIGEST
+            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
 
