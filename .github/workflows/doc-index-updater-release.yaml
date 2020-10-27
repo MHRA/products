@@ -32,8 +32,8 @@ jobs:
         run: |
           TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
           make docker-pull image=$NONPROD_IMAGE tag=$TAG
-          echo ::set-env name=TAG::$TAG
-
+          echo "TAG=$TAG" >>$GITHUB_ENV
+          
       - name: Docker login to prod
         uses: azure/docker-login@v1
         with:
@@ -47,7 +47,7 @@ jobs:
           make docker-retag image=$NONPROD_IMAGE new_image=$PROD_IMAGE tag=$TAG
           make docker-push image=$PROD_IMAGE tag=$TAG
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${PROD_IMAGE}:${TAG})"
-          echo ::set-env name=DIGEST::$DIGEST
+          echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Create Release
         id: create_release
