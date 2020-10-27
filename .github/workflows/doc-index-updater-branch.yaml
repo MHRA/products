@@ -98,7 +98,7 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -eux
+            set -ex
             SOURCE="${PWD}/products/medicines/doc-index-updater/manifests/overlays/dev"
             DEST="${PWD}/deployments/doc-index-updater/dev"
 
