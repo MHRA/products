@@ -8,6 +8,7 @@ on:
       - rust-toolchain
       - medicines/doc-index-updater/**
       - medicines/search-client/**
+      - manifests/doc-index-updater/**
       - .github/workflows/doc-index-updater-branch.yaml
 
 env:
@@ -99,7 +100,7 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -ex
-            SOURCE="${PWD}/products/medicines/doc-index-updater/manifests/overlays/dev"
+            SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/dev"
             DEST="${PWD}/deployments/doc-index-updater/dev"
 
             cd $SOURCE 
