@@ -12,7 +12,7 @@ on:
       - .github/workflows/doc-index-updater-branch.yaml
 
 env:
-  IMAGE: mhraproductsdevelopmentregistry.azurecr.io/products/doc-index-updater
+  IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
 
 jobs:
   build-and-test:
@@ -39,9 +39,9 @@ jobs:
         uses: azure/docker-login@v1
         if: steps.filter.outputs.src == 'true'
         with:
-          login-server: mhraproductsdevelopmentregistry.azurecr.io
-          username: mhraproductsdevelopmentregistry
-          password: ${{ secrets.DEVELOPMENT_REGISTRY_PASSWORD }}
+          login-server: mhraproductsnonprodregistry.azurecr.io
+          username: mhraproductsnonprodregistry
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Make toolchain version available in current directory
         if: steps.filter.outputs.src == 'true'
@@ -101,8 +101,8 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -ex
-            SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/dev"
-            DEST="${PWD}/deployments/doc-index-updater/dev"
+            SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/non-prod"
+            DEST="${PWD}/deployments/doc-index-updater/non-prod"
 
             cd $SOURCE 
             [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
