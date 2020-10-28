@@ -30,6 +30,8 @@ jobs:
       - name: Run tests with coverage
         working-directory: learning/web
         run: yarn test:ci
+        env:
+          ENV: staging
 
       - name: Run cypress end-to-end tests
         working-directory: learning/web

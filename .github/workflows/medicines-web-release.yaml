@@ -35,7 +35,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "13.11"
+          node-version: "14.15"
 
       - name: Install modules
         working-directory: medicines/web
@@ -44,6 +44,8 @@ jobs:
       - name: Run tests with coverage
         working-directory: medicines/web
         run: yarn test:ci
+        env:
+          ENV: staging
 
       - name: Build and export
         working-directory: medicines/web
