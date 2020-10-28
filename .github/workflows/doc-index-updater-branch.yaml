@@ -31,8 +31,8 @@ jobs:
           filters: |
             src:
               - products/rust-toolchain
-              - products/medicines/doc-index-updater/**
-              - products/medicines/search-client/**
+              - products/medicines/doc-index-updater/**/*
+              - products/medicines/search-client/**/*
 
       - name: Docker login
         uses: azure/docker-login@v1
