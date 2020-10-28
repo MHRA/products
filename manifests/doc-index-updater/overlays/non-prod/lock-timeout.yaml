@@ -10,4 +10,4 @@ spec:
         - name: doc-index-updater
           env:
             - name: SERVICE_BUS_MESSAGE_LOCK_TIMEOUT
-              value: "10"
+              value: "20"

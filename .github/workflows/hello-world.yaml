@@ -35,8 +35,8 @@ jobs:
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo ::set-env name=TAG::$TAG
-          echo ::set-env name=DIGEST::$DIGEST
+          echo "TAG=$TAG" >>$GITHUB_ENV
+          echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
