@@ -1,6 +1,6 @@
 #!/bin/bash
 port=4000
-cross-env USE_GRAPHQL=true yarn build && yarn start -p $port &
+cross-env USE_GRAPHQL=true yarn dev -p $port &
 wait-on http://localhost:$port
 server_pid=$!
 ENV_VARS=$(cat .env | sed '/^$/d' | tr "\n" "," | sed 's/,$/ /g')
