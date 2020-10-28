@@ -7,6 +7,7 @@ on:
     paths:
       - medicines/api/**
       - medicines/search-client/**
+      - manifests/medicines-api/**
       - .github/workflows/medicines-api-master.yaml
       - .github/workflows/medicines-api-release.yaml
 
@@ -59,14 +60,14 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            SOURCE="${PWD}/products/medicines/api/manifests/overlays/non-prod"
+            SOURCE="${PWD}/products/manifests/medicines-api/overlays/non-prod"
             DEST="${PWD}/deployments/medicines-api/non-prod"
 
             cd $SOURCE 
             kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
-            
+
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
@@ -80,4 +81,3 @@ jobs:
               n+=1
               git pull --rebase
             done
-
