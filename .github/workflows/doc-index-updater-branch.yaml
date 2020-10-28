@@ -28,11 +28,12 @@ jobs:
       - uses: dorny/paths-filter@v2.5.1
         id: filter
         with:
+          working-directory: products
           filters: |
             src:
-              - products/rust-toolchain
-              - products/medicines/doc-index-updater/**/*
-              - products/medicines/search-client/**/*
+              - rust-toolchain
+              - medicines/doc-index-updater/**/*
+              - medicines/search-client/**/*
 
       - name: Docker login
         uses: azure/docker-login@v1
