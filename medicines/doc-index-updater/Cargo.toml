@@ -5,7 +5,7 @@ authors = ["Stuart Harris <stuart.harris@red-badger.com>", "Robin James Kerrison
 edition = "2018"
 
 [dependencies]
-anyhow = "1.0.32"
+anyhow = "1.0.33"
 async-dup = "1.2.1"
 async-io = "0.1.11" # Dependent on version used by async-ssh2
 async-ssh2 = { git = "https://github.com/0xdeafbeef/async-ssh2", rev = "2127c944beb90ea09b0c4e0d768dac4bd1a20c81" } # Updates smol 
