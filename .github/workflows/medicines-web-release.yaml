@@ -45,7 +45,7 @@ jobs:
         working-directory: medicines/web
         run: yarn test:ci
         env:
-          ENV: staging
+          ENV: test
 
       - name: Build and export
         working-directory: medicines/web

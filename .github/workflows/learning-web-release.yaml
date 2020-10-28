@@ -31,7 +31,7 @@ jobs:
         working-directory: learning/web
         run: yarn test:ci
         env:
-          ENV: staging
+          ENV: test
 
       - name: Run cypress end-to-end tests
         working-directory: learning/web
