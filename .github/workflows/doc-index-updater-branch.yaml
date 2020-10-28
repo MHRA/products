@@ -3,7 +3,7 @@ name: doc-index-updater-branch
 on:
   pull_request:
     branches:
-      - "master"
+      - master
     paths:
       - rust-toolchain
       - medicines/doc-index-updater/**
@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-and-test:
-    name: Build and Test
+    name: Build, Test and Deploy
     runs-on: ubuntu-latest
 
     steps:
