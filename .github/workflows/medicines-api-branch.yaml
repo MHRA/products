@@ -12,7 +12,7 @@ on:
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
-  DEPLOY_TO_NONPROD: "true"
+  DEPLOY_TO_NONPROD: true
 
 jobs:
   build-and-test:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
-        if: env.DEPLOY_TO_NONPROD == "true"
+        if: env.DEPLOY_TO_NONPROD
         with:
           repository: MHRA/deployments
           path: deployments
@@ -57,7 +57,7 @@ jobs:
 
       - name: Update image tag
         uses: stefanprodan/kube-tools@v1
-        if: env.DEPLOY_TO_NONPROD == "true"
+        if: env.DEPLOY_TO_NONPROD
         with:
           kustomize: 3.4.0
           command: |
