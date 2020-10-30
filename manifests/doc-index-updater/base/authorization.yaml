@@ -4,9 +4,6 @@ metadata:
   name: doc-index-updater-deny
   namespace: doc-index-updater
 spec:
-  selector:
-    matchLabels:
-      app: doc-index-updater
   action: DENY
   rules:
     - to:

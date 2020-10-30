@@ -4,9 +4,6 @@ metadata:
   name: medicines-api-deny
   namespace: medicines-api
 spec:
-  selector:
-    matchLabels:
-      app: medicines-api
   action: DENY
   rules:
     - to:
