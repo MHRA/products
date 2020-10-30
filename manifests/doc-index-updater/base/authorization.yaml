@@ -9,10 +9,10 @@ spec:
       app: doc-index-updater
   action: DENY
   rules:
-    # - to:
-    #     - operation:
-    #         notPaths:
-    #           - "/healthz"
+    - to:
+        - operation:
+            notPaths:
+              - "/healthz"
     - from:
         - source:
             notPrincipals:

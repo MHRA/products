@@ -95,7 +95,7 @@ jobs:
           path: deployments
           token: ${{ secrets.DEPLOYMENTS_REPO_TOKEN }}
 
-      - name: Update image tag
+      - name: Update deployments repository configuration
         uses: stefanprodan/kube-tools@v1
         with:
           kustomize: 3.4.0
