@@ -12,7 +12,7 @@ on:
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/medicines-api
-  DEPLOY_TO_NONPROD: true
+  DEPLOY_TO_NONPROD: false
 
 jobs:
   build-and-test:
