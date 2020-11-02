@@ -14,22 +14,22 @@ version = "0.1.0"
 anyhow = "1.0.33" 
 async-dup = "1.2.2" 
 async-io = "0.1.11" # Dependent on version used by async-ssh2
-async-ssh2 = {git = "https://github.com/0xdeafbeef/async-ssh2", rev = "2127c944beb90ea09b0c4e0d768dac4bd1a20c81"}# Updates smol  
+async-ssh2 = {git = "https://github.com/0xdeafbeef/async-ssh2", rev = "2127c944beb90ea09b0c4e0d768dac4bd1a20c81"}# Updates smol          
 async-trait = "0.1.41" 
 azure_sdk_core = "0.43.7" 
 azure_sdk_service_bus = "0.44.2" 
 azure_sdk_storage_blob = "0.45.3" 
 azure_sdk_storage_core = "0.44.4" 
 base64 = "0.13.0" 
-bytes = "0.5.6" 
+bytes = "0.5" # tied to warp
 chrono = "0.4.19" 
-futures = "0.3.6" 
+futures = "0.3.7" 
 hyper = "0.13" 
 lazy_static = "1.4.0" 
 md5 = "0.7.0" 
 percent-encoding = "2.1.0" 
 redis = {version = "0.17.0", features = ["tokio-rt-core"]} 
-regex = "1.4.1" 
+regex = "1.4.2" 
 reqwest = {version = "0.10.8", features = ["json"]} 
 search_client = {path = "../search-client"} 
 serde = "1.0.117" 
@@ -42,10 +42,10 @@ tokio = {version = "0.2.22", features = ["macros", "time"]}
 tracing = {version = "0.1", features = ["attributes"]} 
 tracing-futures = "0.2.4" 
 tracing-log = "0.1.1" 
-tracing-subscriber = "0.2.13" 
+tracing-subscriber = "0.2.14" 
 url = "2.1.1" 
 uuid = {version = "0.8.1", features = ["serde", "v4"]} 
-warp = {git = "https://github.com/m-doughty/warp", branch = "add-xml-support"} 
+warp = {git = "https://github.com/redbadger/warp", branch = "add-xml-support"} 
 
 [dev-dependencies]
 net2 = "0.2.35"
