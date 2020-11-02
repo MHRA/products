@@ -16,7 +16,7 @@ use search_client::{
 };
 use std::time::Duration;
 use storage_client::{AzureBlobStorage, DeleteBlob};
-use tokio::time::delay_for;
+use tokio::time::sleep;
 use uuid::Uuid;
 
 pub mod clean_up_worker;
@@ -38,7 +38,7 @@ pub async fn delete_service_worker(
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
-        delay_for(time_to_wait).await;
+        sleep(time_to_wait).await;
     }
 }
 

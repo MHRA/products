@@ -3,7 +3,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use std::time::Duration;
-use tokio::time::delay_for;
+use tokio::time::sleep;
 
 pub async fn delete_queue_clean_up_worker(
     time_to_wait: Duration,
@@ -21,7 +21,7 @@ pub async fn delete_queue_clean_up_worker(
         {
             Ok(found_message) => {
                 if !found_message {
-                    delay_for(time_to_wait).await;
+                    sleep(time_to_wait).await;
                 }
             }
             Err(e) => tracing::error!("{:?}", e),
