@@ -16,6 +16,10 @@ jobs:
         with:
           path: products
 
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: clippy
+
       - name: Test
         working-directory: ./products/medicines/transaction-log-file-creator
         run: make test
