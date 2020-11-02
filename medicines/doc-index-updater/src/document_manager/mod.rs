@@ -8,12 +8,15 @@ use crate::{
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
 use chrono::Duration;
+use serde_xml_rs;
 use tracing_futures::Instrument;
 use uuid::Uuid;
+use hyper::Body;
+
 use warp::{
     reject,
-    reply::{Json, Xml},
-    Filter, Rejection, Reply,
+    reply::{Json},
+    Filter, Rejection, Reply, http::Response, http::StatusCode, http::HeaderValue
 };
 
 #[derive(Debug)]
@@ -106,11 +109,14 @@ pub async fn delete_document_handler(
 async fn delete_document_xml_handler(
     document_id: String,
     state_manager: StateManager,
-) -> Result<Xml, Rejection> {
+) -> Result<Response<Body>, Rejection> {
     let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), &state_manager, None)
         .await?
         .into();
-    Ok(warp::reply::xml(&r))
+    let body = serde_xml_rs::to_string(&r).map_err(|_err| StatusCode::INTERNAL_SERVER_ERROR.into_response())?;
+    let mut res = Response::new(body);
+    res.headers_mut().insert("Content-type", HeaderValue::from_static("text/xml"));
+    Ok(res.into())
 }
 
 async fn delete_document_json_handler(
@@ -151,11 +157,11 @@ pub async fn check_in_document_handler(
 async fn check_in_document_xml_handler(
     doc: Document,
     state_manager: StateManager,
-) -> Result<Xml, Rejection> {
+) -> Result<Response<Body>, Rejection> {
     let r: XMLJobStatusResponse = check_in_document_handler(doc, &state_manager, None)
         .await?
         .into();
-    Ok(warp::reply::xml(&r))
+    Response::builder().header("Content-type", "text/xml").body(serde_xml_rs::to_string(&r).map_err(|_err| StatusCode::INTERNAL_SERVER_ERROR.into_response()))
 }
 
 async fn check_in_document_json_handler(
