@@ -6,7 +6,7 @@ use doc_index_updater::{
 };
 use redis::{self, Value};
 use search_client::models::DocumentType;
-use std::{fs, io, process, thread::sleep, time::Duration};
+use std::{fs, io, process, thread, thread::sleep, time::Duration, time::Duration};
 use tokio_test::block_on;
 use uuid::Uuid;
 
@@ -246,7 +246,7 @@ pub fn repeatedly_check_until_result_is<T>(
                 result, expected, max_attempts
             );
         }
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        thread::sleep(Duration::from_secs(1));
         i += 1;
     }
 }

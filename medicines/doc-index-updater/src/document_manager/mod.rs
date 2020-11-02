@@ -7,7 +7,7 @@ use crate::{
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
-use time::Duration;
+use chrono::Duration;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 use warp::{
