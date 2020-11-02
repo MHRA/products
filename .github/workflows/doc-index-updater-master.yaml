@@ -5,8 +5,10 @@ on:
     branches:
       - master
     paths:
+      - rust-toolchain
       - medicines/doc-index-updater/**
       - medicines/search-client/**
+      - manifests/doc-index-updater/**
       - .github/workflows/doc-index-updater-master.yaml
       - .github/workflows/doc-index-updater-release.yaml
 
@@ -24,27 +26,68 @@ jobs:
         with:
           path: products
 
+      - uses: dorny/paths-filter@v2.5.1
+        id: filter
+        with:
+          working-directory: products
+          filters: |
+            src:
+              - rust-toolchain
+              - medicines/doc-index-updater/**/*
+              - medicines/search-client/**/*
+
       - name: Docker login
         uses: azure/docker-login@v1
+        if: steps.filter.outputs.src == 'true'
         with:
           login-server: mhraproductsnonprodregistry.azurecr.io
           username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Set .env.build
-        working-directory: ./products/medicines/doc-index-updater
-        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
-        env:
-          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
+      - name: Make toolchain version available in current directory
+        if: steps.filter.outputs.src == 'true'
+        run: cp products/rust-toolchain .
 
-      - name: Build, test and push Docker image
-        working-directory: ./products/medicines/doc-index-updater
+      - uses: actions-rs/toolchain@v1
+        if: steps.filter.outputs.src == 'true'
+        with:
+          components: clippy
+
+      - name: Cache cargo
+        uses: actions/cache@v2
+        if: steps.filter.outputs.src == 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            products/medicines/doc-index-updater/target
+          key: cargo-${{ hashFiles('products/medicines/doc-index-updater/Cargo.lock') }}-1
+
+      - name: Install redis
+        uses: shogo82148/actions-setup-redis@v1
+        if: steps.filter.outputs.src == 'true'
+        with:
+          auto-start: "false"
+
+      - name: Build and test doc-index-updater service
+        if: steps.filter.outputs.src == 'true'
+        working-directory: products/medicines/doc-index-updater
+        run: |
+          set -e
+          set -a && source .env.base && set +a
+          cargo clippy --release -- -D warnings
+          cargo build --release
+          cargo test --release
+
+      - name: Build and push Docker image
+        if: steps.filter.outputs.src == 'true'
+        working-directory: products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci-master tag=$TAG
+          make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo ::set-env name=TAG::$TAG
-          echo ::set-env name=DIGEST::$DIGEST
+          echo "TAG=$TAG" >>$GITHUB_ENV
+          echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Clone Deployments repo
         uses: actions/checkout@v2
@@ -58,14 +101,20 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -eux
-            cd deployments/doc-index-updater/overlays/non-prod
+            set -ex
+            SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/non-prod"
+            DEST="${PWD}/deployments/doc-index-updater/non-prod"
 
-            kustomize edit set image $DIGEST
+            cd $SOURCE 
+            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
+            mkdir -p "${DEST}"
+            kustomize build . > "${DEST}/manifests.yaml"
 
+            cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
-            git diff-index --quiet HEAD || git commit -am "CI: Update image for $TAG"
+            git add --all
+            git diff-index --quiet HEAD || git commit -m "CI: Update image for $TAG"
             declare -i n
             n=0
             until [ $n -ge 5 ]

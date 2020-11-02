@@ -1,0 +1,15 @@
+namespace: medicines-api
+
+resources:
+  - ../../base
+  - SealedSecret-search-creds.yaml
+
+patchesStrategicMerge:
+  - deployment.yaml
+  - ingress.yaml
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+  - digest: sha256:23d0c54b344f7376ef1fa3d135417566503589ad603f5347567304daa80fe195
+    name: mhraproductsnonprodregistry.azurecr.io/products/medicines-api

@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-index-updater
+  namespace: doc-index-updater
+spec:
+  template:
+    spec:
+      containers:
+        - name: doc-index-updater
+          env:
+            - name: SERVICE_BUS_MESSAGE_LOCK_TIMEOUT
+              value: "20"
