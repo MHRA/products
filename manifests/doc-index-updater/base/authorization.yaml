@@ -1,6 +1,24 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
+  name: doc-index-updater-deny
+  namespace: doc-index-updater
+spec:
+  action: DENY
+  rules:
+    - to:
+        - operation:
+            notPaths:
+              - "/healthz"
+      from:
+        - source:
+            notPrincipals:
+              - cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+              - cluster.local/ns/istio-system/sa/istio-ingressgateway-internal-service-account
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
   name: doc-index-updater
   namespace: doc-index-updater
 spec:
