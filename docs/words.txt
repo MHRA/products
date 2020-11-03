@@ -45,6 +45,8 @@ compliances
 config
 configmap
 crds
+CSS
+css
 CSV
 Ctrl
 CVE
@@ -70,6 +72,7 @@ envsubst
 ErgFGAmFm
 externalTrafficPolicy
 fHnH
+fld
 gatling
 GatsbyJS
 GCP
@@ -100,6 +103,7 @@ Istio
 jetstack
 jMHESRNZIU
 jMj
+jpg
 jq
 JSON
 js
@@ -244,6 +248,7 @@ workspaces
 wrk
 www
 xJhl
+xlsx
 XP
 XxIGSA
 yaml
