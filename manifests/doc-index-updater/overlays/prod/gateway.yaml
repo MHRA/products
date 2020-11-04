@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: doc-index-updater-ingressgateway
+  namespace: istio-system
+spec:
+  servers:
+    - port:
+        number: 443
+        name: https-443-api-mhra-gov-uk
+        protocol: HTTPS
+      hosts:
+        - doc-index-updater.api.mhra.gov.uk
+      tls:
+        mode: SIMPLE
+        credentialName: cert-doc-index-updater
+    - port:
+        number: 443
+        name: https-443-mhra-gov-uk
+        protocol: HTTPS
+      hosts:
+        - doc-index-updater.mhra.gov.uk
+      tls:
+        mode: SIMPLE
+        credentialName: doc-index-updater-mhra-gov-uk-cert

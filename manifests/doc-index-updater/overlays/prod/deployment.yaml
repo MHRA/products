@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-index-updater
+  namespace: doc-index-updater
+spec:
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/proxyCPU: 50m
+    spec:
+      containers:
+        - name: doc-index-updater
+          image: mhraproducts4853registry.azurecr.io/products/doc-index-updater
+          env:
+            - name: REDIS_SERVER
+              value: doc-index-updater-4853.redis.cache.windows.net
+            - name: SERVICE_BUS_NAMESPACE
+              value: doc-index-updater-4853
+            - name: SEARCH_SERVICE
+              value: mhraproducts4853
+            - name: RUST_LOG
+              value: doc_index_updater=debug,info
+            - name: PARS_UPLOAD_SITE_ORIGIN
+              value: https://pars.mhra.gov.uk
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 200Mi
