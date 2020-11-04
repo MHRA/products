@@ -7,13 +7,14 @@ use crate::{
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
-use bytes::{buf::BufExt, Buf, Bytes};
+use bytes::{buf::BufExt, Buf};
 use chrono::Duration;
 use hyper::Body;
+use serde::de::DeserializeOwned;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 use warp::{
-    body::aggregate, http::HeaderValue, http::Response, http::StatusCode, reject, reply::Json, Buf,
+    body::aggregate, http::HeaderValue, http::Response, http::StatusCode, reject, reply::Json,
     Filter, Rejection, Reply,
 };
 
@@ -215,6 +216,10 @@ pub fn check_in_document(
         .and_then(check_in_document_json_handler)
 }
 
+pub async fn convert_xml(buf: impl Buf) -> anyhow::Result<T> {
+    serde_xml_rs::from_reader(&mut buf.reader()).map_err(|err| Err(warp::reject::reject()))
+}
+
 pub fn check_in_xml_document(
     state_manager: StateManager,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
@@ -227,9 +232,7 @@ pub fn check_in_xml_document(
             "application/xml",
         ))
         .and(aggregate())
-        .and_then(|buf: impl Buf| async move {
-            serde_xml_rs::from_reader(buf.reader()).map_err(|err| Err(warp::reject::reject()))
-        })
+        .and(|buf| async move { serde_xml_rs::from_reader(buf.reader()).map_err(Into::into) })
         // need to add a recover filter to turn the 500 error into a Reply otherwise it gets returned as a 500 internal server error
         .map(Into::<Document>::into)
         .and(with_state(state_manager))
