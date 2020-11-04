@@ -2,21 +2,19 @@ use crate::{
     auth_manager,
     models::{
         CreateMessage, DeleteMessage, Document, JobStatus, JobStatusResponse, Message,
-        UniqueDocumentIdentifier, XMLDocument, XMLJobStatusResponse,
+        UniqueDocumentIdentifier, XMLJobStatusResponse,
     },
     service_bus_client::{create_factory, delete_factory, DocIndexUpdaterQueue},
     state_manager::{with_state, JobStatusClient, MyRedisError, StateManager},
 };
+use bytes::{buf::BufExt, Buf, Bytes};
 use chrono::Duration;
-use serde_xml_rs;
+use hyper::Body;
 use tracing_futures::Instrument;
 use uuid::Uuid;
-use hyper::Body;
-
 use warp::{
-    reject,
-    reply::{Json},
-    Filter, Rejection, Reply, http::Response, http::StatusCode, http::HeaderValue
+    body::aggregate, http::HeaderValue, http::Response, http::StatusCode, reject, reply::Json, Buf,
+    Filter, Rejection, Reply,
 };
 
 #[derive(Debug)]
@@ -113,10 +111,15 @@ async fn delete_document_xml_handler(
     let r: XMLJobStatusResponse = delete_document_handler(document_id.into(), &state_manager, None)
         .await?
         .into();
-    let body = serde_xml_rs::to_string(&r).map_err(|_err| StatusCode::INTERNAL_SERVER_ERROR.into_response())?;
-    let mut res = Response::new(body);
-    res.headers_mut().insert("Content-type", HeaderValue::from_static("text/xml"));
-    Ok(res.into())
+    match serde_xml_rs::to_string(&r) {
+        Ok(xml_body) => {
+            let mut res = Response::new(xml_body.into());
+            res.headers_mut()
+                .insert("Content-type", HeaderValue::from_static("text/xml"));
+            Ok(res)
+        }
+        Err(_) => Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response()),
+    }
 }
 
 async fn delete_document_json_handler(
@@ -161,7 +164,15 @@ async fn check_in_document_xml_handler(
     let r: XMLJobStatusResponse = check_in_document_handler(doc, &state_manager, None)
         .await?
         .into();
-    Response::builder().header("Content-type", "text/xml").body(serde_xml_rs::to_string(&r).map_err(|_err| StatusCode::INTERNAL_SERVER_ERROR.into_response()))
+    match serde_xml_rs::to_string(&r) {
+        Ok(xml_body) => {
+            let mut res = Response::new(xml_body.into());
+            res.headers_mut()
+                .insert("Content-type", HeaderValue::from_static("text/xml"));
+            Ok(res)
+        }
+        Err(_) => Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response()),
+    }
 }
 
 async fn check_in_document_json_handler(
@@ -211,7 +222,15 @@ pub fn check_in_xml_document(
         .and(warp::post())
         .and(auth_manager::with_basic_auth())
         .and(warp::header::exact_ignore_case("accept", "application/xml"))
-        .and(warp::body::xml_enforce_strict_content_type::<XMLDocument>())
+        .and(warp::header::exact_ignore_case(
+            "content-type",
+            "application/xml",
+        ))
+        .and(aggregate())
+        .and_then(|buf: impl Buf| async move {
+            serde_xml_rs::from_reader(buf.reader()).map_err(|err| Err(warp::reject::reject()))
+        })
+        // need to add a recover filter to turn the 500 error into a Reply otherwise it gets returned as a 500 internal server error
         .map(Into::<Document>::into)
         .and(with_state(state_manager))
         .and_then(check_in_document_xml_handler)

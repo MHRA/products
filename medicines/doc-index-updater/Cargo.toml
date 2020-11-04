@@ -45,7 +45,7 @@ tracing-log = "0.1.1"
 tracing-subscriber = "0.2.14" 
 url = "2.1.1" 
 uuid = {version = "0.8.1", features = ["serde", "v4"]} 
-warp = {git = "https://github.com/m-doughty/warp", branch = "add-xml-support"} 
+warp = "0.2.5"
 
 [dev-dependencies]
 net2 = "0.2.35"
