@@ -1,9 +1,10 @@
+use chrono::Duration;
 use doc_index_updater::{
     auth_manager::AuthenticationFailed, create_manager, delete_manager, document_manager,
     get_env_or_default, health, pars_upload, state_manager,
 };
 use state_manager::get_client;
-use std::{convert::Infallible, error, net::SocketAddr, time::Duration};
+use std::{convert::Infallible, error, net::SocketAddr};
 use tracing::Level;
 use warp::{http::StatusCode, Filter};
 
@@ -28,7 +29,7 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
     let redis_key = get_env_or_default("REDIS_KEY", "".to_string());
     let redis_addr = create_redis_url(redis_server, redis_port, redis_key);
 
-    let time_to_wait = Duration::from_secs(get_env_or_default("SECONDS_TO_WAIT", 5));
+    let time_to_wait = Duration::seconds(get_env_or_default("SECONDS_TO_WAIT", 5));
     let clean_up_time_to_wait = time_to_wait * 10;
     let state = state_manager::StateManager::new(get_client(redis_addr.clone())?);
 
@@ -62,22 +63,22 @@ async fn main() -> Result<(), Box<dyn error::Error>> {
             .await;
         }),
         tokio::spawn(delete_manager::delete_service_worker(
-            time_to_wait,
+            time_to_wait.to_std()?,
             delete_state
         )),
         tokio::spawn(create_manager::create_service_worker(
-            time_to_wait,
+            time_to_wait.to_std()?,
             create_state
         )),
         tokio::spawn(
             create_manager::clean_up_worker::create_queue_clean_up_worker(
-                clean_up_time_to_wait,
+                clean_up_time_to_wait.to_std()?,
                 create_clean_up_state
             )
         ),
         tokio::spawn(
             delete_manager::clean_up_worker::delete_queue_clean_up_worker(
-                clean_up_time_to_wait,
+                clean_up_time_to_wait.to_std()?,
                 delete_clean_up_state
             )
         ),

@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use chrono::Duration;
 use core::{fmt::Debug, future::Future};
 use doc_index_updater::{
     models::{CreateMessage, DeleteMessage, Document, FileSource, Message},
@@ -6,7 +7,7 @@ use doc_index_updater::{
 };
 use redis::{self, Value};
 use search_client::models::DocumentType;
-use std::{fs, io, process, thread::sleep, time::Duration};
+use std::{fs, io, process, thread, thread::sleep};
 use tokio_test::block_on;
 use uuid::Uuid;
 
@@ -111,15 +112,15 @@ impl Default for TestContext {
         .unwrap();
         let mut con;
 
-        let try_connection_after = Duration::from_secs(1);
-        sleep(try_connection_after);
+        let try_connection_after = Duration::seconds(1);
+        sleep(try_connection_after.to_std().unwrap());
         loop {
             match client.get_connection() {
                 Err(err) => {
                     if !err.is_connection_refusal() {
                         panic!("Could not connect: {}", err);
                     }
-                    sleep(try_connection_after);
+                    sleep(try_connection_after.to_std().unwrap());
                 }
                 Ok(x) => {
                     con = x;
@@ -246,7 +247,7 @@ pub fn repeatedly_check_until_result_is<T>(
                 result, expected, max_attempts
             );
         }
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        thread::sleep(Duration::seconds(1).to_std().unwrap());
         i += 1;
     }
 }

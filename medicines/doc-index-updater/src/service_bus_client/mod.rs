@@ -8,9 +8,9 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use azure_sdk_core::errors::AzureError;
 use azure_sdk_service_bus::{event_hub::PeekLockResponse, prelude::Client};
+use chrono::Duration;
 use hyper::StatusCode;
 use thiserror::Error;
-use time::Duration;
 use tracing_futures::Instrument;
 use uuid::Uuid;
 
@@ -172,13 +172,13 @@ pub trait ProcessRetrievalError {
 
 pub struct DocIndexUpdaterQueue {
     service_bus: Client,
-    lock_timeout: time::Duration,
+    lock_timeout: Duration,
 }
 
 impl DocIndexUpdaterQueue {
     fn new(service_bus: Client) -> Self {
         let lock_timeout = get_env_or_default("SERVICE_BUS_MESSAGE_LOCK_TIMEOUT", 10);
-        let lock_timeout = time::Duration::seconds(lock_timeout);
+        let lock_timeout = Duration::seconds(lock_timeout);
         Self {
             service_bus,
             lock_timeout,
@@ -190,7 +190,7 @@ impl DocIndexUpdaterQueue {
     ) -> Result<RetrievedMessage<T>, RetrieveFromQueueError> {
         let peek_lock = self
             .service_bus
-            .peek_lock_full(time::Duration::days(1), Some(self.lock_timeout))
+            .peek_lock_full(Duration::days(1), Some(self.lock_timeout))
             .await
             .map_err(|e| {
                 tracing::error!("{:?}", e);

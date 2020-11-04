@@ -1,6 +1,7 @@
 extern crate doc_index_updater;
 
 mod support;
+use chrono::Duration;
 use doc_index_updater::{
     models::{DeleteMessage, JobStatus},
     service_bus_client::{delete_factory, Removable},
@@ -19,7 +20,7 @@ fn delete_queue_works() {
     let id = Uuid::new_v4();
     let sent_message = get_test_delete_message(id, format!("doc-{}", id));
     let mut queue = get_ok(delete_factory());
-    get_ok(queue.send(sent_message.clone(), time::Duration::seconds(1)));
+    get_ok(queue.send(sent_message.clone(), Duration::seconds(1)));
 
     let mut retrieval = block_on(get_message_safely::<DeleteMessage>(&mut queue));
     while retrieval.message != sent_message {

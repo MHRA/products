@@ -16,7 +16,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use search_index::add_blob_to_search_index;
 use std::{collections::HashMap, time::Duration};
-use tokio::time::delay_for;
+use tokio::time::sleep;
 use uuid::Uuid;
 
 pub mod clean_up_worker;
@@ -43,7 +43,7 @@ pub async fn create_service_worker(
             Ok(()) => {}
             Err(e) => tracing::error!("{:?}", e),
         }
-        delay_for(time_to_wait).await;
+        sleep(time_to_wait).await;
     }
 }
 
