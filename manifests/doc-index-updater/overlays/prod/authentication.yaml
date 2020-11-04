@@ -1,0 +1,14 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: doc-index-updater
+  namespace: doc-index-updater
+spec:
+  selector:
+    matchLabels:
+      app: doc-index-updater
+  jwtRules:
+    - issuer: "https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26/v2.0"
+      jwksUri: "https://login.microsoftonline.com/e527ea5c-6258-4cd2-a27f-8bd237ec4c26/discovery/v2.0/keys"
+      audiences:
+        - "088430d1-a1e4-444a-8769-6d0d998ba67a"

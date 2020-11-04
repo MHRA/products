@@ -116,6 +116,7 @@ kubectl
 kubernetes
 Kubernetes
 Kusto
+kustomize
 lang
 lang's
 learningweb
@@ -220,6 +221,7 @@ stunnel
 subnets
 svc
 SVGR
+synchronise
 tADWy
 terraform
 Terraform
