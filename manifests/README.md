@@ -6,6 +6,6 @@ During the CI and release workflows for an application, its manifests for the re
 
 ## Generating sealed secrets
 
-In order to regenerate or update the secrets for a given application, you can make use of the `keys.sh` script within each application environment's directory. This automatically retrieves all secrets from either the appropriate Azure key vault or by querying the resources via the Azure API. It then uses the kubernetes API to convert the secret into a sealed secret and writes the output to the appropriate sealed secret file.
+In order to regenerate or update the secrets for a given application, you can make use of the `keys.sh` script within each application's environment directory. This automatically retrieves all secrets from either the appropriate Azure key vault or by querying the resources via the Azure API. It then uses the kubernetes API to convert the secret into a sealed secret and writes the output to the appropriate sealed secret file.
 
 This action always generates new encrypted versions of the secret, even if the underlying value of the secret has not changed.
