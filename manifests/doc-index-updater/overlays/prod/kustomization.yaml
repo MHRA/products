@@ -1,0 +1,23 @@
+resources:
+  - ../../base
+  - certificate.yaml
+  - gateway.yaml
+  - SealedSecret-basic-auth-creds.yaml
+  - SealedSecret-doc-index-updater-mhra-gov-uk-cert.yaml
+  - SealedSecret-logs-storage-creds.yaml
+  - SealedSecret-redis-creds.yaml
+  - SealedSecret-search-creds.yaml
+  - SealedSecret-sentinel-creds.yaml
+  - SealedSecret-service-bus-creds.yaml
+  - SealedSecret-storage-creds.yaml
+patchesStrategicMerge:
+  - deployment.yaml
+  - ingress.yaml
+  - lock-timeout.yaml
+  - authentication.yaml
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+  - digest: sha256:3ff15948f18e21b74dbf23dae3af3dbbe41fb92a60b6a040b9e7b074dc82dd29
+    name: mhraproducts4853registry.azurecr.io/products/doc-index-updater

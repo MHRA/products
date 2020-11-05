@@ -45,6 +45,8 @@ compliances
 config
 configmap
 crds
+CSS
+css
 CSV
 Ctrl
 CVE
@@ -70,6 +72,7 @@ envsubst
 ErgFGAmFm
 externalTrafficPolicy
 fHnH
+fld
 gatling
 GatsbyJS
 GCP
@@ -100,6 +103,7 @@ Istio
 jetstack
 jMHESRNZIU
 jMj
+jpg
 jq
 JSON
 js
@@ -112,6 +116,7 @@ kubectl
 kubernetes
 Kubernetes
 Kusto
+kustomize
 lang
 lang's
 learningweb
@@ -216,6 +221,7 @@ stunnel
 subnets
 svc
 SVGR
+synchronise
 tADWy
 terraform
 Terraform
@@ -244,6 +250,7 @@ workspaces
 wrk
 www
 xJhl
+xlsx
 XP
 XxIGSA
 yaml

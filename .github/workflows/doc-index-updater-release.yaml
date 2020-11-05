@@ -33,7 +33,7 @@ jobs:
           TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
           make docker-pull image=$NONPROD_IMAGE tag=$TAG
           echo "TAG=$TAG" >>$GITHUB_ENV
-          
+
       - name: Docker login to prod
         uses: azure/docker-login@v1
         with:
@@ -75,13 +75,19 @@ jobs:
           kustomize: 3.4.0
           command: |
             set -eux
-            cd deployments/doc-index-updater/overlays/prod
+            SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/prod"
+            DEST="${PWD}/deployments/doc-index-updater/prod"
 
+            cd $SOURCE 
             kustomize edit set image $DIGEST
+            mkdir -p "${DEST}"
+            kustomize build . > "${DEST}/manifests.yaml"
 
+            cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
             git config --local user.name "MHRA CI/CD"
-            git diff-index --quiet HEAD || git commit -am "CI: Update production image for $TAG"
+            git add --all
+            git diff-index --quiet HEAD || git commit -m "CI: Update production image for $TAG"
             declare -i n
             n=0
             until [ $n -ge 5 ]

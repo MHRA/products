@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - rust-toolchain
       - medicines/api/**
       - medicines/search-client/**
       - manifests/medicines-api/**
@@ -25,24 +26,58 @@ jobs:
         with:
           path: products
 
+      - uses: dorny/paths-filter@v2.5.1
+        id: filter
+        with:
+          working-directory: products
+          filters: |
+            src:
+              - rust-toolchain
+              - medicines/api/**/*
+              - medicines/search-client/**/*
+
       - name: Docker login
         uses: azure/docker-login@v1
+        if: steps.filter.outputs.src == 'true'
         with:
           login-server: mhraproductsnonprodregistry.azurecr.io
           username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Set .env.build
-        working-directory: products/medicines/api
-        run: echo "SCCACHE_AZURE_CONNECTION_STRING=\"$SCCACHE_AZURE_CONNECTION_STRING\"" > .env.build
-        env:
-          SCCACHE_AZURE_CONNECTION_STRING: ${{ secrets.SCCACHE_AZURE_CONNECTION_STRING }}
+      - name: Make toolchain version available in current directory
+        if: steps.filter.outputs.src == 'true'
+        run: cp products/rust-toolchain .
 
-      - name: Build, test and push Docker image
+      - uses: actions-rs/toolchain@v1
+        if: steps.filter.outputs.src == 'true'
+        with:
+          components: clippy
+
+      - name: Cache cargo
+        uses: actions/cache@v2
+        if: steps.filter.outputs.src == 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            products/medicines/api/target
+          key: cargo-${{ hashFiles('products/medicines/api/Cargo.lock') }}-1
+
+      - name: Build and test Medicines API service
+        if: steps.filter.outputs.src == 'true'
+        working-directory: products/medicines/api
+        run: |
+          set -e
+          cargo clippy --release -- -D warnings
+          cargo build --release
+          cargo test --release
+
+      - name: Build and push Docker image
+        if: steps.filter.outputs.src == 'true'
         working-directory: products/medicines/api
         run: |
           TAG="$(git rev-parse --short=7 ${{ github.sha }})"
-          make ci-master tag=$TAG
+          make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
           echo "TAG=$TAG" >>$GITHUB_ENV
           echo "DIGEST=$DIGEST" >>$GITHUB_ENV
@@ -59,12 +94,12 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -eux
+            set -ex
             SOURCE="${PWD}/products/manifests/medicines-api/overlays/non-prod"
             DEST="${PWD}/deployments/medicines-api/non-prod"
 
             cd $SOURCE 
-            kustomize edit set image $DIGEST
+            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
 
