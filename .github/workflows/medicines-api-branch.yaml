@@ -92,7 +92,7 @@ jobs:
 
       - name: Update image tag
         uses: stefanprodan/kube-tools@v1
-        if: env.DEPLOY_TO_NONPROD
+        if: env.DEPLOY_TO_NONPROD == 'true'
         with:
           kustomize: 3.4.0
           command: |
