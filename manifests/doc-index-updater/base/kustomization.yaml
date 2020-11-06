@@ -8,3 +8,4 @@ resources:
   - ingress.yaml
   - authentication.yaml
   - authorization.yaml
+  - argo-rbac.yaml

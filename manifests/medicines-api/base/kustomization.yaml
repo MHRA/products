@@ -6,4 +6,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - argo-rbac.yaml
   - authorization.yaml
