@@ -51,7 +51,7 @@ impl BlobMetadata {
 impl Into<BlobMetadata> for Document {
     fn into(self) -> BlobMetadata {
         let title = SanitisedString::from(&self.name);
-        let pl_number = extract_product_licences(&self.pl_number);
+        let pl_number = format_product_licence(&self.pl_number);
 
         BlobMetadata {
             file_name: SanitisedString::from(&self.id),
@@ -164,10 +164,10 @@ pub fn create_facets_by_active_substance(
     facets
 }
 
-pub fn extract_product_licences(input: &str) -> String {
+pub fn format_product_licence(input: &str) -> String {
     lazy_static! {
         static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+|/|_|-)").expect("cannot compile regex");
-        static ref RE_PL: Regex = Regex::new(r"(?i:\b|PL)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
+        static ref RE_PL: Regex = Regex::new(r"(?i:\b|[A-Z]+)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
             .expect("cannot compile regex");
     }
     let product_licences: Vec<String> = RE_PL
@@ -177,13 +177,6 @@ pub fn extract_product_licences(input: &str) -> String {
                 .replace_all(m.as_str(), "")
                 .to_ascii_uppercase()
         })
-        .map(|s| {
-            if s.starts_with("PL") {
-                s
-            } else {
-                String::from("PL") + s.as_str()
-            }
-        })
         .collect();
 
     to_json(product_licences)
@@ -192,6 +185,7 @@ pub fn extract_product_licences(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
+    use test_case::test_case;
     use crate::models::FileSource;
     use search_client::models::DocumentType;
 
@@ -291,52 +285,18 @@ mod test {
         );
     }
 
-    #[test]
-    fn extract_product_licence_test() {
-        let input = vec![
-            "00 PL123451234",
-            "01 pl123451234",
-            "02 123451234",
-            "03 PL 12345 1234",
-            "04 PL  12345 1234",
-            "05 test pl 12345   1234",
-            "06 pl  12345   1234 test",
-            "07 12345 1234",
-            "08 PL 12345/1234",
-            "09 PL/12345/1234",
-            "10 pl 12345/1234",
-            "11 pl/12345/1234",
-            "12 12345/1234",
-            "13 PL 12345_1234",
-            "14 PL_12345_1234",
-            "15 pl 12345_1234",
-            "16 pl_12345_1234",
-            "17 12345_1234",
-            "18 PL 12345-1234",
-            "19 PL-12345-1234",
-            "20 pl 12345-1234",
-            "21 pl-12345-1234",
-            "22 12345-1234",
-            "23 12345-1234GG",
-            "PL 12345/1234-0001",
-            "leaflet MAH GENERIC_PL 12345-1234R.pdf",
-        ];
-        let output = "[\"PL123451234\"]";
-        input
-            .iter()
-            .for_each(|i| assert_eq!(extract_product_licences(i), output));
+    #[test_case("PL 12345/1234", "[\"PL123451234\"]")]
+    #[test_case("PL12345/1234", "[\"PL123451234\"]")]
+    #[test_case("PLGB 12345/1234", "[\"PLGB123451234\"]")]
+    #[test_case("PLNI 12345/1234", "[\"PLNI123451234\"]")]
+    #[test_case("THR 12345/1234", "[\"THR123451234\"]")]
+    #[test_case("NR 12345/1234", "[\"NR123451234\"]")]
+    #[test_case("NEW 12345/1234", "[\"NEW123451234\"]")]
+    #[test_case("NO PL", "[]")]
+    fn format_product_licence_test(input: &str, output: &str) {
+        assert_eq!(format_product_licence(input), output);
     }
-    #[test]
-    fn extract_multiple_product_licences() {
-        let input = "00 PL123451234 01 pl123451235__ 02 123451236-03 PL 12345 1237";
-        let output = "[\"PL123451234\",\"PL123451235\",\"PL123451236\",\"PL123451237\"]";
 
-        assert_eq!(extract_product_licences(input), output);
-    }
-    #[test]
-    fn extract_product_licence_test_not_found() {
-        assert_eq!(extract_product_licences("no pl number here"), "[]");
-    }
     #[test]
     fn parses_blob_metadata_from_document() {
         let document = Document {
