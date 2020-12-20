@@ -314,12 +314,14 @@ const SearchResults = (props: ISearchResultsProps) => {
           <p>
             Before a medicine can be sold in the UK, a number of licences are
             essential. Products with a UK marketing authorisation have a licence
-            number in the format ‘PL 12345/0001’. The first 2 characters are
-            always the letters ‘PL’, and this can be found on the packaging of
-            the product.
+            number in the format ‘PL 12345/0001’, ‘PLGB 12345/0002’ or ‘PLNI
+            12345/0003’. The licence number can be found on the packaging of the
+            product and the first 2 characters are always contain the letters
+            ‘PL’.
           </p>
           <p>
-            You can identify the product in the list below using the PL number.
+            You can identify the product in the list below using the PL, PLGB or
+            PLNI number.
           </p>
           <p>
             The information about a medicine will be updated when new evidence
