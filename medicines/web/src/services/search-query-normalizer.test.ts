@@ -50,6 +50,7 @@ describe(normalizeProductLicenses, () => {
     ${'plgb 30464/0140'}                                       | ${'PLGB304640140'}
     ${'plni 30464/0140'}                                       | ${'PLNI304640140'}
     ${'thr 30464/0140'}                                        | ${'THR304640140'}
+    ${'nr 30464/0140'}                                         | ${'NR304640140'}
     ${'pretext 30464-0140'}                                    | ${'pretext 30464-0140'}
     ${'pretext pl 30464-0140'}                                 | ${'pretext PL304640140'}
     ${'pretext pl 30464_0140 posttext'}                        | ${'pretext PL304640140 posttext'}
