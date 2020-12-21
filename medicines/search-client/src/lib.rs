@@ -7,7 +7,7 @@ extern crate lazy_static;
 
 use crate::models::{AzureIndexChangedResults, FacetResults, IndexEntry};
 use crate::query_normalizer::{
-    escape_special_characters, escape_special_words, extract_normalized_product_licences,
+    escape_special_characters, escape_special_words, normalize_product_licences,
     prefer_exact_match_but_support_fuzzy_match,
 };
 use async_trait::async_trait;
@@ -256,7 +256,7 @@ impl Search for AzureSearchClient {
 }
 
 fn clean_up_search_term(search_term: &str) -> String {
-    let search_term = extract_normalized_product_licences(&search_term);
+    let search_term = normalize_product_licences(&search_term);
     let search_term = escape_special_characters(&search_term);
     escape_special_words(&search_term)
 }
