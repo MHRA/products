@@ -3,7 +3,7 @@ import React, { FormEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import { accessibleBackgroundBlue } from '../../styles/colors';
 import { baseSpace, mobileBreakpoint } from '../../styles/dimensions';
-
+import { productLicenseRegExp } from '../../services/search-query-normalizer';
 import DrugIndex, { index, IndexType } from '../drug-index';
 import Search from '../search';
 import YellowCard from '../yellow-card';
@@ -45,19 +45,15 @@ const formatInitialSearchTerm = (searchTerm: string | string[]) => {
   return '';
 };
 
-const extractProductLicenseRegExp: RegExp = new RegExp(
-  '(\\b|PL)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
-  'ig',
-);
-
 const whitespaceRegExp: RegExp = new RegExp('\\s+', 'g');
 
 const formatSearchTerm = (s: string): string => {
   return s
-    .replace(extractProductLicenseRegExp, ' PL $3/$5')
+    .replace(productLicenseRegExp, (match, p1, p2, p3, p4, p5) => {
+      return `${p1.toUpperCase()} ${p3}/${p5}`;
+    })
     .replace(whitespaceRegExp, ' ')
-    .trim()
-    .toLowerCase();
+    .trim();
 };
 
 const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {

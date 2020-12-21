@@ -1,7 +1,7 @@
 import {
   buildFuzzyQuery,
   escapeSpecialWords,
-  extractNormalizedProductLicenses,
+  normalizeProductLicenses,
 } from './search-query-normalizer';
 
 describe(buildFuzzyQuery, () => {
@@ -39,23 +39,24 @@ describe(buildFuzzyQuery, () => {
   });
 });
 
-describe(extractNormalizedProductLicenses, () => {
+describe(normalizeProductLicenses, () => {
   it.each`
-    input                                               | expectedResult
-    ${'pl 30464/0140'}                                  | ${'PL304640140'}
-    ${'pl30464/0140'}                                   | ${'PL304640140'}
-    ${'30464/0140'}                                     | ${'PL304640140'}
-    ${'pl/30464/0140'}                                  | ${'PL304640140'}
-    ${'pl-30464-0140'}                                  | ${'PL304640140'}
-    ${'pl_30464_0140'}                                  | ${'PL304640140'}
-    ${'hr 30464/0140'}                                  | ${'hr PL304640140'}
-    ${'thr 30464/0140'}                                 | ${'thr PL304640140'}
-    ${'pretext 30464/0140'}                             | ${'pretext PL304640140'}
-    ${'pretext 30464-0140'}                             | ${'pretext PL304640140'}
-    ${'pretext 30464_0140 posttext'}                    | ${'pretext posttext PL304640140'}
-    ${'pretext 30464_0140 midtext 12345_1234 posttext'} | ${'pretext midtext posttext PL304640140 PL123451234'}
+    input                                                      | expectedResult
+    ${'pl 30464/0140'}                                         | ${'PL304640140'}
+    ${'pl30464/0140'}                                          | ${'PL304640140'}
+    ${'pl/30464/0140'}                                         | ${'PL304640140'}
+    ${'pl-30464-0140'}                                         | ${'PL304640140'}
+    ${'pl_30464_0140'}                                         | ${'PL304640140'}
+    ${'plgb 30464/0140'}                                       | ${'PLGB304640140'}
+    ${'plni 30464/0140'}                                       | ${'PLNI304640140'}
+    ${'thr 30464/0140'}                                        | ${'THR304640140'}
+    ${'nr 30464/0140'}                                         | ${'NR304640140'}
+    ${'pretext 30464-0140'}                                    | ${'pretext 30464-0140'}
+    ${'pretext pl 30464-0140'}                                 | ${'pretext PL304640140'}
+    ${'pretext pl 30464_0140 posttext'}                        | ${'pretext PL304640140 posttext'}
+    ${'pretext pl 30464_0140 midtext thr 12345_1234 posttext'} | ${'pretext PL304640140 midtext THR123451234 posttext'}
   `('converts $input to $expectedResult', ({ input, expectedResult }) => {
-    const result = extractNormalizedProductLicenses(input);
+    const result = normalizeProductLicenses(input);
     expect(result).toBe(expectedResult);
   });
 });
