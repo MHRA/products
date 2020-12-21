@@ -2,7 +2,7 @@ const searchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 export const productLicenseRegExp: RegExp = new RegExp(
-  '(\\s)*(PL|PLGB|PLNI|THR|NR)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
+  '(PL|PLGB|PLNI|THR|NR)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
   'ig',
 );
 
@@ -23,8 +23,8 @@ const preferExactMatchButSupportFuzzyMatch = (word: string): string =>
   `(${word}~${searchWordFuzziness} || ${word}^${searchExactnessBoost})`;
 
 export const normalizeProductLicenses = (q: string): string => {
-  return q.replace(productLicenseRegExp, (match, p1, p2, p3, p4, p5, p6) => {
-    return `${p1 ? p1 : ''}${p2.toUpperCase()}${p4}${p6}`;
+  return q.replace(productLicenseRegExp, (match, p1, p2, p3, p4, p5) => {
+    return `${p1.toUpperCase()}${p3}${p5}`;
   });
 };
 
