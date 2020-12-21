@@ -167,7 +167,7 @@ pub fn create_facets_by_active_substance(
 pub fn format_product_licence(input: &str) -> String {
     lazy_static! {
         static ref RE_WHITESPACE: Regex = Regex::new(r"(\s+|/|_|-)").expect("cannot compile regex");
-        static ref RE_PL: Regex = Regex::new(r"(?i:\b|[A-Z]+)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
+        static ref RE_PL: Regex = Regex::new(r"(?i:[A-Z]+)(\s+|/|_|-)*\d{5}(\s+|/|_|-)*\d{4}")
             .expect("cannot compile regex");
     }
     let product_licences: Vec<String> = RE_PL
@@ -292,6 +292,7 @@ mod test {
     #[test_case("THR 12345/1234", "[\"THR123451234\"]")]
     #[test_case("NR 12345/1234", "[\"NR123451234\"]")]
     #[test_case("NEW 12345/1234", "[\"NEW123451234\"]")]
+    #[test_case("12345/1234", "[]")]
     #[test_case("NO PL", "[]")]
     fn format_product_licence_test(input: &str, output: &str) {
         assert_eq!(format_product_licence(input), output);
