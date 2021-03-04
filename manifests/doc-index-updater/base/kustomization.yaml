@@ -9,3 +9,4 @@ resources:
   - authentication.yaml
   - authorization.yaml
   - argo-rbac.yaml
+  - istio-rbac.yml

@@ -7,4 +7,5 @@ resources:
   - service.yaml
   - ingress.yaml
   - argo-rbac.yaml
+  - istio-rbac.yml
   - authorization.yaml
