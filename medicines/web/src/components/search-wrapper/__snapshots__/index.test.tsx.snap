@@ -6,14 +6,14 @@ exports[`SearchWrapper should render 1`] = `
 >
   <styled.div>
     <div
-      className="sc-pNWxx fragWr"
+      className="sc-pFZIQ jNBNdH"
     >
       <section
         className="search"
       >
         <styled.h2>
           <h2
-            className="sc-jrsJCI XWPnX"
+            className="sc-jrAGrp bKqvrp"
           >
             Search box
           </h2>
@@ -26,11 +26,11 @@ exports[`SearchWrapper should render 1`] = `
         >
           <styled.section>
             <section
-              className="sc-eCApGN isOGvN"
+              className="sc-eCssSg ekTCxA"
             >
               <styled.h3>
                 <h3
-                  className="sc-jSFkmK bDfivy"
+                  className="sc-jSgupP jbtvHa"
                 >
                   Search by text
                 </h3>
@@ -60,7 +60,7 @@ exports[`SearchWrapper should render 1`] = `
                     value="Search"
                   >
                     <input
-                      className="sc-hKFyIo gabOGu"
+                      className="sc-hKgILt iSAaiA"
                       type="submit"
                       value="Search"
                     />
@@ -188,7 +188,7 @@ exports[`SearchWrapper should render 1`] = `
         >
           <styled.nav>
             <nav
-              className="sc-bdnylx iZXMvu"
+              className="sc-bdfBwQ gbWQay"
             >
               <p
                 className="horizontal"
@@ -818,14 +818,14 @@ exports[`SearchWrapper should render 1`] = `
       <YellowCard>
         <styled.section>
           <section
-            className="sc-gKAblj fykfws"
+            className="sc-gKsewC VMXpa"
           >
             <header
               aria-label="Yellow card"
             >
               <styled.h2>
                 <h2
-                  className="sc-fujyUd brUYGF"
+                  className="sc-fubCfw eiEXpq"
                 >
                   Yellow Card
                 </h2>
@@ -838,7 +838,7 @@ exports[`SearchWrapper should render 1`] = `
                 role="img"
               >
                 <div
-                  className="sc-iCoHVE eykSml"
+                  className="sc-iBPRYJ gfJdTk"
                   role="img"
                 >
                   <div>

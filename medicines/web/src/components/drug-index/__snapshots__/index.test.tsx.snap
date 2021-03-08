@@ -9,11 +9,11 @@ exports[`DrugIndex should render error message 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <styled.p>
         <p
-          className="sc-gtssRu cxxuwU"
+          className="sc-gsTCUz dLbUyF"
         >
           Sorry - the site is experiencing technical issues right now. Please try again later.
         </p>
@@ -142,7 +142,7 @@ exports[`DrugIndex should render horizontal items 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <p
         className="horizontal"
@@ -779,7 +779,7 @@ exports[`DrugIndex should render loading message 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <h2>
         Coffee
@@ -817,7 +817,7 @@ exports[`DrugIndex should render substances 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <h2>
         Coffee

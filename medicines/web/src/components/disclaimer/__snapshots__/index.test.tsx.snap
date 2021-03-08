@@ -38,7 +38,7 @@ exports[`Disclaimer should render 1`] = `
     </p>
     <form>
       <div>
-        <Component
+        <Checkbox
           id="agree-checkbox"
           name="agree"
           onChange={[Function]}
