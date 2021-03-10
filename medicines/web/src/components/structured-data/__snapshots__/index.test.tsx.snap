@@ -85,3 +85,89 @@ exports[`SubstanceStructuredData should render 1`] = `
   }
 />
 `;
+
+exports[`should render 1`] = `
+<JsonLd
+  item={
+    Object {
+      "@context": "https://schema.org",
+      "@type": "Substance",
+      "name": "My cool substance",
+    }
+  }
+/>
+`;
+
+exports[`should render 2`] = `
+<JsonLd
+  item={
+    Object {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": Array [
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Substance",
+            "name": "First cool substance",
+            "url": "https://products.mhra.gov.uk/substance?substance=First%20cool%20substance",
+          },
+          "position": 0,
+        },
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Substance",
+            "name": "Second cool substance",
+            "url": "https://products.mhra.gov.uk/substance?substance=Second%20cool%20substance",
+          },
+          "position": 1,
+        },
+      ],
+    }
+  }
+/>
+`;
+
+exports[`should render 3`] = `
+<JsonLd
+  item={
+    Object {
+      "@context": "https://schema.org",
+      "@type": "Drug",
+      "name": "My cool drug",
+    }
+  }
+/>
+`;
+
+exports[`should render 4`] = `
+<JsonLd
+  item={
+    Object {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": Array [
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Drug",
+            "name": "First cool drug",
+            "url": "https://products.mhra.gov.uk/product?product=First%20cool%20drug",
+          },
+          "position": 0,
+        },
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Drug",
+            "name": "Second cool drug",
+            "url": "https://products.mhra.gov.uk/product?product=Second%20cool%20drug",
+          },
+          "position": 1,
+        },
+      ],
+    }
+  }
+/>
+`;
