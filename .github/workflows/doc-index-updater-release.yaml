@@ -28,6 +28,8 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Fetch image for tagged commit
+        id: fetch-image
+        continue-on-error: true
         working-directory: ./products/medicines/doc-index-updater
         run: |
           TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
@@ -36,12 +38,14 @@ jobs:
 
       - name: Docker login to prod
         uses: azure/docker-login@v1
+        if: steps.fetch-image.outcome == 'success'
         with:
           login-server: mhraproducts4853registry.azurecr.io
           username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
       - name: Push image for tagged commit
+        if: steps.fetch-image.outcome == 'success'
         working-directory: ./products/medicines/doc-index-updater
         run: |
           make docker-retag image=$NONPROD_IMAGE new_image=$PROD_IMAGE tag=$TAG
@@ -79,7 +83,7 @@ jobs:
             DEST="${PWD}/deployments/doc-index-updater/prod"
 
             cd $SOURCE 
-            kustomize edit set image $DIGEST
+            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
 

@@ -29,22 +29,23 @@ jobs:
 
       - name: Fetch image for tagged commit
         id: fetch-image
+        continue-on-error: true
         working-directory: ./products/medicines/api
         run: |
           TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
-          make docker-pull image=$NONPROD_IMAGE tag=$TAG | echo ""::set-output name=IMAGE_ERROR::$!"
+          make docker-pull image=$NONPROD_IMAGE tag=$TAG
           echo "TAG=$TAG" >>$GITHUB_ENV
 
       - name: Docker login to prod
         uses: azure/docker-login@v1
-        if: steps.fetch-image.outputs.IMAGE_ERROR == '0'
+        if: steps.fetch-image.outcome == 'success'
         with:
           login-server: mhraproducts4853registry.azurecr.io
           username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
       - name: Push image for tagged commit
-        if: steps.fetch-image.outputs.IMAGE_ERROR == '0'
+        if: steps.fetch-image.outcome == 'success'
         working-directory: ./products/medicines/api
         run: |
           make docker-retag image=$NONPROD_IMAGE new_image=$PROD_IMAGE tag=$TAG
