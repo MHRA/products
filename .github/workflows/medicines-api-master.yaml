@@ -72,14 +72,18 @@ jobs:
           cargo build --release
           cargo test --release
 
+      - name: Create Docker tag
+        working-directory: products/medicines/api
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          echo "TAG=$TAG" >>$GITHUB_ENV
+
       - name: Build and push Docker image
         if: steps.filter.outputs.src == 'true'
         working-directory: products/medicines/api
         run: |
-          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo "TAG=$TAG" >>$GITHUB_ENV
           echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Clone Deployments repo

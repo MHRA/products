@@ -27,14 +27,18 @@ jobs:
           username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - name: Create Docker tag
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          echo "TAG=$TAG" >>$GITHUB_ENV
+
       - name: Fetch image for tagged commit
         id: fetch-image
         continue-on-error: true
         working-directory: ./products/medicines/doc-index-updater
         run: |
-          TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
           make docker-pull image=$NONPROD_IMAGE tag=$TAG
-          echo "TAG=$TAG" >>$GITHUB_ENV
 
       - name: Docker login to prod
         uses: azure/docker-login@v1
