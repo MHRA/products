@@ -1,9 +1,9 @@
 locals {
   name = "doc-index-updater"
-  queue_names = [
-    "create",
-    "delete",
-  ]
+  queue_names = {
+    create_queue : "create",
+    delete_queue : "delete",
+  }
 }
 
 # Service Bus
@@ -18,11 +18,11 @@ resource "azurerm_servicebus_namespace" "service_bus" {
   }
 }
 
-
 resource "azurerm_servicebus_queue" "service_bus_queue" {
-  name = "${local.name}-${local.queue_names[count.index]}-queue"
+  for_each = local.queue_names
 
-  count               = length(local.queue_names)
+  name = "${local.name}-${each.value}-queue"
+
   namespace_name      = azurerm_servicebus_namespace.service_bus.name
   resource_group_name = var.resource_group_name
   lock_duration       = "PT20S"
@@ -30,12 +30,12 @@ resource "azurerm_servicebus_queue" "service_bus_queue" {
 }
 
 resource "azurerm_servicebus_queue_authorization_rule" "service_bus_queue_auth_rule" {
-  name = "${local.name}-${local.queue_names[count.index]}-auth"
+  for_each = azurerm_servicebus_queue.service_bus_queue
 
+  name = "${each.value.name}-auth"
 
-  count               = length(local.queue_names)
   namespace_name      = azurerm_servicebus_namespace.service_bus.name
-  queue_name          = azurerm_servicebus_queue.service_bus_queue[count.index].name
+  queue_name          = each.value.name
   resource_group_name = var.resource_group_name
 
   listen = true
