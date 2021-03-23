@@ -1,10 +1,18 @@
-provider "azurerm" {
-  version = "=2.20.0"
-  features {}
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.52.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.2"
+    }
+  }
 }
 
-provider "random" {
-  version = "~> 2.2"
+provider "azurerm" {
+  features {}
 }
 
 terraform {
@@ -30,7 +38,7 @@ locals {
 }
 
 # Website
-module products {
+module "products" {
   source = "../../modules/products"
 
   environment         = var.ENVIRONMENT
@@ -42,7 +50,7 @@ module products {
 }
 
 # CPD
-module cpd {
+module "cpd" {
   source = "../../modules/cpd"
 
   environment         = var.ENVIRONMENT
@@ -53,7 +61,7 @@ module cpd {
 }
 
 # Logs
-module logs {
+module "logs" {
   source = "../../modules/logs"
 
   namespace           = local.logs_namespace
@@ -63,7 +71,7 @@ module logs {
 }
 
 # AKS
-module cluster {
+module "cluster" {
   source = "../../modules/cluster"
 
   client_id                             = var.CLIENT_ID
@@ -87,7 +95,7 @@ module cluster {
 }
 
 # Service Bus
-module service_bus {
+module "service_bus" {
   source = "../../modules/service-bus"
 
   environment             = var.ENVIRONMENT
@@ -98,7 +106,7 @@ module service_bus {
 }
 
 # Redis
-module redis {
+module "redis" {
   source = "../../modules/redis"
 
   environment         = var.ENVIRONMENT
@@ -110,7 +118,7 @@ module redis {
 }
 
 # Key vault
-module keyvault {
+module "keyvault" {
   source = "../../modules/keyvault"
 
   environment                 = var.ENVIRONMENT
@@ -123,7 +131,7 @@ module keyvault {
 }
 
 # PARs
-module pars {
+module "pars" {
   source = "../../modules/pars"
 
   resource_group_name                = var.RESOURCE_GROUP_PRODUCTS
@@ -137,7 +145,7 @@ module pars {
 }
 
 # DNS
-module dns {
+module "dns" {
   source = "../../modules/dns"
 
   environment                   = var.ENVIRONMENT
