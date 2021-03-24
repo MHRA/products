@@ -87,7 +87,9 @@ jobs:
             DEST="${PWD}/deployments/medicines-api/prod"
 
             cd $SOURCE
+            set +u
             [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
+            set -u
             mkdir -p "${DEST}"
             kustomize build . > "${DEST}/manifests.yaml"
 
