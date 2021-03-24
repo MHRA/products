@@ -1,10 +1,18 @@
-provider "azurerm" {
-  version = "=2.20.0"
-  features {}
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.52.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.2"
+    }
+  }
 }
 
-provider "random" {
-  version = "~> 2.2"
+provider "azurerm" {
+  features {}
 }
 
 terraform {
@@ -17,15 +25,15 @@ terraform {
 }
 
 locals {
-  namespace        = "mhraproducts${var.ENVIRONMENT}"
-  cpd_namespace    = "mhracpd${var.ENVIRONMENT}"
-  pars_namespace   = "mhrapars${var.ENVIRONMENT}"
+  namespace                   = "mhraproducts${var.ENVIRONMENT}"
+  cpd_namespace               = "mhracpd${var.ENVIRONMENT}"
+  pars_namespace              = "mhrapars${var.ENVIRONMENT}"
   doc_index_updater_namespace = "doc-index-updater-${var.ENVIRONMENT}"
-  logs_namespace   = "mhralogs${var.ENVIRONMENT}"
+  logs_namespace              = "mhralogs${var.ENVIRONMENT}"
 }
 
 # Website
-module products {
+module "products" {
   source = "../../modules/products"
 
   environment         = var.ENVIRONMENT
@@ -35,7 +43,7 @@ module products {
 }
 
 # CPD
-module cpd {
+module "cpd" {
   source = "../../modules/cpd"
 
   environment         = var.ENVIRONMENT
@@ -46,7 +54,7 @@ module cpd {
 }
 
 # Logs
-module logs {
+module "logs" {
   source = "../../modules/logs"
 
   namespace           = local.logs_namespace
@@ -56,7 +64,7 @@ module logs {
 }
 
 # AKS
-module cluster {
+module "cluster" {
   source = "../../modules/cluster"
 
   client_id                             = var.CLIENT_ID
@@ -80,7 +88,7 @@ module cluster {
 }
 
 # Service Bus
-module service_bus {
+module "service_bus" {
   source = "../../modules/service-bus"
 
   environment             = var.ENVIRONMENT
@@ -91,19 +99,19 @@ module service_bus {
 }
 
 # Redis
-module redis {
+module "redis" {
   source = "../../modules/redis"
 
-  environment             = var.ENVIRONMENT
-  location                = var.REGION
-  name                    = local.doc_index_updater_namespace
-  resource_group_name     = var.RESOURCE_GROUP_PRODUCTS
-  redis_use_firewall      = false
-  redis_firewall_ip       = module.cluster.cluster_outbound_ip
+  environment         = var.ENVIRONMENT
+  location            = var.REGION
+  name                = local.doc_index_updater_namespace
+  resource_group_name = var.RESOURCE_GROUP_PRODUCTS
+  redis_use_firewall  = false
+  redis_firewall_ip   = module.cluster.cluster_outbound_ip
 }
 
 # Key vault
-module keyvault {
+module "keyvault" {
   source = "../../modules/keyvault"
 
   environment                 = var.ENVIRONMENT
@@ -116,7 +124,7 @@ module keyvault {
 }
 
 # PARs
-module pars {
+module "pars" {
   source = "../../modules/pars"
 
   resource_group_name                = var.RESOURCE_GROUP_PRODUCTS

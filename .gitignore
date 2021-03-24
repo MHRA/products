@@ -1,3 +1,7 @@
+# Terraform ignores
+.terraform.lock.hcl
+crash.log
+
 # Rust ignores
 **/target
 **/*.rs.bk
