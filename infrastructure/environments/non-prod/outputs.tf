@@ -58,6 +58,10 @@ output "service_bus_queue_keys" {
   value = module.service_bus.queues_default_primary_key
 }
 
+output "service_bus_queue_connnection_string" {
+  value = module.service_bus.queues_default_primary_connection_string
+}
+
 output "redis_access_key" {
   value = module.redis.redis_access_key
 }
