@@ -32,7 +32,7 @@ resource "azurerm_servicebus_queue" "service_bus_queue" {
 resource "azurerm_servicebus_queue_authorization_rule" "service_bus_queue_auth_rule" {
   for_each = azurerm_servicebus_queue.service_bus_queue
 
-  name = "${each.value.name}-auth"
+  name = replace(each.value.name, "queue", "auth")
 
   namespace_name      = azurerm_servicebus_namespace.service_bus.name
   queue_name          = each.value.name
