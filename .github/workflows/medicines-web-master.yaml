@@ -99,7 +99,7 @@ jobs:
 
       - name: Deploy products web to static site in azure storage
         # master causes this step to fail so pointing to last working commit until fixed
-        uses: lauchacarro/Azure-Storage-Action@9225056
+        uses: lauchacarro/Azure-Storage-Action@92250565adefe3844ab7e135cb570ca354f0ac18
         with:
           enabled-static-website: true
           folder: medicines/web/dist
