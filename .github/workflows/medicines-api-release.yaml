@@ -85,7 +85,7 @@ jobs:
             set -ex
             SOURCE="${PWD}/products/manifests/medicines-api/overlays/prod"
             DEST="${PWD}/deployments/medicines-api/prod"
-            DEST_MANIFESTS="${DEST}/manifests.yml"
+            DEST_MANIFESTS="${DEST}/manifests.yaml"
 
             cd $SOURCE
             mkdir -p "${DEST}"
