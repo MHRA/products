@@ -47,7 +47,7 @@ jobs:
           login-server: mhraproducts4853registry.azurecr.io
           username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
-
+      
       - name: Push image for tagged commit
         if: steps.fetch-image.outcome == 'success'
         working-directory: ./products/medicines/api
@@ -82,16 +82,23 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -eux
+            set -ex
             SOURCE="${PWD}/products/manifests/medicines-api/overlays/prod"
             DEST="${PWD}/deployments/medicines-api/prod"
+            DEST_MANIFESTS="${DEST}/manifests.yml"
 
             cd $SOURCE
-            set +u
-            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
-            set -u
             mkdir -p "${DEST}"
-            kustomize build . > "${DEST}/manifests.yaml"
+
+            set +u
+            if [[ -n "${DIGEST}" ]]; then 
+              kustomize edit set image $DIGEST
+            else
+              cat "${DEST_MANIFESTS}" | awk '/image:/ {print}' | sed 's/image://' | xargs kustomize edit set image
+            fi
+            set -u
+
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"

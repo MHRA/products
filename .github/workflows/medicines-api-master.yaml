@@ -101,11 +101,20 @@ jobs:
             set -ex
             SOURCE="${PWD}/products/manifests/medicines-api/overlays/non-prod"
             DEST="${PWD}/deployments/medicines-api/non-prod"
+            DEST_MANIFESTS="${DEST}/manifests.yml"
 
             cd $SOURCE 
-            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
-            kustomize build . > "${DEST}/manifests.yaml"
+
+            set +u
+            if [[ -n "${DIGEST}" ]]; then 
+              kustomize edit set image $DIGEST
+            else
+              cat "${DEST_MANIFESTS}" | awk '/image:/ {print}' | sed 's/image://' | xargs kustomize edit set image
+            fi
+            set -u
+            
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
