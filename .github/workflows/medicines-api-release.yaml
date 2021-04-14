@@ -47,7 +47,7 @@ jobs:
           login-server: mhraproducts4853registry.azurecr.io
           username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
-      
+
       - name: Push image for tagged commit
         if: steps.fetch-image.outcome == 'success'
         working-directory: ./products/medicines/api

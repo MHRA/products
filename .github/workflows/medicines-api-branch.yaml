@@ -116,7 +116,7 @@ jobs:
             fi
             set -u
 
-            kustomize build . > "${DEST}/manifests.yaml"
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
