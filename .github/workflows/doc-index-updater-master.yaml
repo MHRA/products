@@ -105,7 +105,7 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -ex
+            set -eux
             SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/non-prod"
             DEST="${PWD}/deployments/doc-index-updater/non-prod"
             DEST_MANIFESTS="${DEST}/manifests.yaml"

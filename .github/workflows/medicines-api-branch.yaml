@@ -100,7 +100,7 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -ex
+            set -eux
             SOURCE="${PWD}/products/manifests/medicines-api/overlays/non-prod"
             DEST="${PWD}/deployments/medicines-api/non-prod"
             DEST_MANIFESTS="${DEST}/manifests.yaml"
