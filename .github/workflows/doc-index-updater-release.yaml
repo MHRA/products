@@ -85,13 +85,19 @@ jobs:
             set -eux
             SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/prod"
             DEST="${PWD}/deployments/doc-index-updater/prod"
+            DEST_MANIFESTS="${DEST}/manifests.yaml"
 
             cd $SOURCE 
-            set +u
-            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
-            set -u
             mkdir -p "${DEST}"
-            kustomize build . > "${DEST}/manifests.yaml"
+
+            set +u
+            if [[ -n "${DIGEST}" ]]; then 
+              kustomize edit set image $DIGEST
+            else
+              cat "${DEST_MANIFESTS}" | awk '/image:/ {print}' | sed 's/image://' | xargs kustomize edit set image
+            fi
+            
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"
