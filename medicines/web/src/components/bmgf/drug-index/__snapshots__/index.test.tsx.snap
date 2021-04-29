@@ -119,7 +119,7 @@ exports[`DrugIndex should render horizontal items 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <p
         className="horizontal"
@@ -762,7 +762,7 @@ exports[`DrugIndex should render substances 1`] = `
 >
   <styled.nav>
     <nav
-      className="sc-bdnylx iZXMvu"
+      className="sc-bdfBwQ gbWQay"
     >
       <h2>
         Coffee

@@ -8,22 +8,22 @@ exports[`SearchFilter should render search filter 1`] = `
 >
   <styled.section>
     <section
-      className="sc-dlnjPT ldjroq"
+      className="sc-dlfnbm gCBqhY"
     >
       <styled.h3>
         <h3
-          className="sc-gKAblj gHUsfJ"
+          className="sc-gKsewC icRsCX"
         >
           Documents filter
         </h3>
       </styled.h3>
       <styled.fieldset>
         <fieldset
-          className="sc-eCApGN RCFDc"
+          className="sc-eCssSg lnCWGB"
         >
           <styled.legend>
             <legend
-              className="sc-jSFkmK dXYUNp"
+              className="sc-jSgupP bHokth"
             >
               Filter documents by
             </legend>
@@ -40,7 +40,7 @@ exports[`SearchFilter should render search filter 1`] = `
               <div
                 className="checkbox"
               >
-                <Component
+                <Checkbox
                   checked={false}
                   id="filter-spc"
                   name="doc"
@@ -57,7 +57,7 @@ exports[`SearchFilter should render search filter 1`] = `
                   >
                     <input
                       checked={false}
-                      className="sc-bdnylx dUVSoV"
+                      className="sc-bdfBwQ bHPfdB"
                       id="filter-spc"
                       name="doc"
                       onChange={[Function]}
@@ -65,7 +65,7 @@ exports[`SearchFilter should render search filter 1`] = `
                       value="Spc"
                     />
                   </styled.input>
-                </Component>
+                </Checkbox>
               </div>
               <label
                 htmlFor="filter-spc"
@@ -89,7 +89,7 @@ exports[`SearchFilter should render search filter 1`] = `
               <div
                 className="checkbox"
               >
-                <Component
+                <Checkbox
                   checked={false}
                   id="filter-pil"
                   name="doc"
@@ -106,7 +106,7 @@ exports[`SearchFilter should render search filter 1`] = `
                   >
                     <input
                       checked={false}
-                      className="sc-bdnylx dUVSoV"
+                      className="sc-bdfBwQ bHPfdB"
                       id="filter-pil"
                       name="doc"
                       onChange={[Function]}
@@ -114,7 +114,7 @@ exports[`SearchFilter should render search filter 1`] = `
                       value="Pil"
                     />
                   </styled.input>
-                </Component>
+                </Checkbox>
               </div>
               <label
                 htmlFor="filter-pil"
@@ -138,7 +138,7 @@ exports[`SearchFilter should render search filter 1`] = `
               <div
                 className="checkbox"
               >
-                <Component
+                <Checkbox
                   checked={false}
                   id="filter-par"
                   name="doc"
@@ -155,7 +155,7 @@ exports[`SearchFilter should render search filter 1`] = `
                   >
                     <input
                       checked={false}
-                      className="sc-bdnylx dUVSoV"
+                      className="sc-bdfBwQ bHPfdB"
                       id="filter-par"
                       name="doc"
                       onChange={[Function]}
@@ -163,7 +163,7 @@ exports[`SearchFilter should render search filter 1`] = `
                       value="Par"
                     />
                   </styled.input>
-                </Component>
+                </Checkbox>
               </div>
               <label
                 htmlFor="filter-par"
@@ -177,7 +177,7 @@ exports[`SearchFilter should render search filter 1`] = `
           </DocTypeCheckbox>
           <styled.div>
             <div
-              className="sc-hKFyIo hodwMc"
+              className="sc-hKgILt htIFRi"
             >
               <styled.input
                 onClick={[Function]}
@@ -185,7 +185,7 @@ exports[`SearchFilter should render search filter 1`] = `
                 value="Submit"
               >
                 <input
-                  className="sc-gtssRu elyfng"
+                  className="sc-gsTCUz gAyQyd"
                   onClick={[Function]}
                   type="submit"
                   value="Submit"
