@@ -69,4 +69,4 @@ We support IE11 browsers and later, including all versions of Edge, Firefox 21+ 
 
 ## Releasing
 
-To create a new release and deployment to production, create and push a new tag of the form `parsupload.vX.X.X` (e.g. `parsupload.v1.3.0`), incrementing as required from the most recent version. The `pars-upload-release` workflow will then automate the creation of a new deployment in Github, build and test the tagged commit and then push the code to the production storage container. You can then update the release notes with any useful detail in Github.
+To create a new release and deployment to production, create and push a new tag of the form `parsupload.vX.X.X` (e.g. `parsupload.v1.3.0`), incrementing as required from the most recent version. The `pars-upload-release` workflow will then automate the creation of a new deployment in Github, build and test the tagged commit and then push the code to the production storage container. You can then update the release notes with any useful detail in Github..
