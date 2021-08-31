@@ -1,18 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should render 1`] = `
+exports[`DrugListStructuredData should render 1`] = `
 <JsonLd
   item={
     Object {
       "@context": "https://schema.org",
-      "@type": "Substance",
-      "name": "My cool substance",
+      "@type": "ItemList",
+      "itemListElement": Array [
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Drug",
+            "name": "First cool drug",
+            "url": "https://products.mhra.gov.uk/product?product=First%20cool%20drug",
+          },
+          "position": 0,
+        },
+        Object {
+          "@type": "ListItem",
+          "item": Object {
+            "@type": "Drug",
+            "name": "Second cool drug",
+            "url": "https://products.mhra.gov.uk/product?product=Second%20cool%20drug",
+          },
+          "position": 1,
+        },
+      ],
     }
   }
 />
 `;
 
-exports[`should render 2`] = `
+exports[`DrugStructuredData should render 1`] = `
+<JsonLd
+  item={
+    Object {
+      "@context": "https://schema.org",
+      "@type": "Drug",
+      "name": "My cool drug",
+    }
+  }
+/>
+`;
+
+exports[`SubstanceListStructuredData should render 1`] = `
 <JsonLd
   item={
     Object {
@@ -43,44 +74,13 @@ exports[`should render 2`] = `
 />
 `;
 
-exports[`should render 3`] = `
+exports[`SubstanceStructuredData should render 1`] = `
 <JsonLd
   item={
     Object {
       "@context": "https://schema.org",
-      "@type": "Drug",
-      "name": "My cool drug",
-    }
-  }
-/>
-`;
-
-exports[`should render 4`] = `
-<JsonLd
-  item={
-    Object {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": Array [
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Drug",
-            "name": "First cool drug",
-            "url": "https://products.mhra.gov.uk/product?product=First%20cool%20drug",
-          },
-          "position": 0,
-        },
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Drug",
-            "name": "Second cool drug",
-            "url": "https://products.mhra.gov.uk/product?product=Second%20cool%20drug",
-          },
-          "position": 1,
-        },
-      ],
+      "@type": "Substance",
+      "name": "My cool substance",
     }
   }
 />

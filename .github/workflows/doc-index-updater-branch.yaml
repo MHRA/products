@@ -13,7 +13,7 @@ on:
 
 env:
   IMAGE: mhraproductsnonprodregistry.azurecr.io/products/doc-index-updater
-  DEPLOY_TO_NONPROD: false
+  DEPLOY_TO_NONPROD: true
 
 jobs:
   build-and-test:
@@ -79,14 +79,18 @@ jobs:
           cargo build --release
           cargo test --release
 
+      - name: Create Docker tag
+        working-directory: products/medicines/doc-index-updater
+        run: |
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
+          echo "TAG=$TAG" >>$GITHUB_ENV
+
       - name: Build and push Docker image
         if: steps.filter.outputs.src == 'true'
         working-directory: products/medicines/doc-index-updater
         run: |
-          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           make ci-master tag=$TAG image=$IMAGE
           DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE}:${TAG})"
-          echo "TAG=$TAG" >>$GITHUB_ENV
           echo "DIGEST=$DIGEST" >>$GITHUB_ENV
 
       - name: Clone Deployments repo
@@ -103,14 +107,23 @@ jobs:
         with:
           kustomize: 3.4.0
           command: |
-            set -ex
+            set -eux
             SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/non-prod"
             DEST="${PWD}/deployments/doc-index-updater/non-prod"
-
+            DEST_MANIFESTS="${DEST}/manifests.yaml"
+            
             cd $SOURCE 
-            [[ ! -z "${DIGEST}" ]] && kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
-            kustomize build . > "${DEST}/manifests.yaml"
+
+            set +u
+            if [[ -n "${DIGEST}" ]]; then 
+              kustomize edit set image $DIGEST
+            else
+              cat "${DEST_MANIFESTS}" | awk '/image:/ {print}' | sed 's/image://' | xargs kustomize edit set image
+            fi
+            set -u
+
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"

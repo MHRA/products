@@ -27,21 +27,29 @@ jobs:
           username: mhraproductsnonprodregistry
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Fetch image for tagged commit
+      - name: Create Docker tag
         working-directory: ./products/medicines/doc-index-updater
         run: |
-          TAG="$(git rev-parse --short=7 $GITHUB_SHA)"
-          make docker-pull image=$NONPROD_IMAGE tag=$TAG
+          TAG="$(git rev-parse --short=7 ${{ github.sha }})"
           echo "TAG=$TAG" >>$GITHUB_ENV
+
+      - name: Fetch image for tagged commit
+        id: fetch-image
+        continue-on-error: true
+        working-directory: ./products/medicines/doc-index-updater
+        run: |
+          make docker-pull image=$NONPROD_IMAGE tag=$TAG
 
       - name: Docker login to prod
         uses: azure/docker-login@v1
+        if: steps.fetch-image.outcome == 'success'
         with:
           login-server: mhraproducts4853registry.azurecr.io
           username: mhraproducts4853registry
           password: ${{ secrets.PROD_REGISTRY_PASSWORD }}
 
       - name: Push image for tagged commit
+        if: steps.fetch-image.outcome == 'success'
         working-directory: ./products/medicines/doc-index-updater
         run: |
           make docker-retag image=$NONPROD_IMAGE new_image=$PROD_IMAGE tag=$TAG
@@ -77,11 +85,19 @@ jobs:
             set -eux
             SOURCE="${PWD}/products/manifests/doc-index-updater/overlays/prod"
             DEST="${PWD}/deployments/doc-index-updater/prod"
+            DEST_MANIFESTS="${DEST}/manifests.yaml"
 
             cd $SOURCE 
-            kustomize edit set image $DIGEST
             mkdir -p "${DEST}"
-            kustomize build . > "${DEST}/manifests.yaml"
+
+            set +u
+            if [[ -n "${DIGEST}" ]]; then 
+              kustomize edit set image $DIGEST
+            else
+              cat "${DEST_MANIFESTS}" | awk '/image:/ {print}' | sed 's/image://' | xargs kustomize edit set image
+            fi
+            
+            kustomize build . > "${DEST_MANIFESTS}"
 
             cd $DEST
             git config --local user.email "CD.no.reply@mhra.gov.uk"

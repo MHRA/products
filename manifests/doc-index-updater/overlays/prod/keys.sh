@@ -8,7 +8,7 @@ REDIS_KEY=$(az redis list-keys \
 kubectl create secret generic redis-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal key="$REDIS_KEY" |
     kubeseal \
         --format yaml >SealedSecret-redis-creds.yaml
@@ -21,7 +21,7 @@ API_KEY=$(az search admin-key show \
 kubectl create secret generic search-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal api_key="$API_KEY" |
     kubeseal \
         --format yaml >SealedSecret-search-creds.yaml
@@ -55,7 +55,7 @@ SENTINEL_PRIVATE_KEY_PASSWORD=$(az keyvault secret show \
 kubectl create secret generic sentinel-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal server="$SENTINEL_SERVER_IP" \
     --from-literal user="$SENTINEL_USERNAME" \
     --from-literal public_key="$SENTINEL_PUBLIC_KEY" \
@@ -82,7 +82,7 @@ SB_DELETE_KEY=$(az servicebus queue authorization-rule keys list \
 kubectl create secret generic service-bus-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal create_key="$SB_CREATE_KEY" \
     --from-literal delete_key="$SB_DELETE_KEY" |
     kubeseal \
@@ -96,7 +96,7 @@ BLOB_KEY=$(az storage account keys list \
 kubectl create secret generic storage-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal account="mhraproducts4853" \
     --from-literal container="docs" \
     --from-literal container_temporary="temporary-docs" \
@@ -112,7 +112,7 @@ LOG_BLOB_KEY=$(az storage account keys list \
 kubectl create secret generic logs-storage-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal account="mhralogs4853" \
     --from-literal container="transaction-logs" \
     --from-literal key="$LOG_BLOB_KEY" |
@@ -133,7 +133,7 @@ BASIC_AUTH_PASSWORD=$(az keyvault secret show \
 kubectl create secret generic basic-auth-creds \
     -n doc-index-updater \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --from-literal username="$BASIC_AUTH_USERNAME" \
     --from-literal password="$BASIC_AUTH_PASSWORD" |
     kubeseal \
@@ -153,7 +153,7 @@ az keyvault secret show \
 kubectl create secret tls doc-index-updater-mhra-gov-uk-cert \
     -n istio-system \
     -o json \
-    --dry-run \
+    --dry-run=client \
     --cert=./doc-index-updater.crt \
     --key=./doc-index-updater.key |
     kubeseal \

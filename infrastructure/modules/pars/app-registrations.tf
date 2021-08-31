@@ -1,6 +1,6 @@
 resource "azuread_application" "pars-upload" {
   count                      = var.include_pars_app ? 1 : 0
-  name                       = "pars-upload-${var.environment}"
+  display_name               = "pars-upload-${var.environment}"
   reply_urls                 = concat(var.additional_allowed_pars_reply_urls, ["https://${azurerm_cdn_endpoint.pars.host_name}", "https://${azurerm_storage_account.pars.primary_web_host}"])
   group_membership_claims    = "SecurityGroup"
   oauth2_allow_implicit_flow = true
