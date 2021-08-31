@@ -169,7 +169,7 @@ describe('New PARs upload', () => {
       uploadData.brand
     )
   })
-  /* it('shows the uploaded file when going back to upload file page', () => {
+  it('shows the uploaded file when going back to upload file page', () => {
     let uploadData = {
       brand: 'Ibuprofen pills',
       strength: 'Really powerful stuff',
@@ -238,5 +238,5 @@ describe('New PARs upload', () => {
     cy.findByText('Submit another report').click()
 
     cy.findByText('What are you doing today?').should('exist')
-  }) */ //need to ask Red Bagder if this part ever worked.
+  }) 
 })
