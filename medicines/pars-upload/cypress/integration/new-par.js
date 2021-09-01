@@ -238,5 +238,5 @@ describe('New PARs upload', () => {
     cy.findByText('Submit another report').click()
 
     cy.findByText('What are you doing today?').should('exist')
-  })
+  }) 
 })
