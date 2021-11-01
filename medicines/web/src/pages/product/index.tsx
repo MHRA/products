@@ -9,14 +9,19 @@ import { DrugStructuredData } from '../../components/structured-data';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/document';
-import { DocType } from '../../services/azure-search';
+import {
+  DocType,
+  TerritoryType,
+  SearchType,
+} from '../../services/azure-search';
 import { getLoader } from '../../services/loaders/products/product-loader';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
+  territoryTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
-  queryStringFromDocTypes,
+  queryStringFromTypes,
 } from '../../services/querystring-interpreter';
 
 const pageSize = 10;
@@ -32,6 +37,9 @@ const App: NextPage = () => {
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
+  const [territoryTypes, setTerritoryTypes] = React.useState<TerritoryType[]>(
+    [],
+  );
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
@@ -45,6 +53,7 @@ const App: NextPage = () => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
+      ter: territoryQS,
       rerouteType: rerouteTypeQS,
     },
   } = router;
@@ -56,9 +65,11 @@ const App: NextPage = () => {
     const product = queryQS.toString();
     const page = pageQS ? parsePage(pageQS) : 1;
     const docTypes = docTypesFromQueryString(docQS);
+    const territoryTypes = territoryTypesFromQueryString(territoryQS);
     setProductName(product);
     setPageNumber(page);
     setDocTypes(docTypes);
+    setTerritoryTypes(territoryTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
 
     setDocuments([]);
@@ -78,7 +89,7 @@ const App: NextPage = () => {
     Events.viewResultsForProduct({
       productName: product,
       pageNo: page,
-      docTypes: queryStringFromDocTypes(docTypes),
+      docTypes: queryStringFromTypes(docTypes),
     });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
@@ -99,14 +110,17 @@ const App: NextPage = () => {
     productName: string,
     page: number,
     docTypes: DocType[],
+    territoryTypes: TerritoryType[],
   ) => {
     const query = {
       product: productName,
       page,
     };
     if (docTypes.length > 0) {
-      const docKey = 'doc';
-      query[docKey] = queryStringFromDocTypes(docTypes);
+      query[SearchType.Doc] = queryStringFromTypes(docTypes);
+    }
+    if (territoryTypes.length > 0) {
+      query[SearchType.Territory] = queryStringFromTypes(territoryTypes);
     }
     router.push({
       pathname: productPath,
@@ -114,12 +128,15 @@ const App: NextPage = () => {
     });
   };
 
-  const updateDocTypes = (updatedDocTypes: DocType[]) => {
-    reroutePage(productName, 1, updatedDocTypes);
+  const updatePageFilters = (
+    updatedDocTypes: DocType[],
+    updatedTerritoryTypes: TerritoryType[],
+  ) => {
+    reroutePage(productName, 1, updatedDocTypes, updatedTerritoryTypes);
   };
 
   const handlePageChange = async (page: number) => {
-    reroutePage(productName, page, docTypes);
+    reroutePage(productName, page, docTypes, territoryTypes);
   };
 
   return (
@@ -139,7 +156,8 @@ const App: NextPage = () => {
           searchTerm={productName}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          updateDocTypes={updateDocTypes}
+          territoryTypes={territoryTypes}
+          updatePageFilters={updatePageFilters}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
           rerouteType={rerouteType}

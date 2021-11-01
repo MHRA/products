@@ -42,7 +42,8 @@ describe(SearchResults, () => {
         showingResultsForTerm={'Tea'}
         disclaimerAgree
         docTypes={[]}
-        updateDocTypes={updateDocType}
+        territoryTypes={[]}
+        updatePageFilters={updateDocType}
         rerouteType={RerouteType.CheckboxSelected}
         handlePageChange={noFeedback}
         isLoading={false}
@@ -62,8 +63,9 @@ describe(SearchResults, () => {
         showingResultsForTerm={'Tea'}
         disclaimerAgree
         docTypes={[]}
+        territoryTypes={[]}
         rerouteType={RerouteType.Other}
-        updateDocTypes={noFeedback}
+        updatePageFilters={noFeedback}
         handlePageChange={noFeedback}
         isLoading
       />,
@@ -82,8 +84,9 @@ describe(SearchResults, () => {
         showingResultsForTerm={'Tea'}
         disclaimerAgree
         docTypes={[]}
+        territoryTypes={[]}
         rerouteType={RerouteType.Other}
-        updateDocTypes={noFeedback}
+        updatePageFilters={noFeedback}
         handlePageChange={noFeedback}
         isLoading
         errorFetchingResults

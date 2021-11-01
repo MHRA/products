@@ -1,7 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { RerouteType } from '../../model/rerouteType';
-import { DocType } from '../../services/azure-search';
+import {
+  DocType,
+  SearchType,
+  TerritoryType,
+} from '../../services/azure-search';
 import { Button, Checkbox } from '../form-elements';
 
 const StyledSearchFilter = styled.section`
@@ -19,13 +23,14 @@ const StyledSearchFilter = styled.section`
     }
 
     label {
-      flex: 1;
+      display: flex;
+      align-items: center;
     }
   }
 `;
 
 const ButtonContainer = styled.div`
-  padding-top: 10px;
+  padding-top: 15px;
 `;
 
 const Fieldset = styled.fieldset`
@@ -36,6 +41,12 @@ const Fieldset = styled.fieldset`
 const Legend = styled.legend`
   display: block;
   font-size: 18px;
+  font-weight: bold;
+  margin-top: 19px;
+`;
+
+const SubLegend = styled.legend`
+  display: block;
   font-weight: bold;
   margin: 19px 0;
 `;
@@ -49,78 +60,103 @@ const AccessibleHeading = styled.h3`
 
 interface ISearchFilterProps {
   currentlyEnabledDocTypes: DocType[];
-  updateDocTypes: (d: DocType[]) => void;
+  currentlyEnabledTerritoryTypes: TerritoryType[];
+  updatePageFilters: (d: DocType[], t: TerritoryType[]) => void;
   rerouteType: RerouteType;
 }
 
-interface IDocTypeCheckboxProps {
-  docTypeForThisCheckbox: DocType;
-  name: string;
-  toggleDocType: (d: DocType) => void;
-  currentlyEnabledDocTypes: DocType[];
+interface ICheckboxProps {
+  value: string;
+  label: string;
+  checked: boolean;
+  query: string;
+  toggleFilter: (s: string) => void;
 }
 
-const DocTypeCheckbox: React.FC<IDocTypeCheckboxProps> = (props) => {
-  const {
-    docTypeForThisCheckbox,
-    name,
-    toggleDocType,
-    currentlyEnabledDocTypes,
-  } = props;
+const FilterCheckbox: React.FC<ICheckboxProps> = (props) => {
+  const { value, label, checked, toggleFilter, query } = props;
 
-  const toggleDocTypeForThisCheckbox = () =>
-    toggleDocType(docTypeForThisCheckbox);
+  const toggleDocTypeForThisCheckbox = () => toggleFilter(value);
 
-  const id = `filter-${docTypeForThisCheckbox.toLowerCase()}`;
+  const id = `filter-${value.toLowerCase()}`;
 
   return (
     <div className="checkbox-row">
       <div className="checkbox">
         <Checkbox
           id={id}
-          name="doc"
-          value={docTypeForThisCheckbox}
-          checked={currentlyEnabledDocTypes.includes(docTypeForThisCheckbox)}
+          name={query}
+          value={value}
+          checked={checked}
           onChange={toggleDocTypeForThisCheckbox}
         />
       </div>
       <label htmlFor={id}>
-        {name} ({docTypeForThisCheckbox.toUpperCase()})
+        {label} ({value.toUpperCase()})
       </label>
     </div>
   );
 };
 
 const SearchFilter: React.FC<ISearchFilterProps> = (props) => {
-  const [checkedFilters, setCheckedFilters] = React.useState(
+  const [checkedDocFilters, setCheckedDocFilters] = useState(
     props.currentlyEnabledDocTypes,
+  );
+  const [checkedTerritoryFilters, setCheckedTerritoryFilters] = useState(
+    props.currentlyEnabledTerritoryTypes,
   );
   const submitButton = useRef(null);
   const filterHeader = useRef(null);
 
-  const generateCheckboxFor = (docType: DocType, name: string) => (
-    <DocTypeCheckbox
-      toggleDocType={toggleDocType}
-      currentlyEnabledDocTypes={checkedFilters}
-      docTypeForThisCheckbox={docType}
-      name={name}
-    />
-  );
+  const generateDocTypeCheckboxFor = (docType: DocType, name: string) => {
+    const toggleDoc = (docType) =>
+      toggleFilter(docType, checkedDocFilters, setCheckedDocFilters);
+    return (
+      <FilterCheckbox
+        toggleFilter={toggleDoc}
+        value={docType}
+        label={name}
+        query={SearchType.Doc}
+        checked={checkedDocFilters.includes(docType)}
+      />
+    );
+  };
 
-  const toggleDocType = (docTypeToToggle) => {
-    const enabledDocTypes = Array.from(checkedFilters);
-    if (enabledDocTypes.includes(docTypeToToggle)) {
-      const docTypeIndex = enabledDocTypes.indexOf(docTypeToToggle);
-      enabledDocTypes.splice(docTypeIndex, 1);
+  const generateTerritoryTypeCheckboxFor = (
+    territoryType: TerritoryType,
+    name: string,
+  ) => {
+    const toggleTerritory = (territoryType) =>
+      toggleFilter(
+        territoryType,
+        checkedTerritoryFilters,
+        setCheckedTerritoryFilters,
+      );
+    return (
+      <FilterCheckbox
+        toggleFilter={toggleTerritory}
+        value={territoryType}
+        label={name}
+        query={SearchType.Territory}
+        checked={checkedTerritoryFilters.includes(territoryType)}
+      />
+    );
+  };
+
+  const toggleFilter = (filterToToggle, checkedFilters, setCheckedFilters) => {
+    const enabledFilters = Array.from(checkedFilters);
+    if (enabledFilters.includes(filterToToggle)) {
+      const filterIndex = enabledFilters.indexOf(filterToToggle);
+      enabledFilters.splice(filterIndex, 1);
     } else {
-      enabledDocTypes.push(docTypeToToggle);
+      enabledFilters.push(filterToToggle);
     }
-    setCheckedFilters(enabledDocTypes);
+    setCheckedFilters(enabledFilters);
   };
 
   const submit = (e) => {
     e.preventDefault();
-    props.updateDocTypes(checkedFilters);
+    props.updatePageFilters(checkedDocFilters, checkedTerritoryFilters);
   };
 
   useEffect(() => {
@@ -138,9 +174,17 @@ const SearchFilter: React.FC<ISearchFilterProps> = (props) => {
       <AccessibleHeading>Documents filter</AccessibleHeading>
       <Fieldset>
         <Legend ref={filterHeader}>Filter documents by</Legend>
-        {generateCheckboxFor(DocType.Spc, 'Summary of Product Characteristics')}
-        {generateCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
-        {generateCheckboxFor(DocType.Par, 'Public Assessment Reports')}
+        <SubLegend ref={filterHeader}>Type of document</SubLegend>
+        {generateDocTypeCheckboxFor(
+          DocType.Spc,
+          'Summary of Product Characteristics',
+        )}
+        {generateDocTypeCheckboxFor(DocType.Pil, 'Patient Information Leaflet')}
+        {generateDocTypeCheckboxFor(DocType.Par, 'Public Assessment Reports')}
+        <SubLegend ref={filterHeader}>Applicable to territory</SubLegend>
+        {generateTerritoryTypeCheckboxFor(TerritoryType.UK, 'United Kingdom')}
+        {generateTerritoryTypeCheckboxFor(TerritoryType.NI, 'Northern Ireland')}
+        {generateTerritoryTypeCheckboxFor(TerritoryType.GB, 'Great Britain')}
         <ButtonContainer>
           <Button
             type="submit"

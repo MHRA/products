@@ -116,7 +116,7 @@ const App: NextPage = (props) => {
     });
   };
 
-  const updateDocTypes = (updatedDocTypes: DocType[]) => {
+  const updatePageFilters = (updatedDocTypes: DocType[]) => {
     if (docTypes === updatedDocTypes) return;
     reroutePage(query, 1, updatedDocTypes, RerouteType.CheckboxSelected);
   };
@@ -142,7 +142,7 @@ const App: NextPage = (props) => {
           searchTerm={query}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          updateDocTypes={updateDocTypes}
+          updatePageFilters={updatePageFilters}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
           rerouteType={rerouteType}

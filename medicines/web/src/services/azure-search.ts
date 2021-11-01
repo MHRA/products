@@ -16,6 +16,17 @@ export enum DocType {
   Spc = 'Spc',
 }
 
+export enum TerritoryType {
+  UK = 'UK',
+  NI = 'NI',
+  GB = 'GB',
+}
+
+export enum SearchType {
+  Doc = 'doc',
+  Territory = 'ter',
+}
+
 export interface ISearchResult {
   '@search.highlights': { content: string[] };
   '@search.score': number;
