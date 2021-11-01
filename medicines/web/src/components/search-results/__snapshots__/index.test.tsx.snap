@@ -46,8 +46,9 @@ exports[`SearchResults should render 1`] = `
       >
         <SearchFilter
           currentlyEnabledDocTypes={Array []}
+          currentlyEnabledTerritoryTypes={Array []}
           rerouteType={0}
-          updateDocTypes={[Function]}
+          updatePageFilters={[Function]}
         />
       </div>
       <section
