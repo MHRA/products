@@ -8,13 +8,13 @@ import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/document';
-import { DocType } from '../../services/azure-search';
+import { DocType, TerritoryType } from '../../services/azure-search';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
-  queryStringFromDocTypes,
+  queryStringFromTypes,
 } from '../../services/querystring-interpreter';
 import { getLoader } from '../../services/loaders/products/search-results-loader';
 
@@ -31,6 +31,9 @@ const App: NextPage = (props) => {
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
+  const [territoryTypes, setTerritoryTypes] = React.useState<TerritoryType[]>(
+    [],
+  );
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
@@ -59,6 +62,7 @@ const App: NextPage = (props) => {
     setQuery(query);
     setPageNumber(page);
     setDocTypes(docTypes);
+    setTerritoryTypes(territoryTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
 
     setDocuments([]);
@@ -77,7 +81,7 @@ const App: NextPage = (props) => {
     Events.searchForProductsMatchingKeywords({
       searchTerm: query,
       pageNo: page,
-      docTypes: queryStringFromDocTypes(docTypes),
+      docTypes: queryStringFromTypes(docTypes),
     });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
@@ -104,7 +108,7 @@ const App: NextPage = (props) => {
     };
     if (docTypes.length > 0) {
       const docKey = 'doc';
-      query[docKey] = queryStringFromDocTypes(docTypes);
+      query[docKey] = queryStringFromTypes(docTypes);
     }
     if (rerouteType != null) {
       const rerouteTypeKey = 'rerouteType';
@@ -142,6 +146,7 @@ const App: NextPage = (props) => {
           searchTerm={query}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
+          territoryTypes={territoryTypes}
           updatePageFilters={updatePageFilters}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
