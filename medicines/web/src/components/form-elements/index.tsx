@@ -19,7 +19,7 @@ const StyledCheckbox = styled.input`
   }
 `;
 
-export const Checkbox = props => {
+export const Checkbox = (props) => {
   return <StyledCheckbox type="checkbox" {...props} />;
 };
 

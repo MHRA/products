@@ -2,7 +2,7 @@ import { DocType } from './azure-search';
 import {
   docTypesFromQueryString,
   parsePage,
-  queryStringFromDocTypes,
+  queryStringFromTypes,
 } from './querystring-interpreter';
 
 describe(parsePage, () => {
@@ -28,14 +28,14 @@ describe(docTypesFromQueryString, () => {
   });
 });
 
-describe(queryStringFromDocTypes, () => {
+describe(queryStringFromTypes, () => {
   it('can join by pipe', () => {
-    expect(queryStringFromDocTypes([DocType.Par, DocType.Pil])).toStrictEqual(
+    expect(queryStringFromTypes([DocType.Par, DocType.Pil])).toStrictEqual(
       'Par|Pil',
     );
   });
 
   it('gives empty string for empty filters', () => {
-    expect(queryStringFromDocTypes([])).toStrictEqual('');
+    expect(queryStringFromTypes([])).toStrictEqual('');
   });
 });

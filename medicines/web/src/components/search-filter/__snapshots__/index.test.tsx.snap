@@ -3,16 +3,17 @@
 exports[`SearchFilter should render search filter 1`] = `
 <SearchFilter
   currentlyEnabledDocTypes={Array []}
+  currentlyEnabledTerritoryTypes={Array []}
   rerouteType={0}
-  updateDocTypes={[Function]}
+  updatePageFilters={[Function]}
 >
   <styled.section>
     <section
-      className="sc-dlfnbm gCBqhY"
+      className="sc-dlfnbm ledHbp"
     >
       <styled.h3>
         <h3
-          className="sc-gKsewC icRsCX"
+          className="sc-iBPRYJ jueRyf"
         >
           Documents filter
         </h3>
@@ -23,16 +24,24 @@ exports[`SearchFilter should render search filter 1`] = `
         >
           <styled.legend>
             <legend
-              className="sc-jSgupP bHokth"
+              className="sc-jSgupP ifTOsT"
             >
               Filter documents by
             </legend>
           </styled.legend>
-          <DocTypeCheckbox
-            currentlyEnabledDocTypes={Array []}
-            docTypeForThisCheckbox="Spc"
-            name="Summary of Product Characteristics"
-            toggleDocType={[Function]}
+          <styled.legend>
+            <legend
+              className="sc-gKsewC kEXlwV"
+            >
+              Type of document
+            </legend>
+          </styled.legend>
+          <FilterCheckbox
+            checked={false}
+            label="Summary of Product Characteristics"
+            query="doc"
+            toggleFilter={[Function]}
+            value="Spc"
           >
             <div
               className="checkbox-row"
@@ -76,12 +85,13 @@ exports[`SearchFilter should render search filter 1`] = `
                 )
               </label>
             </div>
-          </DocTypeCheckbox>
-          <DocTypeCheckbox
-            currentlyEnabledDocTypes={Array []}
-            docTypeForThisCheckbox="Pil"
-            name="Patient Information Leaflet"
-            toggleDocType={[Function]}
+          </FilterCheckbox>
+          <FilterCheckbox
+            checked={false}
+            label="Patient Information Leaflet"
+            query="doc"
+            toggleFilter={[Function]}
+            value="Pil"
           >
             <div
               className="checkbox-row"
@@ -125,12 +135,13 @@ exports[`SearchFilter should render search filter 1`] = `
                 )
               </label>
             </div>
-          </DocTypeCheckbox>
-          <DocTypeCheckbox
-            currentlyEnabledDocTypes={Array []}
-            docTypeForThisCheckbox="Par"
-            name="Public Assessment Reports"
-            toggleDocType={[Function]}
+          </FilterCheckbox>
+          <FilterCheckbox
+            checked={false}
+            label="Public Assessment Reports"
+            query="doc"
+            toggleFilter={[Function]}
+            value="Par"
           >
             <div
               className="checkbox-row"
@@ -174,10 +185,167 @@ exports[`SearchFilter should render search filter 1`] = `
                 )
               </label>
             </div>
-          </DocTypeCheckbox>
+          </FilterCheckbox>
+          <styled.legend>
+            <legend
+              className="sc-gKsewC kEXlwV"
+            >
+              Applicable to territory
+            </legend>
+          </styled.legend>
+          <FilterCheckbox
+            checked={false}
+            label="United Kingdom"
+            query="ter"
+            toggleFilter={[Function]}
+            value="UK"
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <Checkbox
+                  checked={false}
+                  id="filter-uk"
+                  name="ter"
+                  onChange={[Function]}
+                  value="UK"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-uk"
+                    name="ter"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="UK"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdfBwQ bHPfdB"
+                      id="filter-uk"
+                      name="ter"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="UK"
+                    />
+                  </styled.input>
+                </Checkbox>
+              </div>
+              <label
+                htmlFor="filter-uk"
+              >
+                United Kingdom
+                 (
+                UK
+                )
+              </label>
+            </div>
+          </FilterCheckbox>
+          <FilterCheckbox
+            checked={false}
+            label="Northern Ireland"
+            query="ter"
+            toggleFilter={[Function]}
+            value="NI"
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <Checkbox
+                  checked={false}
+                  id="filter-ni"
+                  name="ter"
+                  onChange={[Function]}
+                  value="NI"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-ni"
+                    name="ter"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="NI"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdfBwQ bHPfdB"
+                      id="filter-ni"
+                      name="ter"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="NI"
+                    />
+                  </styled.input>
+                </Checkbox>
+              </div>
+              <label
+                htmlFor="filter-ni"
+              >
+                Northern Ireland
+                 (
+                NI
+                )
+              </label>
+            </div>
+          </FilterCheckbox>
+          <FilterCheckbox
+            checked={false}
+            label="Great Britain"
+            query="ter"
+            toggleFilter={[Function]}
+            value="GB"
+          >
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <Checkbox
+                  checked={false}
+                  id="filter-gb"
+                  name="ter"
+                  onChange={[Function]}
+                  value="GB"
+                >
+                  <styled.input
+                    checked={false}
+                    id="filter-gb"
+                    name="ter"
+                    onChange={[Function]}
+                    type="checkbox"
+                    value="GB"
+                  >
+                    <input
+                      checked={false}
+                      className="sc-bdfBwQ bHPfdB"
+                      id="filter-gb"
+                      name="ter"
+                      onChange={[Function]}
+                      type="checkbox"
+                      value="GB"
+                    />
+                  </styled.input>
+                </Checkbox>
+              </div>
+              <label
+                htmlFor="filter-gb"
+              >
+                Great Britain
+                 (
+                GB
+                )
+              </label>
+            </div>
+          </FilterCheckbox>
           <styled.div>
             <div
-              className="sc-hKgILt htIFRi"
+              className="sc-hKgILt emQRkz"
             >
               <styled.input
                 onClick={[Function]}

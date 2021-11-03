@@ -8,13 +8,18 @@ import SearchWrapper from '../../components/search-wrapper';
 import { useLocalStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/document';
-import { DocType } from '../../services/azure-search';
+import {
+  DocType,
+  TerritoryType,
+  SearchType,
+} from '../../services/azure-search';
 import Events from '../../services/events';
 import {
   docTypesFromQueryString,
+  territoryTypesFromQueryString,
   parseDisclaimerAgree,
   parsePage,
-  queryStringFromDocTypes,
+  queryStringFromTypes,
 } from '../../services/querystring-interpreter';
 import { getLoader } from '../../services/loaders/products/search-results-loader';
 
@@ -31,6 +36,9 @@ const App: NextPage = (props) => {
   const [count, setCount] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [docTypes, setDocTypes] = React.useState<DocType[]>([]);
+  const [territoryTypes, setTerritoryTypes] = React.useState<TerritoryType[]>(
+    [],
+  );
   const [disclaimerAgree, setDisclaimerAgree] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [rerouteType, setRerouteType] = React.useState(RerouteType.Other);
@@ -44,6 +52,7 @@ const App: NextPage = (props) => {
       page: pageQS,
       disclaimer: disclaimerQS,
       doc: docQS,
+      ter: territoryQS,
       rerouteType: rerouteTypeQS,
     },
   } = router;
@@ -56,9 +65,11 @@ const App: NextPage = (props) => {
     const query = queryQS.toString();
     const page = pageQS ? parsePage(pageQS) : 1;
     const docTypes = docTypesFromQueryString(docQS);
+    const territoryTypes = territoryTypesFromQueryString(territoryQS);
     setQuery(query);
     setPageNumber(page);
     setDocTypes(docTypes);
+    setTerritoryTypes(territoryTypes);
     setDisclaimerAgree(parseDisclaimerAgree(disclaimerQS));
 
     setDocuments([]);
@@ -77,7 +88,7 @@ const App: NextPage = (props) => {
     Events.searchForProductsMatchingKeywords({
       searchTerm: query,
       pageNo: page,
-      docTypes: queryStringFromDocTypes(docTypes),
+      docTypes: queryStringFromTypes(docTypes),
     });
   }, [queryQS, pageQS, disclaimerQS, docQS]);
 
@@ -96,6 +107,7 @@ const App: NextPage = (props) => {
     searchTerm: string,
     page: number,
     docTypes: DocType[],
+    territoryTypes: TerritoryType[],
     rerouteType?: RerouteType,
   ) => {
     const query = {
@@ -103,8 +115,10 @@ const App: NextPage = (props) => {
       page,
     };
     if (docTypes.length > 0) {
-      const docKey = 'doc';
-      query[docKey] = queryStringFromDocTypes(docTypes);
+      query[SearchType.Doc] = queryStringFromTypes(docTypes);
+    }
+    if (territoryTypes.length > 0) {
+      query[SearchType.Territory] = queryStringFromTypes(territoryTypes);
     }
     if (rerouteType != null) {
       const rerouteTypeKey = 'rerouteType';
@@ -116,13 +130,28 @@ const App: NextPage = (props) => {
     });
   };
 
-  const updateDocTypes = (updatedDocTypes: DocType[]) => {
-    if (docTypes === updatedDocTypes) return;
-    reroutePage(query, 1, updatedDocTypes, RerouteType.CheckboxSelected);
+  const updatePageFilters = (
+    updatedDocTypes: DocType[],
+    updatedTerritoryTypes: TerritoryType[],
+  ) => {
+    if (
+      docTypes === updatedDocTypes &&
+      territoryTypes === updatedTerritoryTypes
+    ) {
+      return;
+    }
+
+    reroutePage(
+      query,
+      1,
+      updatedDocTypes,
+      updatedTerritoryTypes,
+      RerouteType.CheckboxSelected,
+    );
   };
 
   const handlePageChange = async (page: number) => {
-    reroutePage(query, page, docTypes);
+    reroutePage(query, page, docTypes, territoryTypes);
   };
 
   return (
@@ -142,7 +171,8 @@ const App: NextPage = (props) => {
           searchTerm={query}
           disclaimerAgree={disclaimerAgree}
           docTypes={docTypes}
-          updateDocTypes={updateDocTypes}
+          territoryTypes={territoryTypes}
+          updatePageFilters={updatePageFilters}
           handlePageChange={handlePageChange}
           isLoading={isLoading}
           rerouteType={rerouteType}

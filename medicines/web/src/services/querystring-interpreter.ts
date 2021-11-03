@@ -1,4 +1,4 @@
-import { DocType } from './azure-search';
+import { DocType, TerritoryType } from './azure-search';
 
 export const parsePage = (page: string | string[]) => {
   let parsedPage = Number(page);
@@ -8,7 +8,7 @@ export const parsePage = (page: string | string[]) => {
   return parsedPage;
 };
 
-const docTypeQueryStringSeparator = '|';
+const typeQueryStringSeparator = '|';
 
 const formatDocTypeFilters = (s: string): DocType[] => {
   if (s.length <= 0) {
@@ -16,14 +16,9 @@ const formatDocTypeFilters = (s: string): DocType[] => {
   }
 
   return s
-    .split(docTypeQueryStringSeparator)
-    .map(d => DocType[d as keyof typeof DocType]);
+    .split(typeQueryStringSeparator)
+    .map((d) => DocType[d as keyof typeof DocType]);
 };
-
-export const queryStringFromDocTypes = (enabledDocTypes: DocType[]): string =>
-  enabledDocTypes.length > 0
-    ? enabledDocTypes.join(docTypeQueryStringSeparator)
-    : '';
 
 export const docTypesFromQueryString = (
   queryDocFilter: string | string[],
@@ -32,6 +27,30 @@ export const docTypesFromQueryString = (
     ? formatDocTypeFilters(queryDocFilter)
     : [];
 };
+
+const formatTerritoryTypeFilters = (s: string): TerritoryType[] => {
+  if (s.length <= 0) {
+    return [];
+  }
+
+  return s
+    .split(typeQueryStringSeparator)
+    .map((d) => TerritoryType[d as keyof typeof TerritoryType]);
+};
+
+export const territoryTypesFromQueryString = (
+  queryTerritoryFilter: string | string[],
+): TerritoryType[] => {
+  return typeof queryTerritoryFilter === 'string' &&
+    queryTerritoryFilter.length > 0
+    ? formatTerritoryTypeFilters(queryTerritoryFilter)
+    : [];
+};
+
+export const queryStringFromTypes = (
+  enabledTypes: DocType[] | TerritoryType[],
+): string =>
+  enabledTypes.length > 0 ? enabledTypes.join(typeQueryStringSeparator) : '';
 
 export const parseDisclaimerAgree = (
   queryDisclaimerAgree: string | string[],

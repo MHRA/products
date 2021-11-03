@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useLocalStorage, useSessionStorage } from '../../hooks';
 import { RerouteType } from '../../model/rerouteType';
 import { IDocument } from '../../model/document';
-import { DocType } from '../../services/azure-search';
+import { DocType, TerritoryType } from '../../services/azure-search';
 import { errorRed, mhraBlue80, mhraGray10, white } from '../../styles/colors';
 import {
   baseSpace,
@@ -220,7 +220,8 @@ interface ISearchResultsProps {
   showingResultsForTerm: string;
   disclaimerAgree: boolean;
   docTypes: DocType[];
-  updateDocTypes: (d: DocType[]) => void;
+  territoryTypes: TerritoryType[];
+  updatePageFilters: (d: DocType[], t: TerritoryType[]) => void;
   handlePageChange: (num: number) => void;
   isLoading: boolean;
   rerouteType: RerouteType;
@@ -253,7 +254,8 @@ const SearchResults = (props: ISearchResultsProps) => {
     searchTerm,
     showingResultsForTerm,
     docTypes,
-    updateDocTypes,
+    territoryTypes,
+    updatePageFilters,
     rerouteType,
   } = props;
 
@@ -340,7 +342,8 @@ const SearchResults = (props: ISearchResultsProps) => {
             <div className="column filter">
               <SearchFilter
                 currentlyEnabledDocTypes={docTypes}
-                updateDocTypes={updateDocTypes}
+                currentlyEnabledTerritoryTypes={territoryTypes}
+                updatePageFilters={updatePageFilters}
                 rerouteType={rerouteType}
               />
             </div>
