@@ -77,7 +77,7 @@ const App: NextPage = (props) => {
     setErrorFetchingResults(false);
 
     getLoader(useGraphQl)
-      .load({ searchTerm: query, page, pageSize, docTypes })
+      .load({ searchTerm: query, page, pageSize, docTypes, territoryTypes })
       .then(({ documents, count }) => {
         setDocuments(documents);
         setCount(count);
@@ -90,7 +90,7 @@ const App: NextPage = (props) => {
       pageNo: page,
       docTypes: queryStringFromTypes(docTypes),
     });
-  }, [queryQS, pageQS, disclaimerQS, docQS]);
+  }, [queryQS, pageQS, disclaimerQS, docQS, territoryQS]);
 
   useEffect(() => {
     window.scrollTo(0, 0);

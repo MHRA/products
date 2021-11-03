@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
 import { IDocument, IDocuments } from '../../../model/document';
-import { DocType, docSearch } from '../../azure-search';
+import { DocType, TerritoryType, docSearch } from '../../azure-search';
 import { graphqlRequest } from '../../graphql';
 import { convertResults } from '../../azure-results-converter';
 
@@ -59,11 +59,11 @@ interface IDocumentResponse {
 }
 
 const query = `
-query ($productName: String!, $first: Int, $skip: Int, $docTypes: [DocumentType!]) {
+query ($productName: String!, $first: Int, $skip: Int, $docTypes: [DocumentType!], $territoryTypes: [TerritoryType!]) {
   products {
     product(name: $productName) {
       name
-      documents(first: $first, offset: $skip, documentTypes: $docTypes) {
+      documents(first: $first, offset: $skip, documentTypes: $docTypes, territoryTypes: $territoryTypes) {
         count: totalCount
         edges {
           node {
@@ -125,12 +125,14 @@ const getDocumentsForProduct = async ({
   page,
   pageSize,
   docTypes,
+  territoryTypes,
 }: IProductInfo) => {
   const variables = {
     productName: name,
     first: pageSize,
     skip: calculatePageStartRecord(page, pageSize),
     docTypes: docTypes.map((s) => s.toUpperCase()),
+    territoryTypes: territoryTypes.map((t) => t.toUpperCase()),
   };
 
   return graphqlRequest<IProductResponse, typeof variables>({
@@ -144,6 +146,7 @@ interface IProductInfo {
   page: number;
   pageSize: number;
   docTypes: DocType[];
+  territoryTypes: TerritoryType[];
 }
 
 const calculatePageStartRecord = (page: number, pageSize: number): number =>
