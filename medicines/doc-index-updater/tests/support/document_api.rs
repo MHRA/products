@@ -5,7 +5,7 @@ use doc_index_updater::{
     models::{Document, FileSource, JobStatus, JobStatusResponse},
 };
 use reqwest::Error;
-use search_client::models::DocumentType;
+use search_client::models::{DocumentType, TerritoryType};
 use uuid::Uuid;
 
 pub fn delete_document(document_id: String) -> Result<JobStatusResponse, Error> {
@@ -35,7 +35,7 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
         author: "author".to_string(),
         products: vec!["products".to_string()],
         pl_number: "pl_number".to_string(),
-        territory: "territory".to_string(),
+        territory: TerritoryType::UK,
         active_substances: vec!["active_substances".to_string()],
         file_path,
         file_source: FileSource::Sentinel,

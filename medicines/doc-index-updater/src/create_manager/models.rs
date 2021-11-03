@@ -2,7 +2,7 @@ use super::sanitiser::{SanitisedString, VecSanitisedString};
 use crate::{create_manager::Blob, models::Document};
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
-use search_client::models::{DocumentType, IndexEntry};
+use search_client::models::{DocumentType, IndexEntry, TerritoryType};
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -11,7 +11,7 @@ pub struct BlobMetadata {
     pub doc_type: DocumentType,
     pub title: SanitisedString,
     pub pl_number: String,
-    pub territory: SanitisedString,
+    pub territory: TerritoryType,
     pub product_names: VecSanitisedString,
     pub active_substances: VecSanitisedString,
     pub author: SanitisedString,
@@ -25,7 +25,7 @@ impl BlobMetadata {
         doc_type: DocumentType,
         title: String,
         pl_number: String,
-        territory: String,
+        territory: TerritoryType,
         product_names: Vec<String>,
         active_substances: Vec<String>,
         author: String,
@@ -36,7 +36,7 @@ impl BlobMetadata {
             doc_type,
             title: title.into(),
             pl_number,
-            territory: territory.into(),
+            territory: territory,
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),
@@ -61,7 +61,7 @@ impl Into<BlobMetadata> for Document {
             doc_type: self.document_type,
             title,
             pl_number,
-            territory: SanitisedString::from(&self.territory),
+            territory: self.territory,
             product_names: VecSanitisedString::from(
                 self.products
                     .iter()
@@ -123,7 +123,7 @@ impl From<Blob> for IndexEntry {
                 .join(", "),
             title: blob.metadata.title.to_string(),
             pl_number: vec![blob.metadata.pl_number.to_string()],
-            territory: blob.metadata.territory.to_string(),
+            territory: blob.metadata.territory,
             file_name: blob.metadata.file_name.to_string(),
             doc_type: blob.metadata.doc_type,
             suggestions: vec![],
@@ -212,7 +212,7 @@ mod test {
                 "PL 12345/6789".to_string(),
             ]),
             pl_number: "PL 12345/6789".to_string(),
-            territory: "UK".to_string(),
+            territory: TerritoryType::UK,
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::Sentinel,
@@ -320,7 +320,7 @@ mod test {
             ],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
-            territory: "UK".to_string(),
+            territory: TerritoryType::UK,
             active_substances: vec!["paracetamol".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "/home/sentinel/something.pdf".to_string(),
@@ -335,7 +335,7 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
-                territory: SanitisedString::from("UK".to_string()),
+                territory: TerritoryType::UK,
                 product_names: VecSanitisedString::from(vec![
                     "GENERIC PARACETAMOL".to_string(),
                     "SPECIAL PARACETAMOL".to_string()
