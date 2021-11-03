@@ -6,7 +6,7 @@ use crate::{
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
-use search_client::models::DocumentType;
+use search_client::models::{DocumentType, TerritoryType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -86,7 +86,7 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
             None => None,
         },
         pl_number: metadata.pl_number,
-        territory: metadata.territory.to_string(),
+        territory: metadata.territory,
         active_substances: metadata.active_substances.to_vec_string(),
         file_source: FileSource::TemporaryAzureBlobStorage,
         file_path: storage_file.name,
@@ -256,7 +256,6 @@ fn product_form_data_to_blob_metadata(
 
     let title = get_field_as_uppercase_string(&fields, "title")?;
     let pl_number = get_field_as_uppercase_string(&fields, "licence_number")?;
-    let territory = get_field_as_uppercase_string(&fields, "territory")?;
 
     let active_substances = fields
         .iter()
@@ -272,7 +271,7 @@ fn product_form_data_to_blob_metadata(
         DocumentType::Par,
         title,
         pl_number,
-        territory,
+        TerritoryType::UK,
         product_names,
         active_substances,
         author,
@@ -355,7 +354,7 @@ mod tests {
                 doc_type: DocumentType::Par,
                 title: "FEEL GOOD PILLS REALLY STRONG HIGH DOSE THR 12345/1234".into(),
                 pl_number: "THR 12345/1234".into(),
-                territory: "UK".into(),
+                territory: TerritoryType::UK,
                 product_names: vec!["FEEL GOOD PILLS".into()].into(),
                 active_substances: vec!["IBUPROFEN".into(), "TEMAZEPAM".into()].into(),
                 author: "".into(),
