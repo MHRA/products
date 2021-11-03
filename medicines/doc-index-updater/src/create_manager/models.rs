@@ -11,6 +11,7 @@ pub struct BlobMetadata {
     pub doc_type: DocumentType,
     pub title: SanitisedString,
     pub pl_number: String,
+    pub territory: SanitisedString,
     pub product_names: VecSanitisedString,
     pub active_substances: VecSanitisedString,
     pub author: SanitisedString,
@@ -24,6 +25,7 @@ impl BlobMetadata {
         doc_type: DocumentType,
         title: String,
         pl_number: String,
+        territory: String,
         product_names: Vec<String>,
         active_substances: Vec<String>,
         author: String,
@@ -34,6 +36,7 @@ impl BlobMetadata {
             doc_type,
             title: title.into(),
             pl_number,
+            territory: territory.into(),
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),
@@ -58,6 +61,7 @@ impl Into<BlobMetadata> for Document {
             doc_type: self.document_type,
             title,
             pl_number,
+            territory: SanitisedString::from(&self.territory),
             product_names: VecSanitisedString::from(
                 self.products
                     .iter()
@@ -96,6 +100,7 @@ impl Into<HashMap<String, String>> for BlobMetadata {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
         metadata.insert("pl_number".to_string(), self.pl_number.clone());
+        metadata.insert("territory".to_string(), self.territory.to_string());
         metadata.insert("author".to_string(), self.author.to_string());
 
         metadata
@@ -118,6 +123,7 @@ impl From<Blob> for IndexEntry {
                 .join(", "),
             title: blob.metadata.title.to_string(),
             pl_number: vec![blob.metadata.pl_number.to_string()],
+            territory: blob.metadata.territory.to_string(),
             file_name: blob.metadata.file_name.to_string(),
             doc_type: blob.metadata.doc_type,
             suggestions: vec![],
@@ -185,9 +191,9 @@ pub fn format_product_licence(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use test_case::test_case;
     use crate::models::FileSource;
     use search_client::models::DocumentType;
+    use test_case::test_case;
 
     #[test]
     fn derive_metadata() {
@@ -206,6 +212,7 @@ mod test {
                 "PL 12345/6789".to_string(),
             ]),
             pl_number: "PL 12345/6789".to_string(),
+            territory: "UK".to_string(),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::Sentinel,
@@ -219,6 +226,7 @@ mod test {
         let expected_substance_name = "[\"PARACETAMOL\",\"CAFFEINE\"]".to_string();
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
+        let expected_territory = "UK".to_string();
 
         let output_metadata: HashMap<String, String> = Into::<BlobMetadata>::into(doc).into();
 
@@ -230,6 +238,7 @@ mod test {
         assert_eq!(output_metadata["substance_name"], expected_substance_name);
         assert_eq!(output_metadata["keywords"], expected_keywords);
         assert_eq!(output_metadata["pl_number"], expected_pl_number);
+        assert_eq!(output_metadata["territory"], expected_territory);
     }
 
     #[test]
@@ -311,6 +320,7 @@ mod test {
             ],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
+            territory: "UK".to_string(),
             active_substances: vec!["paracetamol".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "/home/sentinel/something.pdf".to_string(),
@@ -325,6 +335,7 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
+                territory: SanitisedString::from("UK".to_string()),
                 product_names: VecSanitisedString::from(vec![
                     "GENERIC PARACETAMOL".to_string(),
                     "SPECIAL PARACETAMOL".to_string()

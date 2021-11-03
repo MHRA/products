@@ -189,6 +189,7 @@ mod test {
             title: "title".to_string(),
             created: Some("created".to_string()),
             facets: vec!["facet".to_string()],
+            territory: Some("UK".to_string()),
             keywords: None,
             metadata_storage_size: 300,
             release_state: None,

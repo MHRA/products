@@ -86,6 +86,7 @@ fn document_from_form_data(storage_file: StorageFile, metadata: BlobMetadata) ->
             None => None,
         },
         pl_number: metadata.pl_number,
+        territory: metadata.territory.to_string(),
         active_substances: metadata.active_substances.to_vec_string(),
         file_source: FileSource::TemporaryAzureBlobStorage,
         file_path: storage_file.name,
@@ -255,6 +256,7 @@ fn product_form_data_to_blob_metadata(
 
     let title = get_field_as_uppercase_string(&fields, "title")?;
     let pl_number = get_field_as_uppercase_string(&fields, "licence_number")?;
+    let territory = get_field_as_uppercase_string(&fields, "territory")?;
 
     let active_substances = fields
         .iter()
@@ -270,6 +272,7 @@ fn product_form_data_to_blob_metadata(
         DocumentType::Par,
         title,
         pl_number,
+        territory,
         product_names,
         active_substances,
         author,
@@ -340,6 +343,7 @@ mod tests {
                     "Feel good pills Really Strong High Dose THR 12345/1234",
                 ),
                 text_field("licence_number", "THR 12345/1234"),
+                text_field("territory", "UK"),
             ],
         )
         .unwrap();
@@ -351,6 +355,7 @@ mod tests {
                 doc_type: DocumentType::Par,
                 title: "FEEL GOOD PILLS REALLY STRONG HIGH DOSE THR 12345/1234".into(),
                 pl_number: "THR 12345/1234".into(),
+                territory: "UK".into(),
                 product_names: vec!["FEEL GOOD PILLS".into()].into(),
                 active_substances: vec!["IBUPROFEN".into(), "TEMAZEPAM".into()].into(),
                 author: "".into(),

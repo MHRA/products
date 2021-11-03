@@ -111,6 +111,7 @@ mod test {
                 "PL 12345/6789".to_string(),
             ]),
             pl_number: "PL 12345/6789".to_string(),
+            territory: "UK".to_string(),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::TemporaryAzureBlobStorage,
@@ -141,7 +142,7 @@ mod test {
             DateTime::parse_from_rfc3339("1996-12-19T16:39:57-00:00").unwrap(),
         );
         let message = get_create_message();
-        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,CreateMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document: Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage, file_path: \"location/on/disk\" }, initiator_email: Some(\"example@email.com\") }\n".to_string();
+        let expected = "1kdlkjd1229ui09askjsadkl12da,1996-12-19 16:39:57,CreateMessage { job_id: 739b7840-a1e9-42eb-8013-0120cdf066bc, document: Document { id: \"CON123456\", name: \"Paracetamol Plus PL 12345/6789\", document_type: Spc, author: \"JRR Tolkien\", products: [\"Effective product 1\", \"Effective product 2\"], keywords: Some([\"Very good for you\", \"Cures headaches\", \"PL 12345/6789\"]), pl_number: \"PL 12345/6789\", territory: \"UK\", active_substances: [\"Paracetamol\", \"Caffeine\"], file_source: TemporaryAzureBlobStorage, file_path: \"location/on/disk\" }, initiator_email: Some(\"example@email.com\") }\n".to_string();
 
         let actual = get_log_body(&blob_name, message, &date);
 

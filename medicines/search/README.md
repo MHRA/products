@@ -73,7 +73,7 @@ cargo run delete_datasource
 First check the definition is correct in `definitions/indexes/azureblob-index.json`, then run the following command:
 
 ```sh
-cargo run create_index -i bmgf
+cargo run create_or_update_index -i bmgf
 ```
 
 The `-i` argument is optional and can be used to target an index definition other than `default`.

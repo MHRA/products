@@ -11,8 +11,8 @@ subcommands:
       about: Create a datasource from a definition.
   - delete_datasource:
       about: Delete a datasource.
-  - create_index:
-      about: Create an index from a definition.
+  - create_or_update_index:
+      about: Create or update an index from a definition.
       args:
         - index:
             short: i

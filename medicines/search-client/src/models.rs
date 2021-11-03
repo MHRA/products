@@ -29,6 +29,7 @@ pub struct IndexResult {
     pub score: f32,
     #[serde(rename = "@search.highlights")]
     pub highlights: Option<AzureHighlight>,
+    pub territory: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -131,6 +132,7 @@ pub struct IndexEntry {
     pub keywords: String,
     pub title: String,
     pub pl_number: Vec<String>,
+    pub territory: String,
     pub file_name: String,
     pub metadata_storage_content_type: String,
     pub metadata_storage_size: usize,
@@ -167,6 +169,10 @@ impl From<IndexResult> for IndexEntry {
             },
             keywords: match res.keywords {
                 Some(k) => k,
+                None => "".to_owned(),
+            },
+            territory: match res.territory {
+                Some(t) => t,
                 None => "".to_owned(),
             },
             title: res.title,

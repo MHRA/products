@@ -167,6 +167,20 @@
       "fields": []
     },
     {
+      "name": "territory",
+      "type": "Edm.String",
+      "facetable": false,
+      "filterable": true,
+      "key": false,
+      "retrievable": true,
+      "searchable": false,
+      "sortable": false,
+      "indexAnalyzer": null,
+      "searchAnalyzer": null,
+      "synonymMaps": [],
+      "fields": []
+    },
+    {
       "name": "file_name",
       "type": "Edm.String",
       "facetable": false,
