@@ -1,7 +1,7 @@
 use crate::{pagination, pagination::PageInfo};
 use async_graphql::SimpleObject;
 use search_client::{
-    models::{DocumentType, IndexResult, IndexResults},
+    models::{DocumentType, IndexResult, IndexResults, TerritoryType},
     Search,
 };
 
@@ -20,6 +20,8 @@ pub struct Document {
     pub created: Option<String>,
     #[field(desc = "Document type")]
     pub doc_type: Option<DocumentType>,
+    #[field(desc = "Territory type")]
+    pub territory_type: Option<TerritoryType>,
     #[field(desc = "File size")]
     pub file_size_in_bytes: Option<i32>,
     #[field(desc = "PDF file name")]
@@ -32,6 +34,10 @@ impl Document {
     pub fn is_doc_type(&self, doc_type: DocumentType) -> bool {
         self.doc_type == Some(doc_type)
     }
+
+    pub fn is_territory_type(&self, territory_type: TerritoryType) -> bool {
+        self.territory_type == Some(territory_type)
+    }
 }
 
 impl From<IndexResult> for Document {
@@ -42,6 +48,7 @@ impl From<IndexResult> for Document {
             title: Some(r.title),
             created: r.created,
             doc_type: Some(r.doc_type),
+            territory_type: r.territory,
             file_size_in_bytes: Some(r.metadata_storage_size),
             name: Some(r.file_name),
             url: Some(r.metadata_storage_path),
@@ -102,6 +109,7 @@ pub async fn get_documents(
     first: Option<i32>,
     offset: i32,
     document_types: Option<Vec<DocumentType>>,
+    territory_types: Option<Vec<TerritoryType>>,
     product_name: Option<&str>,
 ) -> Result<AzureDocumentResult, anyhow::Error> {
     let result_count = first.unwrap_or(10);
@@ -114,7 +122,7 @@ pub async fn get_documents(
                 offset,
             },
             true,
-            build_filter(document_types, product_name).as_deref(),
+            build_filter(document_types, territory_types, product_name).as_deref(),
         )
         .await?;
 
@@ -139,12 +147,18 @@ fn map_azure_result(result: IndexResults, offset: i32) -> AzureDocumentResult {
 
 fn build_filter(
     document_types: Option<Vec<DocumentType>>,
+    territory_types: Option<Vec<TerritoryType>>,
     product_name: Option<&str>,
 ) -> Option<String> {
     let docs_filter = document_types.and_then(build_document_types_filter);
     let products_filter = product_name.map(build_product_name_filter);
+    let territories_filter = territory_types.and_then(build_territory_types_filter);
 
-    let filters: Vec<String> = products_filter.into_iter().chain(docs_filter).collect();
+    let filters: Vec<String> = products_filter
+        .into_iter()
+        .chain(docs_filter)
+        .chain(territories_filter)
+        .collect();
 
     match &filters[..] {
         [] => None,
@@ -168,6 +182,21 @@ fn build_document_types_filter(document_types: Vec<DocumentType>) -> Option<Stri
     ))
 }
 
+fn build_territory_types_filter(territory_types: Vec<TerritoryType>) -> Option<String> {
+    if territory_types.is_empty() {
+        return None;
+    }
+
+    Some(format!(
+        "({})",
+        territory_types
+            .into_iter()
+            .map(|territory_type| format!("territory eq '{}'", territory_type))
+            .collect::<Vec<_>>()
+            .join(" or ")
+    ))
+}
+
 fn build_product_name_filter(product_name: &str) -> String {
     format!("(product_name eq '{}')", product_name)
 }
@@ -182,6 +211,7 @@ mod test {
         IndexResult {
             product_name: Some(product_name.to_string()),
             doc_type: DocumentType::Spc,
+            territory: Some(TerritoryType::UK),
             file_name: "our_id".to_string(),
             metadata_storage_name: "storage_name".to_string(),
             metadata_storage_path: "test/path".to_string(),
@@ -189,7 +219,6 @@ mod test {
             title: "title".to_string(),
             created: Some("created".to_string()),
             facets: vec!["facet".to_string()],
-            territory: Some("UK".to_string()),
             keywords: None,
             metadata_storage_size: 300,
             release_state: None,
@@ -283,40 +312,46 @@ mod test {
         then_we_have_the_expected_output(response);
     }
 
-    #[test_case(None, None, None)]
+    #[test_case(None, None, None, None)]
     #[test_case(
+        Some(vec![]),
         Some(vec![]),
         None,
         None
     )]
     #[test_case(
         Some(vec![DocumentType::Spc, DocumentType::Pil,DocumentType::Par,]),
+        Some(vec![TerritoryType::UK, TerritoryType::GB, TerritoryType::NI,]),
         Some("IBUPROFEN 100MG CAPLETS"),
-        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par'))")
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'UK' or territory eq 'GB' or territory eq 'NI'))")
     )]
     #[test_case(
         Some(vec![DocumentType::Spc,  DocumentType::Pil,DocumentType::Par,]),
+        Some(vec![TerritoryType::UK, TerritoryType::GB, TerritoryType::NI,]),
         None,
-        Some("(doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par')")
+        Some("((doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'UK' or territory eq 'GB' or territory eq 'NI'))")
     )]
     #[test_case(
+        None,
         None,
         Some("IBUPROFEN 100MG CAPLETS"),
         Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')")
     )]
     #[test_case(
         Some(vec![]),
+        Some(vec![]),
         Some("IBUPROFEN 100MG CAPLETS"),
         Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')")
     )]
     fn test_build_filter(
         document_types: Option<Vec<DocumentType>>,
+        territory_types: Option<Vec<TerritoryType>>,
         product_name: Option<&str>,
         expected_filter: Option<&str>,
     ) {
         assert_eq!(
             expected_filter.map(|s| s.to_string()),
-            build_filter(document_types, product_name)
+            build_filter(document_types, territory_types, product_name)
         );
     }
 }
