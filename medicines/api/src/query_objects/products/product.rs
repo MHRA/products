@@ -128,6 +128,7 @@ mod test {
             file_name: "README.markdown".to_string(),
             highlights: None,
             keywords: None,
+            territory: Some("UK".to_string()),
             metadata_storage_name: "dummy".to_string(),
             metadata_storage_path: "/".to_string(),
             metadata_storage_size: 0,
