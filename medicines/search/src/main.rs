@@ -18,7 +18,7 @@ async fn main() {
             .expect("Failed to delete datasource"),
         ("create_index", Some(m)) => {
             let index_definition = m.value_of("index").unwrap_or("default");
-            index::create_index(index_definition)
+            index::create_or_update_index(index_definition)
                 .await
                 .expect("Failed to create index")
         }
