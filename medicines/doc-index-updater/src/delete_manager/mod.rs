@@ -528,7 +528,7 @@ mod test {
             metadata_storage_path: "test/path".to_string(),
             product_name: Some("product".to_string()),
             substance_name: vec!["substance".to_string()],
-            territory: TerritoryType::UK,
+            territory: Some(TerritoryType::UK),
             title: "title".to_string(),
             created: None,
             facets: vec!["facet".to_string()],

@@ -36,7 +36,7 @@ impl BlobMetadata {
             doc_type,
             title: title.into(),
             pl_number,
-            territory: territory,
+            territory,
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),

@@ -11,7 +11,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
-use search_client::models::DocumentType;
+use search_client::models::{DocumentType, TerritoryType};
 
 pub struct Products {}
 
@@ -79,6 +79,7 @@ impl Products {
             })
     }
 
+    #[allow(clippy::too_many_arguments)]
     #[field(desc = "SPC, PIL and PAR Documents related to products")]
     async fn documents(
         &self,
@@ -88,6 +89,7 @@ impl Products {
         skip: Option<i32>,
         after: Option<String>,
         document_types: Option<Vec<DocumentType>>,
+        territory_types: Option<Vec<TerritoryType>>,
     ) -> FieldResult<Documents> {
         let context = context.data::<AzureContext>()?;
         let offset = get_offset_or_default(skip, after, 0);
@@ -98,6 +100,7 @@ impl Products {
             first,
             offset,
             document_types,
+            territory_types,
             None,
         )
         .await
