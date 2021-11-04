@@ -6,9 +6,9 @@ use crate::{
     state_manager::{with_state, JobStatusClient, StateManager},
     storage_client::{models::StorageFile, AzureBlobStorage, StorageClient},
 };
-use search_client::models::{DocumentType, TerritoryType};
+use search_client::models::{DocumentType, TerritoryType, TerritoryTypeParseError};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 use uuid::Uuid;
 use warp::{
     http::{header, Method},
@@ -264,6 +264,13 @@ fn product_form_data_to_blob_metadata(
         .map(|s| s.to_uppercase())
         .collect::<Vec<String>>();
 
+    let territory = fields
+        .iter()
+        .find(|field| field.name == "territory")
+        .and_then(|field| field.value.value())
+        .map(|s| TerritoryType::from_str(s))
+        .transpose()?;
+
     let author = "".to_string();
 
     Ok(BlobMetadata::new(
@@ -271,7 +278,7 @@ fn product_form_data_to_blob_metadata(
         DocumentType::Par,
         title,
         pl_number,
-        TerritoryType::UK,
+        territory,
         product_names,
         active_substances,
         author,
@@ -303,6 +310,15 @@ enum SubmissionError {
     MissingField {
         name: &'static str,
     },
+    UnknownTerritoryType {
+        error: TerritoryTypeParseError,
+    },
+}
+
+impl From<TerritoryTypeParseError> for SubmissionError {
+    fn from(error: TerritoryTypeParseError) -> Self {
+        SubmissionError::UnknownTerritoryType { error }
+    }
 }
 
 impl warp::reject::Reject for SubmissionError {}
@@ -354,7 +370,7 @@ mod tests {
                 doc_type: DocumentType::Par,
                 title: "FEEL GOOD PILLS REALLY STRONG HIGH DOSE THR 12345/1234".into(),
                 pl_number: "THR 12345/1234".into(),
-                territory: TerritoryType::UK,
+                territory: Some(TerritoryType::UK),
                 product_names: vec!["FEEL GOOD PILLS".into()].into(),
                 active_substances: vec!["IBUPROFEN".into(), "TEMAZEPAM".into()].into(),
                 author: "".into(),

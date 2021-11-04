@@ -72,7 +72,7 @@ pub struct Document {
     pub products: Vec<String>,
     pub keywords: Option<Vec<String>>,
     pub pl_number: String,
-    pub territory: TerritoryType,
+    pub territory: Option<TerritoryType>,
     pub active_substances: Vec<String>,
     pub file_source: FileSource,
     pub file_path: String,
@@ -134,7 +134,7 @@ pub struct XMLDocument {
     pub products: Products,
     pub keywords: Option<Keywords>,
     pub pl_number: String,
-    pub territory: TerritoryType,
+    pub territory: Option<TerritoryType>,
     pub active_substances: ActiveSubstances,
     pub file_source: FileSource,
     pub file_path: String,
@@ -287,7 +287,7 @@ pub mod test {
             products: vec!["products".to_string()],
             keywords: Some(vec!["keywords".to_string()]),
             pl_number: "pl_number".to_string(),
-            territory: TerritoryType::UK,
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["active_substances".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "file_path".to_string(),
@@ -352,7 +352,7 @@ pub mod test {
         assert_eq!(doc.products.product[0], "This is a product");
         assert_eq!(doc.products.product[1], "This is another product");
         assert_eq!(doc.pl_number, "PL 12345/0010-0001");
-        assert_eq!(doc.territory, TerritoryType::UK);
+        assert_eq!(doc.territory, Some(TerritoryType::UK));
         if let Some(keywords) = doc.keywords {
             assert_eq!(keywords.keyword[0], "Test");
             assert_eq!(keywords.keyword[1], "Test 2");
@@ -404,7 +404,7 @@ pub mod test {
         assert_eq!(doc.products[0], "This is a product");
         assert_eq!(doc.products[1], "This is another product");
         assert_eq!(doc.pl_number, "PL 12345/0010-0001");
-        assert_eq!(doc.territory, TerritoryType::UK);
+        assert_eq!(doc.territory, Some(TerritoryType::UK));
         if let Some(keywords) = doc.keywords {
             assert_eq!(keywords[0], "Test");
             assert_eq!(keywords[1], "Test 2");

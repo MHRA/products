@@ -35,7 +35,7 @@ pub fn create_document(document_id: String, file_path: String) -> Result<JobStat
         author: "author".to_string(),
         products: vec!["products".to_string()],
         pl_number: "pl_number".to_string(),
-        territory: TerritoryType::UK,
+        territory: Some(TerritoryType::UK),
         active_substances: vec!["active_substances".to_string()],
         file_path,
         file_source: FileSource::Sentinel,
