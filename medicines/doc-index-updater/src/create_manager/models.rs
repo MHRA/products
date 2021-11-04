@@ -18,6 +18,23 @@ pub struct BlobMetadata {
     pub keywords: Option<VecSanitisedString>,
 }
 
+fn derive_territory(pl_number: &str, territory: Option<TerritoryType>) -> Option<TerritoryType> {
+    match territory {
+        Some(t) => Some(t),
+        None => match pl_number
+            .chars()
+            .filter(|c| c.is_alphabetic())
+            .collect::<String>()
+            .as_ref()
+        {
+            "PL" => Some(TerritoryType::UK),
+            "PLNI" => Some(TerritoryType::NI),
+            "PLGB" => Some(TerritoryType::GB),
+            _ => None,
+        },
+    }
+}
+
 impl BlobMetadata {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -31,12 +48,14 @@ impl BlobMetadata {
         author: String,
         keywords: Option<Vec<String>>,
     ) -> Self {
+        let derived_territory = derive_territory(&pl_number, territory);
+
         BlobMetadata {
             file_name: file_name.into(),
             doc_type,
             title: title.into(),
             pl_number,
-            territory,
+            territory: derived_territory,
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),
@@ -56,12 +75,14 @@ impl Into<BlobMetadata> for Document {
         let title = SanitisedString::from(&self.name);
         let pl_number = format_product_licence(&self.pl_number);
 
+        let derived_territory = derive_territory(&pl_number, self.territory);
+
         BlobMetadata {
             file_name: SanitisedString::from(&self.id),
             doc_type: self.document_type,
             title,
             pl_number,
-            territory: self.territory,
+            territory: derived_territory,
             product_names: VecSanitisedString::from(
                 self.products
                     .iter()
@@ -347,5 +368,19 @@ mod test {
                 keywords: None,
             }
         )
+    }
+
+    #[test_case(None, "PL123456", Some(TerritoryType::UK))]
+    #[test_case(None, "PLNI123456", Some(TerritoryType::NI))]
+    #[test_case(None, "PLGB123456", Some(TerritoryType::GB))]
+    #[test_case(Some(TerritoryType::UK), "PLNI123456", Some(TerritoryType::UK))]
+    #[test_case(Some(TerritoryType::NI), "PL123456", Some(TerritoryType::NI))]
+    #[test_case(Some(TerritoryType::GB), "PLNI123456", Some(TerritoryType::GB))]
+    fn test_derive_territory(
+        territory: Option<TerritoryType>,
+        pl_number: &str,
+        expected: Option<TerritoryType>,
+    ) {
+        assert_eq!(derive_territory(pl_number, territory), expected);
     }
 }
