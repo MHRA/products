@@ -11,7 +11,7 @@ pub struct BlobMetadata {
     pub doc_type: DocumentType,
     pub title: SanitisedString,
     pub pl_number: String,
-    pub territory: TerritoryType,
+    pub territory: Option<TerritoryType>,
     pub product_names: VecSanitisedString,
     pub active_substances: VecSanitisedString,
     pub author: SanitisedString,
@@ -25,7 +25,7 @@ impl BlobMetadata {
         doc_type: DocumentType,
         title: String,
         pl_number: String,
-        territory: TerritoryType,
+        territory: Option<TerritoryType>,
         product_names: Vec<String>,
         active_substances: Vec<String>,
         author: String,
@@ -100,7 +100,9 @@ impl Into<HashMap<String, String>> for BlobMetadata {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
         metadata.insert("pl_number".to_string(), self.pl_number.clone());
-        metadata.insert("territory".to_string(), self.territory.to_string());
+        if let Some(territory) = self.territory {
+            metadata.insert("territory".to_string(), territory.to_string());
+        }
         metadata.insert("author".to_string(), self.author.to_string());
 
         metadata
@@ -212,7 +214,7 @@ mod test {
                 "PL 12345/6789".to_string(),
             ]),
             pl_number: "PL 12345/6789".to_string(),
-            territory: TerritoryType::UK,
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::Sentinel,
@@ -320,7 +322,7 @@ mod test {
             ],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
-            territory: TerritoryType::UK,
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["paracetamol".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "/home/sentinel/something.pdf".to_string(),
@@ -335,7 +337,7 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
-                territory: TerritoryType::UK,
+                territory: Some(TerritoryType::UK),
                 product_names: VecSanitisedString::from(vec![
                     "GENERIC PARACETAMOL".to_string(),
                     "SPECIAL PARACETAMOL".to_string()

@@ -188,7 +188,7 @@ pub fn get_test_document() -> Document {
         products: vec!["products".to_string()],
         keywords: Some(vec!["keywords".to_string()]),
         pl_number: "pl_number".to_string(),
-        territory: TerritoryType::UK,
+        territory: Some(TerritoryType::UK),
         active_substances: vec!["active_substances".to_string()],
         file_source: FileSource::Sentinel,
         file_path: "file_path".to_string(),
