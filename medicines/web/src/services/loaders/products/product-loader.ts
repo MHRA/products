@@ -20,6 +20,7 @@ export const azureProductsLoader = new DataLoader<IProductInfo, IDocuments>(
           pageSize: searchParameters.pageSize,
           filters: {
             docType: searchParameters.docTypes,
+            territoryType: searchParameters.territoryTypes,
             sortOrder: 'a-z',
             productName: searchParameters.name,
           },

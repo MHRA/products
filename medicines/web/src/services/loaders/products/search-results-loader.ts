@@ -20,6 +20,7 @@ export const azureSearchLoader = new DataLoader<ISearchInfo, IDocuments>(
           pageSize: searchParameters.pageSize,
           filters: {
             docType: searchParameters.docTypes,
+            territoryType: searchParameters.territoryTypes,
             sortOrder: 'a-z',
           },
         });
