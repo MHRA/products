@@ -1,6 +1,7 @@
 mod document_type;
 pub mod models;
 mod query_normalizer;
+mod territory_type;
 
 #[macro_use]
 extern crate lazy_static;
