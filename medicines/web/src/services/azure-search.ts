@@ -153,6 +153,7 @@ const getJson = async (url: string): Promise<any> => {
 
 export interface ISearchFilters {
   docType?: DocType[];
+  territoryType?: TerritoryType[];
   substanceName?: string;
   productName?: string;
   sortOrder: string;
@@ -223,6 +224,13 @@ const createFilter = (filters: ISearchFilters) => {
       docTypeFilters.push(`doc_type eq '${docType}'`);
     }
     filterParams.push('(' + docTypeFilters.join(' or ') + ')');
+  }
+  if (filters.territoryType && filters.territoryType.length > 0) {
+    const territoryTypeFilters = [];
+    for (const territoryType of filters.territoryType) {
+      territoryTypeFilters.push(`territory eq '${territoryType}'`);
+    }
+    filterParams.push('(' + territoryTypeFilters.join(' or ') + ')');
   }
   if (filters.substanceName) {
     filterParams.push(
