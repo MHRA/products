@@ -1,6 +1,5 @@
-pub use crate::document_type::{
-    DocTypeParseError, DocumentType, TerritoryType, TerritoryTypeParseError,
-};
+pub use crate::document_type::{DocTypeParseError, DocumentType};
+pub use crate::territory_type::{TerritoryType, TerritoryTypeParseError};
 use chrono::{SecondsFormat, Utc};
 use core::fmt::Debug;
 use serde_derive::{Deserialize, Serialize};
@@ -134,7 +133,7 @@ pub struct IndexEntry {
     pub keywords: String,
     pub title: String,
     pub pl_number: Vec<String>,
-    pub territory: TerritoryType,
+    pub territory: Option<TerritoryType>,
     pub file_name: String,
     pub metadata_storage_content_type: String,
     pub metadata_storage_size: usize,
@@ -177,10 +176,7 @@ impl From<IndexResult> for IndexEntry {
             pl_number: vec![],
             file_name: res.file_name,
             doc_type: res.doc_type,
-            territory: match res.territory {
-                Some(t) => t,
-                None => TerritoryType::UK,
-            },
+            territory: res.territory,
             suggestions: res.suggestions,
             substance_name: res.substance_name,
             facets: res.facets,
