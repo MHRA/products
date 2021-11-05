@@ -28,6 +28,7 @@ fn derive_territory(pl_number: &str, territory: Option<TerritoryType>) -> Option
             .as_ref()
         {
             "PL" => Some(TerritoryType::UK),
+            "PLPI" => Some(TerritoryType::UK),
             "PLNI" => Some(TerritoryType::NI),
             "PLGB" => Some(TerritoryType::GB),
             _ => None,
@@ -371,10 +372,12 @@ mod test {
     }
 
     #[test_case(None, "PL123456", Some(TerritoryType::UK))]
+    #[test_case(None, "PLPI123456", Some(TerritoryType::UK))]
     #[test_case(None, "PLNI123456", Some(TerritoryType::NI))]
     #[test_case(None, "PLGB123456", Some(TerritoryType::GB))]
     #[test_case(Some(TerritoryType::UK), "PLNI123456", Some(TerritoryType::UK))]
     #[test_case(Some(TerritoryType::NI), "PL123456", Some(TerritoryType::NI))]
+    #[test_case(Some(TerritoryType::NI), "PLPI123456", Some(TerritoryType::NI))]
     #[test_case(Some(TerritoryType::GB), "PLNI123456", Some(TerritoryType::GB))]
     fn test_derive_territory(
         territory: Option<TerritoryType>,
