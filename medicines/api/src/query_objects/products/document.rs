@@ -187,21 +187,18 @@ fn build_territory_types_filter(territory_types: Vec<TerritoryType>) -> Option<S
         return None;
     }
 
-    Some(format!(
-        "({})",
-        territory_types
-            .into_iter()
-            .map(|territory_type| {
-                match territory_type {
-                    TerritoryType::UK => {
-                        format!("territory eq '{}' or territory eq null", territory_type)
-                    }
-                    _ => format!("territory eq '{}'", territory_type),
-                }
-            })
-            .collect::<Vec<_>>()
-            .join(" or ")
-    ))
+    let mut initial_query = territory_types
+        .into_iter()
+        .flat_map(|territory_type| match territory_type {
+            TerritoryType::GB => Some("territory eq 'GB'"),
+            TerritoryType::NI => Some("territory eq 'NI'"),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+
+    initial_query.extend(vec!["territory eq 'UK'", "territory eq null"]);
+
+    Some(format!("({})", initial_query.join(" or ")))
 }
 
 fn build_product_name_filter(product_name: &str) -> String {
@@ -330,19 +327,37 @@ mod test {
         Some(vec![DocumentType::Spc, DocumentType::Pil,DocumentType::Par,]),
         Some(vec![TerritoryType::UK, TerritoryType::GB, TerritoryType::NI,]),
         Some("IBUPROFEN 100MG CAPLETS"),
-        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'UK' or territory eq null or territory eq 'GB' or territory eq 'NI'))")
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'GB' or territory eq 'NI' or territory eq 'UK' or territory eq null))")
     )]
     #[test_case(
         Some(vec![DocumentType::Spc,  DocumentType::Pil,DocumentType::Par,]),
         Some(vec![TerritoryType::UK, TerritoryType::GB, TerritoryType::NI,]),
         None,
-        Some("((doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'UK' or territory eq null or territory eq 'GB' or territory eq 'NI'))")
+        Some("((doc_type eq 'Spc' or doc_type eq 'Pil' or doc_type eq 'Par') and (territory eq 'GB' or territory eq 'NI' or territory eq 'UK' or territory eq null))")
     )]
     #[test_case(
         None,
         None,
         Some("IBUPROFEN 100MG CAPLETS"),
         Some("(product_name eq 'IBUPROFEN 100MG CAPLETS')")
+    )]
+    #[test_case(
+        None,
+        Some(vec![TerritoryType::UK]),
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (territory eq 'UK' or territory eq null))")
+    )]
+    #[test_case(
+        None,
+        Some(vec![TerritoryType::GB]),
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (territory eq 'GB' or territory eq 'UK' or territory eq null))")
+    )]
+    #[test_case(
+        None,
+        Some(vec![TerritoryType::NI]),
+        Some("IBUPROFEN 100MG CAPLETS"),
+        Some("((product_name eq 'IBUPROFEN 100MG CAPLETS') and (territory eq 'NI' or territory eq 'UK' or territory eq null))")
     )]
     #[test_case(
         Some(vec![]),
