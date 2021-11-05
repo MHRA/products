@@ -228,14 +228,13 @@ const createFilter = (filters: ISearchFilters) => {
   if (filters.territoryType && filters.territoryType.length > 0) {
     const territoryTypeFilters = [];
     for (const territoryType of filters.territoryType) {
-      if (territoryType === TerritoryType.UK) {
-        territoryTypeFilters.push(
-          `territory eq '${territoryType}' or territory eq null`,
-        );
-      } else {
+      if ([TerritoryType.GB, TerritoryType.NI].includes(territoryType)) {
         territoryTypeFilters.push(`territory eq '${territoryType}'`);
       }
     }
+    territoryTypeFilters.push("territory eq 'UK'");
+    territoryTypeFilters.push('territory eq null');
+
     filterParams.push('(' + territoryTypeFilters.join(' or ') + ')');
   }
   if (filters.substanceName) {
