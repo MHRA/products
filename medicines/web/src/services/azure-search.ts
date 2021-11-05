@@ -228,7 +228,13 @@ const createFilter = (filters: ISearchFilters) => {
   if (filters.territoryType && filters.territoryType.length > 0) {
     const territoryTypeFilters = [];
     for (const territoryType of filters.territoryType) {
-      territoryTypeFilters.push(`territory eq '${territoryType}'`);
+      if (territoryType === TerritoryType.UK) {
+        territoryTypeFilters.push(
+          `territory eq '${territoryType}' or territory eq null`,
+        );
+      } else {
+        territoryTypeFilters.push(`territory eq '${territoryType}'`);
+      }
     }
     filterParams.push('(' + territoryTypeFilters.join(' or ') + ')');
   }
