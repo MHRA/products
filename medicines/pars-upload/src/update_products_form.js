@@ -286,7 +286,7 @@ const LicenceNumber = ({ formData, checkLicenceNumberIsNotDuplicate }) => (
         onInput={checkLicenceNumberIsNotDuplicate}
       >
         <option value="PL">PL</option>
-        <option value="PLPI">HR</option>
+        <option value="PLPI">PLPI</option>
         <option value="THR">THR</option>
         <option value="PLGB">PLGB</option>
         <option value="PLNI">PLNI</option>
