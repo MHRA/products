@@ -6,7 +6,7 @@ use crate::{
 };
 use anyhow::anyhow;
 use async_graphql::{Context, FieldResult, Object};
-use search_client::models::DocumentType;
+use search_client::models::{DocumentType, TerritoryType};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product {
@@ -42,6 +42,7 @@ impl Product {
         first: Option<i32>,
         offset: Option<i32>,
         document_types: Option<Vec<DocumentType>>,
+        territory_types: Option<Vec<TerritoryType>>,
     ) -> FieldResult<document::Documents> {
         let context = context.data::<AzureContext>()?;
 
@@ -55,6 +56,14 @@ impl Product {
                 Some(document_types) => docs
                     .into_iter()
                     .filter(|x| document_types.iter().any(|&f| x.is_doc_type(f)))
+                    .collect(),
+                None => docs,
+            };
+
+            let docs = match territory_types {
+                Some(territory_types) => docs
+                    .into_iter()
+                    .filter(|x| territory_types.iter().any(|&f| x.is_territory_type(f)))
                     .collect(),
                 None => docs,
             };
@@ -78,6 +87,7 @@ impl Product {
                 first,
                 offset,
                 document_types,
+                territory_types,
                 Some(&self.name),
             )
             .await
@@ -123,6 +133,7 @@ mod test {
         let result = IndexResult {
             product_name,
             doc_type: DocumentType::Spc,
+            territory: Some(TerritoryType::UK),
             created: Some("yes".to_string()),
             facets: Vec::new(),
             file_name: "README.markdown".to_string(),

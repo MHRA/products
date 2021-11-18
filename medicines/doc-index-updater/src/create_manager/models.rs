@@ -2,7 +2,7 @@ use super::sanitiser::{SanitisedString, VecSanitisedString};
 use crate::{create_manager::Blob, models::Document};
 use chrono::{SecondsFormat, Utc};
 use regex::Regex;
-use search_client::models::{DocumentType, IndexEntry};
+use search_client::models::{DocumentType, IndexEntry, TerritoryType};
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -11,10 +11,29 @@ pub struct BlobMetadata {
     pub doc_type: DocumentType,
     pub title: SanitisedString,
     pub pl_number: String,
+    pub territory: Option<TerritoryType>,
     pub product_names: VecSanitisedString,
     pub active_substances: VecSanitisedString,
     pub author: SanitisedString,
     pub keywords: Option<VecSanitisedString>,
+}
+
+fn derive_territory(pl_number: &str, territory: Option<TerritoryType>) -> Option<TerritoryType> {
+    match territory {
+        Some(t) => Some(t),
+        None => match pl_number
+            .chars()
+            .filter(|c| c.is_alphabetic())
+            .collect::<String>()
+            .as_ref()
+        {
+            "PL" => Some(TerritoryType::UK),
+            "PLPI" => Some(TerritoryType::UK),
+            "PLNI" => Some(TerritoryType::NI),
+            "PLGB" => Some(TerritoryType::GB),
+            _ => None,
+        },
+    }
 }
 
 impl BlobMetadata {
@@ -24,16 +43,20 @@ impl BlobMetadata {
         doc_type: DocumentType,
         title: String,
         pl_number: String,
+        territory: Option<TerritoryType>,
         product_names: Vec<String>,
         active_substances: Vec<String>,
         author: String,
         keywords: Option<Vec<String>>,
     ) -> Self {
+        let derived_territory = derive_territory(&pl_number, territory);
+
         BlobMetadata {
             file_name: file_name.into(),
             doc_type,
             title: title.into(),
             pl_number,
+            territory: derived_territory,
             product_names: product_names.into(),
             active_substances: active_substances.into(),
             author: author.into(),
@@ -53,11 +76,14 @@ impl Into<BlobMetadata> for Document {
         let title = SanitisedString::from(&self.name);
         let pl_number = format_product_licence(&self.pl_number);
 
+        let derived_territory = derive_territory(&pl_number, self.territory);
+
         BlobMetadata {
             file_name: SanitisedString::from(&self.id),
             doc_type: self.document_type,
             title,
             pl_number,
+            territory: derived_territory,
             product_names: VecSanitisedString::from(
                 self.products
                     .iter()
@@ -96,6 +122,9 @@ impl Into<HashMap<String, String>> for BlobMetadata {
             metadata.insert("keywords".to_string(), keywords.join(" "));
         }
         metadata.insert("pl_number".to_string(), self.pl_number.clone());
+        if let Some(territory) = self.territory {
+            metadata.insert("territory".to_string(), territory.to_string());
+        }
         metadata.insert("author".to_string(), self.author.to_string());
 
         metadata
@@ -118,6 +147,7 @@ impl From<Blob> for IndexEntry {
                 .join(", "),
             title: blob.metadata.title.to_string(),
             pl_number: vec![blob.metadata.pl_number.to_string()],
+            territory: blob.metadata.territory,
             file_name: blob.metadata.file_name.to_string(),
             doc_type: blob.metadata.doc_type,
             suggestions: vec![],
@@ -185,9 +215,9 @@ pub fn format_product_licence(input: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
-    use test_case::test_case;
     use crate::models::FileSource;
     use search_client::models::DocumentType;
+    use test_case::test_case;
 
     #[test]
     fn derive_metadata() {
@@ -206,6 +236,7 @@ mod test {
                 "PL 12345/6789".to_string(),
             ]),
             pl_number: "PL 12345/6789".to_string(),
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["Paracetamol".to_string(), "Caffeine".to_string()],
             file_path: "location/on/disk".to_string(),
             file_source: FileSource::Sentinel,
@@ -219,6 +250,7 @@ mod test {
         let expected_substance_name = "[\"PARACETAMOL\",\"CAFFEINE\"]".to_string();
         let expected_keywords = "Very good for you Cures headaches PL 12345/6789".to_string();
         let expected_pl_number = "[\"PL123456789\"]".to_string();
+        let expected_territory = "UK".to_string();
 
         let output_metadata: HashMap<String, String> = Into::<BlobMetadata>::into(doc).into();
 
@@ -230,6 +262,7 @@ mod test {
         assert_eq!(output_metadata["substance_name"], expected_substance_name);
         assert_eq!(output_metadata["keywords"], expected_keywords);
         assert_eq!(output_metadata["pl_number"], expected_pl_number);
+        assert_eq!(output_metadata["territory"], expected_territory);
     }
 
     #[test]
@@ -311,6 +344,7 @@ mod test {
             ],
             keywords: None,
             pl_number: "PL 12345/0010-0001".to_string(),
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["paracetamol".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "/home/sentinel/something.pdf".to_string(),
@@ -325,6 +359,7 @@ mod test {
                 doc_type: DocumentType::Spc,
                 title: SanitisedString::from("Some SPC".to_string()),
                 pl_number: "[\"PL123450010\"]".to_string(),
+                territory: Some(TerritoryType::UK),
                 product_names: VecSanitisedString::from(vec![
                     "GENERIC PARACETAMOL".to_string(),
                     "SPECIAL PARACETAMOL".to_string()
@@ -334,5 +369,21 @@ mod test {
                 keywords: None,
             }
         )
+    }
+
+    #[test_case(None, "PL123456", Some(TerritoryType::UK))]
+    #[test_case(None, "PLPI123456", Some(TerritoryType::UK))]
+    #[test_case(None, "PLNI123456", Some(TerritoryType::NI))]
+    #[test_case(None, "PLGB123456", Some(TerritoryType::GB))]
+    #[test_case(Some(TerritoryType::UK), "PLNI123456", Some(TerritoryType::UK))]
+    #[test_case(Some(TerritoryType::NI), "PL123456", Some(TerritoryType::NI))]
+    #[test_case(Some(TerritoryType::NI), "PLPI123456", Some(TerritoryType::NI))]
+    #[test_case(Some(TerritoryType::GB), "PLNI123456", Some(TerritoryType::GB))]
+    fn test_derive_territory(
+        territory: Option<TerritoryType>,
+        pl_number: &str,
+        expected: Option<TerritoryType>,
+    ) {
+        assert_eq!(derive_territory(pl_number, territory), expected);
     }
 }

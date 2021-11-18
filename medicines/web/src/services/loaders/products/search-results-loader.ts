@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
 import { IDocument, IDocuments } from '../../../model/document';
-import { DocType, docSearch } from '../../azure-search';
+import { DocType, TerritoryType, docSearch } from '../../azure-search';
 import { graphqlRequest } from '../../graphql';
 import { convertResults } from '../../azure-results-converter';
 
@@ -20,6 +20,7 @@ export const azureSearchLoader = new DataLoader<ISearchInfo, IDocuments>(
           pageSize: searchParameters.pageSize,
           filters: {
             docType: searchParameters.docTypes,
+            territoryType: searchParameters.territoryTypes,
             sortOrder: 'a-z',
           },
         });
@@ -38,6 +39,7 @@ interface ISearchInfo {
   page: number;
   pageSize: number;
   docTypes: DocType[];
+  territoryTypes: TerritoryType[];
 }
 
 interface IEdge {
@@ -62,9 +64,9 @@ interface IDocumentResponse {
 }
 
 const query = `
-query($searchTerm: String, $first: Int, $after: String, $documentTypes: [DocumentType!]) {
+query($searchTerm: String, $first: Int, $after: String, $documentTypes: [DocumentType!], $territoryTypes: [TerritoryType!]) {
   products {
-    documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes) {
+    documents(search: $searchTerm, first: $first, after: $after, documentTypes: $documentTypes, territoryTypes: $territoryTypes) {
       count: totalCount
       edges {
         cursor
@@ -116,12 +118,14 @@ const getDocumentsForSearch = async ({
   page,
   pageSize,
   docTypes,
+  territoryTypes,
 }: ISearchInfo) => {
   const variables = {
     searchTerm,
     first: pageSize,
     after: makeCursor(page, pageSize),
     documentTypes: docTypes.map((s) => s.toUpperCase()),
+    territoryTypes: territoryTypes.map((t) => t.toUpperCase()),
   };
   const { data } = await graphqlRequest<ISearchResponse, typeof variables>({
     query,

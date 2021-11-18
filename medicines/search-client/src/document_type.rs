@@ -80,7 +80,7 @@ mod tests {
     #[test_case("Spc")]
     #[test_case("Pil")]
     #[test_case("Par")]
-    fn parses_and_formats_to_a_string(doc_type: &str) {
+    fn parses_document_and_formats_to_a_string(doc_type: &str) {
         use pretty_assertions::assert_eq;
 
         let from_str: DocumentType = doc_type.parse().unwrap();
@@ -96,7 +96,7 @@ mod tests {
     #[test_case("\"Pil\"", DocumentType::Pil; "pil titlecase")]
     #[test_case("\"PAR\"", DocumentType::Par; "par uppercase")]
     #[test_case("\"Par\"", DocumentType::Par; "par titlecase")]
-    fn deserializes_cases_insensitively(input: &str, expected: DocumentType) {
+    fn deserializes_document_cases_insensitively(input: &str, expected: DocumentType) {
         use pretty_assertions::assert_eq;
 
         let from_str: DocumentType = serde_json::from_str(input).unwrap();

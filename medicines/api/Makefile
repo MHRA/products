@@ -60,7 +60,6 @@ docker-pull: ## Pull Docker image
 
 .PHONY: docker-push
 docker-push: ## Push Docker image
-	docker push $(image)
 	docker push $(image):$(tag)
 
 .PHONY: docker-retag

@@ -2,8 +2,9 @@ use crate::{
     azure_rest,
     env::{get_from_env, INDEX_NAME, SEARCH_API_ADMIN_KEY, SEARCH_SERVICE},
 };
+use reqwest::Url;
 
-pub async fn create_index(index_definition: &str) -> Result<(), reqwest::Error> {
+pub async fn create_or_update_index(index_definition: &str) -> Result<(), reqwest::Error> {
     let search_service = get_from_env(SEARCH_SERVICE);
     let index_name = get_from_env(INDEX_NAME);
     let api_key = get_from_env(SEARCH_API_ADMIN_KEY);
@@ -13,9 +14,10 @@ pub async fn create_index(index_definition: &str) -> Result<(), reqwest::Error> 
         _ => raw_index_definition = get_default_raw_index_definition(),
     }
     let index_definition = get_index_definition(raw_index_definition, &index_name);
-    let url = get_base_url(&search_service);
+    let mut url = Url::parse(&get_base_url(&search_service)).unwrap();
+    url.set_path(&format!("{}/{}", url.path(), index_name));
 
-    azure_rest::make_post_request_with_body(index_definition, &url, &api_key).await
+    azure_rest::make_put_request_with_body(index_definition, url, &api_key).await
 }
 
 pub async fn delete_index() -> Result<(), reqwest::Error> {
@@ -28,7 +30,7 @@ pub async fn delete_index() -> Result<(), reqwest::Error> {
 }
 
 fn get_base_url(search_service: &str) -> String {
-    "https://SEARCH_SERVICE_PLACEHOLDER.search.windows.net/indexes?api-version=2019-05-06"
+    "https://SEARCH_SERVICE_PLACEHOLDER.search.windows.net/indexes/?api-version=2019-05-06"
         .replace("SEARCH_SERVICE_PLACEHOLDER", search_service)
 }
 
@@ -57,7 +59,7 @@ mod test {
     fn test_get_base_url() {
         assert_eq!(
             get_base_url("service_name"),
-            "https://service_name.search.windows.net/indexes?api-version=2019-05-06".to_string()
+            "https://service_name.search.windows.net/indexes/?api-version=2019-05-06".to_string()
         );
     }
 

@@ -2,7 +2,7 @@ use crate::service_bus_client::ProcessMessageError;
 use async_trait::async_trait;
 use regex::Regex;
 use search_client::{
-    models::{DocumentType, IndexResults},
+    models::{DocumentType, IndexResults, TerritoryType},
     AzureSearchClient, Search,
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -72,6 +72,7 @@ pub struct Document {
     pub products: Vec<String>,
     pub keywords: Option<Vec<String>>,
     pub pl_number: String,
+    pub territory: Option<TerritoryType>,
     pub active_substances: Vec<String>,
     pub file_source: FileSource,
     pub file_path: String,
@@ -97,6 +98,7 @@ impl Into<Document> for XMLDocument {
                 None => None,
             },
             pl_number: self.pl_number,
+            territory: self.territory,
             active_substances: self.active_substances.active_substance,
             file_source: self.file_source,
             file_path: self.file_path,
@@ -132,6 +134,7 @@ pub struct XMLDocument {
     pub products: Products,
     pub keywords: Option<Keywords>,
     pub pl_number: String,
+    pub territory: Option<TerritoryType>,
     pub active_substances: ActiveSubstances,
     pub file_source: FileSource,
     pub file_path: String,
@@ -284,6 +287,7 @@ pub mod test {
             products: vec!["products".to_string()],
             keywords: Some(vec!["keywords".to_string()]),
             pl_number: "pl_number".to_string(),
+            territory: Some(TerritoryType::UK),
             active_substances: vec!["active_substances".to_string()],
             file_source: FileSource::Sentinel,
             file_path: "file_path".to_string(),
@@ -323,6 +327,7 @@ pub mod test {
                 <product>This is another product</product>
             </products>
             <pl_number>PL 12345/0010-0001</pl_number>
+            <territory>UK</territory>
             <keywords>
                 <keyword>
                     Test
@@ -347,6 +352,7 @@ pub mod test {
         assert_eq!(doc.products.product[0], "This is a product");
         assert_eq!(doc.products.product[1], "This is another product");
         assert_eq!(doc.pl_number, "PL 12345/0010-0001");
+        assert_eq!(doc.territory, Some(TerritoryType::UK));
         if let Some(keywords) = doc.keywords {
             assert_eq!(keywords.keyword[0], "Test");
             assert_eq!(keywords.keyword[1], "Test 2");
@@ -372,6 +378,7 @@ pub mod test {
                 <product>This is another product</product>
             </products>
             <pl_number>PL 12345/0010-0001</pl_number>
+            <territory>UK</territory>
             <keywords>
                 <keyword>
                     Test
@@ -397,6 +404,7 @@ pub mod test {
         assert_eq!(doc.products[0], "This is a product");
         assert_eq!(doc.products[1], "This is another product");
         assert_eq!(doc.pl_number, "PL 12345/0010-0001");
+        assert_eq!(doc.territory, Some(TerritoryType::UK));
         if let Some(keywords) = doc.keywords {
             assert_eq!(keywords[0], "Test");
             assert_eq!(keywords[1], "Test 2");
