@@ -2,7 +2,7 @@ const searchExactnessBoost = process.env.AZURE_SEARCH_EXACTNESS_BOOST;
 const searchWordFuzziness = process.env.AZURE_SEARCH_WORD_FUZZINESS;
 
 export const productLicenseRegExp: RegExp = new RegExp(
-  '(PL|PLGB|PLNI|THR|NR)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
+  '(PL|PLGB|PLNI|PLPI|THR|NR)(\\s+|/|_|-)*(\\d{5})(\\s+|/|_|-)*(\\d{4})',
   'ig',
 );
 

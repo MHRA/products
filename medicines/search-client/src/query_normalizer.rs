@@ -4,7 +4,7 @@ use regex::Regex;
 
 pub fn normalize_product_licences(search_term: &str) -> String {
     lazy_static! {
-        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?i)(?P<prefix>PL|PLGB|PLNI|THR|NR)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
+        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?i)(?P<prefix>PL|PLGB|PLNI|PLPI|THR|NR)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
     }
 
     RE_PRODUCT_LICENCE
@@ -63,6 +63,7 @@ mod test {
     #[test_case("THR 12345/1234", "THR123451234")]
     #[test_case("PLGB 12345/1234", "PLGB123451234")]
     #[test_case("PLNI 12345/1234", "PLNI123451234")]
+    #[test_case("PLPI 12345/1234", "PLPI123451234")]
     #[test_case("NEW 12345/1234", "NEW 12345/1234")]
     #[test_case("12345/1234", "12345/1234")]
     #[test_case("PRETEXT PL 12345/1234 POSTTEXT", "PRETEXT PL123451234 POSTTEXT")]
