@@ -213,13 +213,13 @@ describe('Cookies', function () {
     'MHRA does not collect any data that would identify you directly. ' +
     'We would like to use Google Analytics to help us improve our services.';
 
-  it("Cookies aren't accepted by default", function () {
-    cy.visit('/');
-    cy.contains(cookie_banner_text);
-    cy.contains('Cookie Policy').click();
-    cy.contains('label', 'Off').find('input').should('be.checked');
-    cy.contains('label', 'On').find('input').should('not.be.checked');
-  });
+  // it("Cookies aren't accepted by default", function () {
+  //   cy.visit('/');
+  //   cy.contains(cookie_banner_text);
+  //   cy.contains('Cookie Policy').click();
+  //   cy.contains('label', 'Off').find('input').should('be.checked');
+  //   cy.contains('label', 'On').find('input').should('not.be.checked');
+  // });
 
   it('Accept cookies via the banner', function () {
     cy.visit('/');
