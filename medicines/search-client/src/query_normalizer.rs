@@ -4,7 +4,7 @@ use regex::Regex;
 
 pub fn normalize_product_licences(search_term: &str) -> String {
     lazy_static! {
-        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?i)(?P<prefix>PL|PLGB|PLNI|PLPI|THR|NR)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
+        static ref RE_PRODUCT_LICENCE: Regex = Regex::new(r"(?i)(?P<prefix>PL|PLGB|PLNI|PLPI|THR|THRGB|THRNI|NR|NRGB|NRNI)(\s+|/|_|-)*(?P<fivenumbers>\d{5})(\s+|/|_|-)*(?P<fournumbers>\d{4})").unwrap();
     }
 
     RE_PRODUCT_LICENCE
