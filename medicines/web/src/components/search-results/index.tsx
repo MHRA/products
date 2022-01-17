@@ -322,8 +322,8 @@ const SearchResults = (props: ISearchResultsProps) => {
             ‘PL’.
           </p>
           <p>
-            You can identify the product in the list below using the PL, PLGB or
-            PLNI number.
+            You can identify the product in the list below using the PL, PLGB,
+            PLNI, THR, THRGB, THRNI, NR, NRGB or NRNI number.
           </p>
           <p>
             The information about a medicine will be updated when new evidence
