@@ -286,10 +286,14 @@ const LicenceNumber = ({ formData, checkLicenceNumberIsNotDuplicate }) => (
         onInput={checkLicenceNumberIsNotDuplicate}
       >
         <option value="PL">PL</option>
-        <option value="PLPI">PLPI</option>
-        <option value="THR">THR</option>
         <option value="PLGB">PLGB</option>
         <option value="PLNI">PLNI</option>
+        <option value="NR">NR</option>
+        <option value="NRGB">NRGB</option>
+        <option value="NRNI">NRNI</option>
+        <option value="THR">THR</option>
+        <option value="THRGB">THRGB</option>
+        <option value="THRNI">THRNI</option>
       </select>{' '}
       <Field
         className="govuk-input--width-5"
