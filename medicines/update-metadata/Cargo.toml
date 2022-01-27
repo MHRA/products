@@ -1,0 +1,16 @@
+[package]
+name = "update-metadata"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+azure_core = { version = "0.1", git = "https://github.com/Azure/azure-sdk-for-rust", default-features=false }
+azure_storage = { version = "0.1", git = "https://github.com/Azure/azure-sdk-for-rust", default-features=false, features=["account"] }
+azure_storage_blobs = { version = "0.1", git = "https://github.com/Azure/azure-sdk-for-rust" }
+chrono = "0.4.11"
+futures = "0.3.4"
+md5 = "0.7.0"
+tokio = { version = "1", features = ["macros", "time"] }
+http = "0.2.6"
