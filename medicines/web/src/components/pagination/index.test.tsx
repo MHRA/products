@@ -1,4 +1,4 @@
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import React from 'react';
 import Pagination from '.';
 
@@ -11,15 +11,17 @@ const dummyFunc = () => undefined;
 
 describe(Pagination, () => {
   it('should render', () => {
-    const component = shallow(
-      <Pagination
-        currentPage={page}
-        pageSize={pageSize}
-        resultCount={resultCount}
-        searchTerm={searchTerm}
-        handlePageChange={dummyFunc}
-      />,
-    );
+    const component = renderer
+      .create(
+        <Pagination
+          currentPage={page}
+          pageSize={pageSize}
+          resultCount={resultCount}
+          searchTerm={searchTerm}
+          handlePageChange={dummyFunc}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });

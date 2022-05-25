@@ -1,87 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DrugListStructuredData should render 1`] = `
-<JsonLd
-  item={
+<script
+  dangerouslySetInnerHTML={
     Object {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": Array [
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Drug",
-            "name": "First cool drug",
-            "url": "https://products.mhra.gov.uk/product?product=First%20cool%20drug",
-          },
-          "position": 0,
-        },
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Drug",
-            "name": "Second cool drug",
-            "url": "https://products.mhra.gov.uk/product?product=Second%20cool%20drug",
-          },
-          "position": 1,
-        },
-      ],
+      "__html": "{\\"@context\\":\\"https://schema.org\\",\\"@type\\":\\"ItemList\\",\\"itemListElement\\":[{\\"@type\\":\\"ListItem\\",\\"position\\":0,\\"item\\":{\\"@type\\":\\"Drug\\",\\"name\\":\\"First cool drug\\",\\"url\\":\\"https://products.mhra.gov.uk/product?product=First%20cool%20drug\\"}},{\\"@type\\":\\"ListItem\\",\\"position\\":1,\\"item\\":{\\"@type\\":\\"Drug\\",\\"name\\":\\"Second cool drug\\",\\"url\\":\\"https://products.mhra.gov.uk/product?product=Second%20cool%20drug\\"}}]}",
     }
   }
+  type="application/ld+json"
 />
 `;
 
 exports[`DrugStructuredData should render 1`] = `
-<JsonLd
-  item={
+<script
+  dangerouslySetInnerHTML={
     Object {
-      "@context": "https://schema.org",
-      "@type": "Drug",
-      "name": "My cool drug",
+      "__html": "{\\"@context\\":\\"https://schema.org\\",\\"@type\\":\\"Drug\\",\\"name\\":\\"My cool drug\\"}",
     }
   }
+  type="application/ld+json"
 />
 `;
 
 exports[`SubstanceListStructuredData should render 1`] = `
-<JsonLd
-  item={
+<script
+  dangerouslySetInnerHTML={
     Object {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": Array [
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Substance",
-            "name": "First cool substance",
-            "url": "https://products.mhra.gov.uk/substance?substance=First%20cool%20substance",
-          },
-          "position": 0,
-        },
-        Object {
-          "@type": "ListItem",
-          "item": Object {
-            "@type": "Substance",
-            "name": "Second cool substance",
-            "url": "https://products.mhra.gov.uk/substance?substance=Second%20cool%20substance",
-          },
-          "position": 1,
-        },
-      ],
+      "__html": "{\\"@context\\":\\"https://schema.org\\",\\"@type\\":\\"ItemList\\",\\"itemListElement\\":[{\\"@type\\":\\"ListItem\\",\\"position\\":0,\\"item\\":{\\"@type\\":\\"Substance\\",\\"name\\":\\"First cool substance\\",\\"url\\":\\"https://products.mhra.gov.uk/substance?substance=First%20cool%20substance\\"}},{\\"@type\\":\\"ListItem\\",\\"position\\":1,\\"item\\":{\\"@type\\":\\"Substance\\",\\"name\\":\\"Second cool substance\\",\\"url\\":\\"https://products.mhra.gov.uk/substance?substance=Second%20cool%20substance\\"}}]}",
     }
   }
+  type="application/ld+json"
 />
 `;
 
 exports[`SubstanceStructuredData should render 1`] = `
-<JsonLd
-  item={
+<script
+  dangerouslySetInnerHTML={
     Object {
-      "@context": "https://schema.org",
-      "@type": "Substance",
-      "name": "My cool substance",
+      "__html": "{\\"@context\\":\\"https://schema.org\\",\\"@type\\":\\"Substance\\",\\"name\\":\\"My cool substance\\"}",
     }
   }
+  type="application/ld+json"
 />
 `;

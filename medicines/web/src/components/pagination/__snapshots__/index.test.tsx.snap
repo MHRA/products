@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pagination should render 1`] = `
-<styled.nav>
+<nav
+  className="sc-bczRLJ wtnsX"
+>
   <nav
     aria-label="Pagination Navigation"
   >
@@ -20,7 +22,6 @@ exports[`Pagination should render 1`] = `
       >
         <li
           aria-label="Goto Page 1"
-          key="1"
           onClick={[Function]}
         >
           <span
@@ -35,7 +36,6 @@ exports[`Pagination should render 1`] = `
         <li
           aria-current="true"
           aria-label="Current Page, Page 2"
-          key="2"
         >
           2
           <span>
@@ -44,7 +44,6 @@ exports[`Pagination should render 1`] = `
         </li>
         <li
           aria-label="Goto Page 3"
-          key="3"
           onClick={[Function]}
         >
           <span
@@ -58,7 +57,6 @@ exports[`Pagination should render 1`] = `
         </li>
         <li
           aria-label="Goto Page 6"
-          key="6"
           onClick={[Function]}
         >
           <span
@@ -77,5 +75,5 @@ exports[`Pagination should render 1`] = `
       </button>
     </div>
   </nav>
-</styled.nav>
+</nav>
 `;

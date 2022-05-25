@@ -9,7 +9,8 @@ exports[`Button should render 1`] = `
 `;
 
 exports[`Checkbox should render 1`] = `
-<styled.input
+<input
+  className="sc-bczRLJ ldzjBD"
   id="agree-checkbox"
   name="agree"
   onChange={[Function]}

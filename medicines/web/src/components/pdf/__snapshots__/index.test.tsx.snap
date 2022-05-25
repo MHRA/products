@@ -1,44 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pdf should render 1`] = `
-<styled.section>
+<section
+  className="sc-bczRLJ bUvurH"
+>
   <h2>
     Help viewing PDFs
   </h2>
   <ul>
     <li>
-      <OutboundLink
-        eventLabel="Help viewing PDF files"
-        onClick={null}
+      <a
+        href="https://helpx.adobe.com/support/acrobat.html"
+        onClick={[Function]}
+        rel="noopener noreferrer"
         target="_blank"
-        to="https://helpx.adobe.com/support/acrobat.html"
-        trackerNames={null}
       >
         Help viewing PDF files
-      </OutboundLink>
+      </a>
     </li>
     <li>
-      <OutboundLink
-        eventLabel="Download Acrobat reader for free"
-        onClick={null}
+      <a
+        href="http://www.adobe.com/products/acrobat/readstep2.html"
+        onClick={[Function]}
+        rel="noopener noreferrer"
         target="_blank"
-        to="http://www.adobe.com/products/acrobat/readstep2.html"
-        trackerNames={null}
       >
         Download Acrobat reader for free
-      </OutboundLink>
+      </a>
     </li>
     <li>
-      <OutboundLink
-        eventLabel="Adobe text conversion tools"
-        onClick={null}
+      <a
+        href="http://www.adobe.com/products/acrobat/access_onlinetools.html"
+        onClick={[Function]}
+        rel="noopener noreferrer"
         target="_blank"
-        to="http://www.adobe.com/products/acrobat/access_onlinetools.html"
-        trackerNames={null}
       >
         Adobe text conversion tools
-      </OutboundLink>
+      </a>
     </li>
   </ul>
-</styled.section>
+</section>
 `;

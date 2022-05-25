@@ -1,10 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CookieForm should render 🍪 1`] = `
-<styled.section>
-  <styled.h3>
+<section
+  className="sc-bczRLJ iahJwb"
+>
+  <h3
+    className="sc-dkzDqf kQvSSC"
+  >
     Toggle cookie permissions
-  </styled.h3>
+  </h3>
   <form
     onSubmit={[Function]}
   >
@@ -38,7 +42,8 @@ exports[`CookieForm should render 🍪 1`] = `
         Off
       </label>
     </p>
-    <styled.div
+    <div
+      className="sc-gsnTZi jZbapK"
       dangerouslySetInnerHTML={
         Object {
           "__html": Object {
@@ -53,14 +58,18 @@ exports[`CookieForm should render 🍪 1`] = `
       </button>
     </p>
   </form>
-</styled.section>
+</section>
 `;
 
 exports[`CookieForm should render 🚫 1`] = `
-<styled.section>
-  <styled.h3>
+<section
+  className="sc-bczRLJ iahJwb"
+>
+  <h3
+    className="sc-dkzDqf kQvSSC"
+  >
     Toggle cookie permissions
-  </styled.h3>
+  </h3>
   <form
     onSubmit={[Function]}
   >
@@ -94,7 +103,8 @@ exports[`CookieForm should render 🚫 1`] = `
         Off
       </label>
     </p>
-    <styled.div
+    <div
+      className="sc-gsnTZi jZbapK"
       dangerouslySetInnerHTML={
         Object {
           "__html": Object {
@@ -109,5 +119,5 @@ exports[`CookieForm should render 🚫 1`] = `
       </button>
     </p>
   </form>
-</styled.section>
+</section>
 `;

@@ -1,4 +1,4 @@
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import React from 'react';
 import Search from './index';
 
@@ -9,14 +9,16 @@ const searchMock = 'drug';
 
 describe(Search, () => {
   it('should render', () => {
-    const component = shallow(
-      <Search
-        onSearchBlur={onSearchBlurMock}
-        onSearchChange={onSearchChangeMock}
-        onSearchSubmit={onSearchSubmitMock}
-        search={searchMock}
-      />,
-    );
+    const component = renderer
+      .create(
+        <Search
+          onSearchBlur={onSearchBlurMock}
+          onSearchChange={onSearchChangeMock}
+          onSearchSubmit={onSearchSubmitMock}
+          search={searchMock}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });

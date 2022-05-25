@@ -9,7 +9,6 @@ RUN yarn
 
 COPY next.config.js .
 COPY tsconfig.json .
-COPY .babelrc .
 
 # Installing dependencies
 COPY ./src ./src

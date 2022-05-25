@@ -1,10 +1,10 @@
 module.exports = {
-  coveragePathIgnorePatterns: ['/node_modules/', 'enzyme.ts'],
+  coveragePathIgnorePatterns: ['/node_modules/'],
   coverageReporters: ['json', 'lcov', 'text', 'text-summary'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'md'],
   globals: {
     'ts-jest': {
-      tsConfig: '<rootDir>/jest.tsconfig.json',
+      tsconfig: '<rootDir>/jest.tsconfig.json',
     },
   },
   moduleNameMapper: {
@@ -12,8 +12,7 @@ module.exports = {
       '<rootDir>/config/assets-transformer.ts',
     '\\.(css|less|scss)$': '<rootDir>/config/assets-transformer.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/config/enzyme.ts', '<rootDir>/config/env.ts'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
+  setupFilesAfterEnv: ['<rootDir>/config/env.ts'],
   testMatch: ['**/*.(test|spec).(ts|tsx)'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',

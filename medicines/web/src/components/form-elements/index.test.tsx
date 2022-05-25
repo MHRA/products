@@ -1,10 +1,12 @@
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import React from 'react';
 import { Button, Checkbox } from './index';
 
 describe('Button', () => {
   it('should render', () => {
-    const component = shallow(<Button type="submit" value="val" />);
+    const component = renderer
+      .create(<Button type="submit" value="val" />)
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });
@@ -14,14 +16,16 @@ describe('Checkbox', () => {
     const changeHandler = () => {
       return null;
     };
-    const component = shallow(
-      <Checkbox
-        value="val"
-        name="agree"
-        id="agree-checkbox"
-        onChange={changeHandler}
-      />,
-    );
+    const component = renderer
+      .create(
+        <Checkbox
+          value="val"
+          name="agree"
+          id="agree-checkbox"
+          onChange={changeHandler}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });

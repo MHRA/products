@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import renderer from 'react-test-renderer';
 import React from 'react';
 import { RerouteType } from '../../model/rerouteType';
 import { DocType, TerritoryType } from '../../services/azure-search';
@@ -9,14 +9,16 @@ describe(SearchFilter, () => {
     const updatePageFiltersFunction = (d: DocType[], t: TerritoryType[]) => {
       return null;
     };
-    const component = mount(
-      <SearchFilter
-        currentlyEnabledDocTypes={[]}
-        currentlyEnabledTerritoryTypes={[]}
-        updatePageFilters={updatePageFiltersFunction}
-        rerouteType={RerouteType.CheckboxSelected}
-      />,
-    );
+    const component = renderer
+      .create(
+        <SearchFilter
+          currentlyEnabledDocTypes={[]}
+          currentlyEnabledTerritoryTypes={[]}
+          updatePageFilters={updatePageFiltersFunction}
+          rerouteType={RerouteType.CheckboxSelected}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });

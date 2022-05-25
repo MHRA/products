@@ -1,7 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CookieBanner should render 🍪 1`] = `
-<Fragment>
-   
-</Fragment>
-`;
+exports[`CookieBanner should render 🍪 1`] = `" "`;
