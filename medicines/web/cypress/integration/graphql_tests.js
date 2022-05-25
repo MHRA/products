@@ -35,7 +35,7 @@ const mockParacetamolResultsForGraphQl = () =>
 const longerTimeout = 20000;
 
 describe('Search using GraphQl', function () {
-  it.only('can search for Paracetamol', function () {
+  it('can search for Paracetamol', function () {
     mockParacetamolResultsForGraphQl();
     cy.visit('/search?search=paracetamol&page=1');
     cy.contains('I have read and understand the disclaimer', {
@@ -49,18 +49,18 @@ describe('Search using GraphQl', function () {
 describe('A-Z Index', function () {
   it('can navigate to Paracetamol Tablets with GraphQL feature on', function () {
     // Mock out GraphQL response.
-    cy.intercept('POST', graphQlUrl, 'fixture:graphql-substances-index.json');
+    cy.intercept('POST', graphQlUrl, { fixture: 'graphql-substances-index' });
 
     cy.visit('/');
     cy.get('nav').contains('P').click();
     cy.contains('PARACETAMOL');
 
-    cy.intercept('POST', graphQlUrl, 'fixture:graphql-products-index.json');
+    cy.intercept('POST', graphQlUrl, { fixture: 'graphql-products-index' });
 
     cy.contains('PARACETAMOL').click();
     cy.contains('PARACETAMOL 500MG CAPSULES');
 
-    cy.intercept('POST', graphQlUrl, 'fixture:graphql-product-results.json');
+    cy.intercept('POST', graphQlUrl, { fixture: 'graphql-product-results' });
 
     cy.contains('PARACETAMOL 500MG CAPSULES').click();
     cy.contains('I have read and understand the disclaimer', {
@@ -72,7 +72,7 @@ describe('A-Z Index', function () {
 });
 
 const mockParacetamolResultsForMedicineLevelsInPregnancyGraphQl = () =>
-  cy.intercept('POST', graphQlUrl, 'fixture:graphql-search-results-bmgf.json');
+  cy.intercept('POST', graphQlUrl, { fixture: 'graphql-search-results-bmgf' });
 
 describe('Search medicine levels in pregnancy docs using GraphQl', function () {
   it('can search for Paracetamol', function () {
@@ -87,21 +87,17 @@ describe('Search medicine levels in pregnancy docs using GraphQl', function () {
 describe('A-Z Index for medicine levels in pregnancy', function () {
   it('can navigate to Paracetamol Tablets with GraphQL feature on', function () {
     // Mock out GraphQL response.
-    cy.intercept(
-      'POST',
-      graphQlUrl,
-      'fixture:graphql-substances-index-bmgf.json',
-    );
+    cy.intercept('POST', graphQlUrl, {
+      fixture: 'graphql-substances-index-bmgf',
+    });
 
     cy.visit('/medicine-levels-in-pregnancy');
     cy.get('nav').contains('P').click();
     cy.contains('PARACETAMOL');
 
-    cy.intercept(
-      'POST',
-      graphQlUrl,
-      'fixture:graphql-substance-results-bmgf.json',
-    );
+    cy.intercept('POST', graphQlUrl, {
+      fixture: 'graphql-substance-results-bmgf',
+    });
 
     cy.contains('PARACETAMOL').click();
 
