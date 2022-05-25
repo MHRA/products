@@ -4,7 +4,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'md'],
   globals: {
     'ts-jest': {
-      babelConfig: '<rootDir>/.babelrc',
       tsConfig: '<rootDir>/jest.tsconfig.json',
     },
   },

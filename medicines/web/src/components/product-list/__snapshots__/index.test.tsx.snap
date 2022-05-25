@@ -10,7 +10,7 @@ exports[`ProductList should render 1`] = `
       className="product-name"
       key="Caffe Latte"
     >
-      <Link
+      <ForwardRef
         href="/product?product=Caffe%20Latte"
       >
         <a>
@@ -18,13 +18,13 @@ exports[`ProductList should render 1`] = `
            
           0
         </a>
-      </Link>
+      </ForwardRef>
     </li>
     <li
       className="product-name"
       key="Americano"
     >
-      <Link
+      <ForwardRef
         href="/product?product=Americano"
       >
         <a>
@@ -36,13 +36,13 @@ exports[`ProductList should render 1`] = `
           file
           )
         </a>
-      </Link>
+      </ForwardRef>
     </li>
     <li
       className="product-name"
       key="Flat White"
     >
-      <Link
+      <ForwardRef
         href="/product?product=Flat%20White"
       >
         <a>
@@ -54,13 +54,13 @@ exports[`ProductList should render 1`] = `
           files
           )
         </a>
-      </Link>
+      </ForwardRef>
     </li>
     <li
       className="product-name"
       key="Mocha"
     >
-      <Link
+      <ForwardRef
         href="/product?product=Mocha"
       >
         <a>
@@ -72,13 +72,13 @@ exports[`ProductList should render 1`] = `
           files
           )
         </a>
-      </Link>
+      </ForwardRef>
     </li>
     <li
       className="product-name"
       key="Cafe Creme"
     >
-      <Link
+      <ForwardRef
         href="/product?product=Cafe%20Creme"
       >
         <a>
@@ -90,7 +90,7 @@ exports[`ProductList should render 1`] = `
           files
           )
         </a>
-      </Link>
+      </ForwardRef>
     </li>
   </ul>
 </styled.nav>

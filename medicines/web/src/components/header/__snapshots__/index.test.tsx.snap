@@ -6,13 +6,13 @@ exports[`header should render 1`] = `
     className="wrapper"
   >
     <styled.div>
-      <Link
+      <ForwardRef
         href="/"
       >
         <a>
           <SvgMhraLogo />
         </a>
-      </Link>
+      </ForwardRef>
     </styled.div>
     <h1>
       MHRA

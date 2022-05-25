@@ -12,13 +12,13 @@ exports[`Footer should render 1`] = `
       <ul>
         <li>
           <p>
-            <Link
+            <ForwardRef
               href="/cookies"
             >
               <a>
                 Cookie Policy
               </a>
-            </Link>
+            </ForwardRef>
           </p>
         </li>
         <li>
@@ -32,24 +32,24 @@ exports[`Footer should render 1`] = `
         </li>
         <li>
           <p>
-            <Link
+            <ForwardRef
               href="/accessibility"
             >
               <a>
                 Accessibility Statement
               </a>
-            </Link>
+            </ForwardRef>
           </p>
         </li>
         <li>
           <p>
-            <Link
+            <ForwardRef
               href="/about"
             >
               <a>
                 About this service
               </a>
-            </Link>
+            </ForwardRef>
           </p>
         </li>
       </ul>
