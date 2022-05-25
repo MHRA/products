@@ -1,31 +1,4 @@
-// We need to replace window.fetch with an XHR-based implementation so that Cypress
-// can mock out the endpoints we use.
-// See https://docs.cypress.io/guides/guides/network-requests.html#Testing-Strategies
-// and https://github.com/cypress-io/cypress/issues/95.
-
-// Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
-
-// UPDATE 27/07/20: we will no longer need to polyfill once full cypress mocking for fetch implemented when this PR is merged and released: https://github.com/cypress-io/cypress/pull/4176",
-// Once this has been completed, it should be possible to upgrade next from 9.2 -> 9.4 - currently interaction causes fetch polyfill to break
-
-let polyfill;
-
-// grab fetch polyfill from remote URL, could be also from a local package
-before(() => {
-  const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js';
-
-  cy.request(polyfillUrl).then((response) => {
-    polyfill = response.body;
-  });
-});
-
 Cypress.on('window:before:load', (win) => {
-  delete win.fetch;
-  // since the application code does not ship with a polyfill
-  // load a polyfilled "fetch" from the test
-  win.eval(polyfill);
-  win.fetch = win.unfetch;
-
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
 });
@@ -36,55 +9,54 @@ const baseUrl = `https://${Cypress.env(
 const apiKey = `api-key=${Cypress.env(
   'AZURE_SEARCH_KEY',
 )}&api-version=2017-11-11`;
-const genericSearchParams = 'highlight=content&queryType=full&$count=true';
+const genericSearchParams = 'highlight=content&queryType=full&%24count=true';
 
 const mockParacetamolResults = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture: 'search_results'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=%28paracetamol%7E1+%7C%7C+paracetamol%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results' },
   );
 
 const mockParacetamolResultsPage2 = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture: 'search_results'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=%28paracetamol%7E1+%7C%7C+paracetamol%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results' },
   );
 
 const mockIbuprofenResults = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture: 'search_results'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=%28ibuprofen%7E1+%7C%7C+ibuprofen%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results' },
   );
 
 const mockIbuprofenResultsPage2 = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture: 'search_results.page2'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=%28ibuprofen%7E1+%7C%7C+ibuprofen%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results.page2' },
   );
 
 const mockIbuprofenSpcResults = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
-    {fixture: 'search_results.spc'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=%28ibuprofen%7E1+%7C%7C+ibuprofen%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24filter=%28doc_type+eq+%27Spc%27%29`,
+    { fixture: 'search_results.spc' },
   );
 
 const mockIbuprofenSpcResultsPage2 = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc')`,
-    {fixture: 'search_results.spc.page2'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=%28ibuprofen%7E1+%7C%7C+ibuprofen%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24filter=%28doc_type+eq+%27Spc%27%29`,
+    { fixture: 'search_results.spc.page2' },
   );
 
 const mockIbuprofenSpcPilResults = () =>
   cy.intercept(
-    `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(ibuprofen~1+||+ibuprofen^4)&scoringProfile=preferKeywords&searchMode=all&$filter=(doc_type+eq+'Spc'+or+doc_type+eq+'Pil')`,
-    {fixture: 'search_results.spcpil'},
+    `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=%28ibuprofen%7E1+%7C%7C+ibuprofen%5E4%29&scoringProfile=preferKeywords&searchMode=all&%24filter=%28doc_type+eq+%27Spc%27+or+doc_type+eq+%27Pil%27%29`,
+    { fixture: 'search_results.spcpil' },
   );
 
 const longerTimeout = 20000;
 
 describe('Search', function () {
   it('can search for Paracetamol', function () {
-    
     mockParacetamolResults();
     mockParacetamolResultsPage2();
     cy.visit('/');
@@ -99,7 +71,6 @@ describe('Search', function () {
   });
 
   it('can filter for SPCs', function () {
-    
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
     cy.visit('/');
@@ -115,7 +86,6 @@ describe('Search', function () {
   });
 
   it('can filter for SPCs and PILs together', function () {
-    
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
     mockIbuprofenSpcPilResults();
@@ -134,7 +104,6 @@ describe('Search', function () {
   });
 
   it('can filter SPCs then go to next page to see 2nd page filtered documents', function () {
-    
     mockIbuprofenResults();
     mockIbuprofenSpcResults();
     mockIbuprofenSpcResultsPage2();
@@ -156,7 +125,6 @@ describe('Search', function () {
   });
 
   it('can go to next page then filter SPCs to see 1st page filtered documents', function () {
-    
     mockIbuprofenResults();
     mockIbuprofenResults();
     mockIbuprofenResultsPage2();
@@ -179,22 +147,21 @@ describe('Search', function () {
 
 describe('A-Z Index', function () {
   it('can navigate to Paracetamol via A-Z index', function () {
-    
     // Mock out list of substances.
     cy.intercept(
-      `${baseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
-      {fixture: 'facets'},
+      `${baseUrl}?${apiKey}&facet=facets%2Ccount%3A50000%2Csort%3Avalue&%24filter=facets%2Fany%28f%3A+f+eq+%27P%27%29&%24top=0&searchMode=all`,
+      { fixture: 'facets' },
     );
 
     // Mock out first page of search results.
     cy.intercept(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
-      {fixture:'search_results'},
+      `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=&scoringProfile=preferKeywords&searchMode=all&%24filter=product_name+eq+%27PARACETAMOL+TABLETS%27`,
+      { fixture: 'search_results' },
     );
     // Mock out second page of search results.
     cy.intercept(
-      `${baseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=product_name+eq+'PARACETAMOL+TABLETS'`,
-      {fixture:'search_results'},
+      `${baseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=&scoringProfile=preferKeywords&searchMode=all&%24filter=product_name+eq+%27PARACETAMOL+TABLETS%27`,
+      { fixture: 'search_results' },
     );
 
     cy.visit('/');
@@ -258,19 +225,18 @@ const bmgfBaseUrl = `https://${Cypress.env(
 )}.search.windows.net/indexes/${Cypress.env('BMGF_AZURE_SEARCH_INDEX')}/docs`;
 const mockBmgfParacetamolResults = () =>
   cy.intercept(
-    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture:'search_results_bmgf'},
+    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=%28paracetamol%7E1+%7C%7C+paracetamol%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results_bmgf' },
   );
 
 const mockBmgfParacetamolResultsPage2 = () =>
   cy.intercept(
-    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=(paracetamol~1+||+paracetamol^4)&scoringProfile=preferKeywords&searchMode=all`,
-    {fixture: 'search_results_bmgf.page2'},
+    `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=%28paracetamol%7E1+%7C%7C+paracetamol%5E4%29&scoringProfile=preferKeywords&searchMode=all`,
+    { fixture: 'search_results_bmgf.page2' },
   );
 
 describe('Search for medicine levels in pregnancy', function () {
   it('can search for Paracetamol', function () {
-    
     mockBmgfParacetamolResults();
     mockBmgfParacetamolResultsPage2();
     cy.visit('/medicine-levels-in-pregnancy');
@@ -284,23 +250,22 @@ describe('Search for medicine levels in pregnancy', function () {
 
 describe('A-Z Index for medicine levels in pregnancy', function () {
   it('can navigate to Paracetamol via A-Z index', function () {
-    
     // Mock out list of substances.
     cy.intercept(
-      `${bmgfBaseUrl}?${apiKey}&facet=facets,count:50000,sort:value&$filter=facets/any(f:+f+eq+'P')&$top=0&searchMode=all`,
-      {fixture:'facets'},
+      `${bmgfBaseUrl}?${apiKey}&facet=facets%2Ccount%3A50000%2Csort%3Avalue&%24filter=facets%2Fany%28f%3A+f+eq+%27P%27%29&%24top=0&searchMode=all`,
+      { fixture: 'facets' },
     );
 
     // Mock out first page of search results.
     cy.intercept(
-      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=0&search=&scoringProfile=preferKeywords&searchMode=all&$filter=active_substances/any(substance:+substance+eq+'PARACETAMOL')`,
-      {fixture:'search_results_bmgf'},
+      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=0&search=&scoringProfile=preferKeywords&searchMode=all&%24filter=active_substances%2Fany%28substance%3A+substance+eq+%27PARACETAMOL%27%29`,
+      { fixture: 'search_results_bmgf' },
     );
 
     // Mock out second page of search results.
     cy.intercept(
-      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&$top=10&$skip=10&search=&scoringProfile=preferKeywords&searchMode=all&$filter=active_substances/any(substance:+substance+eq+'PARACETAMOL')`,
-      {fixture:'search_results_bmgf.page2'},
+      `${bmgfBaseUrl}?${apiKey}&${genericSearchParams}&%24top=10&%24skip=10&search=&scoringProfile=preferKeywords&searchMode=all&%24filter=active_substances%2Fany%28substance%3A+substance+eq+%27PARACETAMOL%27%29`,
+      { fixture: 'search_results_bmgf.page2' },
     );
 
     cy.visit('/medicine-levels-in-pregnancy');

@@ -1,28 +1,4 @@
-// We need to replace window.fetch with an XHR-based implementation so that Cypress
-// can mock out the endpoints we use.
-// See https://docs.cypress.io/guides/guides/network-requests.html#Testing-Strategies
-// and https://github.com/cypress-io/cypress/issues/95.
-
-// Some code to do this is adapted from https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/stubbing-spying__window-fetch/cypress/integration/polyfill-fetch-from-tests-spec.js
-
-// let polyfill;
-
-// // grab fetch polyfill from remote URL, could be also from a local package
-// before(() => {
-//   const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js';
-
-//   cy.request(polyfillUrl).then((response) => {
-//     polyfill = response.body;
-//   });
-// });
-
 Cypress.on('window:before:load', (win) => {
-  // delete win.fetch;
-  // since the application code does not ship with a polyfill
-  // load a polyfilled "fetch" from the test
-  // win.eval(polyfill);
-  // win.fetch = win.unfetch;
-
   // Clear out session storage so that the disclaimer is always presented.
   win.sessionStorage.clear();
 });
