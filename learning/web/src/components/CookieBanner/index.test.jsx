@@ -1,10 +1,14 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from "react"
 import CookieBanner from "./index"
-import { shallow } from "enzyme"
+import renderer from 'react-test-renderer';
 
 describe(CookieBanner, () => {
   it("should render 🍪", () => {
-    const component = shallow(<CookieBanner />)
+    const component = renderer.create(<CookieBanner />).toJSON()
     expect(component).toMatchSnapshot()
   })
 })

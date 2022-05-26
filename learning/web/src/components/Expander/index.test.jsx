@@ -1,10 +1,11 @@
 import React from "react"
 import Expander from "./index"
-import { shallow } from "enzyme"
+import renderer from "react-test-renderer"
 
 describe(Expander, () => {
   it("should render", () => {
-    const component = shallow(<Expander title={"Hola"} children={<></>} />)
+    const component = renderer.create(<Expander title={"Hola"} children={<></>} />)
+      .toJSON()
     expect(component).toMatchSnapshot()
   })
 })

@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Link should render 1`] = `
+<a
+  className="sc-gsnTZi sc-dkzDqf eaSYuL idTTze"
+  href="infinity"
+  rel="noopener noreferrer"
+  target="_blank"
+>
+   
+  <span>
+    <svg
+      fill="none"
+      height="1em"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      style={
+        Object {
+          "color": undefined,
+        }
+      }
+      viewBox="0 0 24 24"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+      />
+      <polyline
+        points="15 3 21 3 21 9"
+      />
+      <line
+        x1="10"
+        x2="21"
+        y1="14"
+        y2="3"
+      />
+    </svg>
+  </span>
+</a>
+`;
