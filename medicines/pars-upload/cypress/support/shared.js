@@ -1,56 +1,25 @@
 /* eslint-env node, mocha */
 
-/* global Cypress, cy */
-
 export const setUp = () => {
-  let polyfill
-
-  // grab fetch polyfill from remote URL, could be also from a local package
-  before(() => {
-    const polyfillUrl = 'https://unpkg.com/unfetch/dist/unfetch.umd.js'
-    cy.request(polyfillUrl).then((response) => {
-      polyfill = response.body
-    })
-  })
-
   Cypress.on('window:before:load', (win) => {
-    delete win.fetch
-    // since the application code does not ship with a polyfill
-    // load a polyfilled "fetch" from the test
-    win.eval(polyfill)
-    win.fetch = win.unfetch
-
     // Clear out session storage so that the disclaimer is always presented.
     win.sessionStorage.clear()
   })
 }
 
-export const mockSuccessfulSubmission = (baseUrl, url) => {
-  cy.route({
-    method: 'OPTIONS',
-    url: url,
-    status: 200,
-    headers: {
-      'access-control-allow-headers': 'authorization, username',
-      'access-control-allow-methods': 'POST',
-      'access-control-allow-origin': baseUrl,
-      'content-length': '0',
-      date: 'Mon, 18 May 2020 16:13:06 GMT',
-    },
-    response: {},
-  })
-  cy.route({
-    method: 'POST',
-    url: url,
-    status: 200,
-    response: 'fixture:mock_submission_success.json',
+export const mockSuccessfulSubmission = (url) => {
+  cy.intercept('POST', url, {
+    statusCode: 200,
+    fixture: 'mock_submission_success',
   })
 }
 
 export const completeFindParToUpdateStep = (parUrl) => {
-  cy.findAllByText('Search for an existing Public Assessment Report')
-    .not('title')
-    .should('exist')
+  cy.get('body')
+    .find('h1')
+    .should((h1) => {
+      expect(h1).to.contain('Search for an existing Public Assessment Report')
+    })
   cy.findByLabelText('Please insert URL').type(parUrl)
   cy.findByText('Continue').click()
 }
@@ -125,7 +94,8 @@ export const addAndDeleteProducts = (uploadData, expectedTitle) => {
   cy.findByLabelText('Brand/Generic name').should('have.value', '')
 
   const licence_str = `${uploadData.licence.type} ${uploadData.licence.part_one}/${uploadData.licence.part_two}`
-  const product_title = `${uploadData.brand} ${uploadData.strength} ${uploadData.doseForm} - ${licence_str}`.toUpperCase()
+  const product_title =
+    `${uploadData.brand} ${uploadData.strength} ${uploadData.doseForm} - ${licence_str}`.toUpperCase()
 
   cy.findByText(product_title)
     .parent()

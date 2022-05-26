@@ -26,7 +26,7 @@ export const Field = ({
   )
 
   const helpEl = helpContents && (
-    <span className="govuk-hint">{helpContents}</span>
+    <div className="govuk-hint">{helpContents}</div>
   )
 
   return (

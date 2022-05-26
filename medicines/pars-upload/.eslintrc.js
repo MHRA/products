@@ -7,6 +7,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
+    'plugin:cypress/recommended',
     'plugin:prettier/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:react/recommended',

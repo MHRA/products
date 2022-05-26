@@ -1,4 +1,4 @@
-const authPopup = require('./authPopup')
+import { getCurrentHost } from './authPopup'
 
 describe.each([
   ['https://website/1/2/3/4/5', 'https://website'],
@@ -7,6 +7,6 @@ describe.each([
   ['https://website.com/1/2/3/4/5', 'https://website.com'],
 ])('', (input, expected) => {
   test(`getCurrentHost for ${input} returns ${expected}`, () => {
-    expect(authPopup.getCurrentHost(input)).toBe(expected)
+    expect(getCurrentHost(input)).toBe(expected)
   })
 })

@@ -11,12 +11,9 @@ import {
 
 /* eslint-env node, mocha */
 
-/* global Cypress, cy */
-
 setUp()
 
 const parsUrl = Cypress.env('PARS_UPLOAD_URL')
-const baseUrl = Cypress.config().baseUrl
 
 describe('Update PARs', () => {
   beforeEach(() => {
@@ -28,9 +25,11 @@ describe('Update PARs', () => {
 
     cy.findByText('Continue').click()
 
-    cy.findAllByText('Search for an existing Public Assessment Report')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Search for an existing Public Assessment Report')
+      })
   })
 
   it('can add and delete multiple substances', () => {
@@ -116,9 +115,11 @@ describe('Update PARs', () => {
     const expectedTitle = 'Upload a replacement PDF'
     completeUploadFile(fileName, expectedTitle)
 
-    cy.findAllByText('Check your answers before sending the report')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Check your answers before sending the report')
+      })
 
     cy.findByText('Brand/Generic name')
       .parent()
@@ -164,7 +165,8 @@ describe('Update PARs', () => {
       })
 
     const licence_str = `${uploadData.licence.type} ${uploadData.licence.part_one}/${uploadData.licence.part_two}`
-    const product_title = `${uploadData.brand} ${uploadData.strength} ${uploadData.doseForm} - ${licence_str}`.toUpperCase()
+    const product_title =
+      `${uploadData.brand} ${uploadData.strength} ${uploadData.doseForm} - ${licence_str}`.toUpperCase()
 
     cy.findByText(product_title)
       .parent()
@@ -172,9 +174,11 @@ describe('Update PARs', () => {
         cy.findByText('Change').click()
       })
 
-    cy.findAllByText('Updated Public Assessment Report')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Updated Public Assessment Report')
+      })
 
     cy.findByLabelText('Brand/Generic name').should(
       'have.value',
@@ -212,9 +216,11 @@ describe('Update PARs', () => {
     cy.findByText('Current file').should('exist')
 
     cy.findAllByText('Continue').first().click()
-    cy.findAllByText('Check your answers before sending the report')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Check your answers before sending the report')
+      })
   })
   it('can submit the form sucessfully', () => {
     let parToUpdateId = 'aso1901290udkldf901'
@@ -222,9 +228,7 @@ describe('Update PARs', () => {
     if (parsUrl) {
       cy.log('Mocking form submissions endpoint')
 
-      cy.server()
-
-      mockSuccessfulSubmission(baseUrl, `${parsUrl}/${parToUpdateId}`)
+      mockSuccessfulSubmission(`${parsUrl}/${parToUpdateId}`)
     }
 
     completeFindParToUpdateStep(`https://blob.net/docs/${parToUpdateId}`)
@@ -243,15 +247,19 @@ describe('Update PARs', () => {
     const expectedTitle = 'Upload a replacement PDF'
     completeUploadFile(fileName, expectedTitle)
 
-    cy.findAllByText('Check your answers before sending the report')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Check your answers before sending the report')
+      })
 
     cy.findByText('Accept and send').click()
 
-    cy.findAllByText('Submission complete')
-      .not('title')
-      .should('have.length', 1)
+    cy.get('body')
+      .find('h1')
+      .should((h1) => {
+        expect(h1).to.contain('Submission complete')
+      })
 
     cy.findByText('Submit another report').click()
 
