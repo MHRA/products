@@ -1,6 +1,6 @@
 import React from "react"
 import SEO from "./index"
-import { shallow } from "enzyme"
+import renderer from "react-test-renderer"
 import * as Gatsby from "gatsby"
 
 describe(SEO, () => {
@@ -16,9 +16,9 @@ describe(SEO, () => {
         },
       },
     }))
-    const component = shallow(
-      <SEO description={"Amazing"} lang={"en"} title={"😀"} />
-    )
+    const component = renderer
+      .create(<SEO description={"Amazing"} lang={"en"} title={"😀"} />)
+      .toJSON()
     expect(component).toMatchSnapshot()
   })
 })

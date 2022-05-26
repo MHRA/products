@@ -1,12 +1,10 @@
 import React from "react"
 import Cookies from "universal-cookie"
 
-
 import Layout from "../components/Layout"
-import SEO from "../components/SEO"
+import Seo from "../components/SEO"
 import styled from "styled-components"
 import { mhraWhite, primaryColor, mhra } from "../utils/colors"
-
 
 const StyledCookiePolicy = styled.section`
   form {
@@ -30,81 +28,114 @@ const StyledCookiePolicy = styled.section`
       cursor: pointer;
     }
   }
-`;
-
-
+`
 
 class CookiePolicy extends React.Component {
-
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
-      cookiesAllowed: true  // This will be updated once the page is loaded.
-    };
+      cookiesAllowed: true, // This will be updated once the page is loaded.
+    }
   }
-  
+
   componentDidMount() {
     this.setState({
-      cookiesAllowed: window.localStorage.getItem("showCookieBanner") === "false"
-    });
+      cookiesAllowed:
+        window.localStorage.getItem("showCookieBanner") === "false",
+    })
   }
 
   deleteAllStorage() {
-    window.localStorage.clear();
-    window.sessionStorage.clear();
-    const cookies = new Cookies();
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    const cookies = new Cookies()
     for (const cookieName of Object.keys(cookies.getAll())) {
-      cookies.remove(cookieName);
+      cookies.remove(cookieName)
     }
   }
 
   handleCookieFormSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (this.state.cookiesAllowed) {
       window.localStorage.setItem("showCookieBanner", "false")
     } else {
-      this.deleteAllStorage();
+      this.deleteAllStorage()
     }
 
     // Navigate to the home page. Seems to be the only way to stop analytics.
-    window.location.href = '/';
+    window.location.href = "/"
   }
 
   handleCookiesOn = () => {
     this.setState({
-      cookiesAllowed: true
-    });
+      cookiesAllowed: true,
+    })
   }
 
   handleCookiesOff = () => {
     this.setState({
-      cookiesAllowed: false
-    });
+      cookiesAllowed: false,
+    })
   }
-  
 
   render() {
     const title = `Learning Modules for Continuous Professional Development`
     return (
       <StyledCookiePolicy>
         <Layout title={title}>
-          <SEO title={title} />
+          <Seo title={title} />
           <h2>Cookie policy</h2>
-          <p>Cookies are files saved on your phone, tablet or computer when you visit a website.</p>
-          <p>We use cookies to store information about how you use the Learning Modules for Continuous Professional Development website, such as the pages you visit.</p>
-          <p>You can find out more about <a href="https://ico.org.uk/your-data-matters/online/cookies/">how to manage cookies</a> on the Information Commissioner’s Office (ICO) website.</p>
+          <p>
+            Cookies are files saved on your phone, tablet or computer when you
+            visit a website.
+          </p>
+          <p>
+            We use cookies to store information about how you use the Learning
+            Modules for Continuous Professional Development website, such as the
+            pages you visit.
+          </p>
+          <p>
+            You can find out more about{" "}
+            <a href="https://ico.org.uk/your-data-matters/online/cookies/">
+              how to manage cookies
+            </a>{" "}
+            on the Information Commissioner’s Office (ICO) website.
+          </p>
           <h3>Necessary cookies</h3>
-          <p>We use necessary cookies to make our website work. These enable core functionality such as security, network management and accessibility.</p>
+          <p>
+            We use necessary cookies to make our website work. These enable core
+            functionality such as security, network management and
+            accessibility.
+          </p>
 
           <h3>Google Analytics cookies</h3>
 
-          <p>We use Google Analytics, a third party service, to collect standard internet log information and details of visitor behaviour patterns. We do this to find out such things as the number of visitors to the various parts of the site, the search terms used and geographic region.</p>
+          <p>
+            We use Google Analytics, a third party service, to collect standard
+            internet log information and details of visitor behaviour patterns.
+            We do this to find out such things as the number of visitors to the
+            various parts of the site, the search terms used and geographic
+            region.
+          </p>
 
-          <p>This information is only processed in a way that does not identify anyone. We do not make, and do not allow Google to make, any attempt to find out the identities of those visiting our website. Please visit Google’s <a href="https://support.google.com/analytics/answer/6004245">overview of privacy and safeguarding data</a> to know more about their policies.</p>
-          
-          <p>You can turn these cookies on or off below, and then save your preferences. This site stores your acceptance of Google Analytics cookies in your browser’s local storage as 'allowStorage'.</p>
-      <form onSubmit={this.handleCookieFormSubmit}>
+          <p>
+            This information is only processed in a way that does not identify
+            anyone. We do not make, and do not allow Google to make, any attempt
+            to find out the identities of those visiting our website. Please
+            visit Google’s{" "}
+            <a href="https://support.google.com/analytics/answer/6004245">
+              overview of privacy and safeguarding data
+            </a>{" "}
+            to know more about their policies.
+          </p>
+
+          <p>
+            You can turn these cookies on or off below, and then save your
+            preferences. This site stores your acceptance of Google Analytics
+            cookies in your browser’s local storage as 'allowStorage'.
+          </p>
+          <form onSubmit={this.handleCookieFormSubmit}>
             <p>
               <label htmlFor="cookie-on">
                 <input
@@ -131,7 +162,9 @@ class CookiePolicy extends React.Component {
                 Off
               </label>
             </p>
-            <p><b>Google Analytics cookies we use are:</b></p>
+            <p>
+              <b>Google Analytics cookies we use are:</b>
+            </p>
             <table>
               <tbody>
                 <tr>
@@ -162,9 +195,8 @@ class CookiePolicy extends React.Component {
           </form>
         </Layout>
       </StyledCookiePolicy>
-    );
+    )
   }
 }
 
-export default CookiePolicy;
- 
+export default CookiePolicy

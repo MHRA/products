@@ -2,7 +2,7 @@ import React from "react"
 import { graphql } from "gatsby"
 
 import Layout from "../components/Layout"
-import SEO from "../components/SEO"
+import Seo from "../components/SEO"
 import { rhythm } from "../utils/typography"
 import styled from "styled-components"
 import { mhraBlue10, mhraBlue } from "../utils/colors"
@@ -43,7 +43,7 @@ class ModulesIndex extends React.Component {
 
     return (
       <Layout location={this.props.location} title={siteTitle}>
-        <SEO title="Learning modules" />
+        <Seo title="Learning modules" />
         <p>
           We’ve produced a series of learning modules for healthcare
           professionals responsible for prescribing, supplying or administering
