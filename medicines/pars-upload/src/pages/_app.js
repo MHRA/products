@@ -1,4 +1,4 @@
-import 'govuk-frontend/govuk/all.scss'
+import '../global-styles.scss'
 import { useState, useEffect } from 'react'
 import { SignInRequest } from '../auth/signInRequest'
 import { Header } from '../header'

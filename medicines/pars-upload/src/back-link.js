@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import React from 'react'
 
 export const BackLink = ({ href, onClick }) => {
   // The Link element below adds the href attribute

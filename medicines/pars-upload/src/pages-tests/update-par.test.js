@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { getIdOfParToUpdate, combineFormDatas } from '../pages/update-par'
 
 describe(getIdOfParToUpdate, () => {
