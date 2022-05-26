@@ -3,14 +3,14 @@ import { graphql } from "gatsby"
 
 import { MDXRenderer } from "gatsby-plugin-mdx"
 import Layout from "../components/Layout"
-import SEO from "../components/SEO"
+import Seo from "../components/SEO"
 import { components } from "../utils/mdx-components"
 import { rhythm } from "../utils/typography"
 import { MDXProvider } from "@mdx-js/react"
 
 import styled from "styled-components"
 
-const HR = styled.hr`
+const Hr = styled.hr`
   margin-top: ${rhythm(4)};
   margin-bottom: ${rhythm(2)};
 `
@@ -23,7 +23,7 @@ class ModuleTemplate extends React.Component {
   render() {
     const post = this.props.data.mdx
     const modules = this.props.data.allModulesJson.nodes
-    const currentModule = modules.filter(e => {
+    const currentModule = modules.filter((e) => {
       return this.props.location.pathname.includes(e.module)
     })[0]
 
@@ -33,7 +33,7 @@ class ModuleTemplate extends React.Component {
         title={currentModule.name}
         withSidebar
       >
-        <SEO
+        <Seo
           title={post.frontmatter.title}
           description={post.frontmatter.description || post.excerpt}
         />
@@ -45,7 +45,7 @@ class ModuleTemplate extends React.Component {
             <MDXRenderer>{post.body}</MDXRenderer>
           </MDXProvider>
 
-          <HR />
+          <Hr />
         </article>
       </Layout>
     )
