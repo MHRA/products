@@ -1,111 +1,114 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ProductList should render 1`] = `
-<styled.nav>
+<nav
+  className="sc-bczRLJ cVndyS"
+>
   <h2>
     Coffee
   </h2>
   <ul>
     <li
       className="product-name"
-      key="Caffe Latte"
     >
-      <Link
+      <a
         href="/product?product=Caffe%20Latte"
+        onClick={[Function]}
+        onMouseEnter={[Function]}
       >
-        <a>
-          Caffe Latte
-           
-          0
-        </a>
-      </Link>
+        Caffe Latte
+         
+        0
+      </a>
     </li>
     <li
       className="product-name"
-      key="Americano"
     >
-      <Link
+      <a
         href="/product?product=Americano"
+        onClick={[Function]}
+        onMouseEnter={[Function]}
       >
-        <a>
-          Americano
-           
-          (
-          1
-           
-          file
-          )
-        </a>
-      </Link>
+        Americano
+         
+        (
+        1
+         
+        file
+        )
+      </a>
     </li>
     <li
       className="product-name"
-      key="Flat White"
     >
-      <Link
+      <a
         href="/product?product=Flat%20White"
+        onClick={[Function]}
+        onMouseEnter={[Function]}
       >
-        <a>
-          Flat White
-           
-          (
-          -1
-           
-          files
-          )
-        </a>
-      </Link>
+        Flat White
+         
+        (
+        -1
+         
+        files
+        )
+      </a>
     </li>
     <li
       className="product-name"
-      key="Mocha"
     >
-      <Link
+      <a
         href="/product?product=Mocha"
+        onClick={[Function]}
+        onMouseEnter={[Function]}
       >
-        <a>
-          Mocha
-           
-          (
-          9999999
-           
-          files
-          )
-        </a>
-      </Link>
+        Mocha
+         
+        (
+        9999999
+         
+        files
+        )
+      </a>
     </li>
     <li
       className="product-name"
-      key="Cafe Creme"
     >
-      <Link
+      <a
         href="/product?product=Cafe%20Creme"
+        onClick={[Function]}
+        onMouseEnter={[Function]}
       >
-        <a>
-          Cafe Creme
-           
-          (
-          -9999999
-           
-          files
-          )
-        </a>
-      </Link>
+        Cafe Creme
+         
+        (
+        -9999999
+         
+        files
+        )
+      </a>
     </li>
   </ul>
-</styled.nav>
+</nav>
 `;
 
 exports[`ProductList should render error message 1`] = `
-<styled.nav>
-  <styled.p>
+<nav
+  className="sc-bczRLJ cVndyS"
+>
+  <p
+    className="sc-gsnTZi dPidEJ"
+  >
     Sorry - the site is experiencing technical issues right now. Please try again later.
-  </styled.p>
-</styled.nav>
+  </p>
+</nav>
 `;
 
 exports[`ProductList should render loading message 1`] = `
-<styled.nav>
+<nav
+  className="sc-bczRLJ cVndyS"
+>
   <h2>
     Coffee
   </h2>
@@ -114,5 +117,5 @@ exports[`ProductList should render loading message 1`] = `
       Loading results...
     </li>
   </ul>
-</styled.nav>
+</nav>
 `;

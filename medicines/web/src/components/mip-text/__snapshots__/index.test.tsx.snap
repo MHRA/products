@@ -1,15 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MipText should render 1`] = `
-<Fragment>
-  <styled.section
-    dangerouslySetInnerHTML={
-      Object {
-        "__html": Object {
-          "process": [Function],
-        },
-      }
+<section
+  className="sc-bczRLJ fqyYGh"
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": Object {
+        "process": [Function],
+      },
     }
-  />
-</Fragment>
+  }
+/>
 `;

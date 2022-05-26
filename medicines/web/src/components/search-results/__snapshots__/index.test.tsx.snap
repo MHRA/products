@@ -1,21 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SearchResults should render 1`] = `
-<Fragment>
-  <styled.div>
+Array [
+  <div
+    className="sc-kDDrLX dlyPHs"
+  >
     <div>
-      <styled.div>
+      <div
+        className="sc-evZas bmKfiM"
+      >
         <h2
           className="title"
         >
           Showing results for Tea
         </h2>
-        <styled.p
-          className="no-of-results"
+        <p
+          className="sc-breuTD cHDgef no-of-results"
         >
           1 to 2 of 200
-        </styled.p>
-      </styled.div>
+        </p>
+      </div>
       <p
         className="ema-message"
       >
@@ -44,23 +48,206 @@ exports[`SearchResults should render 1`] = `
       <div
         className="column filter"
       >
-        <SearchFilter
-          currentlyEnabledDocTypes={Array []}
-          currentlyEnabledTerritoryTypes={Array []}
-          rerouteType={0}
-          updatePageFilters={[Function]}
-        />
+        <section
+          className="sc-eCYdqJ jVvpYH"
+        >
+          <h3
+            className="sc-papXJ CpIQr"
+          >
+            Documents filter
+          </h3>
+          <fieldset
+            className="sc-gKXOVf hkSDMF"
+          >
+            <legend
+              className="sc-iBkjds iYbVzI"
+            >
+              Filter documents by
+            </legend>
+            <legend
+              className="sc-ftvSup cZSEFc"
+            >
+              Type of document
+            </legend>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-spc"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Spc"
+                />
+              </div>
+              <label
+                htmlFor="filter-spc"
+              >
+                Summary of Product Characteristics
+                 (
+                SPC
+                )
+              </label>
+            </div>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-pil"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Pil"
+                />
+              </div>
+              <label
+                htmlFor="filter-pil"
+              >
+                Patient Information Leaflet
+                 (
+                PIL
+                )
+              </label>
+            </div>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-par"
+                  name="doc"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="Par"
+                />
+              </div>
+              <label
+                htmlFor="filter-par"
+              >
+                Public Assessment Reports
+                 (
+                PAR
+                )
+              </label>
+            </div>
+            <legend
+              className="sc-ftvSup cZSEFc"
+            >
+              Applicable to territory
+            </legend>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-uk"
+                  name="ter"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="UK"
+                />
+              </div>
+              <label
+                htmlFor="filter-uk"
+              >
+                United Kingdom
+                 (
+                UK
+                )
+              </label>
+            </div>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-ni"
+                  name="ter"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="NI"
+                />
+              </div>
+              <label
+                htmlFor="filter-ni"
+              >
+                Northern Ireland
+                 (
+                NI
+                )
+              </label>
+            </div>
+            <div
+              className="checkbox-row"
+            >
+              <div
+                className="checkbox"
+              >
+                <input
+                  checked={false}
+                  className="sc-bczRLJ ldzjBD"
+                  id="filter-gb"
+                  name="ter"
+                  onChange={[Function]}
+                  type="checkbox"
+                  value="GB"
+                />
+              </div>
+              <label
+                htmlFor="filter-gb"
+              >
+                Great Britain
+                 (
+                GB
+                )
+              </label>
+            </div>
+            <div
+              className="sc-jSMfEi dLAtlZ"
+            >
+              <input
+                className="sc-gsnTZi jmRmnt"
+                onClick={[Function]}
+                type="submit"
+                value="Submit"
+              />
+            </div>
+          </fieldset>
+        </section>
       </div>
       <section
         className="column results"
       >
-        <styled.h3>
+        <h3
+          className="sc-iqcoie fwVrMN"
+        >
           Search results
-        </styled.h3>
+        </h3>
         <dl>
           <div
             className="search-result"
-            key="0"
           >
             <dt
               className="left"
@@ -115,7 +302,6 @@ exports[`SearchResults should render 1`] = `
           </div>
           <div
             className="search-result"
-            key="1"
           >
             <dt
               className="left"
@@ -171,31 +357,85 @@ exports[`SearchResults should render 1`] = `
         </dl>
       </section>
     </div>
-  </styled.div>
-  <Pagination
-    currentPage={1}
-    handlePageChange={[Function]}
-    pageSize={20}
-    resultCount={200}
-    searchTerm="Tea"
-  />
-</Fragment>
+  </div>,
+  <nav
+    className="sc-jqUVSM goXwte"
+  >
+    <nav
+      aria-label="Pagination Navigation"
+    >
+      <div
+        className="pagination"
+      >
+        <ul
+          className="pagination-number"
+        >
+          <li
+            aria-current="true"
+            aria-label="Current Page, Page 1"
+          >
+            1
+            <span>
+              –
+            </span>
+          </li>
+          <li
+            aria-label="Goto Page 2"
+            onClick={[Function]}
+          >
+            <span
+              className="link-text"
+            >
+              2
+            </span>
+          </li>
+          <li>
+            …
+          </li>
+          <li
+            aria-label="Goto Page 11"
+            onClick={[Function]}
+          >
+            <span
+              className="link-text"
+            >
+              11
+            </span>
+          </li>
+        </ul>
+        <button
+          aria-label="Goto next page, Page 2"
+          className="arrow"
+          onClick={[Function]}
+        >
+          Next
+        </button>
+      </div>
+    </nav>
+  </nav>,
+]
 `;
 
 exports[`SearchResults should render error message 1`] = `
-<styled.div>
-  <styled.p>
+<div
+  className="sc-kDDrLX dlyPHs"
+>
+  <p
+    className="sc-crXcEl esUImf"
+  >
     Sorry - the site is experiencing technical issues right now. Please try again later.
-  </styled.p>
-</styled.div>
+  </p>
+</div>
 `;
 
 exports[`SearchResults should render loading page 1`] = `
-<styled.div>
+<div
+  className="sc-kDDrLX dlyPHs"
+>
   <h2
     className="title"
   >
     Loading results for Tea...
   </h2>
-</styled.div>
+</div>
 `;

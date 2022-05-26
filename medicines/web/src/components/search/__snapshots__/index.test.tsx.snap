@@ -1,10 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Search should render 1`] = `
-<styled.section>
-  <styled.h3>
+<section
+  className="sc-dkzDqf jHgZzt"
+>
+  <h3
+    className="sc-hKMtZM czpOnd"
+  >
     Search by text
-  </styled.h3>
+  </h3>
   <form
     aria-label="Search for medicines"
     onSubmit={[MockFunction]}
@@ -25,11 +29,12 @@ exports[`Search should render 1`] = `
         type="search"
         value="drug"
       />
-      <styled.input
+      <input
+        className="sc-gsnTZi jmRmnt"
         type="submit"
         value="Search"
       />
     </div>
   </form>
-</styled.section>
+</section>
 `;

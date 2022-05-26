@@ -1,369 +1,192 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SearchFilter should render search filter 1`] = `
-<SearchFilter
-  currentlyEnabledDocTypes={Array []}
-  currentlyEnabledTerritoryTypes={Array []}
-  rerouteType={0}
-  updatePageFilters={[Function]}
+<section
+  className="sc-dkzDqf gFDbOp"
 >
-  <styled.section>
-    <section
-      className="sc-dlfnbm ledHbp"
+  <h3
+    className="sc-iBkjds jopVIF"
+  >
+    Documents filter
+  </h3>
+  <fieldset
+    className="sc-eCYdqJ kcQGTi"
+  >
+    <legend
+      className="sc-jSMfEi hgJpQT"
     >
-      <styled.h3>
-        <h3
-          className="sc-iBPRYJ jueRyf"
-        >
-          Documents filter
-        </h3>
-      </styled.h3>
-      <styled.fieldset>
-        <fieldset
-          className="sc-eCssSg lnCWGB"
-        >
-          <styled.legend>
-            <legend
-              className="sc-jSgupP ifTOsT"
-            >
-              Filter documents by
-            </legend>
-          </styled.legend>
-          <styled.legend>
-            <legend
-              className="sc-gKsewC kEXlwV"
-            >
-              Type of document
-            </legend>
-          </styled.legend>
-          <FilterCheckbox
-            checked={false}
-            label="Summary of Product Characteristics"
-            query="doc"
-            toggleFilter={[Function]}
-            value="Spc"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-spc"
-                  name="doc"
-                  onChange={[Function]}
-                  value="Spc"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-spc"
-                    name="doc"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="Spc"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-spc"
-                      name="doc"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="Spc"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-spc"
-              >
-                Summary of Product Characteristics
-                 (
-                SPC
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <FilterCheckbox
-            checked={false}
-            label="Patient Information Leaflet"
-            query="doc"
-            toggleFilter={[Function]}
-            value="Pil"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-pil"
-                  name="doc"
-                  onChange={[Function]}
-                  value="Pil"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-pil"
-                    name="doc"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="Pil"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-pil"
-                      name="doc"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="Pil"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-pil"
-              >
-                Patient Information Leaflet
-                 (
-                PIL
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <FilterCheckbox
-            checked={false}
-            label="Public Assessment Reports"
-            query="doc"
-            toggleFilter={[Function]}
-            value="Par"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-par"
-                  name="doc"
-                  onChange={[Function]}
-                  value="Par"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-par"
-                    name="doc"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="Par"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-par"
-                      name="doc"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="Par"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-par"
-              >
-                Public Assessment Reports
-                 (
-                PAR
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <styled.legend>
-            <legend
-              className="sc-gKsewC kEXlwV"
-            >
-              Applicable to territory
-            </legend>
-          </styled.legend>
-          <FilterCheckbox
-            checked={false}
-            label="United Kingdom"
-            query="ter"
-            toggleFilter={[Function]}
-            value="UK"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-uk"
-                  name="ter"
-                  onChange={[Function]}
-                  value="UK"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-uk"
-                    name="ter"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="UK"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-uk"
-                      name="ter"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="UK"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-uk"
-              >
-                United Kingdom
-                 (
-                UK
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <FilterCheckbox
-            checked={false}
-            label="Northern Ireland"
-            query="ter"
-            toggleFilter={[Function]}
-            value="NI"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-ni"
-                  name="ter"
-                  onChange={[Function]}
-                  value="NI"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-ni"
-                    name="ter"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="NI"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-ni"
-                      name="ter"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="NI"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-ni"
-              >
-                Northern Ireland
-                 (
-                NI
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <FilterCheckbox
-            checked={false}
-            label="Great Britain"
-            query="ter"
-            toggleFilter={[Function]}
-            value="GB"
-          >
-            <div
-              className="checkbox-row"
-            >
-              <div
-                className="checkbox"
-              >
-                <Checkbox
-                  checked={false}
-                  id="filter-gb"
-                  name="ter"
-                  onChange={[Function]}
-                  value="GB"
-                >
-                  <styled.input
-                    checked={false}
-                    id="filter-gb"
-                    name="ter"
-                    onChange={[Function]}
-                    type="checkbox"
-                    value="GB"
-                  >
-                    <input
-                      checked={false}
-                      className="sc-bdfBwQ bHPfdB"
-                      id="filter-gb"
-                      name="ter"
-                      onChange={[Function]}
-                      type="checkbox"
-                      value="GB"
-                    />
-                  </styled.input>
-                </Checkbox>
-              </div>
-              <label
-                htmlFor="filter-gb"
-              >
-                Great Britain
-                 (
-                GB
-                )
-              </label>
-            </div>
-          </FilterCheckbox>
-          <styled.div>
-            <div
-              className="sc-hKgILt emQRkz"
-            >
-              <styled.input
-                onClick={[Function]}
-                type="submit"
-                value="Submit"
-              >
-                <input
-                  className="sc-gsTCUz gAyQyd"
-                  onClick={[Function]}
-                  type="submit"
-                  value="Submit"
-                />
-              </styled.input>
-            </div>
-          </styled.div>
-        </fieldset>
-      </styled.fieldset>
-    </section>
-  </styled.section>
-</SearchFilter>
+      Filter documents by
+    </legend>
+    <legend
+      className="sc-gKXOVf gQrprt"
+    >
+      Type of document
+    </legend>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-spc"
+          name="doc"
+          onChange={[Function]}
+          type="checkbox"
+          value="Spc"
+        />
+      </div>
+      <label
+        htmlFor="filter-spc"
+      >
+        Summary of Product Characteristics
+         (
+        SPC
+        )
+      </label>
+    </div>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-pil"
+          name="doc"
+          onChange={[Function]}
+          type="checkbox"
+          value="Pil"
+        />
+      </div>
+      <label
+        htmlFor="filter-pil"
+      >
+        Patient Information Leaflet
+         (
+        PIL
+        )
+      </label>
+    </div>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-par"
+          name="doc"
+          onChange={[Function]}
+          type="checkbox"
+          value="Par"
+        />
+      </div>
+      <label
+        htmlFor="filter-par"
+      >
+        Public Assessment Reports
+         (
+        PAR
+        )
+      </label>
+    </div>
+    <legend
+      className="sc-gKXOVf gQrprt"
+    >
+      Applicable to territory
+    </legend>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-uk"
+          name="ter"
+          onChange={[Function]}
+          type="checkbox"
+          value="UK"
+        />
+      </div>
+      <label
+        htmlFor="filter-uk"
+      >
+        United Kingdom
+         (
+        UK
+        )
+      </label>
+    </div>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-ni"
+          name="ter"
+          onChange={[Function]}
+          type="checkbox"
+          value="NI"
+        />
+      </div>
+      <label
+        htmlFor="filter-ni"
+      >
+        Northern Ireland
+         (
+        NI
+        )
+      </label>
+    </div>
+    <div
+      className="checkbox-row"
+    >
+      <div
+        className="checkbox"
+      >
+        <input
+          checked={false}
+          className="sc-bczRLJ ldzjBD"
+          id="filter-gb"
+          name="ter"
+          onChange={[Function]}
+          type="checkbox"
+          value="GB"
+        />
+      </div>
+      <label
+        htmlFor="filter-gb"
+      >
+        Great Britain
+         (
+        GB
+        )
+      </label>
+    </div>
+    <div
+      className="sc-hKMtZM iefjqC"
+    >
+      <input
+        className="sc-gsnTZi jmRmnt"
+        onClick={[Function]}
+        type="submit"
+        value="Submit"
+      />
+    </div>
+  </fieldset>
+</section>
 `;

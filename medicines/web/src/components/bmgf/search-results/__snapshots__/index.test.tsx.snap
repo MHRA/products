@@ -1,32 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SearchResults should render 1`] = `
-<Fragment>
-  <styled.div>
+Array [
+  <div
+    className="sc-gsnTZi hmKVXy"
+  >
     <div>
-      <styled.div>
+      <div
+        className="sc-eCYdqJ gZAhPP"
+      >
         <h2
           className="title"
         >
           Showing results for Tea
         </h2>
-        <styled.p
-          className="no-of-results"
+        <p
+          className="sc-jSMfEi iCawsZ no-of-results"
         >
           1 to 2 of 200
-        </styled.p>
-      </styled.div>
+        </p>
+      </div>
       <p>
         If you’re looking for other information on medicines, you can search for information about medicines including patient information leaflets (PILs), details on how the medicine can be used (SPCs) and scientific reports (PARs).
       </p>
       <p>
-        <Link
+        <a
           href="/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
         >
-          <a>
-            Go to Products website to find information on medicines
-          </a>
-        </Link>
+          Go to Products website to find information on medicines
+        </a>
       </p>
     </div>
     <div
@@ -35,13 +39,14 @@ exports[`SearchResults should render 1`] = `
       <section
         className="column results"
       >
-        <styled.h3>
+        <h3
+          className="sc-dkzDqf eoxGfn"
+        >
           Search results
-        </styled.h3>
+        </h3>
         <dl>
           <div
             className="search-result"
-            key="0"
           >
             <dd
               className="right"
@@ -71,7 +76,6 @@ exports[`SearchResults should render 1`] = `
           </div>
           <div
             className="search-result"
-            key="1"
           >
             <dd
               className="right"
@@ -102,23 +106,73 @@ exports[`SearchResults should render 1`] = `
         </dl>
       </section>
     </div>
-  </styled.div>
-  <Pagination
-    currentPage={1}
-    handlePageChange={[Function]}
-    pageSize={20}
-    resultCount={200}
-    searchTerm="Tea"
-  />
-</Fragment>
+  </div>,
+  <nav
+    className="sc-bczRLJ wtnsX"
+  >
+    <nav
+      aria-label="Pagination Navigation"
+    >
+      <div
+        className="pagination"
+      >
+        <ul
+          className="pagination-number"
+        >
+          <li
+            aria-current="true"
+            aria-label="Current Page, Page 1"
+          >
+            1
+            <span>
+              –
+            </span>
+          </li>
+          <li
+            aria-label="Goto Page 2"
+            onClick={[Function]}
+          >
+            <span
+              className="link-text"
+            >
+              2
+            </span>
+          </li>
+          <li>
+            …
+          </li>
+          <li
+            aria-label="Goto Page 11"
+            onClick={[Function]}
+          >
+            <span
+              className="link-text"
+            >
+              11
+            </span>
+          </li>
+        </ul>
+        <button
+          aria-label="Goto next page, Page 2"
+          className="arrow"
+          onClick={[Function]}
+        >
+          Next
+        </button>
+      </div>
+    </nav>
+  </nav>,
+]
 `;
 
 exports[`SearchResults should render loading page 1`] = `
-<styled.div>
+<div
+  className="sc-gsnTZi hmKVXy"
+>
   <h2
     className="title"
   >
     Loading results for Tea...
   </h2>
-</styled.div>
+</div>
 `;

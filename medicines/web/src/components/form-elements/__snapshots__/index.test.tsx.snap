@@ -2,14 +2,15 @@
 
 exports[`Button should render 1`] = `
 <input
-  className="sc-gsTCUz gAyQyd"
+  className="sc-gsnTZi jmRmnt"
   type="submit"
   value="val"
 />
 `;
 
 exports[`Checkbox should render 1`] = `
-<styled.input
+<input
+  className="sc-bczRLJ ldzjBD"
   id="agree-checkbox"
   name="agree"
   onChange={[Function]}

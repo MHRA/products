@@ -1,4 +1,4 @@
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import React from 'react';
 import {
   DrugListStructuredData,
@@ -9,38 +9,44 @@ import {
 
 describe(SubstanceStructuredData, () => {
   it('should render', () => {
-    const component = shallow(
-      <SubstanceStructuredData substanceName={'My cool substance'} />,
-    );
+    const component = renderer
+      .create(<SubstanceStructuredData substanceName={'My cool substance'} />)
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });
 
 describe(SubstanceListStructuredData, () => {
   it('should render', () => {
-    const component = shallow(
-      <SubstanceListStructuredData
-        substanceNames={['First cool substance', 'Second cool substance']}
-      />,
-    );
+    const component = renderer
+      .create(
+        <SubstanceListStructuredData
+          substanceNames={['First cool substance', 'Second cool substance']}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });
 
 describe(DrugStructuredData, () => {
   it('should render', () => {
-    const component = shallow(<DrugStructuredData drugName={'My cool drug'} />);
+    const component = renderer
+      .create(<DrugStructuredData drugName={'My cool drug'} />)
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });
 
 describe(DrugListStructuredData, () => {
   it('should render', () => {
-    const component = shallow(
-      <DrugListStructuredData
-        drugNames={['First cool drug', 'Second cool drug']}
-      />,
-    );
+    const component = renderer
+      .create(
+        <DrugListStructuredData
+          drugNames={['First cool drug', 'Second cool drug']}
+        />,
+      )
+      .toJSON();
     expect(component).toMatchSnapshot();
   });
 });
