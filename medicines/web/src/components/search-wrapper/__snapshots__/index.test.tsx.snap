@@ -4,6 +4,20 @@ exports[`SearchWrapper should render 1`] = `
 <div
   className="sc-papXJ fXFsBZ"
 >
+  <div
+    className="sc-kDDrLX eBvGpy"
+  >
+         
+    <b>
+      *STATUS UPDATE*
+    </b>
+      We apologise for any inconvenience as we are currently experiencing technical difficulties with adding, updating or deleting all SPCs and PILs. When this message is no longer displayed the issue will have been resolved.
+  </div>
+  <div
+    className="sc-iqcoie efKhbN"
+  >
+    If Product Information documents are urgently required, please send a request to: MHRACustomerServices@mhra.gov.uk
+  </div>
   <section
     className="search"
   >
