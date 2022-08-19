@@ -32,6 +32,15 @@ const AccessibleSearchBoxHeading = styled.h2`
   height: 0;
   margin: 0;
 `;
+const Notice = styled.div`
+  width: 100%;
+  padding: 0.5rem 0rem 0rem 0rem;
+  `;
+
+  const Notice2 = styled.div`
+  width: 100%;
+  padding: 0.5rem 0rem 1.5rem 0rem;
+  `;
 
 interface ISearchWrapperProps {
   initialSearchValue: string | string[];
@@ -92,8 +101,15 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
     });
   };
 
-  return (
+  return (    
     <StyledSearchWrapper>
+      <Notice>     <b>*STATUS UPDATE*</b>  
+      &nbsp; We apologise for any inconvenience as we are currently experiencing technical difficulties with adding, updating or deleting all SPCs and PILs. When this message is no longer displayed the issue will have been resolved. 
+ </Notice>
+ <Notice2>
+ If Product Information documents are urgently required, please send a request to: MHRACustomerServices@mhra.gov.uk
+ </Notice2>
+ 
       <section className="search">
         <AccessibleSearchBoxHeading>Search box</AccessibleSearchBoxHeading>
         <Search
