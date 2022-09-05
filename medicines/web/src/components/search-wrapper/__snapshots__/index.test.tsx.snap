@@ -16,7 +16,7 @@ exports[`SearchWrapper should render 1`] = `
   <div
     className="sc-iqcoie efKhbN"
   >
-    If Product Information documents are urgently required, please send a request to: MHRACustomerServices@mhra.gov.uk
+    If Product Information documents are urgently required, please send a request to: info@mhra.gov.uk
   </div>
   <section
     className="search"
