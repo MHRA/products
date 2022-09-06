@@ -107,8 +107,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
       &nbsp; We apologise for any inconvenience as we are currently experiencing technical difficulties with adding, updating or deleting all SPCs and PILs. When this message is no longer displayed the issue will have been resolved. 
  </Notice>
  <Notice2>
- If Product Information documents are urgently required, please send a request to: info@mhra.gov.uk
-
+ If Product Information documents are urgently required, please send a request to: info@mhra.gov.uk 
  </Notice2>
  
       <section className="search">
