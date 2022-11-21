@@ -102,14 +102,7 @@ const SearchWrapper: React.FC<ISearchWrapperProps> = (props) => {
   };
 
   return (    
-    <StyledSearchWrapper>
-      <Notice>     <b>**STATUS UPDATE**</b>  
-      &nbsp; We apologise for any inconvenience as we are currently experiencing technical difficulties with adding, updating or deleting all SPCs and PILs. When this message is no longer displayed the issue will have been resolved. 
- </Notice>
- <Notice2>
- If Product Information documents are urgently required, please send a request to: info@mhra.gov.uk 
- </Notice2>
- 
+    <StyledSearchWrapper> 
       <section className="search">
         <AccessibleSearchBoxHeading>Search box</AccessibleSearchBoxHeading>
         <Search
