@@ -18,7 +18,7 @@ env:
   GOOGLE_USE_DEBUG: false
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines.api.mhra.gov.uk/graphql
-  USE_GRAPHQL: true
+  USE_GRAPHQL: false
   SHOW_BMGF: false
   BMGF_AZURE_SEARCH_INDEX: bmgf-index
   AZURE_STORAGE_ACCOUNT: mhraproducts4853
