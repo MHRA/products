@@ -97,12 +97,12 @@ jobs:
           name: medicines-pa11y-screenshots
           path: medicines/web/pa11y-screenshots
 
-
-      - name: Deploy products web to static site in azure storage
-        
-        uses: actions/setup-dotnet@v1
+      - name: Use dotnet 3.1
+      uses: actions/setup-dotnet@v1
         with:
           version: 3.1.201
+
+      - name: Deploy products web to static site in azure storage
         uses: lauchacarro/Azure-Storage-Action@92250565adefe3844ab7e135cb570ca354f0ac18
         with:
           enabled-static-website: true
