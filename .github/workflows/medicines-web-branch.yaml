@@ -103,5 +103,5 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az storage blob show -c "gtestremove" -n"testing.pdf" --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
+            az storage blob upload-batch -d "gtestremove" -s"medicines/web/dist" --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
 
