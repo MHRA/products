@@ -98,10 +98,5 @@ jobs:
           name: medicines-pa11y-screenshots
           path: medicines/web/pa11y-screenshots
 
-      - name: Deploy products web to static site in azure storage using azure cli 
-        uses: Azure/cli@v1.0.7
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az storage blob upload-batch -d "\$web" -s"medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
+      
 
