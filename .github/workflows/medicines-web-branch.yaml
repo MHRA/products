@@ -97,3 +97,11 @@ jobs:
         with:
           name: medicines-pa11y-screenshots
           path: medicines/web/pa11y-screenshots
+
+      - name: Test azure cli function
+              uses: Azure/cli
+              with:
+        azcliversion: latest
+        inlineScript: |
+          az storage blob show -c "gtestremove" -n"testing.pdf" --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
+
