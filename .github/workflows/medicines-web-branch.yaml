@@ -103,5 +103,5 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az storage blob copy start-batch --destination-container "web-copy" --source-container "\$web" --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
+            az storage blob upload-batch -d "$web" -s"medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
 
