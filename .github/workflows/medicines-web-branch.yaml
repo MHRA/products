@@ -99,7 +99,7 @@ jobs:
           path: medicines/web/pa11y-screenshots
 
       - name: Test azure cli function
-        uses: Azure/cli@latest
+        uses: Azure/cli@v1.0.7
         with:
           azcliversion: latest
           inlineScript: |
