@@ -113,4 +113,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az storage blob upload-batch -d "\$web" -s "medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PRODUCTS_WEB_CONNECTION_STRING }}"
+            az storage blob upload-batch -d "\$web" -s "medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}"
