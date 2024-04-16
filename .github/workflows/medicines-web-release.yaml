@@ -19,7 +19,7 @@ env:
   ROOT_URL_DOMAIN: .windows.net
   GRAPHQL_URL: https://medicines.api.mhra.gov.uk/graphql
   USE_GRAPHQL: false
-  SHOW_BMGF: false
+  SHOW_BMGF: true
   BMGF_AZURE_SEARCH_INDEX: bmgf-index
   AZURE_STORAGE_ACCOUNT: mhraproducts4853
   AZURE_STORAGE_KEY: ${{ secrets.PRODUCTS_STORAGE_MASTER_KEY_PROD }}
