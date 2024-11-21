@@ -39,7 +39,7 @@ serde_json = "1.0"
 sha1 = "0.6.0" 
 thiserror = "1.0.21" 
 time = "0.1.43" #Dependent on version used by Chrono 
-tokio = {version = "0.2.22", features = ["macros", "time"]} 
+tokio = {version = "1.18.5", features = ["macros", "time"]} 
 tracing = {version = "0.1", features = ["attributes"]} 
 tracing-futures = "0.2.4" 
 tracing-log = "0.1.1" 
