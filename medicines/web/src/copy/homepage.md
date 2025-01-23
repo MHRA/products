@@ -30,7 +30,7 @@ We also publish [Safety Public Assessment Reports][spar]
 
 [Further information about SPC, PILs and PARs][about]
 
-***Please note, that following implementation of the [Windsor framework][Windsor] on 1st January 2025, all existing Great Britain (GB) marketing authorisations (PLGBs) have been converted to [UK-wide][UK-W] marking authorisations but their MA numbers including the PLGB prefix, have not changed.***
+***Please note, that following implementation of the [Windsor framework][Windsor] on 1st January 2025, all existing Great Britain (GB) marketing authorisations (PLGBs) have been converted to [UK-wide][UK-W] marketing authorisations but their MA numbers, including the PLGB prefix, have not changed.***
 
 [spar]: https://www.gov.uk/guidance/safety-public-assessment-reports
 [about]: /about
