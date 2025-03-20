@@ -37,15 +37,16 @@ We also publish [Safety Public Assessment Reports][spar]
 
 [Further information about SPC, PILs and PARs][about]
 
-***Please note, that following implementation of the [Windsor framework][Windsor] on 1st January 2025, all existing Great Britain (GB) marketing authorisations (PLGBs) have been converted to [UK-wide][UK-W] marking authorisations but their MA numbers including the PLGB prefix, have not changed.***
+<span style="font-weight: 555; font-style: italic;">Please note that following implementation of the [Windsor Framework][Windsor] on 1st January 2025, all existing Great Britain (GB) marketing authorisations (PLGBs) have been converted to [UK-wide][UK-W] marketing authorisations but their MA numbers, including the PLGB prefix, have not changed.</span>
 
 [spar]: https://www.gov.uk/guidance/safety-public-assessment-reports
 [about]: /about
 [Windsor]:https://www.gov.uk/government/collections/mhra-windsor-framework
 [UK-W]:https://www.gov.uk/government/publications/uk-wide-licensing-for-human-medicines/uk-wide-licensing-for-human-medicines
 
-### Medicine levels in pregnancy reports
+<!-- ### Medicine levels in pregnancy reports
 
 We collected pregnancy pharmacokinetics data from literature and worked on a pregnancy mathematical modelling technique, known as physiologically based pharmacokinetics (PBPK) modelling, which may be used by healthcare professionals to predict medicine levels in pregnant women.
 
 [Search for reports on medicine levels on the Medicine Levels in Pregnancy website](/medicine-levels-in-pregnancy).
+ -->
