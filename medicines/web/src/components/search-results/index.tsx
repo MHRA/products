@@ -331,6 +331,12 @@ const SearchResults = (props: ISearchResultsProps) => {
             the information in the pack and the information here. The most
             up-to-date information will be available on this site.
           </p>
+          <p>
+            When referencing product information from this site, 
+            please note SmPC Section 10. ‘Date of revision of the text’ 
+            will reflect the date of processing within the MHRA system, 
+            which may be different to the actual date of implementation by the MAH.
+          </p>
         </div>
         {showDisclaimerWarning && hasDrugs && !disclaimerAgree ? (
           <Disclaimer
