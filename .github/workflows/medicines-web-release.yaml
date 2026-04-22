@@ -27,13 +27,13 @@ env:
 jobs:
   build:
     name: Build, test, create release and deploy to production
-    runs-on: ubuntu-latest
+    runs-on: gp-prod-runner-set
     steps:
       - name: Clone repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Setup node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
           node-version: "14.15"
 
@@ -69,14 +69,14 @@ jobs:
           ROOT_URL_DOMAIN: localhost
 
       - name: Upload cypress screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: medicines-cypress-screenshots
           path: medicines/web/cypress/screenshots
 
       - name: Upload cypress videos
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: medicines-cypress-videos
@@ -89,7 +89,7 @@ jobs:
           ROOT_URL_DOMAIN: localhost
 
       - name: Upload pa11y screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: medicines-pa11y-screenshots
@@ -97,7 +97,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -109,8 +109,5 @@ jobs:
           prerelease: false
 
       - name: Deploy products web to static site in azure storage using azure cli 
-        uses: Azure/cli@v1.0.7
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az storage blob upload-batch -d "\$web" -s "medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}"
+        run: |
+          az storage blob upload-batch -d "\$web" -s "medicines/web/dist" --overwrite true --connection-string "${{ secrets.AZURE_STORAGE_PROD_PRODUCTS_WEB_CONNECTION_STRING }}"
