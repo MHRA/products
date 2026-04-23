@@ -6,7 +6,7 @@
     "core-js": "^3.22.7",
     "dataloader": "^2.1.0",
     "dotenv": "^16.0.1",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "next": "12.1.6",
     "prop-types": "^15.8.1",
     "react": "^18.1.0",
