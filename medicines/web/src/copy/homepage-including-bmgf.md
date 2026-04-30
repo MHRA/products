@@ -39,10 +39,20 @@ We also publish [Safety Public Assessment Reports][spar]
 
 <span style="font-weight: 500; font-style: italic;">Please note that following implementation of the [Windsor Framework][Windsor] on 1st January 2025, all existing Great Britain (GB) marketing authorisations (PLGBs) have been converted to [UK-wide][UK-W] marketing authorisations but their MA numbers, including the PLGB prefix, have not changed.</span>
 
+#### Suggestions or feedback related to a report and its content
+
+We welcome feedback and suggestions which can be made by email to: parfeedback@mhra.gov.uk. While this is not a fully anonymised service, onward sharing of feedback will be done so anonymously, excepting instances where it is not possible to so.
+
+Your Personal data will only be used for the purpose of administering feedback. We envisage your personal data will be retained for two years. Your information will only be shared persons required to aid with design and implementation of this initiative: Further information about how MHRA manage your personal data and also information about your rights can be found in the following link.
+
+[Medicines and Healthcare products Regulatory Agency Privacy Notice - GOV.UK][privacy]
+
 [spar]: https://www.gov.uk/guidance/safety-public-assessment-reports
 [about]: /about
 [Windsor]:https://www.gov.uk/government/collections/mhra-windsor-framework
 [UK-W]:https://www.gov.uk/government/publications/uk-wide-licensing-for-human-medicines/uk-wide-licensing-for-human-medicines
+[privacy]: https://www.gov.uk/government/publications/mhra-privacy-notice
+
 
 <!-- ### Medicine levels in pregnancy reports
 
