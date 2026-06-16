@@ -23,3 +23,4 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: test-mhra-gov-uk-cert
+        minProtocolVersion: TLSV1_2

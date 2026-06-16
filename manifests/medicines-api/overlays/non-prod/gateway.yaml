@@ -13,4 +13,5 @@ spec:
         - medicines-api.non-prod.mhra.gov.uk
       tls:
         mode: SIMPLE
+        minProtocolVersion: TLSV1_2
         credentialName: cert-medicines-api
